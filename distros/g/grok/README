@@ -1,0 +1,48 @@
+NAME
+    App::Grok - Does most of grok's heavy lifting
+
+DESCRIPTION
+    This class provides the main functionality needed by grok. It has some
+    methods you can use if you need to hook into grok.
+
+METHODS
+  "new"
+    This is the constructor. It takes no arguments.
+
+  "run"
+    If you call this method, it will look at the command line arguments in
+    @ARGV and act accordingly. This is basically what the "grok" program
+    does. Takes no arguments.
+
+  "target_index"
+    Takes no arguments. Returns a list of all the targets known to "grok".
+
+  "detect_source"
+    Takes a filename as an argument. Returns the name of the appropriate
+    "App::Grok::*" class to parse it. Returns nothing if the file doesn't
+    contain any Pod.
+
+  "locate_target"
+    Takes a target name as an argument. Returns the path to the target, or
+    nothing if the target is not recognized.
+
+  "render_target"
+    Takes two arguments, a target and the name of an output format. Returns
+    a string containing the rendered documentation, or nothing if the target
+    is unrecognized.
+
+  "render_file"
+    Takes two arguments, a filename and the name of an output format.
+    Returns a string containing the rendered document. Note: this method is
+    called by "render_target".
+
+AUTHOR
+    Hinrik Örn Sigurðsson, hinrik.sig@gmail.com
+
+LICENSE AND COPYRIGHT
+    Copyright 2009 Hinrik Örn Sigurðsson
+
+    "grok" is distributed under the terms of the Artistic License 2.0. For
+    more details, see the full text of the license in the file LICENSE that
+    came with this distribution.
+

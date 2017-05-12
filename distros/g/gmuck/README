@@ -1,0 +1,73 @@
+Welcome to gmuck!
+
+  gmuck assists you in producing valid (X)HTML by checking CGI scripts,
+  XSL stylesheets, templates, normal HTML files or [you name it] and
+  reporting errors that it finds.
+
+  It is not a replacement for real validation tools, but is handy in
+  quick checks and in situations where validation of the actual generated
+  markup is troublesome.
+
+  gmuck is a line-oriented tool.  Because of that, its structural
+  checking capabilities are limited, but it makes an attempt to report
+  syntactical errors as well as provides some lint-like features.
+
+  There gmuck distribution consists of the "HTML::GMUCK" module and the
+  "gmuck" command line interface to it.
+
+  See the gmuck(1) and HTML::GMUCK(3) manual pages
+  (or before installation, "perldoc bin/gmuck.pod" and
+  "perldoc lib/HTML/GMUCK.pod" in the dir where you unpacked gmuck),
+  and ChangeLog, TODO and BUGS files for more information.
+
+  gmuck is short for Generated MarkUp ChecKer, or Generated MUCK if you
+  like.  Hmph, that's actually ambiguous, see above for a better explanation.
+  But gmuck sounds cool :)
+
+DEPENDENCIES
+
+  gmuck should work with Perl 5.6.0 and later.  The development and
+  most of the testing has been done with Perl 5.6.1, 5.8.0 and 5.8.3 
+  on Linux.  If you encounter problems,  please report them, preferably
+  with a suggested fix (see FEEDBACK).
+
+  gmuck is written in pure Perl, so no C requirements.  Also, all
+  platforms that Perl works on should be supported.
+
+
+INSTALLATION
+
+   Installation goes the normal way:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+
+AVAILABILITY
+
+  Source code tarballs are available from gmuck's home page at
+  <http://gmuck.sourceforge.net/>.  CPAN, <http://search.cpan.org/dist/gmuck/>
+  should also have the latest version.
+
+
+FEEDBACK
+
+  For all your feedback, feature requests, bug reports and patches,
+  please use the facilities of the SourceForge project page at
+  <URL:http://sourceforge.net/projects/gmuck/>.
+
+  Ville Skyttä  <ville.skytta at iki.fi>
+
+
+COPYRIGHT
+
+  Copyright (C) 2001-2007  Ville Skyttä.  All rights reserved.
+
+  gmuck is free software, you can redistribute it and/or modify it
+  under the terms of The Artistic License or the GNU General Public
+  License ("GPL") as published by the Free Software Foundation;
+  either version 2 of the GPL, or (at your option) any later version.
+
+$Id: README,v 1.14 2007/03/11 15:58:40 scop Exp $

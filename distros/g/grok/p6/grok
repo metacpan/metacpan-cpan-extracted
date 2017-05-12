@@ -1,0 +1,12 @@
+#!/usr/bin/env perl6
+
+use v6;
+use Pod::to::text;
+
+if !@*ARGS || @*ARGS[0] ne '-F' {
+    say "Only grok6 -F file.pod is supported";
+    exit 1;
+};
+
+say Pod::to::text.new.parse_file(@*ARGS[1]);
+

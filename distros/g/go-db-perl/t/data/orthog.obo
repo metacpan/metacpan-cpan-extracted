@@ -1,0 +1,61 @@
+[ontology]
+name: zoo
+
+[term]
+acc: animal
+property: has_size size
+namerule: [$has_size] $NAME
+defrule: An animal [of $has_size size]
+
+[term]
+acc: animal_part
+property: part_of animal
+namerule: [$part_of] part
+defrule: a subpart [of a $part_of]
+
+[term]
+acc: animal_tail
+relationship: is_a animal_part
+namerule: [$part_of] tail
+defrule: the tail [of a $part_of]
+
+
+[term]
+acc: dog
+relationship: is_a animal
+defrule: A woofing animal [which is $has_size]
+
+[term]
+acc: cat
+relationship: is_a animal
+
+[term]
+acc: rodent
+relationship: is_a animal
+
+[term]
+acc: mouse
+relationship: is_a rodent
+
+
+! size ont
+[ontology]
+name: phys_attr
+
+[term]
+acc: size
+
+[term]
+acc: big
+relationship: is_a size
+
+[term]
+acc: small
+relationship: is_a size
+
+[term]
+acc: enormous
+relationship: is_a big
+
+
+

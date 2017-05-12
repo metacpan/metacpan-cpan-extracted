@@ -1,0 +1,2063 @@
+#!/usr/bin/perl
+
+# ABSTRACT: automate the git steps required for a deploying code from a git repository
+# PODNAME: git-deploy
+
+use strict;
+use warnings;
+
+use Getopt::Long qw(GetOptions);
+use Pod::Usage qw(pod2usage);
+use Cwd qw(cwd abs_path);
+use Sys::Hostname qw(hostname);
+use POSIX qw(strftime);
+use FindBin ();
+use File::Basename qw(dirname);
+use File::Spec::Functions qw(catdir);
+our $GIT_DEPLOY_LIB;
+
+BEGIN {
+    my $path_to_gd = abs_path($0);
+    if (-l $path_to_gd) {
+        # If we have a symlink in /usr/local/bin we have to resolve it
+        # and then find the library dir.
+        $path_to_gd = readlink $path_to_gd;
+    }
+    my $git_deploy_dir = dirname($path_to_gd);
+    $GIT_DEPLOY_LIB = catdir($git_deploy_dir, '..', 'lib');
+
+    # we set this up so that it's always in PERL5LIB when hooks execute
+    $ENV{PERL5LIB} .= ":" if $ENV{PERL5LIB};
+    $ENV{PERL5LIB} .= $GIT_DEPLOY_LIB;
+    # and we set this up so that hooks can find it alone
+    $ENV{GIT_DEPLOY_LIB}= $GIT_DEPLOY_LIB;
+}
+use lib $GIT_DEPLOY_LIB;
+use Git::Deploy::Timing qw(
+    push_timings
+    should_write_timings
+    write_timings
+);
+local $SIG{__DIE__} = sub {
+    print STDERR "@_";
+    push_timings("gdt_end");
+    write_timings();
+    die;
+};
+use Git::Deploy::Say;
+use Git::Deploy;
+
+# debugging
+use Data::Dumper qw(Dumper);
+
+# perltidy settings for this file:
+# perltidy -ple -bbb -bbc -bbs -nolq -l=100 -noll -nola -nwls='=' -isbc -nolc -otr -kis -ci=4
+#
+
+sub get_to_mail {
+    my ($action, $to_mail)= @_;
+    $to_mail="" if $to_mail and $to_mail eq 'silent' or $to_mail eq 'none';
+    return $to_mail;
+}
+
+# Send an E-Mail, early in the file so I can debug subroutines that
+# use this with BEGIN blocks.
+sub send_email_with_sendmail {
+    my (%args) = @_;
+
+    my $to_mail = delete $args{to_mail} || die "Need to_mail =>";
+    my $subject = delete $args{subject} || die "Need subject =>";
+    my $body    = delete $args{body}    || die "Need body =>";
+
+    my $handle;
+    my $sendmail= get_config("mail-tool","/usr/sbin/sendmail -f");
+    my $from_name= get_config("user.name");
+    my $from_email= get_config("user.email");
+
+    my $cmd= "$sendmail '$from_email' '$to_mail'";
+    if ( $to_mail eq 'debug' ) {
+        $handle= \*STDERR;
+        print $handle $cmd, "\n";
+    }
+    else {
+        open $handle, "| $cmd"
+            or _die "Failed to open pipe to $cmd: $!\n";
+    }
+
+    my $mail= join "", "To: $to_mail\n", "From: $from_name <$from_email>\n", "Subject: $subject\n",
+        "\n$body\n\n\n";
+    _info $mail if $DEBUG;
+    print $handle $mail;
+    close $handle
+        if $to_mail ne 'debug';    # dont close STDERR accidentally
+
+    return;
+}
+
+# These are higher level functions that wrap the others, and are used directly
+# from the main code.
+
+sub do_pre_checks {
+    my ($prefix,$action)= @_;
+
+    push_timings("gdt_internal__do_pre_checks__start");
+
+    if ( my $unclean_status= check_if_working_dir_is_clean() ) {
+        _die "working directory not clean. git status reports:\n" . $unclean_status;
+    }
+
+    # check that we are actually on a branch
+    my $branch= get_current_branch();
+    if ( !$branch ) {
+        _warn "working directory is not checked out to a branch tip\n",
+            "Checking if this commit is on any branches -- this may take a minute\n";
+        my @branches= what_branches_can_reach_head();
+        if ( !@branches ) {
+            _die "The current commit is not reachable from any branch tip\n",
+                "This probably means someone committed a change against an old commit\n",
+                "You should probably do something like:\n\n",
+                "\tgit checkout -b temporary_branch HEAD\n",
+                "\tgit checkout trunk\n",
+                "\tgit merge temporary_branch\n",
+                "\tgit branch -d temporary_branch\n\n",
+                "However you should investigate what changes were involved before doing so\n";
+        }
+        else {
+            _die join( "\n\t", "The current checkout is on the following branches:", @branches ),
+                "\n",
+                "This most likely means that someone has checked out an old commit\n",
+                "and you need to do:\n",
+                "\tgit checkout $branches[0]\n",
+                "and then rerun the original command\n";
+        }
+    }
+    push_timings("gdt_internal__do_pre_checks__end");
+}
+
+
+sub do_get_name_list {
+    my ( $ignore_older_than, $list, $list_all, $include_branches )= @_;
+    push_timings("gdt_internal__do_get_name_list__start");
+    ###################################################################################
+    # find matching tags
+    my $start_time= time;
+    my @head_refs= get_sorted_list_of_tags();
+    my $elapsed= time - $start_time;
+    _info "get_sorted_list_of_tags() took $elapsed seconds\n" if $DEBUG;
+    if ($include_branches) {
+
+        # add the branches if requested, but only if @ARGV is empty indicating
+        # that we are not creating a tag (we don't want to return a branch name as a tag).
+        push @head_refs, get_branches();
+    }
+    $start_time= time;
+    @head_refs= filter_names_by_date( $ignore_older_than, @head_refs )
+        if $ignore_older_than;
+    $elapsed= time - $start_time;
+    _info "filter_names_by_date() took $elapsed seconds\n" if $DEBUG;
+
+    $start_time= time;
+    @head_refs= filter_names_matching_head( $list, @head_refs )
+        if !$list_all;
+    $elapsed= time - $start_time;
+    _info "filter_names_matching_head() took $elapsed seconds\n" if $DEBUG;
+    push_timings("gdt_internal__do_get_name_list__end");
+    return \@head_refs;
+}
+
+sub do_interactive_revert {
+    my ( $list_count, $prefix, $action, $ignore_older_than, $include_branches, $deploy_file_name, $message, $rsubject, $rmessage, $revert_choice, $date_fmt  )=
+        @_;
+    my $tags= do_get_name_list( $ignore_older_than, 1, 1, $include_branches );
+    _print colored( ['bold cyan'], "The following commits are available to revert the site to:" ), "\n";
+    my @printed= print_refs( {
+            list            => 1,             #$list,
+            long_digest     => 1,             #$long_digest,
+            count           => $list_count,
+            prefix          => $prefix,
+            tag_only        => 0,             #$tag_only,
+            action          => $action,
+            for_interactive => 1,
+        },
+        $tags
+    );
+    my $input;
+    do {
+        _print colored( ['bold cyan'],
+            $revert_choice
+            ? "You've selected the choice <$revert_choice> from the above list\n"
+            : "Please select a commit from 1-" . ( 0 + @printed ) . " to revert to, or 'quit' to not do anything: " );
+        if ($revert_choice) {
+            $input = $revert_choice;
+        } else {
+            chomp( $input= <> );
+            _log( "input: '$input'");
+        }
+        if ( lc($input) eq 'quit' ) {
+            $$rsubject= "Aborting revert of $prefix";
+            $$rmessage= "$ENV{USER} has instructed git-deploy abort an automated revert of $prefix.\n\n"
+                      . "The live tag is still: $printed[0]\n\n";
+            return "abort";                # we dont want to roll out.
+        }
+        if ($input =~ /[^0-9]/ or $input < 1 or $input > @printed) {
+            if ($revert_choice) {
+                _error "Your revert choice of '$input' is invalid, aborting revert, try again";
+                return "abort";
+            } else {
+                undef $input;
+            }
+        }
+    } while !$input;
+    _tell("Will revert code to tag $printed[$input-1]");
+    $$rsubject= "Reverting $prefix from $printed[0] to $printed[$input-1]";
+    $$rmessage= "$ENV{USER} has instructed git-deploy to begin an automated revert of $prefix.\n\n"
+              . "The live tag that we are reverting from is: $printed[0]\n\n"
+              . "We will revert to the code previously rolled out as tag $printed[$input-1]\n\n"
+              . "NOTE that a new tag will be generated for the code when it is synchronzied.\n\n";
+
+    # If we get time someday we should make this happen after the revert is complete, and get the
+    # user to enter in why they did a revert. But for now we wont, as every second during a revert
+    # is precious. -- Yves
+    my $revert_tag= make_dated_tag( $prefix, $date_fmt . "_reverted", $$rsubject, $$rmessage )
+                    or _warn "Failed to create revert tag! This shouldn't happen! Ignoring, but this should be fixed!\n";
+    _tell("Marked $printed[0] as reverted with tag $revert_tag");
+
+    reset_to_name( $action, $printed[ $input - 1 ], $prefix );
+    my $sync_hook= get_sync_hook( $prefix );
+    if ($sync_hook) {
+        return "sync";                        # they have a sync hook, so call it.
+    }
+    else {
+        return;                               # no sync hook the procedure is manual
+    }
+}
+
+sub do_sync_with_sync_hook {
+    my (%args) = @_;
+
+    my $env                               = delete $args{env}   || die "Need env =>";
+    my $actions                           = delete $args{actions};
+    my $push_action_if_ok                 = delete $args{push_action_if_ok};
+    my $disable_further_actions_if_not_ok = delete $args{disable_further_actions_if_not_ok};
+    my $sync_hook                         = delete $args{sync_hook} || die "Need sync_hook =>";
+    my $sync_is_abort                  = delete $args{sync_is_abort};
+
+    my $ok= eval {
+        $ENV{DEPLOY_ROLLOUT_TAG}    = $env->{rollout_tag};
+        $ENV{DEPLOY_ROLLBACK_TAG}   = $env->{start_tag};
+        $ENV{DEPLOY_DEPLOY_FILE}    = $env->{deploy_file};
+        $ENV{DEPLOY_DEPLOY_TEXT}    = $env->{deploy_text};
+        $ENV{DEPLOY_ROLLOUT_PREFIX} = $env->{rollout_prefix};
+
+        execute_hook($sync_hook);
+        if ($push_action_if_ok and $push_action_if_ok eq "finish") {
+            _say "Sync ran ok! Everything looks good! Automatically finishing\n";
+            push @$actions => $push_action_if_ok;
+        } elsif ($sync_is_abort) {
+            _say "Sync back to starting point for rollout abort appeared to run ok\n";
+        }
+
+        1;
+    } or do {
+
+        my $sync_hook_fail_message = get_config(
+            'message-on-sync-hook-fail-whale',
+            "A) Retry the synchronization hook. You can do this by moving to the root of the repository\n" .
+            "   and executing the following command by hand:\n\n" .
+            "   \$ {SYNC_HOOK}\n\n" .
+            "   which if it succeeds can be followed with a\n\n" .
+            "   \$ git-deploy finish\n\n" .
+            "   If that doesn't work then you should seek further assistance from sysadmin.\n" .
+            "   * NOTE * This is NOT an error in git-deploy itself.\n\n" .
+            "B) Inform {SUPPORT_EMAIL} of the failure and any relevant\n" .
+            "   output there might be. Please do this even if the manual process works out.\n\n"
+        );
+        _expand_template_variables(
+            \$sync_hook_fail_message,
+            {
+                SYNC_HOOK => $sync_hook,
+                SUPPORT_EMAIL => get_config('support-email','maintainer'),
+            }
+        );
+
+        _tell
+            "The syncronization hook has returned failure: $@\n\n",
+            "                         *** DON'T PANIC ***\n\n",
+            "You will now be dropped into 'manual' sync mode. Please follow these instructions:\n\n",
+            $sync_hook_fail_message;
+
+        if ($disable_further_actions_if_not_ok) {
+            # disable any further actions as requested.
+            @$actions= ();
+        }
+    };
+
+    return $ok
+}
+
+sub show_modified {
+    my ( $start_tag, $rollout_tag )= @_;
+    if ( !$start_tag ) {
+        return;
+    }
+    else {
+        $rollout_tag ||= "";
+    }
+    my @modified= `git diff --name-status $start_tag..$rollout_tag`;
+    my %counts;
+    my %type_color= (
+        'M' => { clr => COLOR_MODIFIED,   txt => 'Modified' },
+        'A' => { clr => COLOR_ADDED,      txt => 'Added' },
+        'D' => { clr => COLOR_DELETED,    txt => 'Deleted' },
+        'R' => { clr => COLOR_RENAMED,    txt => 'Renamed' },
+        'T' => { clr => COLOR_MODECHG,    txt => 'Type (mode) change' },
+        'U' => { clr => COLOR_WARN,       txt => 'Unmerged' },
+        'X' => { clr => COLOR_WARN,       txt => 'Unknown' },
+        'B' => { clr => COLOR_WARN,       txt => 'Pairing broken' },
+    );
+
+    my $total= 0;
+    foreach (@modified) {
+        chomp;
+        my $color;
+        my ( $type, $file )= split /\s+/, $_;
+        _print colored( [ $type_color{$type}{clr} ], "$type\t$file" ), "\n";
+        $counts{$type}++;
+        $total++;
+    }
+    my $summary= "";
+    foreach my $type (qw(M A D R T U X B)) {
+        next unless $counts{$type};
+        $summary .=
+            colored( [ $type_color{$type}{clr} ], sprintf "%s: %d", lc $type_color{$type}{txt}, $counts{$type} ) . ", ";
+    }
+    $summary =~ s/,\s+\z/\n/;
+    if ($total) {
+        _print "Total files: $total, $summary";
+    }
+    else {
+        _print "No files have been modified\n";
+    }
+    return;
+}
+
+sub _checktag {
+    my ( $action, $name, $value, $expect_bool )= @_;
+    if ( !$value != !$expect_bool ) {
+        my $should= $expect_bool ? "should" : "should not";
+        _die "Something is wrong, there $should be a $name tag defined\n" . "when you perform '$action'\n";
+    }
+}
+
+sub do_fetch {
+    my ($remote_site)= @_;
+    fetch_tags( $remote_site );
+    fetch( $remote_site, undef );
+}
+
+
+###################################################################################
+# main routine -- read options and do stuff
+###################################################################################
+my $list_all= 0;
+my $check_clean= 1;
+my $use_remote= 1;
+
+my %legal_action= (
+    start    => 'start',
+    begin    => 'start',
+    sync     => 'sync',
+    'manual-sync' => 'manual-sync',
+    finish   => 'finish',
+    finnish  => 'finnish',
+    end      => 'finish',
+    done     => 'finish',
+    none     => 'none',
+    0        => 'none',
+    ''       => 'none',
+    abort => 'abort',
+    oops     => 'abort',
+    bail     => 'abort',
+    1        => 'start',
+    2        => 'sync',
+    3        => 'finish',
+    4        => 'abort',
+    abort    => 'abort',
+    check    => 'check',
+
+    # special
+    good       => 'release',
+    release    => 'release',
+    show       => 'show',
+    tag        => 'tag',
+    showtag    => 'showtag',
+    'show-tag' => 'showtag',
+    'latest'   => 'showtag',
+    hotfix     => 'hotfix',
+
+    # introspection
+    'diff'     => 'diff',
+    'log'      => 'log',
+    'status'   => 'status',
+    'modified' => 'modified',
+
+    # interactive
+    revert => 'revert',
+);
+
+my %git_wrap= (
+    'diff' => 1,
+    'log'  => 1,
+);
+
+my %custom_options= (
+    'revert' => 1,
+);
+
+Getopt::Long::Configure( "require_order", "bundling" );
+GetOptions(
+    'm|message=s' => \my @message,
+
+    'prefix=s'           => \( my $prefix= '' ),
+    'deploy-file-name=s' => \( my $deploy_file_name ),
+
+    'to-mail=s' => \( my $to_mail= ($ENV{LIVE_EMAIL_ADDR} || get_config("announce-mail","none"))),
+    'date-fmt=s' => \( my $date_fmt= "%Y%m%d-%H%M%S" ),
+
+    'check-clean!'    => \$check_clean,
+    'remote!'         => \$use_remote,
+    'remote-site=s'   => \( my $remote_site= 'origin' ),
+    'remote-branch=s' => \( my $remote_branch= '' ),
+
+    'make-tag'                 => \( my $make_tag ),
+    'show-tag'                 => \( my $show_tag ),
+    'tag-only'                 => \( my $tag_only ),
+    'show-list|list!'          => \( my $list ),
+    'count=i'                  => \( my $list_count ),
+    'a|show-all|list-all|all!' => \$list_all,
+    'include-branches!'        => \( my $include_branches= 0 ),
+    'ignore-older-than=s'      => \( my $ignore_older_than= "20080101" ),
+    'long-digest!'             => \( my $long_digest ),
+    'force!'                   => \( my $force ),
+
+    'show-deploy-file!'     => \( my $show_deploy_file ),
+    'show-prefix'           => \( my $show_prefix ),
+    'show-hook-dir'         => \( my $show_hook_dir ),
+
+    'skip_hooks' => \( $SKIP_HOOKS ),
+
+    'v|verbose+' => \( $VERBOSE= ($ENV{GIT_DEPLOY_VERBOSE} || 0) ),
+    'help|?'     => \( my $help ),
+    'man'        => \( my $man ),
+    'V|version'  => sub { print "$0 v" . ($Git::Deploy::VERSION || "Git") . "\n"; exit },
+) or pod2usage(2);
+pod2usage(1) if $help;
+pod2usage( -exitstatus => 0, -verbose => 2 ) if $man;
+
+my $action= shift @ARGV;
+$action= "" if !defined $action;
+if ( @ARGV and !$git_wrap{$action} and !$custom_options{$action}) {
+    my $p= shift @ARGV;
+    $prefix ||= $p;
+}
+pod2usage("It looks like you used the option '$prefix' after the action. You must put the options first.") if $prefix=~/^-/;
+if ($action) {
+    pod2usage("Unknown action: $action")
+        if not $legal_action{ lc $action };
+    $action= $legal_action{ lc $action };
+
+    # set some special default flags for a specific action.
+    if ( $action eq 'show' ) {
+        $check_clean= 0;
+        $list_all= 1;
+        $use_remote= 0;
+    }
+    elsif ( $action eq 'showtag' ) {
+        $list_all= 1;
+        $list_count= 1;
+        $tag_only= 1;
+        $use_remote= 0;
+        $check_clean= 0;
+    }
+    elsif ( $action eq 'revert' or $action eq 'start' ) {
+        $list_all= 0;
+    }
+}
+
+
+# test that we actually are in a git repository before we do anything non argument processing related
+init_gitdir();
+
+
+# Don't let users invoke us with a wrong umask
+if (defined(my $require= get_config_int("restrict-umask",undef))) {
+    my $umask= umask;
+    if ( $umask != $require ) {
+        _die sprintf( "Your umask is not set properly; got %04o instead of %04o\n", $umask, $require);
+    }
+}
+
+
+# do some defaulting
+
+$VERBOSE++ if $action;
+$list= 1   if !$action;
+
+$prefix ||= get_config('tag-prefix','');
+$to_mail= 'silent'
+    if $prefix =~ /debug-deploy/i;
+$remote_site= "none"
+    if !$use_remote;
+$list ||= "all"
+    if $list_all;
+$list_count= 20 if !defined $list_count;
+###################################################################################
+# Handle --show and --list style options. This precludes any type of rollout step
+# from occuring.
+
+# read the start tag files from disk.
+my $start_tag= fetch_tag_info( 'start' );
+my $rollout_tag= fetch_tag_info( 'rollout' );
+
+# show options can not be mixed together ...
+if ($show_prefix) {
+    if ($prefix) {
+        print $prefix, ( $prefix && -t STDOUT ) ? "\n" : "";
+        exit(0);
+    }
+    else {
+        _warn "No prefix detected\n";
+        exit(1);
+    }
+}
+
+if ($show_hook_dir) {
+
+    if (my $hook_dir = get_hook_dir($prefix, 1)) {
+        print $hook_dir, "\n";
+        exit(0);
+    }
+    else {
+        _warn "No hook dir detected\n";
+        exit(1);
+    }
+}
+
+if ($show_deploy_file) {
+    $deploy_file_name ||= get_deploy_file_name();
+    if ($start_tag) {
+        _warn "Rollout in progress. The deploy file <$deploy_file_name> is not valid.\n";
+        exit(1);
+    }
+    my $deploy_file_text= read_deploy_file($deploy_file_name);
+    if ($deploy_file_text) {
+        print $deploy_file_text, ( $deploy_file_text && -t STDOUT ) ? "\n" : "";
+        exit(0);
+    }
+    else {
+        if (-e $deploy_file_name and !-r $deploy_file_name) {
+            _warn "The deploy file <$deploy_file_name> exists, but we can't read it\n";
+        } elsif (!-e $deploy_file_name) {
+            _warn "The deploy file <$deploy_file_name> doesn't exist.\n" .
+                  "\n" .
+                  "You should run:\n" .
+                  "\n" .
+                  "\tgit-deploy start\n" .
+                  "\n" .
+                  "Followed by:\n" .
+                  "\n" .
+                  "\tgit-deploytool sync\n" .
+                  "\n" .
+                  "To create one and sync out your code\n";
+        } else {
+            _warn "The deploy file <$deploy_file_name> is not valid\n";
+        }
+        exit(1);
+    }
+}
+
+if ( $action eq 'status' ) {
+    my $status= read_rollout_status();
+    my $exit_val= 0;
+    if ( !$start_tag || !$status ) {
+        if (my $message= check_rollouts_blocked($force,"no_die")) {
+            _say $message;
+            $exit_val= 3;
+        } else {
+            _say "No $prefix deployment currently in progress\n";
+            $exit_val= 0;
+        }
+    }
+    elsif ( !$rollout_tag ) {
+        _say "$prefix rollout started - not synced yet ($start_tag)\n";
+        $exit_val= 1;
+    }
+    else {
+        _say "$prefix rollout tagged - awaiting sync? ($start_tag..$rollout_tag)\n";
+        $exit_val= 2;
+    }
+    if ($status) {
+        _say $status;
+    }
+    exit($exit_val);
+}
+
+my @extra= @ARGV;
+if ( $git_wrap{$action} ) {
+    if ( !$start_tag ) {
+        exit;
+    }
+    elsif ($rollout_tag) {
+        exec( "git", $action, @extra, "$rollout_tag..$start_tag" );
+    }
+    else {
+        exec( "git", $action, @extra, "$start_tag..HEAD" );
+    }
+}
+
+if ( $action eq 'modified' ) {
+    show_modified( $start_tag, $rollout_tag );
+    exit;
+}
+
+my $revert_choice;
+if ( $action eq 'revert' ) {
+    if (@ARGV) {
+        $revert_choice = shift @ARGV;
+    }
+}
+
+if (@ARGV) {
+    pod2usage("Too many arguments.");
+}
+
+# we want this before actions are handled. but not for show_actions that
+# dont involve looking at the git tree.
+if ( !$prefix ) {
+    _die "It appears you have not specified a tag prefix and it is not configured either.\n"
+        . "You can use:\n\n"
+        . "    git config deploy.tag-prefix PREFIX\n\n"
+        . "to configure this repository for deployment, or provide one on the command line.\n";
+}
+
+if ( $list || $show_tag ) {
+    my $head_refs= do_get_name_list( $ignore_older_than, $list, $list_all, $include_branches );
+
+    print_refs( {
+            list        => $list,
+            long_digest => $long_digest,
+            count       => $list_count,
+            prefix      => $prefix,
+            tag_only    => $tag_only,
+            action      => $action,
+        },
+        $head_refs
+    );
+    exit(0);
+}
+
+if (!$force and (!get_config("user.name","") or !get_config("user.email",""))) {
+    _die  "Please make sure you execute:\n\n"
+        . "    git config --global user.name 'Your Name'\n"
+        . "    git config --global user.email 'email\@host.com'\n"
+        . "\n"
+        . "before you use this tool";
+}
+
+if ($check_clean) {
+    _info "Checking working directory\n" if $VERBOSE > 1;
+    do_pre_checks($prefix,$action);
+}
+
+if ( $make_tag or $action eq 'tag' ) {
+    do_fetch($remote_site);
+    _die "You aren't allowed to make tags for the prefix '$prefix' (can-make-tags is 'false')"
+        unless get_config_bool("can-make-tags",'false');
+    if ( !@message and $action eq 'tag' ) {
+        if ( $prefix =~ /^(\w+?)_?prt$/ ) {
+            push @message, "\U$1\E Production Readyness Test Release";
+        }
+        else {
+            push @message, "Working tag for '$prefix'\n";
+        }
+    }
+    _die "Message is not optional with --make-tag" unless @message;
+    my $tag= make_dated_tag( $prefix, $date_fmt, @message )
+        or _die "Failed to create tag!\n";
+    if ( $action eq 'tag' ) {
+
+        # and push any tags that might have been created
+        write_deploy_file( $tag, \@message, $deploy_file_name );
+        push_tag( $remote_site, $tag );
+    }
+    print "$tag\n";
+    exit(0);
+}
+
+###################################################################################
+# At this point we are have been asked to do a rollout step and we are in a clean
+# working directory. Depending on which $action they request we do different things
+
+my $host= hostname();
+my @actions= ($action);
+if ( $action eq 'release' ) {
+    _die "You arent allowed to use the 'release' action for the prefix '$prefix'"
+        unless get_config_bool("can-make-tags",'false');
+    push @actions, "finish";
+}
+
+while (@actions) {
+    my $final_words= "";    #any messages to display at the end of the rollout - distinct from yay message
+    my $action= shift @actions;
+    my $start_tag= fetch_tag_info( 'start' );
+    my $rollout_tag= fetch_tag_info( 'rollout' );
+    my ( $subject, $body );
+    my $start_time= time;
+    _info "Starting step '$action' at ", strftime("%Y-%m-%d %H:%M:%S",localtime($start_time)),"\n";
+    push_timings("gdt_action_$action");
+
+######################################################
+    if ( $action eq 'start' or $action eq 'revert' or $action eq 'hotfix' ) {
+
+	# these will die if there is a problem
+	execute_deploy_hooks(
+	    action  => $action,
+	    phase   => "pre-start",
+	    prefix  => $prefix,
+	);
+
+        should_write_timings();
+
+        write_rollout_status(
+            "start", $force,
+            sub {
+                _checktag( $action, 'start', $start_tag, 0 );
+                _checktag( $action, 'rollout',  $rollout_tag,  0 );
+            } );    # this will die if there is a problem
+        do_fetch($remote_site);
+
+        # $list_all is always false here.
+        ($start_tag)= @{ do_get_name_list( $ignore_older_than, $list, $list_all, $include_branches ) };
+
+        if ($start_tag) {
+            _info "Working directory was checked out to tag '$start_tag', will restore this tag on abort\n"
+                if $VERBOSE;
+        }
+        else {
+            if ( !@message ) {
+                push @message, "tagged as restore point if you abort deployment procedure for $prefix";
+            }
+            $start_tag= make_dated_tag( $prefix, $date_fmt, @message )
+                or _die "Failed to create tag!\n";
+        }
+        store_tag_info( 'start', $start_tag );
+        my $sha1= get_commit_for_name($start_tag);
+        my $first_line;
+        # these will die if there is a problem
+        execute_deploy_hooks(
+            action  => $action,
+            phase     => "pre-pull",
+            prefix    => $prefix,
+            start_tag => $start_tag,
+        );
+        _info "Pruning dead remote branches";
+        _info `git remote prune origin`;
+        if ( $action eq 'revert' ) {
+            execute_log_hooks(
+                action       => $action,
+                prefix       => $prefix,
+                log_announce => 1,
+                log_level    => "info",
+                log_message  => "Starting revert of '$prefix' from $start_tag"
+            );
+            push @actions,
+                do_interactive_revert( $list_count, $prefix, $action, $ignore_older_than, $include_branches,
+                    $deploy_file_name, \@message, \$subject, \$body, $revert_choice, $date_fmt );
+            $first_line= "\nRevert procedure has started. You should now be checked out to the chosen commit.\n";
+        }
+        elsif ( $action eq 'start' ) {
+            execute_log_hooks(
+                action       => $action,
+                prefix       => $prefix,
+                log_announce => 1,
+                log_level    => "info",
+                log_message  => "Starting rollout of '$prefix', previous rollout was $start_tag",
+            );
+
+            pull( $remote_site, $remote_branch );
+            $first_line= "\nDeploy procedure has started. You should now be checked out to the latest commit.\n"
+                . "You should now restart your server if necessary, and test the deploy\n",;
+
+            # these will die if there is a problem
+            execute_deploy_hooks(
+                action    => $action,
+                phase     => $_,
+                prefix    => $prefix,
+                start_tag => $start_tag,
+            ) for qw(post-pull post-tree-update);
+            $subject= "Starting live rollout of $prefix";
+            $body=
+                  "About to start rollout procedure for $prefix on $host\n\n"
+                . "The currently deployed checkout is $start_tag $sha1\n\n"
+                . read_deploy_file($deploy_file_name);
+        }
+        elsif ( $action eq 'hotfix' ) {
+            execute_log_hooks(
+                action       => $action,
+                prefix       => $prefix,
+                log_announce => 1,
+                log_level    => "info",
+                log_message  => "Starting hotfix of '$prefix', previous rollout was $start_tag",
+
+            );
+
+            $first_line=
+                  "\nHotfix deploy procedure has started. You are still checked out to the same commit as before.\n"
+                . "You should make, test, and commit whatever modifications you need.\n";
+
+            $subject= "Starting *hotfix* rollout of $prefix";
+            $body= "A hotfix rollout procedure has begun for $prefix on $host\n\n"
+                 . "The initial state of the checkout is $start_tag $sha1\n\n"
+                 . read_deploy_file($deploy_file_name);
+        }
+
+
+        if ( !@actions ) {
+            _tell $first_line, "\n",
+                "If you want abandon this deploy use\n\n",
+                "  git-deploy abort\n\n",
+                "When you are ready to rollout use\n\n",
+                "  git-deploy sync\n\n",
+                "to continue with the rollout process.\n\n",
+                "You can view a list of modified files with\n\n",
+                "  git-deploy modified\n\n",
+                "Or view a diff or log of changes with the normal git options with\n\n",
+                "  git-deploy diff [options]\n",
+                "  git-deploy log [options]\n\n",
+                ;
+        }
+
+        execute_deploy_hooks(
+            action      => $action,
+            phase       => "post-start",
+            prefix      => $prefix,
+            start_tag   => $start_tag,
+        );
+######################################################
+    }
+    elsif ( $action eq 'sync' or $action eq 'release' or $action eq 'manual-sync' ) {
+        should_write_timings();
+        write_rollout_status(
+            $action, $force,
+            sub {
+                _checktag( $action, 'start', $start_tag, 1 );
+                _checktag( $action, 'rollout',  $rollout_tag,  0 );
+
+                my $commit_for_HEAD = get_commit_for_name("HEAD");
+                my $commit_for_start = get_commit_for_name($start_tag);
+                if ( $action ne 'release'
+                    and $commit_for_HEAD eq $commit_for_start  )
+                {
+                    if ($force) {
+                        _warn "--force enabling rolling out same thing you had when you started\n";
+                    }
+                    else {
+                        _die "It seems like there is nothing to $action\n",
+                            "The commit for HEAD ($commit_for_HEAD)\n",
+                            "Is the same as the start commit ($commit_for_start, tag $start_tag)\n",
+                            "\n",
+                            "If you really want to rollout the same thing ",
+                            "you started with then use the --force option\n\n";
+                    }
+                }
+
+                # this will die if there are unpushed commits
+                check_for_unpushed_commits( $remote_site, $remote_branch, $force );
+
+                # these will die if there is a problem
+                execute_deploy_hooks(
+                    action  => $action,
+                    phase   => "pre-sync",
+                    prefix  => $prefix,
+                    start_tag => $start_tag,
+                );
+            } );
+        do_fetch($remote_site);
+
+        if ( !@message ) {
+            push @message, "rollout of $prefix ($start_tag..%TAG)";
+        }
+        $rollout_tag= make_dated_tag( $prefix, $date_fmt, @message )
+            or _die "Failed to create tag!\n";
+        store_tag_info( 'rollout', $rollout_tag );
+        my $deploy_text= write_deploy_file( $rollout_tag, \@message, $deploy_file_name );
+
+        $subject= "Syncing $prefix to $rollout_tag from $host (replacing $start_tag)";
+
+        my $shortlog_cmd= qq(git shortlog --format='%h %s' $start_tag..$rollout_tag);
+        my $diff_cmd= qq(git diff --stat $start_tag..$rollout_tag);
+        $body=
+              "$subject\n\n"
+            . read_deploy_file($deploy_file_name)
+            . "\n-----------\n"
+            . "Commits Involved (By Author):\n"
+            . "$shortlog_cmd\n"
+            . `$shortlog_cmd`
+            . "\n-----------\n"
+            . "$diff_cmd\n"
+            . `$diff_cmd`;
+
+        #XXX: we want a mail here. as it's a pretty useful mail.
+
+        if ( $action ne 'manual-sync' and my $sync_hook= get_sync_hook( $prefix ) ) {
+
+            _info "A sync hook has been defined for this server!\n",
+                  "Will use '$sync_hook' to synchronize code to remote servers\n",
+                  "If the synchronization completes successfully then your rollout\n",
+                  "session will be automatically 'finished' and you will be done.\n",
+            ;
+
+            execute_log_hooks(
+                action       => $action,
+                prefix       => $prefix,
+                log_announce => 1,
+                log_level    => "info",
+                log_message  => $subject,
+            );
+
+            do_sync_with_sync_hook(
+                sync_hook => $sync_hook,
+                env => {
+                    rollout_tag    => $rollout_tag,
+                    start_tag   => $start_tag,
+                    deploy_file    => get_deploy_file_name($deploy_file_name),
+                    deploy_text    => $deploy_text,
+                    rollout_prefix => $prefix,
+                },
+                actions => \@actions,
+                push_action_if_ok => "finish",
+                disable_further_actions_if_not_ok => 1,
+            ) or do {
+                $final_words= "Sync step for '$prefix' was only partially successful,\n"
+                            . "tag '$rollout_tag' has been created but NOT properly synced!";
+            };
+        }
+        elsif ( $action ne 'release' ) {
+            _tell "You must now hand execute the synchronization process and then execute git-deploy finish\n";
+
+            execute_log_hooks(
+                action       => $action,
+                prefix       => $prefix,
+                log_announce => 1,
+                log_level    => "info",
+                log_message  => "sync step ignored for $prefix rollout - manual sync required",
+            );
+        }
+
+        # these will die if there is a problem - should they be executed if the sync failed?
+        execute_deploy_hooks(
+            action      => $action,
+            phase       => "post-sync",
+            prefix      => $prefix,
+            start_tag   => $start_tag,
+            rollout_tag => $rollout_tag,
+        );
+######################################################
+    }
+    elsif ( $action eq 'abort' ) {
+        should_write_timings();
+
+        # this will die if there is a problem
+        write_rollout_status(
+            $action, $force,
+            sub {
+                _checktag( $action, 'abort', $start_tag, 1 );
+            } );
+
+        _say "Rolling back to $start_tag\n";
+        reset_to_name( $action, $start_tag, $prefix );
+        my $deploy_text= "";
+        if ( !$rollout_tag ) {
+
+            #they havent synced yet
+            $subject= "Aborted $prefix rollout";
+            $body= "Update of $prefix from $host has been aborted.\n\n" . "Servers are still at $start_tag\n\n";
+            if ( !@message ) {
+                push @message, "Aborted rollout, returned to $start_tag";
+            }
+            $deploy_text= write_deploy_file( $start_tag, \@message, $deploy_file_name );
+            execute_log_hooks(
+                action       => $action,
+                prefix       => $prefix,
+                log_announce => 1,
+                log_level    => "info",
+                log_message  => "Aborting $prefix rollout, no synchronization performed",
+            );
+        }
+        else {
+            do_fetch($remote_site);
+            # they did sync it
+            my $new_start_tag;
+            if ( !@message ) {
+                push @message, "Aborted rollout of $rollout_tag, rolled back to $start_tag";
+            }
+            $new_start_tag= make_dated_tag( $prefix, $date_fmt, @message )
+                or _die "Failed to create tag!\n";
+            $deploy_text= write_deploy_file( $new_start_tag, \@message, $deploy_file_name );
+
+            $subject= "Rollout of $rollout_tag has been aborted, rolled back to $start_tag!";
+            $body=
+                  "Update of $prefix from $host has been aborted.\n\n"
+                . "Servers will be rolled back to $start_tag with a new tag of $new_start_tag\n\n"
+                . "New deploy status:"
+                . read_deploy_file($deploy_file_name);
+
+            if ( my $sync_hook= get_sync_hook( $prefix ) ) {
+                _info "Will automatically execute $sync_hook to update servers\n";
+                execute_log_hooks(
+                    action       => $action,
+                    prefix       => $prefix,
+                    log_announce => 1,
+                    log_level    => "info",
+                    log_message  => "$prefix rollout aborted after a partial or full sync, syncing previous tag $start_tag (via rollback tag $new_start_tag)",
+                );
+                do_sync_with_sync_hook(
+                    sync_hook => $sync_hook,
+                    env => {
+                        rollout_tag    => $new_start_tag,
+                        start_tag   => $start_tag,
+                        deploy_file    => get_deploy_file_name($deploy_file_name),
+                        deploy_text    => $deploy_text,
+                        rollout_prefix => $prefix,
+                    },
+                    actions => \@actions,
+                ) or do {
+                    $final_words= "Rollback of '$start_tag' has only been partially successful.\n"
+                                . "New tag '$new_start_tag' has not been fully synchronized.\n";
+                };
+            } else {
+                execute_log_hooks(
+                    action       => $action,
+                    prefix       => $prefix,
+                    log_announce => 1,
+                    log_level    => "warning",
+                    log_message  => "Aborting $prefix rollout after a partial sync WITHOUT RESYNCING REVERTED CODE",
+                );
+                _tell "You must execute the server update step yourself after start.\n";
+            }
+        }
+
+        execute_deploy_hooks(
+            action  => $action,
+            phase   => "post-abort",
+            prefix  => $prefix,
+        );
+
+        unlink_rollout_status_file();
+
+        ######################################################
+    }
+    elsif ( $action eq 'finish' ) {
+        execute_log_hooks(
+            action       => $action,
+            prefix       => $prefix,
+            log_announce => 1,
+            log_level    => "info",
+            log_message  => "Finished $prefix rollout session for $rollout_tag",
+        );
+        write_rollout_status(
+            $action, $force,
+            sub {
+                _checktag( $action, 'start', $start_tag, 1 );
+                _checktag( $action, 'rollout',  $rollout_tag,  1 );
+
+                if ( get_commit_for_name("HEAD") ne get_commit_for_name($rollout_tag) ) {
+                    _die "Something is wrong.\n"
+                        . "Your rollout tag '$rollout_tag' does not correspond to HEAD\n"
+                        . "When performing the 'finish' step HEAD should match the rollout tag\n";
+                }
+
+                # this will _die if there is a problem
+            } );
+
+        $subject= "Finished $prefix rollout";
+        $body=
+              "Update of $prefix from $host is now complete.\n\n"
+            . "Servers now updated from $start_tag to $rollout_tag\n\n"
+            . read_deploy_file($deploy_file_name);
+        unlink_rollout_status_file();
+
+        _info "Pruning dead remote branches";
+        _info `git remote prune origin`;
+        _info "Packing references for speedup next time";
+        _info `git pack-refs`;
+
+        # XXX: this is a cheap an easy way to silence the mails for this action
+        # by request of liz and the teamleaders.
+        ######################################################
+        _say "Looks like you are all done! Have a nice day.";
+    }
+    else {
+        _die "panic: unhanded \$action: $action\n";
+    }
+
+    # send out the announcement mail if requested
+    {
+        my $send_mail_config_param = "send-mail-on-$action";
+        if (get_config_bool($send_mail_config_param, "false")) {
+            if ( my $send_to_mail= get_to_mail($action,$to_mail) ) {
+                send_email_with_sendmail(
+                    to_mail => $send_to_mail,
+                    subject => $subject,
+                    body    => $body,
+                );
+                _say "Mailed '$action' mail to $send_to_mail\n";
+            }
+        } else {
+            _info "Not sending mail on action '$action'. This can be configured with the '$send_mail_config_param'";
+        }
+    }
+
+    _info "Step '$action' finished. Started at ", strftime("%Y-%m-%d %H:%M:%S",localtime($start_time)),
+          "; took ",(time - $start_time)," seconds to complete\n";
+    if ($final_words) {
+        my $msg = "'$action' for '$prefix' had problems\n$final_words";
+        _warn $msg;
+        execute_log_hooks(
+            action       => $action,
+            prefix       => $prefix,
+            log_announce => 1,
+            log_level    => "warning",
+            log_message  => $msg,
+        );
+        exit(71);
+    } else {
+        my $msg = "'$action' for '$prefix' completed successfully";
+        $rollout_tag and $msg .= " (now at $rollout_tag)";
+        _yay "$msg\n";
+        execute_log_hooks(
+            action       => $action,
+            prefix       => $prefix,
+            log_announce => 1,
+            log_level    => "info",
+            log_message  => $msg,
+        ) if $action eq 'sync' or
+             $action eq 'manual-sync';
+    }
+}
+
+# and push any tags that might have been created
+push_timings("gdt_push_tags");
+push_tags( $remote_site );
+
+push_timings("gdt_end");
+write_timings();
+
+exit(0);
+
+__END__
+
+=head1 NAME
+
+git-deploy - automate the git steps required for a deploying code from a git repository
+
+=head1 SYNOPSIS
+
+    git deploy [deploy-options] [action [prefix]] [action-options]
+    git deploy --man
+
+    actions:
+        status                   # show rollout status of current repository
+        start|abort|sync|finish  # normal multi-server rollout sequence (finish is automatic if sync succeeds)
+        start|abort|release      # normal single-server rollout sequence (when you don't need a sync hook)
+        hotfix                   # Roll out the site with a hotfix (a.k.a. start without an automatic "git pull")
+        revert                   # revert site to previous rollout (interactive - replaces start)
+        manual-sync              # manual sync process (replaces sync - can be used for a gradual sync)
+        show                     # show list of tags
+        show-tag                 # show the currently deployed tag (if it exists)
+        tag                      # create a tag for this commit (restricted to certain environments)
+        log                      # during a rollout show log of changes since the last rollout
+        diff                     # during a rollout show differences between previous rollout
+
+=head1 NAVIGATION
+
+=over
+
+=item *
+
+See L</DESCRIPTION> for an overview of what B<git-deploy> is all
+about, and how it operates from a big picture perspective.
+
+=item *
+
+See L</ACTIONS> for the B<git-deploy> sub-commands. These are the
+commands you'll be using on a daily (or hopefully less than hourly)
+basis to do rollouts.
+
+=item *
+
+See L</OPTIONS> and L</OTHER OPTIONS> for common options you might
+want to use, and increasingly obscure options you'll probably never
+need, respectively.
+
+=item *
+
+See L</CONFIGURATION> for configuring B<git-deploy>. Unless you're the
+sysadmin setting up the tool you don't need to worry about this.
+
+=item *
+
+See L</WRITING DEPLOY HOOKS> for how deploy hooks work. This is
+relevant to you if you're the poor sob tasked with implementing said
+hooks.
+
+=back
+
+=head1 DESCRIPTION
+
+B<git-deploy> is a tool written to make deployments so easy that
+you'll let new hires do them on their first day. Conceived and
+introduced at Booking.com in 2008, it has changed deployments from being
+something that took hours, to being so easy that deploying 20 times a
+day is what happens (on a slow day).
+
+It's highly configurable and pluggable. We use it for deploying
+everything from single-server environments to deploying our main web
+server cluster.
+
+It creates an annotated git tag for every rollout, and pushes those tags
+upstream, so anyone with a copy of the repository can see what's
+deployed where. This is invaluable for debugging and tracking the
+history of deployments.
+
+It adheres to the Unix philosophy, being a tool that does one thing and,
+does it well. It's fully pluggable (the hook API is just a bunch
+of executable files with exit() values, you don't have to learn to use
+a complicated API), it's easily scriptable, and it runs anywhere you
+have a standard installation of Perl 5.8 or later.
+
+But enough with the sales pitch, what does it actually do?
+
+=over 8
+
+=item *
+
+git-deploy implements exclusive locking, i.e. it allows only one person to
+deploy to an environment at the same time. This is how a deployment starts, and
+you do this with:
+
+    git-deploy start
+
+...which will create a lock file and do "git pull" for you, to update your
+local tree to include the latest upstream code.
+
+This means that you have a repository somewhere that you do
+deployments from. This is your staging server, or the only server you
+have, it doesn't matter. It just has to be one standard location.
+
+Under the hood locking is simply implemented with a
+F<.git/deploy/lock> file - if users have configured their umask
+correctly (and git-deploy can enforce this) you can forcibly take over
+another user's deployments with C<--force>.
+
+=item *
+
+Once you're in the locked state you can do any git operation you'd
+like. git-deploy doesn't care, you can "git pull", you can make new
+commits (as long as you push them upstream before the sync step).
+
+If you chicken out at this point you can always:
+
+    git-deploy abort
+
+Which'll get you back to the state you were in before you ran
+L</start>.
+
+When you're happy with the state of things you want to deploy, git-deploy will
+create a tag to record in the commit history that the current state is what was
+released, and then call your sync hooks (if any are configured):
+
+    git-deploy sync
+
+...which will create a tag, and roll it out to your network. The details of the
+rollout itself are B<completely up to you> (see L</Sync Hooks>). You can use
+everything from git itself to carrier pigeons, git-deploy doesn't care.
+
+If the sync hook fails (e.g. because a cat ate your pigeon)
+git-deploy exits with an error and expects to you fix the situation.
+
+Usually fixing it is a combination of running the sync hook manually
+again, and making a mental note to beat your sysadmins with a
+rake. 
+
+If you prefer to perform the rollout yourself, you can instead use git-deploy
+to simply tag a release and push that back to your main repository.
+
+    git-deploy release
+
+This is not a recommended way to use the tool since one of git-deploy's
+functions is to manage the process of pushing code out to multiple production
+boxes. Your life will be much easier if you choose to implement sync hooks
+instead.
+
+You'll have to set L</deploy.can-make-tags> to C<true> to use this.
+
+Once you've done the former successfully:
+
+    git-deploy finish
+
+(...which "git-deploy release" and "git-deploy sync" do for you if you
+haven't encountered an error.)
+
+That'll perform any final actions (like sending an e-mail about your shiny
+new deployment), and then unlock the deployment server so the next
+poor sob who has to do a deployment can use it.
+
+=back
+
+Does that sound simple? Well that's because it is. It's a very simple
+tool, it's so simple that we even allow designers to use it.
+
+So why do you need it? Well partly because we've been lying to you up
+until this point. The main feature of this tool is not actually doing
+rollouts, it's doing reverts.
+
+When you inevitably bork a rollout and you want to undo as fast
+as possible, B<git-deploy> makes this really easy. You can run
+B<git-deploy show> to see a history of recent rollouts, and you can use
+B<git-deploy revert> to interactively revert to a previous revision.
+
+This means that you get presented with a list of things that were
+recently rolled out, and then have the chance to choose which should
+be rolled out as a replacement. Once you select the synchronization
+process is started and the bad code is replaced by whatever you have
+selected.
+
+When you manage to get even this wrong, and revert to the wrong commit
+B<git-deploy> makes it easy to see exactly what happened and what you did, and
+B<git-deploy show> will show you which of the several tags you've been jumping
+back and forth between correspond to a given revision.  Once have figured out
+which commit you should go to, use B<git-deploy revert> to roll it out.
+
+The tool also performs very exhaustive error checking added over years of
+trial and error, as its inexperienced users have tried to screw up
+rollouts in every way possible.
+
+If there is a problem in general the tool will detect it, and advise
+you of what it is and how to deal with it.
+
+It'll ensure that tags are created which you can roll back to, and
+ensure that they are pushed afterwards.
+
+B<git-deploy> will fetch all tags from the remote repository
+configured in the current repository before processing. You can
+disable this behaviour by using --no-remote which overrides all remote
+actions.
+
+In the case of an unclean working directory an error message will be
+produced and the output of `git status` will be displayed. Note: This includes
+untracked files, which must be either deleted or added to the
+repository's F<.gitignore> (which itself must then be committed),
+before you can proceed with using B<git-deploy>. You can disable this
+with --no-check if you're feeling adventurous.
+
+One thing it definitely doesn't do is worry about how your code gets
+copied around to your production servers, that's completely up to you.
+
+If you have some way of copying around code to be deployed (git
+archive, rsync, building .deb or .rpm packages) that you use now you
+can and should continue using it.
+
+git-deploy solves the problem of making your deployment history
+available in a distributed way to everyone with a Git checkout, as
+well as making sure that there's an exclusive lock on deployments
+while they're in progress (although you could skip that part if you
+were feeling adventurous enough).
+
+=head2 Deploy Files
+
+A deploy file consists of a set of keys and values, followed by a newline,
+followed by the deployment message used to create the deployment tag. For
+instance:
+
+    commit: 7e25a770901c9b1eb75ad1511580a98acff4ad60
+    tag: sheep-20080827-1419
+    deploy-date: 2008-08-27 14:19:58
+    deployed-from: bountiful.farm.com
+    deployed-by: rafael
+
+    rollout of sheep
+
+    <EOF>
+
+If new key/values are added, they will always be added before the blank line.
+
+=head2 Deploy Hooks
+
+At various points in the deployment process F<git-deploy> can
+execute user-supplied hooks.
+
+This is to provide a mechanism by which actions and tests
+will be automatically executed, and if necessary can prevent the
+final sync step from occurring.
+
+Hooks can be specific at the generic level (i.e. for all
+environments), and on an environment-specific basis.
+
+=head1 OPTIONS
+
+Use git-deploy --man to see complete set of options and details of use.
+
+=over 8
+
+=item B<--force>
+
+Force the action, and bypass most sanity checks. Do not use unless you know what you
+are doing.
+
+=item B<--verbose>
+
+Emits progress information to STDERR during processing.
+
+=item B<--help>
+
+Print a brief help message and exits. (You are probably reading this output right now.)
+
+=item B<--man>
+
+Uses perldoc/man to output far far more than you ever realized there was to know about
+using this tool.
+
+=back
+
+=head1 OTHER OPTIONS
+
+=over 8
+
+=item B<--message>=STRING
+
+Message to use when creating a tag. Required when creating a new tag. Since you
+can't know the name of the newly created tag when writing the message you can use
+the special sequence C<%TAG> as a replacement.
+
+=item B<--show-prefix>
+
+Print to STDOUT whatever prefix would be used given the current arguments and then exit.
+Throw an error if there would be no prefix.
+
+=item B<--to-mail>=STRING
+
+Address to use to send announcement mails to. Defaults to 'none'. See
+L</deploy.announce-mail> for a config option to set this.
+
+=item B<--show-deploy-file>
+
+Prints the name of the current deploy file to STDOUT, if and only if the commit it contains
+corresponds to HEAD. Otherwise prints nothing. Exits immediately afterwards.
+
+=item B<--deploy-file-name>
+
+Set the deploy file name. If this option is not provided the deploy file defaults to
+C<./lib/.deploy> if a directory named C<./lib> exists, and otherwise to C<./.deploy>
+
+=item B<--list>
+
+=item B<--list-all>
+
+Instead of printing out a single tagname for the current commit's tag, print out a
+verbose list of tags, sorted by the date that they contain in order of most recent to
+oldest. The output is structured like so:
+
+    7e25a770901c.. *tag: sheep-20080827-1419
+    2806eb24c3c2..  tag: cows-20080827-1240
+    d6af6e1ad6f1..  tag: goats_20080826-1458
+    889f65216880..  tag: goats_20080826-1034
+    90318602f8d2..  tag: cows_20080826-1005
+    6bd340c67bdb..  tag: sheep-20080825-2245
+    19587c195a8b..  tag: sheep-20080825-2116 -> sheep-20080825-2105
+    19587c195a8b..  tag: sheep-20080825-2105
+
+The first column is the abbreviated commit SHA1 (abbreviation can be disabled
+with the C<--long-digest> option), Followed by either C<< <space><space> >> or
+by C<< <space><star> >>. The starred items correspond to HEAD. The arrow indicates
+that there are two different tags to the same commit, and points to the oldest
+equivalent tag. This is then followed by either 'tag:' or 'branch:' (depending on
+whether C<--include-branches> is invoked) and then the item name. This may then be
+followed by space and an arrow, and then a second name, which indicates that
+the tag is a duplicate and shows the oldest displayed item. Undated items like
+branches go last in alphabetic order, with some special exceptions for i.e. trunk or
+master.
+
+When used with just C<--list> mode, only starred items corresponding to HEAD are displayed,
+--list-all shows unstarred items that do not correspond to HEAD as well.
+
+=item B<--include-branches>
+
+Show information about branches as well when in C<--list> mode
+
+=item B<--long-digest>
+
+Show full SHA1's when in C<--list> mode.
+
+=item B<--ignore-older-than>=YYYYMMDD
+
+Totally ignore tags which are from before this date. Defaults to C<20080101>.
+
+Checking *every* tag to see if it corresponds to HEAD can be expensive. This options
+makes it possible to filter old tags by date to avoid checking them when you know they
+wont match.
+
+=item B<--make-tag>
+
+Make a tag. This is the same as the "tag" action except the tag will not be automatically
+pushed.
+
+=item B<--no-check-clean>
+
+Do not check that the working directory is clean before doing things.
+
+=item B<--no-remote>
+
+Skip any actions that involve talking to a remote repository.
+
+=item B<--remote-site>=STRING
+
+Name of remote site to access when pushing, pulling or fetching. Defaults to 'origin'.
+
+Using an remote site name of 'none' is the same as using --no-remote
+
+=item B<--remote-branch>=STRING
+
+Name of remote branch to access when pushing, pulling or fetching. Defaults to the current
+branch, just like git pull or git push would.
+
+=item B<--date-fmt>=FORMAT
+
+Perl strfime() format to use in datestamped tags. Defaults to '%Y%m%d-%H%M'.
+Changing this value is probably unwise, as various features of the deploy process
+expect to be able to parse date stamps in this format.
+
+=back
+
+=head1 ACTIONS
+
+=head2 start
+
+Used to start a multi step rollout procedure. Remembers (and if necessary, tags) start
+position as well as create locks to prevent two people from doing a procedure at the
+same time. See C<hotfix> below for rollout out a hotfix on top of a previous rollout
+tag.
+
+=head2 sync
+
+Used to declare that the current commit is ready for sync. This will automatically call
+the appropriate sync command for this app, as defined in F<deploy/sync/$app.sync>.
+
+=head2 abort
+
+A command which can be used any time prior to the manual synchronization step which will
+automatically end the rollout, restore the git working directory from the current state
+to the start position. Note this is NOT the way to "rollback a rollout", it is the
+way to abort a rollout prior to its completion.
+
+I.e. if someone else has started a rollout and gone away you can do:
+
+    git-deploy --force abort
+
+And the state of the rollout machine will be reset back to what it was
+before they ran C<git-deploy start>.
+
+=head2 finish
+
+Used to declare that the rollout session is finished, and that git-deploy
+should push any new commits or tags, create the final emails of any changes
+and perform related functions.
+
+=head2 release
+
+Used in the "two step" rollout process for boxes where there is no manual
+synchronization step.
+
+=head2 tag
+
+Used in the "one step" rollout process to tag a commit and push it to the
+remote.
+
+=head2 revert
+
+This is used to do an interactive "revert" of the site to a previous rollout.
+It combines the steps "git-deploy start/git reset .../git-deploy
+sync/git-deploy finish" into one, with interactive selection of the commit to
+revert to. If sync hooks and deploy hooks are provided then they will be
+automatically run as normal. If they aren't, a manual sync/finish is required.
+
+=head2 show-tag
+
+Show the tag for the current commit, if there is one.
+
+=head2 status
+
+Show the status of the deploy procedure. Can be used to check what step you are on.
+
+=head2 hotfix
+
+Here's how you can do a hotfix rollout, i.e. when you have an existing
+rollout tag that you wish to apply a single commit (or several) onto.
+
+First, instead of C<git-deploy start>, do:
+
+    git-deploy hotfix
+
+...which will start C<git-deploy> without performing a C<git pull>
+beforehand. Then you cherry-pick some commit/s:
+
+    git cherry-pick SHA1_OF_HOTFIX
+
+...and make a note of the resulting <NEW_SHA1>:
+
+    git --no-pager log -1 --pretty=%H
+
+Then do a:
+
+    git pull --no-rebase
+
+Followed by:
+
+    git push
+
+to push your hotfix to the Git server. But now you're not at what you
+want to roll out, so do:
+
+    git reset --hard NEW_SHA1
+    git checkout -f
+
+This will ensure that you are on your hotfix commit, and that any git hooks are
+executed. You should then TEST the code. On a webserver this normally involves
+
+    httpd restart
+
+followed by some manual testing of the relevant web site.
+
+When you are satisfied that things are OK, you can execute the sync:
+
+    git-deploy sync
+
+B<TODO>: The last 3 pull/push/reset steps are busywork that should be, and eventually
+will be merged into C<git-deploy sync>.
+
+=head2 manual-sync
+
+Declares the current commit is ready for sync, but will drop the user back into the shell
+to execute the sync manually. It is then up to the user to execute the finish action when
+they have deemed the rollout to be complete.
+
+=head1 CONFIGURATION
+
+git-deploy uses L<git(1)> to drive its configuration. This means that
+if you're rolling out a given repository situated at F</some/path> you
+can configure everything in F</some/path/.git/config> with
+L<git-config(1)>.
+
+We use the namespace C<deploy> for our configuration. See this section
+for an overview of our configuration options, but you can also jump to
+L</EXAMPLE CONFIGURATION> for an example of how to configure the tool.
+
+These are L<git(1)> config options that need to be set, see
+L<git-config(1)> for details:
+
+=over
+
+=item * user.name
+
+=item * user.email
+
+=back
+
+And these are L<git-deploy(1)>-specific options:
+
+=head3 deploy.log-directory
+
+This is a directory where we emit a F<git-deploy.log> file and if
+C<deploy.log-timing-data> is true we'll also emit timing data there.
+
+=head3 deploy.log-timing-data
+
+A boolean option that configures whether or not we log timing data,
+off by default.
+
+=head3 deploy.block-file
+
+A path to a file which if existent will block rollouts,
+e.g. F</etc/ROLLOUTS_BLOCKED>
+
+=head3 deploy.can-make-tags
+
+Can this environment make tags manually with C<git-deploy tag>? Used
+for special purposes, you probably don't need this.
+
+=head3 deploy.config-file
+
+The C<git-deploy> config file, set this to e.g. C</etc/git-deploy.ini>
+in C</etc/gitconfig> on the deployment box to have C<git-deploy> read
+that config file.
+
+We'll read the config file with C<git config --file> so you can
+B<also> put stuff in C</etc/gitconfig>, C<.git/config> or any other
+file Git normally reads.
+
+=head3 deploy.deploy-file
+
+This is a file we write out to the directory being deployed before the
+C<sync> step to indicate what tag we've deployed, who deployed it
+etc. See L</Deploy Files> for details.
+
+This is F<.deploy> by default, but you can also set it to
+e.g. F<lib/.deploy> in environments where only the lib/ directory is
+synced out.
+
+=head3 deploy.hook-dir
+
+What directory do we look for our hooks in? See L</Deploy Hooks> for
+details.
+
+=head3 deploy.tag-prefix
+
+A prefix we'll add to your tags, set to e.g. C<cron> for your cron
+deploys, C<app> for your main web application. C<debug> is something
+you can use to test the tool.
+
+=head3 deploy.support-email
+
+An e-mail address we'll tell the user to contact if the sync hook
+fails. This'll be in the big "DON'T PANIC" message that we emit if the
+sync hook fails.
+
+=head3 deploy.mail-tool
+
+The tool we use to send mail. C</usr/sbin/sendmail -f> by default.
+
+=head3 deploy.restrict-umask
+
+Force the user to have a given umask before they can invoke us.
+
+=head3 deploy.announce-mail
+
+An e-mail address that the below C<send-mail-on-*> mails will be sent
+to.
+
+=head3 deploy.send-mail-on-ACTION
+
+A boolean option that configures when we send
+mail. E.g. C<deploy.send-mail-on-start = true> will have mail sent
+when we do "git-deploy start".
+
+=head3 deploy.repo-name-detection
+
+The strategy we'll use to detect the current repository
+name. Currently only C<dot-git-parent-dir> is supported. See the
+L</EXAMPLE CONFIGURATION> for how this is used.
+
+=head3 deploy.lock-dir-root
+
+Normally git-deploy tucks its lock file and reference data away in
+the .git directory of the repo being deployed. It can be useful to
+specify a common place for multiple repositories to share for this
+purpose, providing an "interlock" behaviour that prevents more than
+one of the repositories being rolled out at once.
+
+=head3 deploy.message-on-sync-hook-fail-whale
+
+A message you can specify which'll be output when we fail to run the
+sync hook instead of the default message. You can put any
+site-specific instructions here to replace the defaults.
+
+The strings C<{SYNC_HOOK}> and C<{SUPPORT_EMAIL}> in that message will
+be replaced with the sync hook that was run and the support E-Mail
+specified in L</deploy.support-email>.
+
+=head1 EXAMPLE CONFIGURATION
+
+Here's an example git-deploy configuration that can deal with rolling
+out more than one repository on a given box with a globally maintained
+config file. First we set up C<deploy.config-file> in
+F</etc/gitconfig>:
+
+    $ cat /etc/gitconfig
+    [deploy]
+            config-file = /etc/git-deploy.conf
+
+Then we configure git-deploy in the F</etc/git-deploy.conf> to roll
+out two repositories, F</repo/code> and F</repo/static_assets>:
+
+    $ cat /etc/git-deploy.conf
+    ;; Global options
+    [deploy]
+            ;; Force users to have this umask
+            restrict-umask = 0002
+
+            ;; If this file exists all rollouts are blocked
+            block-file = /etc/ROLLOUTS_BLOCKED
+
+            ;; E-Mail addresses to complain to when stuff goes wrong
+            support-email = admins@example.com, infrastructure@example.com
+
+            ;; What strategy should we use to detect the repo name?
+            repo-name-detection = dot-git-parent-dir
+
+            ;; Where should the mail configured below go?
+            announce-mail = announce@example.com
+
+            ;; When should we send an E-Mail?
+            send-mail-on-sync   = true
+            send-mail-on-revert = true
+
+            ;; Where to store the timing information
+            log-directory = /var/log/deploy
+
+            ;; We want timing information
+            log-timing-data = true
+
+    ;; Per-repo options, keys here override equivalent keys in the
+    ;; global options
+
+    [deploy "repository code"]
+            ;; Prefix to give to tags created here. A prefix of 'debug'
+            ;; will result in debug-YYYYMMDD-HHMMSS tags
+            tag-prefix = app
+
+            ;; In code.git we put the .deploy file in lib/.deploy. this is
+            ;; because traditionally we only sync out the lib
+            ;; folder.
+            deploy-file = lib/.deploy
+
+            ;; Where the git-deploy hooks live
+            hook-dir = /repos/hooks/git-deploy-data/deploy-code
+
+    [deploy "repository static_assets"]
+            ;; Prefix to give to tags created here. A prefix of 'debug'
+            ;; will result in debug-YYYYMMDD-HHMMSS tags
+            tag-prefix = app_tmpl
+
+            ;; We sync out this whole repository
+            deploy-file = .deploy
+
+            ;; Where the git-deploy hooks live
+            hook-dir = /repos/hooks/git-deploy-data/deploy-static_assets
+
+Notice how they have sections of their own later in the config file,
+these sections only apply to them using the
+C<deploy.repo-name-detection> logic, any values in the per-repo
+sections override the corresponding deploy.* values.
+
+Since we're using the C<dot-git-parent-dir> strategy for
+C<deploy.repo-name-detection> running git-deploy inside F</repo/code>
+will cause us to pick up the "repository code" section of the
+configuration. I.e. we're using the name of the parent folder of our
+F<.git> directory.
+
+=head1 WRITING DEPLOY HOOKS
+
+The pre-deploy framework is expected to reside in the
+F<$GIT_WORK_DIR/deploy> directory (i.e. the F<deploy> directory of the
+repository that's being rolled out). This directory has the following
+tree:
+
+    $GIT_WORK_DIR/deploy/                   # deploy directory
+                        /apps/              # Directory per application + 'common'
+                             /common/       # deploy scripts that apply to all apps
+                             /$app/         # deploy scripts for a specific $app
+                        /sync/              # sync
+                             /$app.sync
+
+The C<$app> in F<deploy/{apps,sync}/$app> is the server prefix that
+you'd see in the rollout tag. E.g. A company might have multiple environments
+which they roll out, for instance "sheep", "cows" and "goats". Here is a practical
+example of the deployment hooks that might be used in the C<sheep> environment:
+
+    $ tree deploy/apps/{sheep,common}/ deploy/sync/
+    deploy/apps/sheep/
+    |-- post-pull.010_httpd_configtest.sh
+    |-- post-pull.020_restart_httpd.sh
+    |-- pre-pull.010_nobranch_rollout.sh
+    |-- pre-pull.020_check_that_we_are_in_the_load_balancer.pl
+    |-- pre-pull.021_take_us_out_of_the_load_balancer.pl
+    `-- pre-pull.022_check_that_we_are_not_in_the_load_balancer.pl -> pre-pull.020_check_that_we_are_in_the_load_balancer.pl
+    deploy/apps/common/
+    |-- pre-sync.001_setup_affiliate_symlink.pl
+    `-- pre-sync.002_check_permissions.pl
+    deploy/sync/
+    |-- sheep.sync
+
+All the hooks in F<deploy/apps> are prefixed by a C<phase> in which
+C<git-deploy> will execute them (e.g. C<pre-pull> just before a
+pull).
+
+During these phases C<git-deploy> will C<glob> in all the
+F<deploy/apps/{common,$app}/$phase.*> hooks and execute them in
+C<sort> order, first the C<common> hooks and then the C<$app> specific
+hooks. Note that the hooks B<MUST> have their executable bit set.
+
+=head2 Environment variables available to hooks
+
+The following environment variables are available to the phase hooks:
+
+=head3 GIT_DEPLOY_ACTION
+
+The current action we're running, e.g. "start", "hotfix", "abort" etc.
+
+=head3 GIT_DEPLOY_PHASE
+
+The current hook phase, e.g. "post-pull", "pre-sync" etc.
+
+=head3 GIT_DEPLOY_PREFIX
+
+The prefix of the current environment, e.g. "sheep", "cron" etc.
+
+=head3 GIT_DEPLOY_HOOK_PREFIX
+
+The prefix of the currently executing hook, like L</GIT_DEPLOY_PREFIX>
+except this will be "common" when the "common" hooks are being
+executed.
+
+=head3 GIT_DEPLOY_START_TAG
+
+Set to the tag we started with, currently only set (and can only ever
+be set) for a subset of the hooks.
+
+=head3 GIT_DEPLOY_ROLLOUT_TAG
+
+The tag we're rolling out, like L</GIT_DEPLOY_START_TAG> this isn't
+set for all hooks.
+
+=head2 Available phase hooks
+
+Currently, these are the hooks that will be executed. All the
+hooks, except the L</post-tree-update> hook, correspond to specific
+git-deploy actions:
+
+=head3 pre-start
+
+The first hook to be executed. Will be run before the deployment tag
+is created (but obviously, after we do C<git fetch>).
+
+=head3 post-start
+
+Executed after the start phase (also executed on hotfix), useful to
+e.g. print out any custom messages you'd like to print out at the end
+of the start/hotfix phase.
+
+=head3 pre-pull
+
+Executed before we update the working tree with C<git pull>. This is
+where hooks that e.g. take the deployment machine out of the load
+balancer should be executed.
+
+=head3 post-pull
+
+Just after the pull in the "start" phase.
+
+=head3 pre-sync
+
+Just before we create the tag we're about to sync out and execute the
+F<deploy/sync/$app.sync> hook.
+
+=head3 post-sync
+
+After we've synced. Here you could e.g. send custom e-mails indicating
+that the deployment was a success.
+
+=head3 post-abort
+
+Hooks executed after an C<abort>.
+
+=head3 post-reset
+
+Hooks executed after a reset, either via C<abort> or
+C<revert>. Most of the time you want to use C<post-tree-update> hooks
+instead, but this is useful e.g. for putting a staging server back
+into a load balancer.
+
+=head3 post-tree-update
+
+Executed after we update the working tree to a new revision, whether
+that's after the C<pull> in the C<start> phase, after C<git reset
+--hard> in the C<abort> phase, or after a C<revert>.
+
+Here's where hooks that e.g. restart the webserver and run any
+critical tests (e.g. config tests) should be run.
+
+The exit code from these hooks is ignored in actions like C<abort>
+and C<revert>. We don't want the abort or revert to fail just
+because a web server didn't restart.
+
+=head3 log
+
+Called at various points with log messages, these are just like normal
+phase hooks except they'll have a few extra environment variables set
+for them. By default we ignore the exit code of log hooks, because we
+don't want failure in logging to stop the deployment.
+
+=over
+
+=item GIT_DEPLOY_LOG_LEVEL
+
+The log level, the lowercase equivalent of the levels documented in
+L<syslog(3)> without the C<LOG_*> prefix, e.g. "info" or "warning".
+
+=item GIT_DEPLOY_LOG_MESSAGE
+
+A free-form log message that we're passing to the log hook
+
+=item GIT_DEPLOY_LOG_ANNOUNCE
+
+Whether this message should be announced. These are messages that are
+more important than others that you'd e.g. like to output to your IRC
+or Jabber deployment channel.
+
+=back
+
+=head2 Return values
+
+Each script is expected to return a nonzero exit code on failure, and
+a zero exit code on success (in other words, standard Unix shell return
+semantics). Any script that "fails" will cause C<git-deploy> to
+abort at that point.
+
+More granular failure codes are planned in the future. E.g. "failed
+but should try again", "failed but should ask the user before trying
+again" etc. But this hasn't yet been implemented.
+
+=head2 Sync Hooks
+
+A special case for a hook that really should be just a regular L<phase
+hook|/Available phase hooks>. But isn't yet because it would have
+required more major surgery on C<git-deploy> at the time phase
+hooks were written, as well as access by the author to all deployment
+environments (which wasn't the case).
+
+The only notable difference is that there is only one phase hook for
+each C<$app>, and it's located in F<deploy-$repo/sync/$app.sync>.
+
+Note: the sync hook can be skipped (and the associated finish) with the
+manual-sync action. This will however execute the pre-sync and post-sync
+hooks, possibly with errors.
+
+=head1 DETAILS
+
+=head2 Source Code Repository
+
+git-deploy master development repository is hosted by GitHub at:
+
+    https://github.com/git-deploy/git-deploy
+
+The authors would like to thank GitHub for their support of the open source
+community.
+
+=head2 LICENSE
+
+This software is licensed under the same terms as the Perl language.
+See http://dev.perl.org/licenses/ for details.
+
+=cut
+
+# vim: filetype=perl tabstop=4 shiftwidth=4 expandtab:

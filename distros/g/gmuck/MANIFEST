@@ -1,0 +1,19 @@
+# $Id: MANIFEST,v 1.8 2004/08/07 23:42:53 scop Exp $
+
+BUGS
+ChangeLog
+Makefile.PL
+MANIFEST
+README
+SIGNATURE
+SPECS
+TODO
+test.pl
+bin/gmuck
+bin/gmuck.pod
+lib/HTML/GMUCK.pm
+lib/HTML/GMUCK.pod
+lib/HTML/GMUCK/regexps.pl
+etc/gmuck.spec
+etc/genregexps.PL
+META.yml                                 Module meta-data (added by MakeMaker)

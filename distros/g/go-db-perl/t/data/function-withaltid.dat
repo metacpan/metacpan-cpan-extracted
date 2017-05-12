@@ -1,0 +1,6 @@
+$Gene_Ontology ; GO:0003673
+ $molecular_function ; GO:0003674
+  %enzyme ; GO:0003824
+   %urea carboxylase ; GO:0004847 ; EC:6.3.4.6
+   %urease ; GO:0009039 ; EC:3.5.1.5
+    %urea \t\r\a\n\s\p\o\r\t\er ; GO:0015204, GO:0015287 ; TC:1.A.44.-.- % alpha-type channel ; GO:0015268

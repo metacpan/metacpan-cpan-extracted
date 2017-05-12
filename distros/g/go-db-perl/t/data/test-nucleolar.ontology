@@ -1,0 +1,116 @@
+$Gene_Ontology ; GO:0003673
+ <biological_process ; GO:0008150
+  %cellular process ; GO:0009987
+   %cellular physiological process ; GO:0050875 % physiological process ; GO:0007582
+    %cell death ; GO:0008219 % death ; GO:0016265
+     <cell aging ; GO:0007569 ; synonym:cellular senescence % aging ; GO:0007568      <nucleolar fragmentation ; GO:0007576
+       %nucleolar fragmentation during replicative aging ; GO:0001303 < replicative cell aging ; GO:0001302
+      %replicative cell aging ; GO:0001302
+       <nucleolar fragmentation during replicative aging ; GO:0001303 % nucleolar fragmentation ; GO:0007576
+    %cell growth and/or maintenance ; GO:0008151 ; synonym:cell physiology
+     %cell organization and biogenesis ; GO:0016043
+      %nuclear organization and biogenesis ; GO:0006997 ; synonym:GO:0048287 ; synonym:nucleus organization and biogenesis
+       %nuclear body organization and biogenesis ; GO:0030575
+  %development ; GO:0007275
+   %aging ; GO:0007568 ; synonym:GO:0016280 ; synonym:senescence < death ; GO:0016265
+    %cell aging ; GO:0007569 ; synonym:cellular senescence < cell death ; GO:0008219
+     <nucleolar fragmentation ; GO:0007576
+      %nucleolar fragmentation during replicative aging ; GO:0001303 < replicative cell aging ; GO:0001302
+     %replicative cell aging ; GO:0001302
+      <nucleolar fragmentation during replicative aging ; GO:0001303 % nucleolar fragmentation ; GO:0007576
+  %obsolete biological process ; GO:0008371
+   %nucleolar fragmentation (sensu Saccharomyces) ; GO:0046616
+   %nucleolar size increase ; GO:0007575
+   %nucleolar size increase (sensu Saccharomyces) ; GO:0046617
+  %physiological process ; GO:0007582
+   %cellular physiological process ; GO:0050875 % cellular process ; GO:0009987
+    %cell death ; GO:0008219 % death ; GO:0016265
+     <cell aging ; GO:0007569 ; synonym:cellular senescence % aging ; GO:0007568      <nucleolar fragmentation ; GO:0007576
+       %nucleolar fragmentation during replicative aging ; GO:0001303 < replicative cell aging ; GO:0001302
+      %replicative cell aging ; GO:0001302
+       <nucleolar fragmentation during replicative aging ; GO:0001303 % nucleolar fragmentation ; GO:0007576
+    %cell growth and/or maintenance ; GO:0008151 ; synonym:cell physiology
+     %cell organization and biogenesis ; GO:0016043
+      %nuclear organization and biogenesis ; GO:0006997 ; synonym:GO:0048287 ; synonym:nucleus organization and biogenesis
+       %nuclear body organization and biogenesis ; GO:0030575
+   %death ; GO:0016265
+    <aging ; GO:0007568 ; synonym:GO:0016280 ; synonym:senescence % development ; GO:0007275
+     %cell aging ; GO:0007569 ; synonym:cellular senescence < cell death ; GO:0008219
+      <nucleolar fragmentation ; GO:0007576
+       %nucleolar fragmentation during replicative aging ; GO:0001303 < replicative cell aging ; GO:0001302
+      %replicative cell aging ; GO:0001302
+       <nucleolar fragmentation during replicative aging ; GO:0001303 % nucleolar fragmentation ; GO:0007576
+    %cell death ; GO:0008219 % cellular physiological process ; GO:0050875
+     <cell aging ; GO:0007569 ; synonym:cellular senescence % aging ; GO:0007568      <nucleolar fragmentation ; GO:0007576
+       %nucleolar fragmentation during replicative aging ; GO:0001303 < replicative cell aging ; GO:0001302
+      %replicative cell aging ; GO:0001302
+       <nucleolar fragmentation during replicative aging ; GO:0001303 % nucleolar fragmentation ; GO:0007576
+   %metabolism ; GO:0008152
+    %catabolism ; GO:0009056
+     %macromolecule catabolism ; GO:0009057
+      %RNA catabolism ; GO:0006401 % RNA metabolism ; GO:0016070
+       %snoRNA catabolism ; GO:0016077 % snoRNA metabolism ; GO:0016074
+    %nucleobase\, nucleoside\, nucleotide and nucleic acid metabolism ; GO:0006139
+     %RNA metabolism ; GO:0016070
+      %RNA catabolism ; GO:0006401 % macromolecule catabolism ; GO:0009057
+       %snoRNA catabolism ; GO:0016077 % snoRNA metabolism ; GO:0016074
+      %RNA processing ; GO:0006396 ; synonym:GO:0006394
+       %snoRNA processing ; GO:0043144 % snoRNA metabolism ; GO:0016074
+      %snoRNA metabolism ; GO:0016074
+       %snoRNA catabolism ; GO:0016077 % RNA catabolism ; GO:0006401
+       %snoRNA processing ; GO:0043144 % RNA processing ; GO:0006396
+     %transcription ; GO:0006350
+      %transcription\, DNA-dependent ; GO:0006351
+       %snoRNA transcription ; GO:0009302
+ <cellular_component ; GO:0005575
+  %cell ; GO:0005623
+   <intracellular ; GO:0005622 ; synonym:protoplasm
+    <chromosome ; GO:0005694
+     <chromatin ; GO:0000785
+      %nuclear chromatin ; GO:0000790 < nuclear chromosome ; GO:0000228
+       <nucleolar chromatin ; GO:0030874 < nucleolus ; GO:0005730
+     %nuclear chromosome ; GO:0000228 < nucleus ; GO:0005634
+      <nuclear chromatin ; GO:0000790 % chromatin ; GO:0000785
+       <nucleolar chromatin ; GO:0030874 < nucleolus ; GO:0005730
+    <cytoplasm ; GO:0005737
+     <preribosome ; GO:0030684 % ribonucleoprotein complex ; GO:0030529
+      %nucleolar preribosome ; GO:0030685 < nucleolus ; GO:0005730
+       %nucleolar preribosome\, large subunit precursor ; GO:0030687 ; synonym:66S preribosome
+       %nucleolar preribosome\, small subunit precursor ; GO:0030688 ; synonym:43S preribosome
+    <nucleus ; GO:0005634
+     <nuclear chromosome ; GO:0000228 % chromosome ; GO:0005694
+      <nuclear chromatin ; GO:0000790 % chromatin ; GO:0000785
+       <nucleolar chromatin ; GO:0030874 < nucleolus ; GO:0005730
+     <nucleolus ; GO:0005730
+      <nucleolar chromatin ; GO:0030874 < nuclear chromatin ; GO:0000790
+      <nucleolar preribosome ; GO:0030685 % preribosome ; GO:0030684
+       %nucleolar preribosome\, large subunit precursor ; GO:0030687 ; synonym:66S preribosome
+       %nucleolar preribosome\, small subunit precursor ; GO:0030688 ; synonym:43S preribosome
+      <nucleolar ribonuclease P complex ; GO:0005655 ; synonym:nucleolar RNase P complex % ribonuclease P complex ; GO:0030677
+      <small nucleolar ribonucleoprotein complex ; GO:0005732 ; synonym:snoRNP % ribonucleoprotein complex ; GO:0030529
+     <nucleoplasm ; GO:0005654
+      <chromatin remodeling complex ; GO:0016585 ; synonym:chromatin remodelling complex
+       %chromatin silencing complex ; GO:0005677
+        %RENT complex ; GO:0030869
+      <nuclear body ; GO:0016604
+       %nuclear speck ; GO:0016607 ; synonym:nuclear speckle ; synonym:speckle domain ; synonym:speckle focus ; synonym:splicing speckle
+    <ribonucleoprotein complex ; GO:0030529 ; synonym:RNP
+     %preribosome ; GO:0030684 < cytoplasm ; GO:0005737
+      %nucleolar preribosome ; GO:0030685 < nucleolus ; GO:0005730
+       %nucleolar preribosome\, large subunit precursor ; GO:0030687 ; synonym:66S preribosome
+       %nucleolar preribosome\, small subunit precursor ; GO:0030688 ; synonym:43S preribosome
+     %ribonuclease P complex ; GO:0030677 ; synonym:RNase P complex
+      %nucleolar ribonuclease P complex ; GO:0005655 ; synonym:nucleolar RNase P complex < nucleolus ; GO:0005730
+     %small nucleolar ribonucleoprotein complex ; GO:0005732 ; synonym:snoRNP < nucleolus ; GO:0005730
+  %obsolete cellular component ; GO:0008370
+   %small nucleolar RNA ; GO:0005733 ; synonym:snoRNA
+ <molecular_function ; GO:0003674
+  %binding ; GO:0005488 ; synonym:ligand
+   %nucleic acid binding ; GO:0003676
+    %RNA binding ; GO:0003723
+     %snoRNA binding ; GO:0030515
+   %ribonucleoprotein binding ; GO:0043021 ; synonym:RNP binding
+    %snoRNP binding ; GO:0030519
+  %obsolete molecular function ; GO:0008369
+   %small nucleolar ribonucleoprotein ; GO:0030355 ; synonym:snoRNP
+   %small nucleolar RNA ; GO:0005569

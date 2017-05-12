@@ -1,0 +1,200 @@
+<HTML>
+<HEAD>
+<TITLE>GD::RPPNG - Package for generating human only readable images</TITLE>
+<LINK REV="made" HREF="mailto:root@asgard.spale.com">
+</HEAD>
+
+<BODY>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI>
+	<LI><A HREF="#description">DESCRIPTION</A></LI>
+	<LI><A HREF="#synopsis">SYNOPSIS</A></LI>
+	<LI><A HREF="#methods">METHODS</A></LI>
+	<LI><A HREF="#examples">EXAMPLES</A></LI>
+	<LI><A HREF="#author">AUTHOR</A></LI>
+	<LI><A HREF="#version">VERSION</A></LI>
+	<LI><A HREF="#copyright">COPYRIGHT</A></LI>
+	<LI><A HREF="#see also">SEE ALSO</A></LI>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<H1><A NAME="name">NAME</A></H1>
+<P>GD::RPPNG - Package for generating human only readable images</P>
+<P>
+<HR>
+<H1><A NAME="description">DESCRIPTION</A></H1>
+<P>GD::RPPNG - Package for generating human-only readable images</P>
+<P>The GD::RPPNG (Random Password PNG) module was created to provide an easy access
+to human-only readable images. This is very usefull to avoid automatic processing
+of authentication. (ie: subscription to free email accounts).</P>
+<P>
+<HR>
+<H1><A NAME="synopsis">SYNOPSIS</A></H1>
+<PRE>
+    use GD::RPPNG;</PRE>
+<PRE>
+    # create a new image
+    $myimage = new GD::RPPNG;</PRE>
+<PRE>
+    # configure the image
+    $myimage-&gt;Config (
+        Xsize            =&gt; 400,
+        Ysize            =&gt; 75,
+        CharSet          =&gt; 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789',
+        CodeLen          =&gt; 8,
+        FontMinPT        =&gt; 12,
+        FontMaxPT        =&gt; 28,
+        yDivert          =&gt; 10,
+        Angle            =&gt; 45,
+        XLinesFactor     =&gt; 10,
+        YLinesFactor     =&gt; 10,
+        Transparent      =&gt; 0,
+        Colors           =&gt; 1,
+        bgColor          =&gt; 'FFFFFF',
+        fgColor          =&gt; '000000',
+        Code             =&gt; 'mypasswd',
+        DebugCode        =&gt; 0,
+        );</PRE>
+<PRE>
+    # add TrueType(C) fonts
+    $myimage-&gt;AddFonts (
+        '/usr/X11R6/lib/X11/fonts/truetype/arial.ttf',
+        '/usr/X11R6/lib/X11/fonts/truetype/courier.ttf',
+    );</PRE>
+<PRE>
+    # generate the image
+    ( $mycode, $mypng ) = $image-&gt;GenImage();</PRE>
+<P>
+<HR>
+<H1><A NAME="methods">METHODS</A></H1>
+<DL>
+<DT><STRONG><A NAME="item_%24object_%3D_new_GD%3A%3ARPPNG">$object = new GD::RPPNG</A></STRONG><BR>
+<DD>
+Creates a new object and sets all default options (see next METHOD for detailed description):
+<PRE>
+    Xsize         =&gt; 400
+    Ysize         =&gt; 75
+    CharSet       =&gt; 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'
+    CodeLen       =&gt; 8
+    FontMinPT     =&gt; 12
+    FontMaxPT     =&gt; 28
+    yDivert       =&gt; 10
+    Angle         =&gt; 45
+    XLinesFactor  =&gt; 10
+    YLinesFactor  =&gt; 10
+    Transparent   =&gt; 0
+    Colors        =&gt; 1
+    bgColor       =&gt; 'FFFFFF'
+    fgColor       =&gt; '000000'
+    Code          =&gt; ''
+    DebugCode     =&gt; 0</PRE>
+<P></P>
+<DT><STRONG><A NAME="item_Config">$object-&gt;<CODE>Config()</CODE></A></STRONG><BR>
+<DD>
+With this method you can override all the default options shown above.
+<P>'Xsize' defines the width of the image in pixels. here's an example:</P>
+<PRE>
+    $object-&gt;Config( Xsize =&gt; 400 )</PRE>
+<P>'Ysize' defines the height of the image in pixels. here's an example:</P>
+<PRE>
+    $object-&gt;Config( Ysize =&gt; 75 )</PRE>
+<P>'CharSet' defines the list of chars which may be used to generate the ``code''. Depending on the fonts you will use, its recommended to skip I,L,0,O and 1 as they might be confusing. here's an example:</P>
+<PRE>
+    $object-&gt;Config( CharSet =&gt; 'ABCDEFGHJKMNOPQRSTUVWXYZ23456789%$#@' )</PRE>
+<P>'CodeLen' defines the number of chars to be used to generate the ``code''. here's an example:</P>
+<PRE>
+    $object-&gt;Config( CodeLen =&gt; 8 )</PRE>
+<P>'FontMinPT' defines the minimal font size to use. here's an example:</P>
+<PRE>
+    $object-&gt;Config( FontMinPT =&gt; 12 )</PRE>
+<P>'FontMaxPT' defines the maximal font size to use. here's an example:</P>
+<PRE>
+    $object-&gt;Config( FontMaxPT =&gt; 24 )</PRE>
+<P>'yDivert' defines, in percent of the image height, the vertical range in which chars may be printed. here's an example:</P>
+<PRE>
+    $object-&gt;Config( yDivert =&gt; 10 )</PRE>
+<P>'Angle' defines, in degree, the angle range in which chars may be rotated. As an example, 90 will allow chars to be rotated from -45 to +45 degrees. here's an example:</P>
+<PRE>
+    $object-&gt;Config( Angle =&gt; 45 )</PRE>
+<P>'XLinesFactor' defines, in percent, the amount of horizontal lines to be draw. As an example, 50 on a 400 pixels wide image will draw about 200 lines. here's an example:</P>
+<PRE>
+    $object-&gt;Config( XLinesFactor =&gt; 20 )</PRE>
+<P>'YLinesFactor' defines, in percent, the amount of vertical lines to be draw. As an example, 50 on a 100 pixels high image will draw about 50 lines. here's an example:</P>
+<PRE>
+    $object-&gt;Config( YLinesFactor =&gt; 20 )</PRE>
+<P>'Transparent' defines if the background has to be transparent or not. here's an example:</P>
+<PRE>
+    $object-&gt;Config( Transparent =&gt; 0 )</PRE>
+<P>'Colors' defines if the image will use random colors or not. here's an example:</P>
+<PRE>
+    $object-&gt;Config( Colors =&gt; 1 )</PRE>
+<P>'bgColor' defines, in RRGGBB (hex) format, the background color to use. here's an example:</P>
+<PRE>
+    $object-&gt;Config( bgColor =&gt; 'FFFFFF' )</PRE>
+<P>'fgColor' defines, in RRGGBB (hex) format, the foreground color to use. here's an example:</P>
+<PRE>
+    $object-&gt;Config( fgColor =&gt; '000000' )</PRE>
+<P>'Code' defines the ``code''. If not set, a random code will be generated using the CharSet and the CodeLen options. If set, CharSet and CodeLen will be ignored. here's an example:</P>
+<PRE>
+    $object-&gt;Config( Code =&gt; 'q12we34r' )</PRE>
+<P><STRONG>NOTE: You may specify multiple options at the same time</STRONG> here's an example:</P>
+<PRE>
+    $object-&gt;Config(
+        Xsize =&gt; 400,
+        Ysize =&gt; 75,
+        Colors =&gt; 1
+   );</PRE>
+<P>'DebugCode' defines if the ``code'' will be displayed on the top left of the image or not. NOTE: Do only use this for debugging purpose! here's an example:</P>
+<P></P>
+<DT><STRONG><A NAME="item_AddFonts">$object-&gt;<CODE>AddFonts()</CODE></A></STRONG><BR>
+<DD>
+With this method you can add TrueType fonts. Those fonts will be randomly used to draw the ``code'' on the image. here's an example:
+<PRE>
+    $object-&gt;AddFonts(
+        '/usr/X11R6/lib/X11/fonts/truetype/arial.ttf',
+        '/usr/X11R6/lib/X11/fonts/truetype/courier.ttf'
+    );</PRE>
+<P></P>
+<DT><STRONG><A NAME="item_GenImage">$object-&gt;<CODE>GenImage()</CODE></A></STRONG><BR>
+<DD>
+With this method you will generate the image. The method will return the ``code'' and the image in an array. here's an example:
+<PRE>
+    ($mycode, $myimage) = $object-&gt;GenImage();
+    print &quot;Content-type: image/png\n\n&quot;;
+    print $myimage;</PRE>
+<P></P></DL>
+<P>
+<HR>
+<H1><A NAME="examples">EXAMPLES</A></H1>
+<P>Many examples may be found at <A HREF="http://www.spale.com/gd-rppng">http://www.spale.com/gd-rppng</A></P>
+<P>
+<HR>
+<H1><A NAME="author">AUTHOR</A></H1>
+<P>Pascal Gloor &lt;<A HREF="mailto:spale@cpan.org">spale@cpan.org</A>&gt;</P>
+<P>The GD::RPPNG module was written by Pascal Gloor.</P>
+<P>
+<HR>
+<H1><A NAME="version">VERSION</A></H1>
+<P>Version 0.9, released on 11 Dec 2003.</P>
+<P>
+<HR>
+<H1><A NAME="copyright">COPYRIGHT</A></H1>
+<P>GD::RPPNG Copyright (C) 2003 Pascal Gloor &lt;<A HREF="mailto:spale@cpan.org">spale@cpan.org</A>&gt;</P>
+<P>GD Copyright (C) 1995-2000, Lincoln D. Stein.</P>
+<P>This module is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.</P>
+<P>
+<HR>
+<H1><A NAME="see also">SEE ALSO</A></H1>
+<P><A HREF="/GD/RPPNG.html">the GD::RPPNG manpage</A></P>
+
+</BODY>
+
+</HTML>

@@ -1,0 +1,21 @@
+!THIS IS TEST DATA
+! Even if the biology in this becomes superceded, please DO NOT edit
+! this file, it is here as part of the test suite
+! and lives in database go_mini
+$Gene_Ontology ; GO:0003673
+ <biological_process ; GO:0008150
+  %cell growth and maintenance ; GO:0008151
+   %metabolism ; GO:0008152
+    %catabolism ; GO:0009056
+     %macromolecule catabolism ; GO:0009057
+    %biosynthesis ; GO:0009058 ; synonym:anabolism
+     %macromolecule biosynthesis ; GO:0009059
+    %carbon utilization ; GO:0015976
+     %carbon utilization by fixation of carbon dioxide ; GO:0015977 ; synonym:autotrophy
+     %carbon utilization by utilization of organic compounds ; GO:0015978 ; synonym:heterotrophy
+    %carbohydrate metabolism ; GO:0005975
+     %monosaccharide metabolism ; GO:0005996
+      %xylulose metabolism ; GO:0005997
+       %xylulose catabolism ; GO:0005998 % catabolism ; GO:0009056
+       %xylulose biosynthesis ; GO:0005999 % biosynthesis ; GO:0009058
+      %fructose metabolism ; GO:0006000

@@ -1,0 +1,12 @@
+[ontology]
+name:test
+
+[term]
+acc: ZO:0001
+name: blah
+
+[term]
+acc: ZO:0002
+name: foo
+relationship: isa blah
+property: synthesizes PO:0001

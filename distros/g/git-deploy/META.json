@@ -1,0 +1,68 @@
+{
+   "abstract" : "automate the git steps required for a deploying code from a git repository",
+   "author" : [
+      "\u00c6var Arnfj\u00f6r\u00f0 Bjarmason <avarab@gmail.com>, Yves Orton <demerphq@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.300021, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "git-deploy",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Cwd" : "0",
+            "Data::Dumper" : "0",
+            "Exporter" : "0",
+            "Fcntl" : "0",
+            "File::Basename" : "0",
+            "File::Spec::Functions" : "0",
+            "FindBin" : "0",
+            "Getopt::Long" : "0",
+            "Memoize" : "0",
+            "POSIX" : "0",
+            "Pod::Usage" : "0",
+            "Sys::Hostname" : "0",
+            "Term::ReadLine" : "0",
+            "Time::HiRes" : "0",
+            "constant" : "0",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "File::Temp" : "0",
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://github.com/git-deploy/git-deploy/issues"
+      },
+      "homepage" : "http://git-deploy.github.com",
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/git-deploy/git-deploy.git",
+         "web" : "https://github.com/git-deploy/git-deploy"
+      }
+   },
+   "version" : "6.01"
+}
+

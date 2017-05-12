@@ -1,0 +1,101 @@
+#!/usr/bin/env perl
+
+package grok;
+BEGIN {
+  $grok::AUTHORITY = 'cpan:HINRIK';
+}
+{
+  $grok::VERSION = '0.26';
+}
+use strict;
+use warnings FATAL => 'all';
+
+use App::Grok;
+my $grok = App::Grok->new();
+$grok->run();
+
+=encoding utf8
+
+=head1 NAME
+
+grok - Perl 6 documentation reader
+
+=head1 SYNOPSIS
+
+B<grok> <options> <target>
+
+ Options:
+   -F FILE, --file=FILE         A file to read Pod from
+   -h, --help                   Print this help message
+   -i, --index                  Print index of things grok knows about
+   -l, --locate                 Locate the target file
+   -o FORMAT, --output=FORMAT   The output format, ansi/text/xhtml/pod
+   -T, --no-pager               Send output to STDOUT without any pager
+   -U, --update                 Update all document resources from the web
+   -u, --unformatted            Print unformatted Pod output
+   -V, --version                Print version information
+
+ If you don't supply the -F or -i options, you need to supply a target.
+ The following targets are recognized:
+
+   * A Synopsis name ('s02', 's02-bits', 's32-rules')
+   * An Apocalypse name ('a01', 'a02', 'a03')
+   * An Exegesis name ('e01', 'e02', 'e03')
+   * An article name ('m01', 'm01-perl6-announcement', 'm02')
+   * A function name from Synopsis 29
+   * An entry in the Perl 6 Table Index ('%', '!=', 'split')
+   * The Perl 6 Tablet Index itself ('tablet_index')
+   * A path to a file containing Pod ('/some/file.pod')
+
+=head1 DESCRIPTION
+
+This little application is intended to be a C<L<perldoc>> for Perl 6.
+
+=head2 Prior art and inspiration
+
+=over 4
+
+=item Perl 5's C<perldoc> (L<http://perldoc.perl.org/perldoc.html>)
+
+=item Python's C<pydoc> (L<http://docs.python.org/library/pydoc.html>)
+
+=item Ruby's C<ri> (L<http://svn.ruby-lang.org/cgi-bin/viewvc.cgi/trunk/lib/rdoc/>)
+
+=item L<http://svn.pugscode.org/pugs/ext/Perldoc/>
+
+=item L<http://svn.pugscode.org/pugs/examples/perldoc.pl>
+
+=back
+
+=head1 CAVEATS
+
+=head2 Limitations of C<Perl6::Perldoc>
+
+I<The following only affects Pod 6 documents.>
+
+=over 2
+
+=item * Long lines are not wrapped to fit your terminal.
+
+=item * Extraneous whitespace in paragraphs is preserved, counter to the spec.
+
+=item * Formatting codes using french quotes (C<C«»>) aren't parsed correctly,
+so they are rendered verbatim.
+
+=item * Formatting codes within C<=table> blocks are ignored.
+
+=back
+
+=head1 AUTHOR
+
+Hinrik Örn Sigurðsson, L<hinrik.sig@gmail.com>
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright 2009 Hinrik Örn Sigurðsson
+
+C<grok> is distributed under the terms of the Artistic License 2.0.
+For more details, see the full text of the license in the file F<LICENSE>
+that came with this distribution.
+
+=cut

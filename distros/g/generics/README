@@ -1,0 +1,25 @@
+generics version 0.04
+=====================
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires no other modules and libraries. The test
+suite however requires Test::Exception.
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2004 Infinity Interactive, Inc.
+
+http://www.iinteractive.com
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 

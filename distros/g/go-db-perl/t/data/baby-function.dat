@@ -1,0 +1,123 @@
+!THIS IS TEST DATA
+! Even if the biology in this becomes superceded, please DO NOT edit
+! this file, it is here as part of the test suite
+! and lives in database go_mini
+$Gene_Ontology ; GO:0003673
+ $fake_term ; GO:0008233
+ %cellular_component ; GO:0005575
+  %cell ; GO:0005623
+   <AMP-activated protein kinase complex ; GO:0031588 ; synonym:Snf1 kinase complex ; synonym:Snf1 serine/threonine protein kinase complex ; synonym:5'-AMP-activated protein kinase complex
+   <apical part of cell ; GO:0045177
+   <ATP-binding cassette (ABC) transporter complex ; GO:0043190 ; synonym:ABC-type efflux permease activity ; synonym:ABC-type efflux porter activity ; synonym:ABC-type uptake permease activity ; synonym:ATP-binding cassette (ABC) transporter activity ; synonym:mating pheromone exporter
+   <basal part of cell ; GO:0045178
+   <bud ; GO:0005933
+    <bud neck ; GO:0005935 % site of polarized growth ; GO:0030427
+     <bud neck polarisome ; GO:0031560
+     <contractile ring (sensu Saccharomyces) ; GO:0000142 ; synonym:actomyosin ring (sensu Saccharomyces) ; synonym:cytokinetic ring (sensu Saccharomyces) ; synonym:neck ring
+   <cell fraction ; GO:0000267
+   <cell projection ; GO:0042995
+   <cell septum ; GO:0030428 ; synonym:cross wall ; synonym:septum
+   <cell soma ; GO:0043025 ; synonym:cell body
+   <cell surface ; GO:0009986 ; synonym:cell associated ; synonym:cell bound
+   <external encapsulating structure ; GO:0030312
+   <glutamate synthase complex ; GO:0031026
+   <immature spore ; GO:0042763 ; synonym:forespore ; synonym:prospore
+   <intracellular ; GO:0005622 ; synonym:protoplasm
+   <lateral part of motile cell ; GO:0031255
+   <leading edge ; GO:0031252 ; synonym:front of cell
+   <membrane ; GO:0016020
+   <midbody ; GO:0030496
+   <periplasmic space ; GO:0042597 ; synonym:periplasm
+   <photoreceptor inner segment ; GO:0001917
+   <site of polarized growth ; GO:0030427 ; synonym:site of polarized growth (sensu Fungi) ; synonym:site of polarized growth (sensu Saccharomyces) ; synonym:GO:0000134 ; synonym:GO:0030483
+    %bud tip ; GO:0005934
+    %cell tip ; GO:0051286 ; synonym:cell end
+    %growth cone ; GO:0030426
+    %hyphal tip ; GO:0001411
+    %mating projection tip ; GO:0043332 ; synonym:conjugation tube tip
+    <polarisome ; GO:0000133
+   <trailing edge ; GO:0031254 ; synonym:back of cell
+    <trailing edge membrane ; GO:0031257
+    <uropod ; GO:0001931 ; synonym:distal pole complex ; synonym:retractile pole
+   <tripartite ATP-independent periplasmic transporter complex ; GO:0031317 ; synonym:TRAP transporter complex ; synonym:TRAP-T transporter complex
+  %cellular component unknown ; GO:0008372
+  %envelope ; GO:0031975
+  %extracellular matrix ; GO:0031012
+  %extracellular region ; GO:0005576 ; synonym:extracellular
+  %membrane-enclosed lumen ; GO:0031974
+  %organelle ; GO:0043226
+  %protein complex ; GO:0043234
+  %virion ; GO:0019012 ; synonym:complete virus particle
+ $molecular_function ; GO:0003674
+  %nucleic acid binding ; GO:0003676
+   %DNA binding ; GO:0003677
+    %DNA helicase ; GO:0003678, GO:0003679 % helicase ; GO:0004386
+    %AT DNA binding ; GO:0003680
+    %bent DNA binding ; GO:0003681
+    %chromatin binding ; GO:0003682
+     %lamin/chromatin binding ; GO:0003683
+    %damaged DNA binding ; GO:0003684
+    %DNA bending ; GO:0008301
+    %DNA repair protein ; GO:0003685
+     %DNA repair enzyme ; GO:0003686 % enzyme ; GO:0003824
+    %DNA replication factor ; GO:0003687
+     %DNA replication origin binding ; GO:0003688
+     %DNA clamp loader ; GO:0003689
+    %double-stranded DNA binding ; GO:0003690
+     %double-stranded telomeric DNA binding ; GO:0003691 % telomerase ; GO:0003720
+     %recombinase ; GO:0000150 ; synonym:FLP recombinase ; synonym:YADDA
+    %left-handed Z-DNA binding ; GO:0003692
+    %P-element binding ; GO:0003693
+    %plasmid-associated protein ; GO:0003694
+    %random coil DNA binding ; GO:0003695
+    %ribosomal DNA (rDNA) binding ; GO:0000182
+    %satellite DNA binding ; GO:0003696
+    %single-stranded DNA binding ; GO:0003697, GO:0003698, GO:0003699
+    %DNA secondary structure binding ; GO:0000217
+    %transcription factor ; GO:0003700, GO:0000130
+     %RNA polymerase I transcription factor ; GO:0003701
+     %RNA polymerase II transcription factor ; GO:0003702
+      %general RNA polymerase II transcription factor ; GO:0003703
+      %specific RNA polymerase II transcription factor ; GO:0003704
+      %enhancer binding ; GO:0003705
+      %ligand-regulated transcription factor ; GO:0003706
+       %steroid hormone receptor ; GO:0003707 % ligand-dependent nuclear receptor ; GO:0004879
+       %retinoic acid receptor ; GO:0003708 % ligand-dependent nuclear receptor ; GO:0004879
+     %RNA polymerase III transcription factor ; GO:0003709
+     %transcription activating factor ; GO:0003710
+     %transcription elongation factor ; GO:0003711
+      %negative transcription elongation factor ; GO:0008148
+      %positive transcription elongation factor ; GO:0008159
+     %transcription termination factor ; GO:0003715
+      %Pol I transcription termination factor ; GO:0003716
+      %Pol II transcription termination factor ; GO:0003717
+      %Pol III transcription termination factor ; GO:0003718
+    %telomerase ; GO:0003720
+     %telomeric RNA reverse transcriptase ; GO:0003721 ; EC:2.7.7.49 % RNA-directed DNA polymerase ; GO:0003964
+     %double-stranded telomeric DNA binding ; GO:0003691 % double-stranded DNA binding ; GO:3690
+  %enzyme ; GO:0003824
+   %alpha,alpha-trehalose-phosphate synthase (UDP-forming) ; GO:0003825 ; EC:2.4.1.15
+   %alpha-ketoacid dehydrogenase ; GO:0003826
+   %alpha-methylacyl-CoA racemase ; GO:0008111 ; EC:5.1.99.4
+   %alpha-N-acetylgalactosaminidase ; GO:0008456 ; EC:3.2.1.49
+   %beta-alanyl-dopamine hydrolase ; GO:0003832
+   %beta-alanyl-dopamine synthase ; GO:0003833
+   %beta-carotene 15,15'-dioxygenase ; GO:0003834 ; EC:1.13.11.21
+   %beta-ureidopropionase ; GO:0003837 ; EC:3.5.1.6
+   %delta,5-delta2,4-dienoyl-CoA isomerase ; GO:0008416
+   %delta(3)-cis-delta(2)-trans-enoyl-CoA isomerase ; GO:0008461 ; EC:5.3.3.8
+   %gamma-butyrobetaine,2-oxoglutarate dioxygenase ; GO:0008336 ; EC:1.14.11.1
+   %gamma-glutamyl carboxylase ; GO:0008488
+   %gamma-glutamylcyclotransferase ; GO:0003839 ; EC:2.3.2.4
+   %gamma-glutamyl hydrolase ; GO:0008464 ; EC:3.4.19.9
+   %gamma-glutamyl transferase ; GO:0003840 ; EC:2.3.2.2
+   %DNA repair enzyme ; GO:0003686 % DNA repair protein ; GO:0003685
+    %deoxyribodipyrimidine photolyase ; GO:0003904 ; EC:4.1.99.3 % DNA photolyase ; GO:0003913
+    %DNA-3-methyladenine glycosidase II ; GO:0003905 ; EC:3.2.2.21
+    %DNA-(apurinic or apyrimidinic site) lyase ; GO:0003906 ; EC:4.2.99.18
+    %methylated-DNA--[protein]-cysteine S-methyltransferase ; GO:0003908 ; EC:2.1.1.63 % S-methyltransferase ; GO:0008172
+   %DNA glycolase ; GO:0008578
+    %8-oxoguanine DNA glycosylase ; GO:0008534
+    %G/T-mismatch-specific thymine-DNA glycosylase ; GO:0008263 % DNA repair enzyme ; GO:0003686
+    %formamidopyrimidine-DNA glycosylase ; GO:0003907 ; EC:3.2.2.23 % DNA repair enzyme ; GO:0003686
+    %uracil-DNA glycosylase ; GO:0004844 ; EC:3.2.2.- % DNA repair enzyme ; GO:0003686

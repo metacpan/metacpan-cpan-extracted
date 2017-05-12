@@ -1,0 +1,104 @@
+$Id: SPECS,v 1.3 2002/04/29 21:26:29 scop Exp $
+-------------------------------------------------------------------------------
+NUMBER (HTML 4.01), %Number (XHTML 1.0): handled as an integer.
+-------------------------------------------------------------------------------
+Element(s)        Attribute(s)          HTML 4.01           XHTML 1.0
+textarea          rows, cols                x                   x
+td, th            rowspan, colspan          x                   x
+input             maxlength                 x                   x
+select            size                      x                   x
+col, colgroup     span                      x                   x
+ol                start                     x                   x
+a, area, button,  tabindex                  x                   x
+  input, object,
+  select, textarea
+li                value                     x                   x
+pre               width                     x                   x
+-------------------------------------------------------------------------------
+%Pixels: handled as an integer.
+-------------------------------------------------------------------------------
+applet, img       hspace, vspace            x                   x
+frame, iframe     marginheight,             x                   x
+                  marginwidth
+hr                size                      x                   x
+img               border                    x                   -
+table             border                    x                   x
+object            border, hspace, vspace    x                   x
+td, th            width, height             -                   x
+-------------------------------------------------------------------------------
+%Length: integer, possibly following a '%'.
+-------------------------------------------------------------------------------
+applet, iframe,   height                    x                   x
+  img, object
+applet, hr,       width                     x                   x
+  iframe, img,
+  object, table
+col, colgroup,    charoff                   x                   x
+  tbody, td, tfoot,
+  th, thead, tr
+img               border                    -                   x
+table             cellpadding, cellspacing  x                   x
+td, th            width, height             x                   -
+-------------------------------------------------------------------------------
+Fixed-valued attributes:
+-------------------------------------------------------------------------------
+hr                    align           left|center|justify
+div,h1-h6,p           align           left|center|right|justify
+col,colgroup,tbody,   align           left|center|right|justify|char
+  td,tfoot,th,thead,tr
+input                 checked         checked
+br                    clear           left|all|right|none
+dir,dl,menu,ol,ul     compact         compact
+object                declare         declare
+script                defer           defer
+all elements but      dir             ltr|rtl
+  applet,base,
+  basefont,br,frame,
+  frameset,iframe,
+  param,script
+button,input,option,  disabled        disabled
+  optgroup,select,textarea
+frame, iframe         frameborder     1|0
+img, input            ismap           ismap
+form                  method          get|post
+area                  nohref          nohref
+frame                 noresize        noresize
+hr                    noshade         noshade
+td, th                nowrap          nowrap
+textarea              readonly        readonly
+input                 readonly        readonly
+frame, iframe         scrolling       yes|no|auto
+button                type            button|submit|reset
+col,colgroup,tbody,   valign          top|middle|bottom|baseline
+  td,tfoot,th,thead,tr
+param                 valuetype       data|ref|object
+caption,legend        align           top|bottom|left|right
+applet,iframe,img,    align           top|middle|bottom|left|right
+  input,object
+table                 align           left|center|right
+table                 frame           void|above|below|hsides|lhs|rhs|vsides|
+                                        box|border
+table                 rules           none|groups|rows|cols|all
+td,th                 scope           row|col|rowgroup|colgroup
+area,a                shape           rect|circle|poly|default
+li                    style           disc|square|circle|1|a|A|i|I
+ol                    style           1|a|A|i|I
+ul                    style           disc|square|circle
+input                 type            text|password|checkbox|radio|submit|
+                                        reset|file|hidden|image|button
+--- XHTML-only below ---
+html                  xmlns           http://www.w3.org/1999/xhtml
+style                 xml:space       preserve
+script                xml:space       preserve
+pre                   xml:space       preserve
+-------------------------------------------------------------------------------
+ID,NAME,IDREF: ^[a-zA-Z][-\w:.]*$
+-------------------------------------------------------------------------------
+all elements but      id                        ID
+  base,head,html,
+  meta,script,style,
+  title
+label                 for                       IDREF
+meta                  name,http-equiv           NAME
+td,th                 headers                   IDREFS (space-separated IDREFs)
+-------------------------------------------------------------------------------

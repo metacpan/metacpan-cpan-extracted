@@ -1,0 +1,412 @@
+!!!!!!!!!!!
+! generic !
+!!!!!!!!!!!
+
+[property]
+id: successor_to
+relationship: is_a variation_of
+
+[term]
+id: analysis_program
+property: has_version string
+property: has_vendor_impl vendor_impl
+property: developed_by
+property: has_sensitivity scale_val
+property: has_selectivity scale_val
+property: variation_of analysis_program
+
+[term]
+id: protocol
+property: has_program analysis_program *
+definition: a computable description of how to run a set of analyses
+
+[term]
+id: sequence_analysis_program
+relationship: is_a analysis_program
+property: has_query_sequence SO:so
+property: has_query_sequence_source string
+
+[term]
+id: structure_prediction_program
+relationship: is_a sequence_analysis_program
+
+[term]
+id: secondary_structure_prediction_program
+relationship: is_a structure_prediction_program
+
+[term]
+id: rna_structure_prediction_program
+relationship: is_a structure_prediction_program
+
+[term]
+id: na_sequence_analysis_program
+relationship: is_a sequence_analysis_program
+relationship: has_query_sequence SO:na
+
+[term]
+id: dna_sequence_analysis_program
+relationship: is_a na_sequence_analysis_program
+
+[term]
+id: rna_sequence_analysis_program
+relationship: is_a na_sequence_analysis_program
+relationship: has_query_sequence SO:rna
+
+[term]
+id: transcribed_na_sequence_analysis_program
+relationship: is_a na_sequence_analysis_program
+
+[term]
+id: aa_sequence_analysis_program
+relationship: is_a sequence_analysis_program
+
+[term]
+id: nucleotide_motif_detection_program
+relationship: is_a motif_detection_program
+relationship: input_sequence_type SO:nucleotide
+
+[term]
+id: prediction_program
+relationship: is_a sequence_analysis_program
+property: predicts_type SO:so
+property: model_source source
+property: model_source_file source_file
+
+!!!!!!!!!!!!!!
+! prediction !
+!!!!!!!!!!!!!!
+
+! diff btwn motif and prediction??
+
+[term]
+id: protein_motif_detection_program
+relationship: is_a prediction_program
+relationship: predicts_type SO:protein_motif
+
+[term]
+id: interproscan
+relationship: is_a protein_motif_detection_program
+relationship: is_a protocol
+relationship: has_program prints
+relationship: has_program pfam
+
+[term]
+id: pfam
+relationship: is_a protein_motif_detection_program
+
+[term]
+id: part_of_gene
+relationship: part_of SO:gene
+
+[term]
+id: gene_prediction_program
+relationship: is_a prediction_program
+relationship: predicts_type part_of_gene
+
+[term]
+id: noncoding_gene_prediction_program
+relationship: is_a gene_prediction_program
+relationship: predicts_type SO:noncoding_transcript
+
+[term]
+id: trnascan-se
+relationship: is_a noncoding_gene_prediction_program
+relationship: predicts_type SO:tRNA
+
+[term]
+id: protein_coding_gene_prediction_program
+relationship: is_a gene_prediction_program
+relationship: predicts_type SO:CDS
+
+[term]
+id: fgenesh
+relationship: is_a protein_coding_gene_prediction_program
+relationship: predicts_type SO:CDS
+
+[term]
+id: fgenesh++
+relationship: successor_to fgenesh
+
+[term]
+id: geneid
+relationship: is_a protein_coding_gene_prediction_program
+relationship: predicts_type SO:CDS
+
+[term]
+id: genewise
+relationship: is_a protein_coding_gene_prediction_program
+relationship: predicts_type SO:CDS
+
+[term]
+id: genscan
+relationship: is_a protein_coding_gene_prediction_program
+relationship: predicts_type SO:CDS
+relationship: has_sensitivity high
+relationship: has_selectivity low
+
+[term]
+id: genie
+relationship: is_a protein_coding_gene_prediction_program
+relationship: predicts_type SO:CDS
+relationship: has_sensitivity low
+relationship: has_selectivity high
+
+[term]
+id: combined_prediction_pairwise_alignment_program
+relationship: is_a prediction_program
+relationship: is_a pairwise_alignment_program
+
+[term]
+id: genie-EST
+relationship: is_a combined_prediction_pairwise_alignment_program
+relationship: is_a genie
+
+[term]
+id: twinscan
+relationship: is_a combined_prediction_pairwise_alignment_program
+relationship: predicts_type SO:mRNA
+
+!!!!!!!!!!!!!
+! alignment !
+!!!!!!!!!!!!!
+
+[term]
+id: sequence_alignment_program
+relationship: is_a sequence_analysis_program
+
+[term]
+id: structural_sequence_alignment_program
+relationship: is_a sequence_alignment_program
+definition: aligns using both primary and secondary structure
+
+[term]
+id: multiple_sequence_alignment_program
+relationship: is_a sequence_alignment_program
+
+[term]
+id: tcoffee
+relationship: is_a multiple_sequence_alignment_program
+
+[term]
+id: clustalw
+relationship: is_a multiple_sequence_alignment_program
+
+[term]
+id: pairwise_sequence_alignment_program
+relationship: is_a sequence_alignment_program
+
+[term]
+id: exonerate
+relationship: is_a pairwise_sequence_alignment_program
+
+[term]
+id: sim4
+relationship: is_a pairwise_sequence_alignment_program
+relationship: seq_type genome_to_expressed
+
+[term]
+id: blast
+relationship: is_a pairwise_sequence_alignment_program
+
+[term]
+id: blastn
+cross_product: blast (seq_type nucleotide_to_nucleotide)
+
+[term]
+id: blastp
+cross_product: blast (seq_type protein_to_protein)
+
+[term]
+id: blastx
+cross_product: blast (seq_type nucelotide_to_protein)
+
+[term]
+id: tblastx
+cross_product: blast (seq_type translated_nucleotide_to_nucleotide)
+
+[term]
+id: tblastn
+cross_product: blast (seq_type protein_to_nucleotide)
+
+[term]
+id: seq_type
+property: has_query_seq_type
+property: has_subject_seq_type
+
+[term]
+id: nucleotide_seq_input
+relationship: is_a seq_type
+relationship: has_query_seq_type SO:nucleotide
+
+[term]
+id: protein_seq_input
+relationship: is_a seq_type
+relationship: has_query_seq_type SO:protein
+
+[term]
+id: nucelotide_to_protein
+cross_product: nucleotide_seq_input (has_subject_seq_type SO:protein)
+
+!!!!!!!!!!!!!!!!
+! vendor_impl  !
+!!!!!!!!!!!!!!!!
+
+[term]
+id: vendor_impl
+
+[term]
+id: ncbi
+relationship: is_a vendor_impl
+
+[term]
+id: wu
+relationship: is_a vendor_impl
+
+
+!!!!!!!!!!!
+! output  !
+!!!!!!!!!!!
+
+[term]
+id: program_output
+property: has_unit score_unit
+property: has_program analysis_program
+
+[term]
+id: blast_score
+cross_product: program_output (has_program blast)
+
+! what about normalized!!!???
+[term]
+id: blast_bitscore
+cross_product: blast_score (has_unit bit)
+
+[term]
+id: blast_natscore
+cross_product: blast_score (has_unit nat)
+
+[term]
+id: score_unit
+
+[term]
+id: nat
+relationship: is_a score_unit
+
+[term]
+id: bit
+relationship: is_a score_unit
+definition:
+
+[term]
+id: p_value
+relationship: is_a program_output
+definition: probability
+
+[term]
+id: e_value
+relationship: is_a program_output
+definition: expectation
+
+[term]
+id: conversion_formula
+property: has_equation string
+property: has_input value
+property: has_output value
+
+[term]
+id: conversion_e_to_p
+relationship: is_a conversion_formula
+relationship: has_input e_value
+relationship: has_output p_value
+relationship: has_equation $input=$output blah blah... 
+
+[term]
+id: parameter
+property: has_program analysis_program
+
+!!!!!!!!!!!!!!!!!!!!
+! program params   !
+!!!!!!!!!!!!!!!!!!!!
+
+[term]
+id: program_parameter
+relationship: is_a parameter
+
+[term]
+id: relative_entropy
+relationship: is_a program_parameter
+
+!!!!!!!!!!!
+! input   !
+!!!!!!!!!!!
+
+[term]
+id: input_parameter
+relationship: is_a parameter
+property: cmd_line_switch
+
+[term]
+id: scoring_matrix
+relationship: is_a input_parameter
+
+[term]
+id: pam
+relationship: is_a scoring_matrix
+property: pam_num int
+
+[term]
+id: pam250
+cross_product: pam (pam_num 250)
+
+[term]
+id: blosum
+relationship: is_a scoring_matrix
+property: blosum_num int
+
+[term]
+id: subject_sequence_source
+relationship: is_a input_parameter
+
+[term]
+id: single_subject_sequence_source
+relationship: is_a subject_sequence_source
+
+[term]
+id: multiple_subject_sequence_source
+relationship: is_a subject_sequence_source
+
+[term]
+id: query_sequence_source
+relationship: is_a input_parameter
+
+!!!!!!!!!
+[term]
+id: command_line_fmt
+property: has_program
+property: fmt_str
+
+[term]
+id: ncbi_blast_command_line_fmt
+cross_product: command_line_fmt (has_program ncbi_blast)
+relationship: fmt_str 'blastall -p %has_program% -i ...'
+
+[term]
+id: program_installation
+property: has_program analysis_program
+property: has_site string
+property: has_path string
+property: has_installation_date
+
+[term]
+id: program_run
+property: has_program analysis_program
+
+[term]
+id: foo
+
+[instance]
+class: query_sequence_source
+propval: has_program blast
+propval: cmd_line_switch -i
+
+!!!!!!! END !!!!!!!!

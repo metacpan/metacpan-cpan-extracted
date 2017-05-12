@@ -1,0 +1,21 @@
+Features
+--------------------
+
+ * Hook into STD.pm or something similar so the user can do something like
+   C<grok '[*]'> or C<grok -s '[*]'> to find out about syntax
+ * Look at proto and other installation software for Perl 6 and see if we can
+   find a way to look up module files, for C<grok Pod::Parser>, etc
+ * Add -m switch to display module's file in its entirety like perldoc
+ * Think about i18n, add -L for lang code like perldoc
+ * Maybe use Pod::Man to allow --format=man
+ * Start porting/bundling third-party docs
+
+
+Perl6::Perldoc-related
+--------------------
+ * Figure out how to wrap lines to $COLUMNS
+ * Maybe write an nroff renderer (for --format=man)
+ * Allow passing through the Pod verbatim (for --unformatted / --format=pod)
+ * Maybe indent paragraphs automatically like Pod::Text does
+
+

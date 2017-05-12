@@ -1,0 +1,71 @@
+[ontology]
+name: test_anatomy
+
+[term]
+acc: cellular_process
+name: cellular_process
+property: affects anatomical_part
+namerule: $NAME [in $affects]
+
+[term]
+acc: 1
+name: apoptosis
+relationship: is_a cellular_process
+namerule: $NAME [of $affects]
+
+[term]
+acc: 2
+name: induction of apoptosis
+relationship: part_of 1
+relationship: is_a cellular_process
+namerule: $NAME [of $affects]
+
+[term]
+acc: 3
+name: killing of inflammatory cells
+relationship: is_a 2
+
+[term]
+acc: 4
+name: terminal differentiation of inflammatory cells
+relationship: part_of 3
+relationship: is_a cellular_process
+
+[term]
+acc: 5
+name: induction of apoptosis of inflammatory cells
+relationship: part_of 3
+relationship: is_a cellular_process
+
+[term]
+acc: anatomical_part
+name: anatomical_part
+
+[term]
+acc: A
+name: limb
+relationship: is_a anatomical_part
+
+[term]
+acc: B
+name: handplate
+relationship: is_a anatomical_part
+relationship: part_of A
+
+[term]
+acc: C
+name: interdigital mesenchyme
+relationship: is_a anatomical_part
+relationship: part_of B
+
+!!! Cross product term
+[term]
+acc: 6
+name: apoptosis of interdigital mesenchyme
+cross_product: 1 (affects C)
+
+[term]
+acc: 7
+name: signaling from condensing mesenchyme cells
+relationship: part_of 6
+

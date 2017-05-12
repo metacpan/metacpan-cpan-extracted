@@ -1,0 +1,24 @@
+Revision history for Perl extension GCrypt.
+
+0.3   Fri Dec 27 13:11:05 CET 2002
+
+* GCrypt.xs: Rename blksize attribute to blklen throughout for conformity.
+(GCrypt_Cipher): Add keylen attribute.
+(gcry_cipher_new): Initialise it here.
+(gcry_cipher_setkey): Use it to pad or truncate key as needed.
+(gcry_cipher_sync, gcry_cipher_keylen, gcry_cipher_blklen,
+gcry_cipher_DESTROY): New functions.
+* t/1.t: Test the keylen and blklen methods on the various ciphers.
+Replace one aes application with twofish to get more cipher variety.
+* GCrypt.pm: Describe sync, keylen and blklen.
+Try to explain the modes a bit.
+
+0.2   Thu Dec 26 20:22:51 CET 2002
+	- Implements GCrypt::Cipher with methods new, setkey, setiv, encrypt,
+	  and decrypt.
+
+0.01  Sat Nov 30 14:37:45 2002
+	- originally created by h2xs 1.22 with options
+		-O -b 5.6.0 -n GCrypt /usr/include/gcrypt.h
+	- I later zilched all constant handling, so "-c" would have been better
+	  from the start.

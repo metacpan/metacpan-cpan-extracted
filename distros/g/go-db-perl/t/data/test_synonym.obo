@@ -1,0 +1,9 @@
+synonymtypedef: syncat1 "test synonym category 1"
+synonymtypedef: syncat2 "test synonym category 2"
+
+[Term]
+id: X:1
+name: x
+synonym: "foo" EXACT syncat1 [PMID:123]
+synonym: "foo bar" EXACT []
+synonym: "bar" RELATED syncat2 []

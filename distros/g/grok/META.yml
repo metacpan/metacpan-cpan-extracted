@@ -1,0 +1,46 @@
+---
+abstract: 'Perl 6 documentation reader'
+author:
+  - 'Hinrik Örn Sigurðsson <hinrik.sig@gmail.com>'
+build_requires:
+  Test::More: 0.47
+  Test::Script: 1.07
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300005, CPAN::Meta::Converter version 2.112621'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: grok
+no_index:
+  directory:
+    - t
+    - xt
+    - utils
+recommends:
+  Term::ProgressBar: 0
+  Win32::Console::ANSI: 0
+requires:
+  File::HomeDir: 0
+  File::ShareDir: 0
+  File::Temp: 0
+  Getopt::Long: 2.33
+  IO::Interactive: 0
+  IO::Socket::SSL: 0
+  LWP::UserAgent: 0
+  Perl6::Doc: 0.47
+  Perl6::Perldoc: 0.0.5
+  Perl6::Perldoc::To::Ansi: 0.07
+  Pod::Parser: 1.36
+  Pod::Text::Ansi: 0.04
+  Pod::Xhtml: 0
+  perl: 5.006
+resources:
+  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=grok
+  homepage: http://metacpan.org/release/grok
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/hinrik/grok.git
+version: 0.26
+x_authority: cpan:HINRIK

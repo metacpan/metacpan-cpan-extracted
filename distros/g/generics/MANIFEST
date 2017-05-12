@@ -1,0 +1,14 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+lib/generics.pm
+t/10_generics_test.t
+t/20_generics_inherit_test.t
+t/30_generics_errors_test.t
+t/test_lib/Base.pm
+t/test_lib/Broken.pm
+t/test_lib/BrokenThree.pm
+t/test_lib/BrokenTwo.pm
+t/test_lib/Derived.pm
+t/test_lib/Session.pm

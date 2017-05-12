@@ -1,0 +1,10 @@
+Revision history for Perl extension getaddress.
+
+0.03  Thu Aug 13 04:34:35 2009
+    - update README;
+0.02  Thu Jul 30 23:33:34 2009 
+    - fix bug about buffer return;
+    - exceptional disposal.
+0.01  Fri Feb  1 13:33:57 2008
+    - original version created by Cnangel
+

@@ -1,0 +1,56 @@
+[ontology]
+name: ribosome_ontology
+
+[term]
+id: ribosomal_subunit
+name: ribosomal subunit
+property: sensu taxon
+property: has_size size
+property: has_location ribosomal_subunit_location
+!!namerule: [$has_size] [$has_locatiion] $NAME [sensu $sensu]
+
+[term]
+id: size
+
+[term]
+id: large
+is_a: size
+
+[term]
+id: small
+is_a: size
+
+[term]
+id: ribosomal_subunit_location
+
+[term]
+id: cytosolic
+is_a: ribosomal_subunit_location
+
+[term]
+id: nuclear
+is_a: ribosomal_subunit_location
+
+[term]
+id: organellar
+is_a: ribosomal_subunit_location
+
+[term]
+id: mitochondrial
+is_a: organellar
+
+[term]
+id: plastid
+is_a: organellar
+
+[term]
+id: taxon
+
+[term]
+id: Eukarya
+is_a: taxon
+
+[term]
+id: Bacteria
+is_a: taxon
+

@@ -1,0 +1,58 @@
+[ontology]
+name: test_ontology
+
+[term]
+acc: cellular_process
+name: cellular_process
+
+[term]
+acc: regulation
+name: regulation
+property: regulates regulatable
+relationship: is_a cellular_process
+namerule: $NAME [of $regulates]
+
+[term]
+acc: negative regulation
+name: negative regulation
+relationship: is_a regulation
+
+[term]
+acc: positive regulation
+name: positive regulation
+relationship: is_a regulation
+
+[term]
+acc: regulatable
+name: regulatable
+relationship: is_a cellular_process
+
+[term]
+acc: contraction
+name: contraction
+property: contracts anatomical_part
+relationship: is_a regulatable
+namerule: [$contracts] $NAME
+
+[term]
+acc: qualifier
+name: qualifier
+
+[term]
+acc: negative
+name: negative
+relationship: is_a qualifier
+
+[term]
+acc: positive
+name: positive
+relationship: is_a qualifier
+
+[term]
+acc: anatomical_part
+name: anatomical_part
+
+[term]
+acc: A
+name: muscle
+relationship: is_a anatomical_part

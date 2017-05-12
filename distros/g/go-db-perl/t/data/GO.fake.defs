@@ -1,0 +1,11 @@
+!THIS IS TEST DATA
+! Even if the biology in this becomes superceded, please DO NOT edit
+! this file, it is here as part of the test suite
+! and lives in database go_mini
+
+term: molecular_function
+goid: GO:0003674
+definition: The action characteristic of a gene product.
+definition_reference: GO:curators
+definition_reference: testdb:001
+comment: test comment

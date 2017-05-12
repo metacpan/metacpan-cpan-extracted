@@ -1,0 +1,249 @@
+
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+  <head>
+    <title>GO Database Perl Module</title>
+    <link rel="stylesheet" type="text/css" href="../../doc/stylesheet.css">
+  </head>
+
+  <body>
+    <h1>GO Database Perl Module</h1>
+
+    <h2>Introduction</h2>
+
+    <p>
+      The go-db-perl module is an object/relational API for querying
+      the GO db and receiving perl objects. Using the API you can
+      write perl scripts to:
+
+      <ul>
+	<li>
+	  Search on GO terms from the database
+	</li>
+
+	<li>
+	  Fetch and traverse subgraphs of the GO ontology
+	</li>
+
+	<li>
+	  Fetch gene products from the database; for example, <b>find
+	    all gene products attached to <i>transmembrane
+	      receptor</i> and its children</b>
+	</li>
+
+	<li>
+	  Fetch terms and graphs from the database by gene product
+	</li>
+
+	<li>
+	  Filter and constrain searches by GO evidence codes, species
+	  and other criteria
+	</li>
+
+	<li>
+	  ...and much more!
+	</li>
+
+      </ul>
+
+      go-db-perl comes with a number of applications for loading and
+      querying the GO Database, including a Tk graphical user
+      interface, and a powerful command line interface "GOshell"
+
+    </p>
+    <p>
+      You should have a solid understanding of object oriented perl
+      before using the the go-db-perl modules
+    </p>
+
+
+    <h2>Installation</h2>
+
+    <p>
+      You should have a local copy of the GO mysql database. You will
+      also need the go-perl modules
+    </p>
+
+    <p>
+      Please follow the installation instructions for <a
+      href="../../go-perl/doc/go-perl-doc.html">go-perl</a>
+    </p>
+
+    <h2>Scripts</h2>
+    <p>
+      go-db-perl comes with scripts in the <a
+      href="../scripts">scripts</a> directory to help with querying and loading
+      databases.
+    </p>
+    <h3>Command Line Options</h3>
+    <p>
+      The following command line options are available to all database
+      scripts. If you are connecting to a local MySQL installation
+      that is not password protected you should only need the
+      <b>-d</b> option
+    <ul>
+      <li><b>-dbname (-d)</b> <i>database-name</i>
+      </li>
+      <li><b>-dbhost (-h)</b> <i>server-name</i>
+      </li>
+      <li><b>-dbuser (-u)</b> <i>user-name</i>
+      </li>
+      <li><b>-dbauth (-p)</b> <i>password</i>
+      </li>
+      <li><b>-port</b> <i>port-number</i>
+      </li>
+      <li><b>-dbms</b> <i>DBMS-type</i>
+      </li>
+      <li><b>-dsn</b> <i>DBI-DSN</i>
+      </li>
+    </ul>
+    </p>
+    <h3>Data access scripts</h3>
+    <ul>
+      <li>
+        <a href="/dev/pod/scripts/GOshell.html">GOshell.pl</a> -- an
+        interactive shell for easy object-oriented querying of the
+        database. Contains online help
+      </li>
+    </ul>
+    <h3>Data loading scripts</h3>
+    <ul>
+      <li>
+          <a href="/dev/pod/scripts/load-go-into-db.html">load-go-into-db.pl</a> -- loads a go/obo or assoc file into a database
+        </li>
+        <li>
+          <a
+          href="/dev/pod/scripts/go-prepare-release.html">go-prepare-release.pl</a>
+          -- handles the entire db release process, from generating an
+          empty db through loading it to generating exported data
+        </li>
+        <li>
+          <a href="/dev/pod/scripts/go-manager.html">go-manager.pl</a>
+          -- similar to above but allows interactive control over the
+          parts of the release process
+        </li>
+    </ul>
+    <h2>GO::AppHandle</h2>
+
+    <p>
+      The core class in the API is the <a
+	href="../../pod/GO/AppHandle.html">GO::AppHandle</a> object - it
+      mediates between your code and the database.
+    </p>
+    <p>
+      After downloading go-db-perl, consult the POD documentation,
+      either using the <b>perldoc</b> command,
+    <div class="codeblock">
+      <pre>
+perldoc GO/AppHandle.pm
+      </pre>
+    </div>
+      or consult the <a href="../../pod/GO/AppHandle.html">Online
+        Documentation</a>
+    </p>
+
+    <h3>Fetching Objects from the DB</h3>
+
+    <p>
+      The AppHandle takes requests, queries the database, and turns
+      the results into perl objects. See the <a
+	href="../../go-perl/doc/go-perl-doc.html">go-perl</a>
+      documentation for a description of the object model
+    </p>
+
+
+    <h2>Database Loading</h2>
+    <h3>How database loading works</h3>
+    <p>
+      First of all a file (any ontology format or a gene assoc file)
+      is parsed using <a
+      href="/dev/pod/GO/Parser.html">GO::Parser</a>. The parser will
+      generate an Obo-xml stream. This stream is <i>transformed</i>
+      using an <a href="../../xml/xsl/oboxml_to_godb_prestore.xsl">XSLT
+      Transformation</a> into a different kind of XML that is
+      isomorphic to the GO Database Schema. This godb-xml can be
+      loaded into the database using a generic loader.
+    </p>
+
+    <h3>Database loading components</h3>
+    <p>
+      <ul>
+        <li>
+          <a href="/dev/pod/scripts/go-prepare-release.html">go-prepare-release.pl</a> -- this script is a wrapper for the components below
+        </li>
+        <li>
+          <a href="/dev/pod/GO/Parser.html">GO::Parser</a> -- the parser
+          is created and used by the go-prepeare-release.pl script to
+          make obo-xml
+
+        </li>
+        <li>
+          <a
+          href="../../xml/xsl/oboxml_to_godb_prestore.xsl">oboxml_to_godb_prestore.xsl</a>
+          -- this is a 'program' written in the XSLT language
+          specifying how to transform obo-xml into db-xml. It uses the
+          xsltproc command.
+        </li>
+        <li>
+          <a
+          href="/dev/pod/GO/Handlers/godb.html">GO::Handlers::godb</a>
+          -- this module takes the db-xml stream and loads the
+          database; this module is actually a wrapper for the generic
+          <a
+          href="http://search.cpan.org/perldoc?DBIx::DBStag">DBIx::DBStag</a>
+          loader
+        </li>
+      </ul>
+    </p>
+    <p>
+      See also <a
+        href="../../xml/doc/xml-doc.html">xml</a> documentation.
+    </p>
+
+    <h2>Future Directions</h2>
+
+    <p>
+      We're currently looking at alternatives to the object/relational
+      approach to querying the database via perl and other
+      languages. On the one hand, the API allows us to reuse code and
+      provide a simplified interface to some complex queries. On the
+      other hand, it requires a lot of hard-to-maintain code. And
+      whilst the API approach works well with queries that follow
+      certain set patterns, it is not so good for arbitrary queries -
+      for that you need to revert back to the full expressive power of
+      a query language, such as SQL
+    </p>
+
+    <h3>DBStag</h3>
+    <p>
+      We are developing a library called DBStag (see <a
+      href="http://stag.sf.net">Stag project page</a> for details),
+      which transforms the results of multijoin SQL queries into
+      nested XML. It also allows for SQL reuse in the form of Stag SQL
+      templates. We have provided a number of these templates for GO
+      in the <a href="../../sql/stag-templates">stag-templates
+      directory</a>
+    </p>
+
+    <p>
+      We expect to stop development on GO::AppHandle by 2005 and
+      switch to an approach such as DBStag which combines the
+      expressive power of a language such as SQL with hierarchical XML
+      query results
+    </p>
+
+    <p>
+      DBStag also allows for querying of the go-database using SQL
+      templates - see <a href="../../sql/doc/godb-sql-doc.html">GODB
+        SQL</a> documentation
+    </p>
+
+    <hr>
+    <address><a href="mailto:cjm@fruitfly.org">Chris Mungall</a></address>
+<!-- Created: Fri Jan 23 14:30:13 PST 2004 -->
+<!-- hhmts start -->
+Last modified: Thu Feb 10 15:30:54 PST 2005
+<!-- hhmts end -->
+  </body>
+</html>
+

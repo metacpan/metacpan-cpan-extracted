@@ -1,0 +1,17 @@
+$Id: TODO,v 1.8 2002/04/29 21:29:33 scop Exp $
+
+TODO items for gmuck, in no particular order.
+
+o Enable tests.
+o Implement more-than-one-line checks, in order to provide more context.
+o Better XML checks.
+o Non-nitpick mode?
+o WWW pointers for reported errors.
+o Deprecated attributes checks should maybe contain also non-standard ones
+  and other common troublesome ones, like <body margin(width|height)>,
+  <table height>.
+o Check the wicked piece of regexp in the start of the
+  "non-lowercase attribute" test in &_attributes, and adapt it to others.
+o Check for ID,NAME,IDREF,IDREFS attributes (see SPECS).
+o See the XHTML spec for ID,NAME and the like in SPECS.
+o Check for the "all elements but ..." stuff in SPECS' fixed-valued attributes.

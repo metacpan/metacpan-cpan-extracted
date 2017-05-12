@@ -1,0 +1,30 @@
+format-version: 1.0
+date: 30:03:2004 14:23
+saved-by: gwg
+auto-generated-by: DAG-Edit 1.415
+default-namespace: gene_ontology
+remark: 
+
+[Typedef]
+id: part_of
+name: Part of
+
+[Term]
+id: GO:0008150
+name: biological_process
+namespace: process
+def: "A phenomenon marked by changes that lead to a particular result\, mediated by one or more gene products." [GO:curators]
+
+[Term]
+id: GO:0001907
+name: dual
+namespace: process
+def: "Dual one." [WB:ems, ISBN:0395448956]
+is_a: GO:0008150
+
+[Term]
+id: GO:0019899
+name: single
+namespace: process
+def: "Single one." [GO:mah, ISBN:0877797099]
+is_a: GO:0008150

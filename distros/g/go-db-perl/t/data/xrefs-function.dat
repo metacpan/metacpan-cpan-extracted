@@ -1,0 +1,28 @@
+!THIS IS TEST DATA
+! Even if the biology in this becomes superceded, please DO NOT edit
+! this file, it is here as part of the test suite
+$Gene_Ontology ; GO:0003673
+ <biological_process ; GO:0008150
+  %cell communication ; GO:0007154
+   %response to external stimulus ; GO:0009605 ; UM-MADE_UP:2\,4-d
+    %response to abiotic stimulus ; GO:0009628 ; MetaCyc:A-THIS-IS-MADE-UP ; MetaCyc:B-THIS-IS-ALSO-MADE-UP
+     %xenobiotic response ; GO:0009410
+      <xenobiotic metabolism ; GO:0006805 % metabolism ; GO:0008152
+       %atrazine metabolism ; GO:0018873
+        %atrazine catabolism ; GO:0019381 ; MetaCyc:P141-PWY % catabolism ; GO:0009056
+         %atrazine catabolism to cyanuric acid ; GO:0019625
+         %atrazine catabolism to isopropylamine ; GO:0019624
+         %atrazine catabolism to urea ; GO:0019623
+  %cell growth and/or maintenance ; GO:0008151
+   %metabolism ; GO:0008152
+    %catabolism ; GO:0009056
+     %atrazine catabolism ; GO:0019381 ; MetaCyc:P141-PWY % atrazine metabolism ; GO:0018873
+      %atrazine catabolism to cyanuric acid ; GO:0019625
+      %atrazine catabolism to isopropylamine ; GO:0019624
+      %atrazine catabolism to urea ; GO:0019623
+    %xenobiotic metabolism ; GO:0006805 < xenobiotic response ; GO:0009410
+     %atrazine metabolism ; GO:0018873
+      %atrazine catabolism ; GO:0019381 ; MetaCyc:P141-PWY % catabolism ; GO:0009056
+       %atrazine catabolism to cyanuric acid ; GO:0019625
+       %atrazine catabolism to isopropylamine ; GO:0019624
+       %atrazine catabolism to urea ; GO:0019623

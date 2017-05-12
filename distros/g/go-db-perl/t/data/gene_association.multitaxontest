@@ -1,0 +1,696 @@
+! THIS IS NOT A REAL GENE ASSOCIATION FILE
+! IT IS FOR TESTING PURPOSES
+! it was modified from tigr_tbrucei
+! FAKE secondary taxons were placed in the file - to human and cow - at random
+TIGR_Tba1	10C8.10	10C8.10		GO:0008150	GO_REF:nd	ND		P	FtsJ cell division protein, putative		protein	taxon:5691|taxon:9606	20020521	TIGR	
+TIGR_Tba1	10C8.10	10C8.10		GO:0003674	GO_REF:nd	ND		F	FtsJ cell division protein, putative		protein	taxon:5691|taxon:9606	20020521	TIGR	
+TIGR_Tba1	10C8.10	10C8.10		GO:0005575	GO_REF:nd	ND		C	FtsJ cell division protein, putative		protein	taxon:5691|taxon:9606	20020521	TIGR	
+TIGR_Tba1	Tb927.2.2670	10C8.135		GO:0003677	TIGR_Tba1:annotation	ISS	SWISS-PROT:P02304	F	histone H4, putative		protein	taxon:5691|taxon:9606	20020606	TIGR	
+TIGR_Tba1	Tb927.2.2670	10C8.135		GO:0005634	TIGR_Tba1:annotation	ISS	SWISS-PROT:P02304	C	histone H4, putative		protein	taxon:5691|taxon:9606	20020606	TIGR	
+TIGR_Tba1	Tb927.2.2720	10C8.160		GO:0004672	TIGR_Tba1:annotation	ISS	INTERPRO:IPR001245	F	Protein kinase, putative		protein	taxon:5691|taxon:9606	20020524	TIGR	
+TIGR_Tba1	Tb927.2.2730	10C8.165		GO:0008150	GO_REF:nd	ND		P	T. brucei family hypothetical protein		protein	taxon:5691|taxon:9606	20020603	TIGR	
+TIGR_Tba1	Tb927.2.2730	10C8.165		GO:0003674	GO_REF:nd	ND		F	T. brucei family hypothetical protein		protein	taxon:5691|taxon:9606	20020603	TIGR	
+TIGR_Tba1	Tb927.2.2730	10C8.165		GO:0005575	GO_REF:nd	ND		C	T. brucei family hypothetical protein		protein	taxon:5691|taxon:9606	20020603	TIGR	
+TIGR_Tba1	Tb927.2.2760	10C8.180		GO:0008150	GO_REF:nd	ND		P	T. brucei family hypothetical protein		protein	taxon:5691|taxon:9606	20020531	TIGR	
+TIGR_Tba1	Tb927.2.2760	10C8.180		GO:0003674	GO_REF:nd	ND		F	T. brucei family hypothetical protein		protein	taxon:5691|taxon:9606	20020531	TIGR	
+TIGR_Tba1	Tb927.2.2760	10C8.180		GO:0005575	GO_REF:nd	ND		C	T. brucei family hypothetical protein		protein	taxon:5691|taxon:9606	20020531	TIGR	
+TIGR_Tba1	Tb927.2.2790	10C8.195		GO:0008150	GO_REF:nd	ND		P	T. brucei family hypothetical protein		protein	taxon:5691|taxon:9606	20020603	TIGR	
+TIGR_Tba1	Tb927.2.2790	10C8.195		GO:0003674	GO_REF:nd	ND		F	T. brucei family hypothetical protein		protein	taxon:5691|taxon:9606	20020603	TIGR	
+TIGR_Tba1	Tb927.2.2790	10C8.195		GO:0005575	GO_REF:nd	ND		C	T. brucei family hypothetical protein		protein	taxon:5691|taxon:9606	20020603	TIGR	
+TIGR_Tba1	Tb927.2.2810	10C8.205		GO:0008150	GO_REF:nd	ND		P	T. brucei family hypothetical protein		protein	taxon:5691|taxon:9606	20020603	TIGR	
+TIGR_Tba1	Tb927.2.2810	10C8.205		GO:0003674	GO_REF:nd	ND		F	T. brucei family hypothetical protein		protein	taxon:5691|taxon:9606	20020603	TIGR	
+TIGR_Tba1	Tb927.2.2810	10C8.205		GO:0005575	GO_REF:nd	ND		C	T. brucei family hypothetical protein		protein	taxon:5691|taxon:9606	20020603	TIGR	
+TIGR_Tba1	Tb927.2.2820	10C8.210		GO:0008150	GO_REF:nd	ND		P	T. brucei family hypothetical protein		protein	taxon:5691|taxon:9606	20020603	TIGR	
+TIGR_Tba1	Tb927.2.2820	10C8.210		GO:0003674	GO_REF:nd	ND		F	T. brucei family hypothetical protein		protein	taxon:5691|taxon:9606	20020603	TIGR	
+TIGR_Tba1	Tb927.2.2820	10C8.210		GO:0005575	GO_REF:nd	ND		C	T. brucei family hypothetical protein		protein	taxon:5691|taxon:9606	20020603	TIGR	
+TIGR_Tba1	Tb927.2.2840	10C8.220		GO:0008150	GO_REF:nd	ND		P	T. brucei family hypothetical protein		protein	taxon:5691|taxon:9606	20020530	TIGR	
+TIGR_Tba1	Tb927.2.2840	10C8.220		GO:0003674	GO_REF:nd	ND		F	T. brucei family hypothetical protein		protein	taxon:5691|taxon:9606	20020530	TIGR	
+TIGR_Tba1	Tb927.2.2840	10C8.220		GO:0005575	GO_REF:nd	ND		C	T. brucei family hypothetical protein		protein	taxon:5691|taxon:9606	20020530	TIGR	
+TIGR_Tba1	Tb927.2.2880	10C8.240		GO:0003674	GO_REF:nd	ND		F	conserved/T. brucei family hypothetical protein		protein	taxon:5691|taxon:9606	20020531	TIGR	
+TIGR_Tba1	Tb927.2.2880	10C8.240		GO:0005575	GO_REF:nd	ND		C	conserved/T. brucei family hypothetical protein		protein	taxon:5691|taxon:9606	20020531	TIGR	
+TIGR_Tba1	Tb927.2.2880	10C8.240		GO:0008150	GO_REF:nd	ND		P	conserved/T. brucei family hypothetical protein		protein	taxon:5691|taxon:9606	20020531	TIGR	
+TIGR_Tba1	10C8.25	10C8.25		GO:0006464	PMID:7768995	ISS	SWISS-PROT:P40984	P	Ubiquitin-conjugating enzyme E2, putative		protein	taxon:5691|taxon:9606	20020523	TIGR	
+TIGR_Tba1	10C8.25	10C8.25		GO:0005634	PMID:7768995	ISS	SWISS-PROT:P40984	C	Ubiquitin-conjugating enzyme E2, putative		protein	taxon:5691|taxon:9606	20020523	TIGR	
+TIGR_Tba1	Tb927.2.2970	10C8.285		GO:0006810	TIGR_Tba1:annotation	ISS	INTERPRO:IPR002067	P	Mitochondrial carrier protein, putative		protein	taxon:5691|taxon:9606	20020606	TIGR	
+TIGR_Tba1	Tb927.2.2970	10C8.285		GO:0005488	TIGR_Tba1:annotation	ISS	INTERPRO:IPR001993	F	Mitochondrial carrier protein, putative		protein	taxon:5691|taxon:9606	20020606	TIGR	
+TIGR_Tba1	10C8.30	10C8.30		GO:0005739	PMID:11564867	IDA		C	RNA-editing complex protein MP81		protein	taxon:5691|taxon:9606	20020517	TIGR	
+TIGR_Tba1	Tb927.2.3090	10C8.345		GO:0008150	GO_REF:nd	ND		P	T. brucei family hypothetical protein		protein	taxon:5691|taxon:9606	20020603	TIGR	
+TIGR_Tba1	Tb927.2.3090	10C8.345		GO:0003674	GO_REF:nd	ND		F	T. brucei family hypothetical protein		protein	taxon:5691|taxon:9606	20020603	TIGR	
+TIGR_Tba1	Tb927.2.3090	10C8.345		GO:0005575	GO_REF:nd	ND		C	T. brucei family hypothetical protein		protein	taxon:5691|taxon:9606	20020603	TIGR	
+TIGR_Tba1	Tb927.2.3180	10C8.390		GO:0008150	GO_REF:nd	ND		P	T. brucei family hypothetical protein		protein	taxon:5691|taxon:9606	20020529	TIGR	
+TIGR_Tba1	Tb927.2.3180	10C8.390		GO:0003674	GO_REF:nd	ND		F	T. brucei family hypothetical protein		protein	taxon:5691|taxon:9606	20020529	TIGR	
+TIGR_Tba1	Tb927.2.3180	10C8.390		GO:0005575	GO_REF:nd	ND		C	T. brucei family hypothetical protein		protein	taxon:5691|taxon:9606	20020529	TIGR	
+TIGR_Tba1	Tb927.2.3270	10C8.435		GO:0005886	PMID:1587856	ISS	NCBI_gi:161946	C	65 kDa invariant surface glycoprotein		protein	taxon:5691|taxon:9606	20020523	TIGR	
+TIGR_Tba1	Tb927.2.3270	10C8.435		GO:0003674	PMID:9574923	TAS		F	65 kDa invariant surface glycoprotein		protein	taxon:5691|taxon:9606	20020523	TIGR	
+TIGR_Tba1	Tb927.2.3280	10C8.440		GO:0005886	PMID:1587856	ISS	NCBI_gi:161946	C	65 kDa invariant surface glycoprotein		protein	taxon:5691|taxon:9606	20020523	TIGR	
+TIGR_Tba1	Tb927.2.3280	10C8.440		GO:0003674	PMID:9574923	TAS		F	65 kDa invariant surface glycoprotein		protein	taxon:5691|taxon:9606	20020523	TIGR	
+TIGR_Tba1	Tb927.2.3290	10C8.445		GO:0005886	PMID:1587856	ISS	NCBI_gi:161946	C	65 kDa invariant surface glycoprotein		protein	taxon:5691|taxon:9606	20020523	TIGR	
+TIGR_Tba1	Tb927.2.3290	10C8.445		GO:0003674	PMID:9574923	TAS		F	65 kDa invariant surface glycoprotein		protein	taxon:5691|taxon:9606	20020523	TIGR	
+TIGR_Tba1	Tb927.2.3300	10C8.450		GO:0005886	PMID:1587856	ISS	NCBI_gi:161946	C	65 kDa invariant surface glycoprotein		protein	taxon:5691|taxon:9606	20020523	TIGR	
+TIGR_Tba1	Tb927.2.3300	10C8.450		GO:0003674	PMID:9574923	TAS		F	65 kDa invariant surface glycoprotein		protein	taxon:5691|taxon:9606	20020523	TIGR	
+TIGR_Tba1	Tb927.2.3310	10C8.455		GO:0005886	PMID:1587856	ISS	NCBI_gi:161946	C	65 kDa invariant surface glycoprotein		protein	taxon:5691|taxon:9606	20020523	TIGR	
+TIGR_Tba1	Tb927.2.3310	10C8.455		GO:0003674	PMID:9574923	TAS		F	65 kDa invariant surface glycoprotein		protein	taxon:5691|taxon:9606	20020523	TIGR	
+TIGR_Tba1	Tb927.2.3320	10C8.460		GO:0005886	PMID:1587856	ISS	NCBI_gi:161946	C	65 kDa invariant surface glycoprotein		protein	taxon:5691|taxon:9606	20020523	TIGR	
+TIGR_Tba1	Tb927.2.3320	10C8.460		GO:0003674	PMID:9574923	TAS		F	65 kDa invariant surface glycoprotein		protein	taxon:5691|taxon:9606	20020523	TIGR	
+TIGR_Tba1	Tb927.2.3370	10C8.485		GO:0008150	GO_REF:nd	ND		P	T. brucei family hypothetical protein		protein	taxon:5691|taxon:9606	20020531	TIGR	
+TIGR_Tba1	Tb927.2.3370	10C8.485		GO:0003674	GO_REF:nd	ND		F	T. brucei family hypothetical protein		protein	taxon:5691|taxon:9606	20020531	TIGR	
+TIGR_Tba1	Tb927.2.3370	10C8.485		GO:0005575	GO_REF:nd	ND		C	T. brucei family hypothetical protein		protein	taxon:5691|taxon:9606	20020531	TIGR	
+TIGR_Tba1	10C8.50	10C8.50		GO:0008150	GO_REF:nd	ND		P	T. brucei family hypothetical protein		protein	taxon:5691|taxon:9606	20020604	TIGR	
+TIGR_Tba1	10C8.50	10C8.50		GO:0003674	GO_REF:nd	ND		F	T. brucei family hypothetical protein		protein	taxon:5691|taxon:9606	20020604	TIGR	
+TIGR_Tba1	10C8.50	10C8.50		GO:0005575	GO_REF:nd	ND		C	T. brucei family hypothetical protein		protein	taxon:5691|taxon:9606	20020604	TIGR	
+TIGR_Tba1	10C8.55	10C8.55		GO:0008150	GO_REF:nd	ND		P	T. brucei family hypothetical protein		protein	taxon:5691|taxon:9606	20020604	TIGR	
+TIGR_Tba1	10C8.55	10C8.55		GO:0003674	GO_REF:nd	ND		F	T. brucei family hypothetical protein		protein	taxon:5691|taxon:9606	20020604	TIGR	
+TIGR_Tba1	10C8.55	10C8.55		GO:0005575	GO_REF:nd	ND		C	T. brucei family hypothetical protein		protein	taxon:5691|taxon:9606	20020604	TIGR	
+TIGR_Tba1	Tb927.2.5480	1F7.110		GO:0008150	GO_REF:nd	ND		P	T. brucei family hypothetical protein		protein	taxon:5691|taxon:9913	20020530	TIGR	
+TIGR_Tba1	Tb927.2.5480	1F7.110		GO:0003674	GO_REF:nd	ND		F	T. brucei family hypothetical protein		protein	taxon:5691|taxon:9913	20020530	TIGR	
+TIGR_Tba1	Tb927.2.5480	1F7.110		GO:0005575	GO_REF:nd	ND		C	T. brucei family hypothetical protein		protein	taxon:5691|taxon:9913	20020530	TIGR	
+TIGR_Tba1	Tb927.2.5490	1F7.115		GO:0008150	GO_REF:nd	ND		P	T. brucei family hypothetical protein		protein	taxon:5691|taxon:9913	20020529	TIGR	
+TIGR_Tba1	Tb927.2.5490	1F7.115		GO:0003674	GO_REF:nd	ND		F	T. brucei family hypothetical protein		protein	taxon:5691|taxon:9913	20020529	TIGR	
+TIGR_Tba1	Tb927.2.5490	1F7.115		GO:0005575	GO_REF:nd	ND		C	T. brucei family hypothetical protein		protein	taxon:5691|taxon:9913	20020529	TIGR	
+TIGR_Tba1	Tb927.2.5500	1F7.120		GO:0008150	GO_REF:nd	ND		P	T. brucei family hypothetical protein		protein	taxon:5691|taxon:9913	20020530	TIGR	
+TIGR_Tba1	Tb927.2.5500	1F7.120		GO:0003674	GO_REF:nd	ND		F	T. brucei family hypothetical protein		protein	taxon:5691|taxon:9913	20020530	TIGR	
+TIGR_Tba1	Tb927.2.5500	1F7.120		GO:0005575	GO_REF:nd	ND		C	T. brucei family hypothetical protein		protein	taxon:5691|taxon:9913	20020530	TIGR	
+TIGR_Tba1	Tb927.2.5530	1F7.135		GO:0005575	GO_REF:nd	ND		C	T. brucei family hypothetical protein		protein	taxon:5691|taxon:9913	20020530	TIGR	
+TIGR_Tba1	Tb927.2.5530	1F7.135		GO:0003674	GO_REF:nd	ND		F	T. brucei family hypothetical protein		protein	taxon:5691|taxon:9913	20020530	TIGR	
+TIGR_Tba1	Tb927.2.5530	1F7.135		GO:0008150	GO_REF:nd	ND		P	T. brucei family hypothetical protein		protein	taxon:5691|taxon:9913	20020530	TIGR	
+TIGR_Tba1	Tb927.2.5540	1F7.140		GO:0008150	GO_REF:nd	ND		P	T. brucei family hypothetical protein		protein	taxon:5691|taxon:9913	20020530	TIGR	
+TIGR_Tba1	Tb927.2.5540	1F7.140		GO:0003674	GO_REF:nd	ND		F	T. brucei family hypothetical protein		protein	taxon:5691|taxon:9913	20020530	TIGR	
+TIGR_Tba1	Tb927.2.5540	1F7.140		GO:0005575	GO_REF:nd	ND		C	T. brucei family hypothetical protein		protein	taxon:5691|taxon:9913	20020530	TIGR	
+TIGR_Tba1	Tb927.2.5550	1F7.145		GO:0008150	GO_REF:nd	ND		P	T. brucei family hypothetical protein		protein	taxon:5691|taxon:9913	20020529	TIGR	
+TIGR_Tba1	Tb927.2.5550	1F7.145		GO:0003674	GO_REF:nd	ND		F	T. brucei family hypothetical protein		protein	taxon:5691|taxon:9913	20020529	TIGR	
+TIGR_Tba1	Tb927.2.5550	1F7.145		GO:0005575	GO_REF:nd	ND		C	T. brucei family hypothetical protein		protein	taxon:5691|taxon:9913	20020529	TIGR	
+TIGR_Tba1	1F7.15	1F7.15		GO:0003674	GO_REF:nd	ND		F	T. brucei family hypothetical protein		protein	taxon:5691|taxon:9913	20020603	TIGR	
+TIGR_Tba1	1F7.15	1F7.15		GO:0005575	GO_REF:nd	ND		C	T. brucei family hypothetical protein		protein	taxon:5691|taxon:9913	20020603	TIGR	
+TIGR_Tba1	1F7.15	1F7.15		GO:0008150	GO_REF:nd	ND		P	T. brucei family hypothetical protein		protein	taxon:5691|taxon:9913	20020605	TIGR	
+TIGR_Tba1	Tb927.2.5590	1F7.165		GO:0008150	GO_REF:nd	ND		P	T. brucei family hypothetical protein		protein	taxon:5691|taxon:9913	20020529	TIGR	
+TIGR_Tba1	Tb927.2.5590	1F7.165		GO:0003674	GO_REF:nd	ND		F	T. brucei family hypothetical protein		protein	taxon:5691|taxon:9913	20020529	TIGR	
+TIGR_Tba1	Tb927.2.5590	1F7.165		GO:0005575	GO_REF:nd	ND		C	T. brucei family hypothetical protein		protein	taxon:5691|taxon:9913	20020529	TIGR	
+TIGR_Tba1	Tb927.2.5600	1F7.170		GO:0005575	GO_REF:nd	ND		C	T. brucei family hypothetical protein		protein	taxon:5691|taxon:9913	20020530	TIGR	
+TIGR_Tba1	Tb927.2.5600	1F7.170		GO:0003674	GO_REF:nd	ND		F	T. brucei family hypothetical protein		protein	taxon:5691|taxon:9913	20020530	TIGR	
+TIGR_Tba1	Tb927.2.5600	1F7.170		GO:0008150	GO_REF:nd	ND		P	T. brucei family hypothetical protein		protein	taxon:5691|taxon:9913	20020530	TIGR	
+TIGR_Tba1	Tb927.2.5610	1F7.175		GO:0005575	GO_REF:nd	ND		C	T. brucei family hypothetical protein		protein	taxon:5691|taxon:9913	20020530	TIGR	
+TIGR_Tba1	Tb927.2.5610	1F7.175		GO:0003674	GO_REF:nd	ND		F	T. brucei family hypothetical protein		protein	taxon:5691|taxon:9913	20020530	TIGR	
+TIGR_Tba1	Tb927.2.5610	1F7.175		GO:0008150	GO_REF:nd	ND		P	T. brucei family hypothetical protein		protein	taxon:5691|taxon:9913	20020530	TIGR	
+TIGR_Tba1	Tb927.2.5630	1F7.185		GO:0008150	GO_REF:nd	ND		P	T. brucei family hypothetical protein		protein	taxon:5691|taxon:9913	20020530	TIGR	
+TIGR_Tba1	Tb927.2.5630	1F7.185		GO:0003674	GO_REF:nd	ND		F	T. brucei family hypothetical protein		protein	taxon:5691|taxon:9913	20020530	TIGR	
+TIGR_Tba1	Tb927.2.5630	1F7.185		GO:0005575	GO_REF:nd	ND		C	T. brucei family hypothetical protein		protein	taxon:5691|taxon:9913	20020530	TIGR	
+TIGR_Tba1	Tb927.2.5640	1F7.190		GO:0008150	GO_REF:nd	ND		P	T. brucei family hypothetical protein		protein	taxon:5691|taxon:9913	20020529	TIGR	
+TIGR_Tba1	Tb927.2.5640	1F7.190		GO:0003674	GO_REF:nd	ND		F	T. brucei family hypothetical protein		protein	taxon:5691|taxon:9913	20020529	TIGR	
+TIGR_Tba1	Tb927.2.5640	1F7.190		GO:0005575	GO_REF:nd	ND		C	T. brucei family hypothetical protein		protein	taxon:5691|taxon:9913	20020529	TIGR	
+TIGR_Tba1	Tb927.2.5650	1F7.195		GO:0008150	GO_REF:nd	ND		P	T. brucei family hypothetical protein		protein	taxon:5691|taxon:9913	20020530	TIGR	
+TIGR_Tba1	Tb927.2.5650	1F7.195		GO:0003674	GO_REF:nd	ND		F	T. brucei family hypothetical protein		protein	taxon:5691|taxon:9913	20020530	TIGR	
+TIGR_Tba1	Tb927.2.5650	1F7.195		GO:0005575	GO_REF:nd	ND		C	T. brucei family hypothetical protein		protein	taxon:5691|taxon:9913	20020530	TIGR	
+TIGR_Tba1	1F7.20	1F7.20		GO:0008150	GO_REF:nd	ND		P	T. brucei family hypothetical protein		protein	taxon:5691|taxon:9913	20020603	TIGR	
+TIGR_Tba1	1F7.20	1F7.20		GO:0003674	GO_REF:nd	ND		F	T. brucei family hypothetical protein		protein	taxon:5691|taxon:9913	20020603	TIGR	
+TIGR_Tba1	1F7.20	1F7.20		GO:0005575	GO_REF:nd	ND		C	T. brucei family hypothetical protein		protein	taxon:5691|taxon:9913	20020603	TIGR	
+TIGR_Tba1	Tb927.2.5660	1F7.200		GO:0006139	TIGR_Tba1:annotation	ISS	SWISS-PROT:P27144	P	Adenylate kinase		protein	taxon:5691|taxon:9913	20020605	TIGR	
+TIGR_Tba1	Tb927.2.5750	1F7.245		GO:0005634	TIGR_Tba1:annotation	IC	GO:0006281	C	Tyrosyl-DNA Phosphodiesterase (Tdp1), putative		protein	taxon:5691|taxon:9913	20020606	TIGR	
+TIGR_Tba1	1F7.25	1F7.25		GO:0008150	GO_REF:nd	ND		P	T. brucei family hypothetical protein		protein	taxon:5691|taxon:9913	20020603	TIGR	
+TIGR_Tba1	1F7.25	1F7.25		GO:0003674	GO_REF:nd	ND		F	T. brucei family hypothetical protein		protein	taxon:5691|taxon:9913	20020603	TIGR	
+TIGR_Tba1	1F7.25	1F7.25		GO:0005575	GO_REF:nd	ND		C	T. brucei family hypothetical protein		protein	taxon:5691|taxon:9913	20020603	TIGR	
+TIGR_Tba1	Tb927.2.5760	1F7.250		GO:0008150	GO_REF:nd	ND		P	T. brucei family hypothetical protein		protein	taxon:5691|taxon:9913	20020530	TIGR	
+TIGR_Tba1	Tb927.2.5760	1F7.250		GO:0003674	GO_REF:nd	ND		F	T. brucei family hypothetical protein		protein	taxon:5691|taxon:9913	20020530	TIGR	
+TIGR_Tba1	Tb927.2.5760	1F7.250		GO:0005575	GO_REF:nd	ND		C	T. brucei family hypothetical protein		protein	taxon:5691|taxon:9913	20020530	TIGR	
+TIGR_Tba1	Tb927.2.5850	1F7.295		GO:0005634	PMID:10900267	TAS		C	Small nuclear ribonucleoprotein Sm D2		protein	taxon:5691|taxon:9913	20020528	TIGR	
+TIGR_Tba1	Tb927.2.5320	1F7.30		GO:0008150	GO_REF:nd	ND		P	T. brucei family hypothetical protein		protein	taxon:5691|taxon:9913	20020603	TIGR	
+TIGR_Tba1	Tb927.2.5320	1F7.30		GO:0003674	GO_REF:nd	ND		F	T. brucei family hypothetical protein		protein	taxon:5691|taxon:9913	20020603	TIGR	
+TIGR_Tba1	Tb927.2.5320	1F7.30		GO:0005575	GO_REF:nd	ND		C	T. brucei family hypothetical protein		protein	taxon:5691|taxon:9913	20020603	TIGR	
+TIGR_Tba1	Tb927.2.5860	1F7.300		GO:0008150	GO_REF:nd	ND		P	T. brucei family hypothetical protein		protein	taxon:5691|taxon:9913	20020530	TIGR	
+TIGR_Tba1	Tb927.2.5860	1F7.300		GO:0003674	GO_REF:nd	ND		F	T. brucei family hypothetical protein		protein	taxon:5691|taxon:9913	20020530	TIGR	
+TIGR_Tba1	Tb927.2.5860	1F7.300		GO:0005575	GO_REF:nd	ND		C	T. brucei family hypothetical protein		protein	taxon:5691|taxon:9913	20020530	TIGR	
+TIGR_Tba1	Tb927.2.5870	1F7.305		GO:0008150	GO_REF:nd	ND		P	T. brucei family hypothetical protein		protein	taxon:5691|taxon:9913	20020530	TIGR	
+TIGR_Tba1	Tb927.2.5870	1F7.305		GO:0003674	GO_REF:nd	ND		F	T. brucei family hypothetical protein		protein	taxon:5691|taxon:9913	20020530	TIGR	
+TIGR_Tba1	Tb927.2.5870	1F7.305		GO:0005575	GO_REF:nd	ND		C	T. brucei family hypothetical protein		protein	taxon:5691|taxon:9913	20020530	TIGR	
+TIGR_Tba1	Tb927.2.5910	1F7.325		GO:0006412	TIGR_Tba1:annotation	ISS	INTERPRO:IPR000589|SWISS-PROT:P05756	P	40S ribosomal protein S13, putative		protein	taxon:5691|taxon:9913	20020605	TIGR	
+TIGR_Tba1	Tb927.2.5950	1F7.345		GO:0008150	GO_REF:nd	ND		P	T. brucei family hypothetical protein		protein	taxon:5691|taxon:9913	20020530	TIGR	
+TIGR_Tba1	Tb927.2.5950	1F7.345		GO:0003674	GO_REF:nd	ND		F	T. brucei family hypothetical protein		protein	taxon:5691|taxon:9913	20020530	TIGR	
+TIGR_Tba1	Tb927.2.5950	1F7.345		GO:0005575	GO_REF:nd	ND		C	T. brucei family hypothetical protein		protein	taxon:5691|taxon:9913	20020530	TIGR	
+TIGR_Tba1	Tb927.2.5330	1F7.35		GO:0008150	GO_REF:nd	ND		P	T. brucei family hypothetical protein		protein	taxon:5691|taxon:9913	20020603	TIGR	
+TIGR_Tba1	Tb927.2.5330	1F7.35		GO:0003674	GO_REF:nd	ND		F	T. brucei family hypothetical protein		protein	taxon:5691|taxon:9913	20020603	TIGR	
+TIGR_Tba1	Tb927.2.5330	1F7.35		GO:0005575	GO_REF:nd	ND		C	T. brucei family hypothetical protein		protein	taxon:5691|taxon:9913	20020603	TIGR	
+TIGR_Tba1	Tb927.2.5980	1F7.360		GO:0005575	GO_REF:nd	ND		C	Heat shock protein 100 (clp protein)		protein	taxon:5691|taxon:9913	20020528	TIGR	
+TIGR_Tba1	Tb927.2.6000	1F7.370		GO:0005886	PMID:3745171	IDA		C	Glycosylphosphatidylinositol-specific phospholipase C		protein	taxon:5691|taxon:9913	20020528	TIGR	
+TIGR_Tba1	Tb927.2.5340	1F7.40		GO:0008150	GO_REF:nd	ND		P	T. brucei family hypothetical protein		protein	taxon:5691	20020603	TIGR	
+TIGR_Tba1	Tb927.2.5340	1F7.40		GO:0003674	GO_REF:nd	ND		F	T. brucei family hypothetical protein		protein	taxon:5691	20020603	TIGR	
+TIGR_Tba1	Tb927.2.5340	1F7.40		GO:0005575	GO_REF:nd	ND		C	T. brucei family hypothetical protein		protein	taxon:5691	20020603	TIGR	
+TIGR_Tba1	Tb927.2.5350	1F7.45		GO:0008150	GO_REF:nd	ND		P	T. brucei family hypothetical protein		protein	taxon:5691	20020603	TIGR	
+TIGR_Tba1	Tb927.2.5350	1F7.45		GO:0003674	GO_REF:nd	ND		F	T. brucei family hypothetical protein		protein	taxon:5691	20020603	TIGR	
+TIGR_Tba1	Tb927.2.5350	1F7.45		GO:0005575	GO_REF:nd	ND		C	T. brucei family hypothetical protein		protein	taxon:5691	20020603	TIGR	
+TIGR_Tba1	1F7.5	1F7.5		GO:0008150	GO_REF:nd	ND		P	Trans-sialidase (5' end), putative		protein	taxon:5691	20020531	TIGR	
+TIGR_Tba1	1F7.5	1F7.5		GO:0003674	GO_REF:nd	ND		F	Trans-sialidase (5' end), putative		protein	taxon:5691	20020531	TIGR	
+TIGR_Tba1	1F7.5	1F7.5		GO:0005575	GO_REF:nd	ND		C	Trans-sialidase (5' end), putative		protein	taxon:5691	20020531	TIGR	
+TIGR_Tba1	Tb927.2.5360	1F7.50		GO:0008150	GO_REF:nd	ND		P	T. brucei family hypothetical protein		protein	taxon:5691	20020603	TIGR	
+TIGR_Tba1	Tb927.2.5360	1F7.50		GO:0003674	GO_REF:nd	ND		F	T. brucei family hypothetical protein		protein	taxon:5691	20020603	TIGR	
+TIGR_Tba1	Tb927.2.5360	1F7.50		GO:0005575	GO_REF:nd	ND		C	T. brucei family hypothetical protein		protein	taxon:5691	20020603	TIGR	
+TIGR_Tba1	Tb927.2.5410	1F7.75		GO:0006810	TIGR_Tba1:annotation	ISS	NCBI_gi:17131237	P	ABC transporter family protein (multidrug resistance), putative		protein	taxon:5691	20020521	TIGR	
+TIGR_Tba1	Tb927.2.5410	1F7.75		GO:0005575	GO_REF:nd	ND		C	ABC transporter family protein (multidrug resistance), putative		protein	taxon:5691	20020531	TIGR	
+TIGR_Tba1	Tb927.2.5440	1F7.90		GO:0005575	GO_REF:nd	ND		C	T. brucei family hypothetical protein		protein	taxon:5691	20020530	TIGR	
+TIGR_Tba1	Tb927.2.5440	1F7.90		GO:0008150	GO_REF:nd	ND		P	T. brucei family hypothetical protein		protein	taxon:5691	20020530	TIGR	
+TIGR_Tba1	Tb927.2.5440	1F7.90		GO:0003674	GO_REF:nd	ND		F	T. brucei family hypothetical protein		protein	taxon:5691	20020530	TIGR	
+TIGR_Tba1	1L12.385	1L12.385		GO:0005739	PMID:11124327	IDA		C	RNA editing ligase MP52		protein	taxon:5691	20020520	TIGR	
+TIGR_Tba1	Tb927.2.2510	25N14.10		GO:0008150	GO_REF:nd	ND		P	T. brucei family hypothetical protein		protein	taxon:5691	20020604	TIGR	
+TIGR_Tba1	Tb927.2.2510	25N14.10		GO:0003674	GO_REF:nd	ND		F	T. brucei family hypothetical protein		protein	taxon:5691	20020604	TIGR	
+TIGR_Tba1	Tb927.2.2320	25N14.105		GO:0008150	GO_REF:nd	ND		P	T. brucei family hypothetical protein		protein	taxon:5691	20020531	TIGR	
+TIGR_Tba1	Tb927.2.2320	25N14.105		GO:0003674	GO_REF:nd	ND		F	T. brucei family hypothetical protein		protein	taxon:5691	20020531	TIGR	
+TIGR_Tba1	Tb927.2.2320	25N14.105		GO:0005575	GO_REF:nd	ND		C	T. brucei family hypothetical protein		protein	taxon:5691	20020531	TIGR	
+TIGR_Tba1	Tb927.2.2300	25N14.115		GO:0008150	GO_REF:nd	ND		P	T. brucei family hypothetical protein		protein	taxon:5691	20020603	TIGR	
+TIGR_Tba1	Tb927.2.2300	25N14.115		GO:0003674	GO_REF:nd	ND		F	T. brucei family hypothetical protein		protein	taxon:5691	20020603	TIGR	
+TIGR_Tba1	Tb927.2.2300	25N14.115		GO:0005575	GO_REF:nd	ND		C	T. brucei family hypothetical protein		protein	taxon:5691	20020603	TIGR	
+TIGR_Tba1	Tb927.2.2260	25N14.135		GO:0008150	GO_REF:nd	ND		P	Phosphatidylinositol 3-kinase, putative		protein	taxon:5691	20020528	TIGR	
+TIGR_Tba1	Tb927.2.2260	25N14.135		GO:0003674	GO_REF:nd	ND		F	Phosphatidylinositol 3-kinase, putative		protein	taxon:5691	20020528	TIGR	
+TIGR_Tba1	Tb927.2.2240	25N14.145		GO:0005634	PMID:9512417	ISS	SWISS-PROT:O43592	C	Exportin (tRNA), putative		protein	taxon:5691	20020523	TIGR	
+TIGR_Tba1	Tb927.2.2240	25N14.145		GO:0006810	PMID:9512417	ISS	SWISS-PROT:O43592	P	Exportin (tRNA), putative		protein	taxon:5691	20020523	TIGR	
+TIGR_Tba1	Tb927.2.2190	25N14.170		GO:0005575	GO_REF:nd	ND		C	Histone deacetylase, putative		protein	taxon:5691	20020604	TIGR	
+TIGR_Tba1	Tb927.2.2190	25N14.170		GO:0007275	TIGR_Tba1:annotation	ISS	SWISS-PROT:Q9UBN7	P	Histone deacetylase, putative		protein	taxon:5691	20020604	TIGR	
+TIGR_Tba1	Tb927.2.2180	25N14.175		GO:0003723	PMID:11447124	TAS		F	Ribosomal RNA processing protein RRP41B		protein	taxon:5691	20020604	TIGR	
+TIGR_Tba1	Tb927.2.2130	25N14.200		GO:0005886	PMID:9074639	ISS	FB:FBgn0014010	C	Small GTP binding protein RAB6, putative		protein	taxon:5691	20020604	TIGR	
+TIGR_Tba1	Tb927.2.2090	25N14.220		GO:0008150	GO_REF:nd	ND		P	T. brucei family hypothetical protein		protein	taxon:5691	20020530	TIGR	
+TIGR_Tba1	Tb927.2.2090	25N14.220		GO:0003674	GO_REF:nd	ND		F	T. brucei family hypothetical protein		protein	taxon:5691	20020530	TIGR	
+TIGR_Tba1	Tb927.2.2090	25N14.220		GO:0005575	GO_REF:nd	ND		C	T. brucei family hypothetical protein		protein	taxon:5691	20020530	TIGR	
+TIGR_Tba1	Tb927.2.2060	25N14.235		GO:0005886	PMID:9574923	TAS		C	Variant surface glycoprotein, putative		protein	taxon:5691	20020523	TIGR	
+TIGR_Tba1	Tb927.2.2020	25N14.255		GO:0008150	GO_REF:nd	ND		P	Expression site associated protein 3 (ESAG3), putative		protein	taxon:5691	20020607	TIGR	
+TIGR_Tba1	Tb927.2.2020	25N14.255		GO:0003674	GO_REF:nd	ND		F	Expression site associated protein 3 (ESAG3), putative		protein	taxon:5691	20020607	TIGR	
+TIGR_Tba1	Tb927.2.2020	25N14.255		GO:0005886	PMID:11356509	TAS		C	Expression site associated protein 3 (ESAG3), putative		protein	taxon:5691	20020607	TIGR	
+TIGR_Tba1	Tb927.2.2010	25N14.260		GO:0008150	GO_REF:nd	ND		P	T. brucei family hypothetical protein		protein	taxon:5691	20020531	TIGR	
+TIGR_Tba1	Tb927.2.2010	25N14.260		GO:0003674	GO_REF:nd	ND		F	T. brucei family hypothetical protein		protein	taxon:5691	20020531	TIGR	
+TIGR_Tba1	Tb927.2.2000	25N14.265		GO:0008150	GO_REF:nd	ND		P	T. brucei family hypothetical protein		protein	taxon:5691	20020531	TIGR	
+TIGR_Tba1	Tb927.2.2000	25N14.265		GO:0003674	GO_REF:nd	ND		F	T. brucei family hypothetical protein		protein	taxon:5691	20020531	TIGR	
+TIGR_Tba1	Tb927.2.2000	25N14.265		GO:0005575	GO_REF:nd	ND		C	T. brucei family hypothetical protein		protein	taxon:5691	20020531	TIGR	
+TIGR_Tba1	Tb927.2.1990	25N14.270		GO:0008150	GO_REF:nd	ND		P	T. brucei family hypothetical protein		protein	taxon:5691	20020603	TIGR	
+TIGR_Tba1	Tb927.2.1990	25N14.270		GO:0003674	GO_REF:nd	ND		F	T. brucei family hypothetical protein		protein	taxon:5691	20020603	TIGR	
+TIGR_Tba1	Tb927.2.1990	25N14.270		GO:0005575	GO_REF:nd	ND		C	T. brucei family hypothetical protein		protein	taxon:5691	20020603	TIGR	
+TIGR_Tba1	Tb927.2.2470	25N14.30		GO:0005739	PMID:11564867	IDA		C	RNA-editing complex protein MP81	TBMP81	protein	taxon:5691	20020516	TIGR	
+TIGR_Tba1	Tb927.2.1920	25N14.305		GO:0003674	GO_REF:nd	ND		F	Expression site associated protein 5 (ESAG5), putative		protein	taxon:5691	20020607	TIGR	
+TIGR_Tba1	Tb927.2.1920	25N14.305		GO:0008150	GO_REF:nd	ND		P	Expression site associated protein 5 (ESAG5), putative		protein	taxon:5691	20020607	TIGR	
+TIGR_Tba1	Tb927.2.1920	25N14.305		GO:0005886	PMID:11356509	TAS		C	Expression site associated protein 5 (ESAG5), putative		protein	taxon:5691	20020607	TIGR	
+TIGR_Tba1	Tb927.2.1890	25N14.320		GO:0015031	TIGR_Tba1:annotation	ISS	SWISS-PROT:P40344	P	Autophagocytosis protein, putative		protein	taxon:5691	20020604	TIGR	
+TIGR_Tba1	Tb927.2.1890	25N14.320		GO:0005575	GO_REF:nd	ND		C	Autophagocytosis protein, putative		protein	taxon:5691	20020604	TIGR	
+TIGR_Tba1	Tb927.2.2460	25N14.35		GO:0006464	PMID:7768995|TIGR_Tba1:annotation	ISS	SWISS-PROT:P40984|INTERPRO:IPR000608	P	Ubiquitin-conjugating enzyme E2, putative		protein	taxon:5691	20020523	TIGR	
+TIGR_Tba1	Tb927.2.2460	25N14.35		GO:0005634	TIGR_Tba1:annotation	ISS	SWISS-PROT:P40984	C	Ubiquitin-conjugating enzyme E2, putative		protein	taxon:5691	20020523	TIGR	
+TIGR_Tba1	Tb927.2.2450	25N14.40		GO:0005575	GO_REF:nd	ND		C	Methyltransferase, putative		protein	taxon:5691	20020521	TIGR	
+TIGR_Tba1	Tb927.2.2450	25N14.40		GO:0003674	GO_REF:nd	ND		F	Methyltransferase, putative		protein	taxon:5691	20020521	TIGR	
+TIGR_Tba1	Tb927.2.2450	25N14.40		GO:0008150	GO_REF:nd	ND		P	Methyltransferase, putative		protein	taxon:5691	20020521	TIGR	
+TIGR_Tba1	Tb927.2.2520	25N14.5		GO:0008150	GO_REF:nd	ND		P	T. brucei family hypothetical protein		protein	taxon:5691	20020604	TIGR	
+TIGR_Tba1	Tb927.2.2520	25N14.5		GO:0003674	GO_REF:nd	ND		F	T. brucei family hypothetical protein		protein	taxon:5691	20020604	TIGR	
+TIGR_Tba1	Tb927.2.2520	25N14.5		GO:0005575	GO_REF:nd	ND		C	T. brucei family hypothetical protein		protein	taxon:5691	20020604	TIGR	
+TIGR_Tba1	Tb927.2.2430	25N14.50		GO:0004672	TIGR_Tba1:annotation	ISS	INTERPRO:IPR001245	F	Casein kinase II, alpha chain, putative		protein	taxon:5691	20020524	TIGR	
+TIGR_Tba1	Tb927.2.2400	25N14.65		GO:0008150	GO_REF:nd	ND		P	T. brucei family hypothetical protein		protein	taxon:5691	20020529	TIGR	
+TIGR_Tba1	Tb927.2.2400	25N14.65		GO:0003674	GO_REF:nd	ND		F	T. brucei family hypothetical protein		protein	taxon:5691	20020529	TIGR	
+TIGR_Tba1	Tb927.2.2400	25N14.65		GO:0005575	GO_REF:nd	ND		C	T. brucei family hypothetical protein		protein	taxon:5691	20020529	TIGR	
+TIGR_Tba1	Tb927.2.2390	25N14.70		GO:0008150	GO_REF:nd	ND		P	hypothetical protein, conserved		protein	taxon:5691	20020604	TIGR	
+TIGR_Tba1	Tb927.2.2390	25N14.70		GO:0003674	GO_REF:nd	ND		F	hypothetical protein, conserved		protein	taxon:5691	20020604	TIGR	
+TIGR_Tba1	Tb927.2.2390	25N14.70		GO:0005575	GO_REF:nd	ND		C	hypothetical protein, conserved		protein	taxon:5691	20020604	TIGR	
+TIGR_Tba1	Tb927.2.2380	25N14.75		GO:0008150	GO_REF:nd	ND		P	T. brucei family hypothetical protein		protein	taxon:5691	20020529	TIGR	
+TIGR_Tba1	Tb927.2.2380	25N14.75		GO:0003674	GO_REF:nd	ND		F	T. brucei family hypothetical protein		protein	taxon:5691	20020529	TIGR	
+TIGR_Tba1	Tb927.2.2380	25N14.75		GO:0005575	GO_REF:nd	ND		C	T. brucei family hypothetical protein		protein	taxon:5691	20020529	TIGR	
+TIGR_Tba1	Tb927.2.2350	25N14.90		GO:0008150	GO_REF:nd	ND		P	T. brucei family hypothetical protein		protein	taxon:5691	20020603	TIGR	
+TIGR_Tba1	Tb927.2.2350	25N14.90		GO:0003674	GO_REF:nd	ND		F	T. brucei family hypothetical protein		protein	taxon:5691	20020603	TIGR	
+TIGR_Tba1	Tb927.2.2350	25N14.90		GO:0005575	GO_REF:nd	ND		C	T. brucei family hypothetical protein		protein	taxon:5691	20020603	TIGR	
+TIGR_Tba1	Tb927.2.1180	25N24.100		GO:0008150	GO_REF:nd	ND		P	Retrotransposon hot spot protein, RHS3-a		protein	taxon:5691	20020523	TIGR	
+TIGR_Tba1	Tb927.2.1180	25N24.100		GO:0005634	BIOSIS:200200247281	TAS		C	Retrotransposon hot spot protein, RHS3-a		protein	taxon:5691	20020523	TIGR	
+TIGR_Tba1	Tb927.2.1180	25N24.100		GO:0003674	GO_REF:nd	ND		F	Retrotransposon hot spot protein, RHS3-a		protein	taxon:5691	20020523	TIGR	
+TIGR_Tba1	Tb927.2.1170	25N24.105		GO:0008150	GO_REF:nd	ND		P	Retrotransposon hot spot protein, RHS5-b		protein	taxon:5691	20020523	TIGR	
+TIGR_Tba1	Tb927.2.1170	25N24.105		GO:0005634	BIOSIS:200200247281	TAS		C	Retrotransposon hot spot protein, RHS5-b		protein	taxon:5691	20020523	TIGR	
+TIGR_Tba1	Tb927.2.1170	25N24.105		GO:0003674	GO_REF:nd	ND		F	Retrotransposon hot spot protein, RHS5-b		protein	taxon:5691	20020523	TIGR	
+TIGR_Tba1	Tb927.2.1350	25N24.15		GO:0008150	GO_REF:nd	ND		P	Retrotransposon hot spot protein RHS1		protein	taxon:5691	20020523	TIGR	
+TIGR_Tba1	Tb927.2.1350	25N24.15		GO:0005634	BIOSIS:200200247281	TAS		C	Retrotransposon hot spot protein RHS1		protein	taxon:5691	20020523	TIGR	
+TIGR_Tba1	Tb927.2.1350	25N24.15		GO:0003674	GO_REF:nd	ND		F	Retrotransposon hot spot protein RHS1		protein	taxon:5691	20020523	TIGR	
+TIGR_Tba1	Tb927.2.1080	25N24.150		GO:0008150	GO_REF:nd	ND		P	Retrotransposon hot spot protein, RHS5-c		protein	taxon:5691	20020523	TIGR	
+TIGR_Tba1	Tb927.2.1080	25N24.150		GO:0005634	BIOSIS:200200247281	TAS		C	Retrotransposon hot spot protein, RHS5-c		protein	taxon:5691	20020523	TIGR	
+TIGR_Tba1	Tb927.2.1080	25N24.150		GO:0003674	GO_REF:nd	ND		F	Retrotransposon hot spot protein, RHS5-c		protein	taxon:5691	20020523	TIGR	
+TIGR_Tba1	Tb927.2.1070	25N24.155		GO:0008150	GO_REF:nd	ND		P	T. brucei family hypothetical protein		protein	taxon:5691	20020530	TIGR	
+TIGR_Tba1	Tb927.2.1070	25N24.155		GO:0003674	GO_REF:nd	ND		F	T. brucei family hypothetical protein		protein	taxon:5691	20020530	TIGR	
+TIGR_Tba1	Tb927.2.1070	25N24.155		GO:0005575	GO_REF:nd	ND		C	T. brucei family hypothetical protein		protein	taxon:5691	20020530	TIGR	
+TIGR_Tba1	Tb927.2.1020	25N24.180		GO:0003674	GO_REF:nd	ND		F	T. brucei family hypothetical protein		protein	taxon:5691	20020603	TIGR	
+TIGR_Tba1	Tb927.2.1020	25N24.180		GO:0008150	GO_REF:nd	ND		P	T. brucei family hypothetical protein		protein	taxon:5691	20020603	TIGR	
+TIGR_Tba1	Tb927.2.1020	25N24.180		GO:0005575	GO_REF:nd	ND		C	T. brucei family hypothetical protein		protein	taxon:5691	20020603	TIGR	
+TIGR_Tba1	Tb927.2.1000	25N24.190		GO:0008150	GO_REF:nd	ND		P	T. brucei family hypothetical protein		protein	taxon:5691	20020529	TIGR	
+TIGR_Tba1	Tb927.2.1000	25N24.190		GO:0003674	GO_REF:nd	ND		F	T. brucei family hypothetical protein		protein	taxon:5691	20020529	TIGR	
+TIGR_Tba1	Tb927.2.1000	25N24.190		GO:0005575	GO_REF:nd	ND		C	T. brucei family hypothetical protein		protein	taxon:5691	20020529	TIGR	
+TIGR_Tba1	Tb927.2.960	25N24.210		GO:0008150	GO_REF:nd	ND		P	T. brucei family hypothetical protein		protein	taxon:5691	20020531	TIGR	
+TIGR_Tba1	Tb927.2.960	25N24.210		GO:0003674	GO_REF:nd	ND		F	T. brucei family hypothetical protein		protein	taxon:5691	20020531	TIGR	
+TIGR_Tba1	Tb927.2.960	25N24.210		GO:0005575	GO_REF:nd	ND		C	T. brucei family hypothetical protein		protein	taxon:5691	20020531	TIGR	
+TIGR_Tba1	Tb927.2.950	25N24.215		GO:0005515	PMID:2247064	TAS		F	Leucine-rich repeat protein 1 (LRRP1)		protein	taxon:5691	20020524	TIGR	
+TIGR_Tba1	Tb927.2.950	25N24.215		GO:0005575	GO_REF:nd	ND		C	Leucine-rich repeat protein 1 (LRRP1)		protein	taxon:5691	20020524	TIGR	
+TIGR_Tba1	Tb927.2.950	25N24.215		GO:0003676	PMID:2247064	ISS		F	Leucine-rich repeat protein 1 (LRRP1)		protein	taxon:5691	20020524	TIGR	
+TIGR_Tba1	Tb927.2.950	25N24.215		GO:0008150	GO_REF:nd	ND		P	Leucine-rich repeat protein 1 (LRRP1)		protein	taxon:5691	20020524	TIGR	
+TIGR_Tba1	Tb927.2.940	25N24.220		GO:0008150	GO_REF:nd	ND		P	T. brucei family hypothetical protein		protein	taxon:5691	20020604	TIGR	
+TIGR_Tba1	Tb927.2.940	25N24.220		GO:0003674	GO_REF:nd	ND		F	T. brucei family hypothetical protein		protein	taxon:5691	20020604	TIGR	
+TIGR_Tba1	Tb927.2.940	25N24.220		GO:0005575	GO_REF:nd	ND		C	T. brucei family hypothetical protein		protein	taxon:5691	20020604	TIGR	
+TIGR_Tba1	Tb927.2.930	25N24.225		GO:0005575	GO_REF:nd	ND		C	T. brucei family hypothetical protein		protein	taxon:5691	20020603	TIGR	
+TIGR_Tba1	Tb927.2.930	25N24.225		GO:0003674	GO_REF:nd	ND		F	T. brucei family hypothetical protein		protein	taxon:5691	20020603	TIGR	
+TIGR_Tba1	Tb927.2.930	25N24.225		GO:0008150	GO_REF:nd	ND		P	T. brucei family hypothetical protein		protein	taxon:5691	20020603	TIGR	
+TIGR_Tba1	Tb927.2.900	25N24.240		GO:0008150	GO_REF:nd	ND		P	T. brucei family hypothetical protein		protein	taxon:5691	20020604	TIGR	
+TIGR_Tba1	Tb927.2.900	25N24.240		GO:0003674	GO_REF:nd	ND		F	T. brucei family hypothetical protein		protein	taxon:5691	20020604	TIGR	
+TIGR_Tba1	Tb927.2.900	25N24.240		GO:0005575	GO_REF:nd	ND		C	T. brucei family hypothetical protein		protein	taxon:5691	20020604	TIGR	
+TIGR_Tba1	Tb927.2.890	25N24.245		GO:0003674	GO_REF:nd	ND		F	T. brucei family hypothetical protein		protein	taxon:5691	20020603	TIGR	
+TIGR_Tba1	Tb927.2.890	25N24.245		GO:0005575	GO_REF:nd	ND		C	T. brucei family hypothetical protein		protein	taxon:5691	20020603	TIGR	
+TIGR_Tba1	Tb927.2.890	25N24.245		GO:0008150	GO_REF:nd	ND		P	T. brucei family hypothetical protein		protein	taxon:5691	20020603	TIGR	
+TIGR_Tba1	25N24.260	25N24.260		GO:0005575	GO_REF:nd	ND		C	T. brucei family hypothetical protein		protein	taxon:5691	20020603	TIGR	
+TIGR_Tba1	25N24.260	25N24.260		GO:0008150	GO_REF:nd	ND		P	T. brucei family hypothetical protein		protein	taxon:5691	20020603	TIGR	
+TIGR_Tba1	25N24.260	25N24.260		GO:0003674	GO_REF:nd	ND		F	T. brucei family hypothetical protein		protein	taxon:5691	20020603	TIGR	
+TIGR_Tba1	25N24.275	25N24.275		GO:0008150	GO_REF:nd	ND		P	Retrotransposon hot spot protein, RHS6-a		protein	taxon:5691	20020523	TIGR	
+TIGR_Tba1	25N24.275	25N24.275		GO:0005634	BIOSIS:200200247281	TAS		C	Retrotransposon hot spot protein, RHS6-a		protein	taxon:5691	20020523	TIGR	
+TIGR_Tba1	25N24.275	25N24.275		GO:0003674	GO_REF:nd	ND		F	Retrotransposon hot spot protein, RHS6-a		protein	taxon:5691	20020523	TIGR	
+TIGR_Tba1	Tb927.2.1320	25N24.30		GO:0003674	GO_REF:ND	ND		F	T. brucei family hypothetical protein		protein	taxon:5691	20020530	TIGR	
+TIGR_Tba1	Tb927.2.1320	25N24.30		GO:0008150	GO_REF:nd	ND		P	T. brucei family hypothetical protein		protein	taxon:5691	20020530	TIGR	
+TIGR_Tba1	Tb927.2.1320	25N24.30		GO:0005575	GO_REF:nd	ND		C	T. brucei family hypothetical protein		protein	taxon:5691	20020530	TIGR	
+TIGR_Tba1	Tb927.2.1290	25N24.45		GO:0005575	GO_REF:nd	ND		C	T. brucei family hypothetical protein		protein	taxon:5691	20020603	TIGR	
+TIGR_Tba1	Tb927.2.1290	25N24.45		GO:0003674	GO_REF:nd	ND		F	T. brucei family hypothetical protein		protein	taxon:5691	20020603	TIGR	
+TIGR_Tba1	Tb927.2.1290	25N24.45		GO:0008150	GO_REF:nd	ND		P	T. brucei family hypothetical protein		protein	taxon:5691	20020603	TIGR	
+TIGR_Tba1	Tb927.2.1370	25N24.5		GO:0003674	GO_REF:nd	ND		F	T. brucei family hypothetical protein		protein	taxon:5691	20020603	TIGR	
+TIGR_Tba1	Tb927.2.1370	25N24.5		GO:0008150	GO_REF:nd	ND		P	T. brucei family hypothetical protein		protein	taxon:5691	20020603	TIGR	
+TIGR_Tba1	Tb927.2.1370	25N24.5		GO:0005575	GO_REF:nd	ND		C	T. brucei family hypothetical protein		protein	taxon:5691	20020603	TIGR	
+TIGR_Tba1	Tb927.2.1250	25N24.65		GO:0008150	GO_REF:nd	ND		P	T. brucei family hypothetical protein		protein	taxon:5691	20020604	TIGR	
+TIGR_Tba1	Tb927.2.1250	25N24.65		GO:0003674	GO_REF:nd	ND		F	T. brucei family hypothetical protein		protein	taxon:5691	20020604	TIGR	
+TIGR_Tba1	Tb927.2.1250	25N24.65		GO:0005575	GO_REF:nd	ND		C	T. brucei family hypothetical protein		protein	taxon:5691	20020604	TIGR	
+TIGR_Tba1	Tb927.2.1240	25N24.70		GO:0003674	GO_REF:nd	ND		F	T. brucei family hypothetical protein		protein	taxon:5691	20020603	TIGR	
+TIGR_Tba1	Tb927.2.1240	25N24.70		GO:0005575	GO_REF:nd	ND		C	T. brucei family hypothetical protein		protein	taxon:5691	20020603	TIGR	
+TIGR_Tba1	Tb927.2.1240	25N24.70		GO:0008150	GO_REF:nd	ND		P	T. brucei family hypothetical protein		protein	taxon:5691	20020603	TIGR	
+TIGR_Tba1	Tb927.2.1220	25N24.80		GO:0008150	GO_REF:nd	ND		P	T. brucei family hypothetical protein		protein	taxon:5691	20020529	TIGR	
+TIGR_Tba1	Tb927.2.1220	25N24.80		GO:0003674	GO_REF:nd	ND		F	T. brucei family hypothetical protein		protein	taxon:5691	20020529	TIGR	
+TIGR_Tba1	Tb927.2.1220	25N24.80		GO:0005575	GO_REF:nd	ND		C	T. brucei family hypothetical protein		protein	taxon:5691	20020529	TIGR	
+TIGR_Tba1	Tb927.2.1210	25N24.85		GO:0008150	GO_REF:nd	ND		P	Retrotransposon hot spot protein, RHS4-e		protein	taxon:5691	20020523	TIGR	
+TIGR_Tba1	Tb927.2.1210	25N24.85		GO:0005634	BIOSIS:200200247281	TAS		C	Retrotransposon hot spot protein, RHS4-e		protein	taxon:5691	20020523	TIGR	
+TIGR_Tba1	Tb927.2.1210	25N24.85		GO:0003674	GO_REF:nd	ND		F	Retrotransposon hot spot protein, RHS4-e		protein	taxon:5691	20020523	TIGR	
+TIGR_Tba1	Tb927.2.1190	25N24.95		GO:0008150	GO_REF:nd	ND		P	T. brucei family hypothetical protein		protein	taxon:5691	20020530	TIGR	
+TIGR_Tba1	Tb927.2.1190	25N24.95		GO:0003674	GO_REF:nd	ND		F	T. brucei family hypothetical protein		protein	taxon:5691	20020530	TIGR	
+TIGR_Tba1	Tb927.2.1190	25N24.95		GO:0005575	GO_REF:nd	ND		C	T. brucei family hypothetical protein		protein	taxon:5691	20020530	TIGR	
+TIGR_Tba1	Tb927.2.1680	27H14.100		GO:0005575	GO_REF:nd	ND		C	Cyclophilin, putative		protein	taxon:5691	20020524	TIGR	
+TIGR_Tba1	Tb927.2.1850	27H14.15		GO:0008150	GO_REF:nd	ND		P	T. brucei family hypothetical protein		protein	taxon:5691	20020531	TIGR	
+TIGR_Tba1	Tb927.2.1850	27H14.15		GO:0003674	GO_REF:nd	ND		F	T. brucei family hypothetical protein		protein	taxon:5691	20020531	TIGR	
+TIGR_Tba1	Tb927.2.1850	27H14.15		GO:0005575	GO_REF:nd	ND		C	T. brucei family hypothetical protein		protein	taxon:5691	20020531	TIGR	
+TIGR_Tba1	Tb927.2.1560	27H14.160		GO:0005575	GO_REF:nd	ND		C	cyclophilin, putative		protein	taxon:5691	20020524	TIGR	
+TIGR_Tba1	Tb927.2.1840	27H14.20		GO:0008150	GO_REF:nd	ND		P	T. brucei family hypothetical protein		protein	taxon:5691	20020530	TIGR	
+TIGR_Tba1	Tb927.2.1840	27H14.20		GO:0003674	GO_REF:nd	ND		F	T. brucei family hypothetical protein		protein	taxon:5691	20020530	TIGR	
+TIGR_Tba1	Tb927.2.1840	27H14.20		GO:0005575	GO_REF:nd	ND		C	T. brucei family hypothetical protein		protein	taxon:5691	20020530	TIGR	
+TIGR_Tba1	Tb927.2.1500	27H14.210		GO:0008150	GO_REF:nd	ND		P	T. brucei family hypothetical protein		protein	taxon:5691	20020603	TIGR	
+TIGR_Tba1	Tb927.2.1500	27H14.210		GO:0003674	GO_REF:nd	ND		F	T. brucei family hypothetical protein		protein	taxon:5691	20020603	TIGR	
+TIGR_Tba1	Tb927.2.1500	27H14.210		GO:0005575	GO_REF:nd	ND		C	T. brucei family hypothetical protein		protein	taxon:5691	20020603	TIGR	
+TIGR_Tba1	Tb927.2.1490	27H14.215		GO:0008150	GO_REF:nd	ND		P	T. brucei family hypothetical protein		protein	taxon:5691	20020531	TIGR	
+TIGR_Tba1	Tb927.2.1490	27H14.215		GO:0003674	GO_REF:nd	ND		F	T. brucei family hypothetical protein		protein	taxon:5691	20020531	TIGR	
+TIGR_Tba1	Tb927.2.1490	27H14.215		GO:0005575	GO_REF:nd	ND		C	T. brucei family hypothetical protein		protein	taxon:5691	20020531	TIGR	
+TIGR_Tba1	Tb927.2.1480	27H14.220		GO:0008150	GO_REF:nd	ND		P	T. brucei family hypothetical protein		protein	taxon:5691	20020531	TIGR	
+TIGR_Tba1	Tb927.2.1480	27H14.220		GO:0003674	GO_REF:nd	ND		F	T. brucei family hypothetical protein		protein	taxon:5691	20020531	TIGR	
+TIGR_Tba1	Tb927.2.1470	27H14.225		GO:0008150	GO_REF:nd	ND		P	T. brucei family hypothetical protein		protein	taxon:5691	20020530	TIGR	
+TIGR_Tba1	Tb927.2.1470	27H14.225		GO:0003674	GO_REF:nd	ND		F	T. brucei family hypothetical protein		protein	taxon:5691	20020530	TIGR	
+TIGR_Tba1	Tb927.2.1470	27H14.225		GO:0005575	GO_REF:nd	ND		C	T. brucei family hypothetical protein		protein	taxon:5691	20020530	TIGR	
+TIGR_Tba1	Tb927.2.1460	27H14.230		GO:0008150	GO_REF:nd	ND		P	T. brucei family hypothetical protein		protein	taxon:5691	20020529	TIGR	
+TIGR_Tba1	Tb927.2.1460	27H14.230		GO:0003674	GO_REF:nd	ND		F	T. brucei family hypothetical protein		protein	taxon:5691	20020529	TIGR	
+TIGR_Tba1	Tb927.2.1460	27H14.230		GO:0005575	GO_REF:nd	ND		C	T. brucei family hypothetical protein		protein	taxon:5691	20020529	TIGR	
+TIGR_Tba1	Tb927.2.1440	27H14.240		GO:0005575	GO_REF:nd	ND		C	Reverse transcriptase (Ingi), putative		protein	taxon:5691	20020530	TIGR	
+TIGR_Tba1	Tb927.2.1430	27H14.245		GO:0008150	GO_REF:nd	ND		P	T. brucei family hypothetical protein		protein	taxon:5691	20020603	TIGR	
+TIGR_Tba1	Tb927.2.1430	27H14.245		GO:0003674	GO_REF:nd	ND		F	T. brucei family hypothetical protein		protein	taxon:5691	20020603	TIGR	
+TIGR_Tba1	Tb927.2.1430	27H14.245		GO:0005575	GO_REF:nd	ND		C	T. brucei family hypothetical protein		protein	taxon:5691	20020603	TIGR	
+TIGR_Tba1	Tb927.2.1420	27H14.250		GO:0008150	GO_REF:nd	ND		P	T. brucei family hypothetical protein		protein	taxon:5691	20020531	TIGR	
+TIGR_Tba1	Tb927.2.1420	27H14.250		GO:0003674	GO_REF:nd	ND		F	T. brucei family hypothetical protein		protein	taxon:5691	20020531	TIGR	
+TIGR_Tba1	Tb927.2.1420	27H14.250		GO:0005575	GO_REF:nd	ND		C	T. brucei family hypothetical protein		protein	taxon:5691	20020531	TIGR	
+TIGR_Tba1	Tb927.2.1410	27H14.255		GO:0008150	GO_REF:nd	ND		P	T. brucei family hypothetical protein		protein	taxon:5691	20020531	TIGR	
+TIGR_Tba1	Tb927.2.1410	27H14.255		GO:0003674	GO_REF:nd	ND		F	T. brucei family hypothetical protein		protein	taxon:5691	20020531	TIGR	
+TIGR_Tba1	Tb927.2.1380	27H14.270		GO:0005515	PMID:2247064	TAS		F	Leucine-rich repeat protein (LRRP)		protein	taxon:5691	20020524	TIGR	
+TIGR_Tba1	Tb927.2.1380	27H14.270		GO:0005575	GO_REF:nd	ND		C	Leucine-rich repeat protein (LRRP)		protein	taxon:5691	20020524	TIGR	
+TIGR_Tba1	Tb927.2.1380	27H14.270		GO:0003676	PMID:2247064	ISS		F	Leucine-rich repeat protein (LRRP)		protein	taxon:5691	20020524	TIGR	
+TIGR_Tba1	Tb927.2.1380	27H14.270		GO:0008150	GO_REF:nd	ND		P	Leucine-rich repeat protein (LRRP)		protein	taxon:5691	20020524	TIGR	
+TIGR_Tba1	27H14.275	27H14.275		GO:0003674	GO_REF:nd	ND		F	T. brucei family hypothetical protein		protein	taxon:5691	20020603	TIGR	
+TIGR_Tba1	27H14.275	27H14.275		GO:0008150	GO_REF:nd	ND		P	T. brucei family hypothetical protein		protein	taxon:5691	20020603	TIGR	
+TIGR_Tba1	27H14.275	27H14.275		GO:0005575	GO_REF:nd	ND		C	T. brucei family hypothetical protein		protein	taxon:5691	20020603	TIGR	
+TIGR_Tba1	27H14.285	27H14.285		GO:0003674	GO_REF:nd	ND		F	Retrotransposon hot spot protein RHS1		protein	taxon:5691	20020523	TIGR	
+TIGR_Tba1	27H14.285	27H14.285		GO:0008150	GO_REF:nd	ND		P	Retrotransposon hot spot protein RHS1		protein	taxon:5691	20020523	TIGR	
+TIGR_Tba1	27H14.285	27H14.285		GO:0005634	BIOSIS:200200247281	TAS		C	Retrotransposon hot spot protein RHS1		protein	taxon:5691	20020523	TIGR	
+TIGR_Tba1	Tb927.2.1820	27H14.30		GO:0004672	TIGR_Tba1:annotation	ISS	INTERPRO:IPR001245	F	Protein kinase, putative		protein	taxon:5691	20020524	TIGR	
+TIGR_Tba1	27H14.300	27H14.300		GO:0008150	GO_REF:nd	ND		P	T. brucei family hypothetical protein		protein	taxon:5691	20020531	TIGR	
+TIGR_Tba1	27H14.300	27H14.300		GO:0003674	GO_REF:nd	ND		F	T. brucei family hypothetical protein		protein	taxon:5691	20020531	TIGR	
+TIGR_Tba1	27H14.300	27H14.300		GO:0005575	GO_REF:nd	ND		C	T. brucei family hypothetical protein		protein	taxon:5691	20020531	TIGR	
+TIGR_Tba1	27H14.305	27H14.305		GO:0003674	GO_REF:ND	ND		F	T. brucei family hypothetical protein		protein	taxon:5691	20020530	TIGR	
+TIGR_Tba1	27H14.305	27H14.305		GO:0008150	GO_REF:nd	ND		P	T. brucei family hypothetical protein		protein	taxon:5691	20020530	TIGR	
+TIGR_Tba1	27H14.305	27H14.305		GO:0005575	GO_REF:nd	ND		C	T. brucei family hypothetical protein		protein	taxon:5691	20020530	TIGR	
+TIGR_Tba1	27H14.310	27H14.310		GO:0005515	PMID:2247064	TAS		F	Leucine-rich repeat protein 1 (LRRP1)		protein	taxon:5691	20020524	TIGR	
+TIGR_Tba1	27H14.310	27H14.310		GO:0005575	GO_REF:nd	ND		C	Leucine-rich repeat protein 1 (LRRP1)		protein	taxon:5691	20020524	TIGR	
+TIGR_Tba1	27H14.310	27H14.310		GO:0003676	PMID:2247064	ISS		F	Leucine-rich repeat protein 1 (LRRP1)		protein	taxon:5691	20020524	TIGR	
+TIGR_Tba1	27H14.310	27H14.310		GO:0008150	GO_REF:nd	ND		P	Leucine-rich repeat protein 1 (LRRP1)		protein	taxon:5691	20020524	TIGR	
+TIGR_Tba1	27H14.315	27H14.315		GO:0005515	PMID:2247064	TAS		F	Leucine-rich repeat protein (LRRP), pseudogene		protein	taxon:5691	20020524	TIGR	
+TIGR_Tba1	27H14.315	27H14.315		GO:0005575	GO_REF:nd	ND		C	Leucine-rich repeat protein (LRRP), pseudogene		protein	taxon:5691	20020524	TIGR	
+TIGR_Tba1	27H14.315	27H14.315		GO:0003676	PMID:2247064	ISS		F	Leucine-rich repeat protein (LRRP), pseudogene		protein	taxon:5691	20020524	TIGR	
+TIGR_Tba1	27H14.315	27H14.315		GO:0008150	GO_REF:nd	ND		P	Leucine-rich repeat protein (LRRP), pseudogene		protein	taxon:5691	20020524	TIGR	
+TIGR_Tba1	27H14.335	27H14.335		GO:0005575	GO_REF:nd	ND		C	T. brucei family hypothetical protein		protein	taxon:5691	20020603	TIGR	
+TIGR_Tba1	27H14.335	27H14.335		GO:0003674	GO_REF:nd	ND		F	T. brucei family hypothetical protein		protein	taxon:5691	20020603	TIGR	
+TIGR_Tba1	27H14.335	27H14.335		GO:0008150	GO_REF:nd	ND		P	T. brucei family hypothetical protein		protein	taxon:5691	20020603	TIGR	
+TIGR_Tba1	Tb927.2.1810	27H14.35		GO:0008150	GO_REF:nd	ND		P	Transcription activator, putative		protein	taxon:5691	20020528	TIGR	
+TIGR_Tba1	Tb927.2.1800	27H14.40		GO:0005634	TIGR_Tba1:annotation	IC	GO:0005634	C	DNA polymerase delta catalytic subunit, putative		protein	taxon:5691	20020607	TIGR	
+TIGR_Tba1	Tb927.2.1780	27H14.50		GO:0005575	GO_REF:nd	ND		C	N-acetylglucosaminyl-phosphatidylinositol biosynthetic protein, putative		protein	taxon:5691	20020607	TIGR	
+TIGR_Tba1	Tb927.2.1770	27H14.55		GO:0008150	GO_REF:nd	ND		P	T. brucei family hypothetical protein		protein	taxon:5691	20020603	TIGR	
+TIGR_Tba1	Tb927.2.1770	27H14.55		GO:0003674	GO_REF:nd	ND		F	T. brucei family hypothetical protein		protein	taxon:5691	20020603	TIGR	
+TIGR_Tba1	Tb927.2.1770	27H14.55		GO:0005575	GO_REF:nd	ND		C	T. brucei family hypothetical protein		protein	taxon:5691	20020603	TIGR	
+TIGR_Tba1	Tb927.2.1760	27H14.60		GO:0008150	GO_REF:nd	ND		P	T. brucei family hypothetical protein		protein	taxon:5691	20020603	TIGR	
+TIGR_Tba1	Tb927.2.1760	27H14.60		GO:0003674	GO_REF:nd	ND		F	T. brucei family hypothetical protein		protein	taxon:5691	20020603	TIGR	
+TIGR_Tba1	Tb927.2.1760	27H14.60		GO:0005575	GO_REF:nd	ND		C	T. brucei family hypothetical protein		protein	taxon:5691	20020603	TIGR	
+TIGR_Tba1	Tb927.2.1720	27H14.80		GO:0003674	GO_REF:nd	ND		F	hypothetical protein, conserved		protein	taxon:5691	20020812	TIGR	
+TIGR_Tba1	Tb927.2.1720	27H14.80		GO:0008150	GO_REF:nd	ND		P	hypothetical protein, conserved		protein	taxon:5691	20020812	TIGR	
+TIGR_Tba1	Tb927.2.1720	27H14.80		GO:0005575	GO_REF:nd	ND		C	hypothetical protein, conserved		protein	taxon:5691	20020812	TIGR	
+TIGR_Tba1	Tb927.2.1700	27H14.90		GO:0008150	GO_REF:nd	ND		P	T. brucei family hypothetical protein		protein	taxon:5691	20020603	TIGR	
+TIGR_Tba1	Tb927.2.1700	27H14.90		GO:0003674	GO_REF:nd	ND		F	T. brucei family hypothetical protein		protein	taxon:5691	20020603	TIGR	
+TIGR_Tba1	Tb927.2.1700	27H14.90		GO:0005575	GO_REF:nd	ND		C	T. brucei family hypothetical protein		protein	taxon:5691	20020603	TIGR	
+TIGR_Tba1	Tb927.2.3520	28H13.110		GO:0008150	GO_REF:nd	ND		P	T. brucei family hypothetical protein		protein	taxon:5691	20020603	TIGR	
+TIGR_Tba1	Tb927.2.3520	28H13.110		GO:0003674	GO_REF:nd	ND		F	T. brucei family hypothetical protein		protein	taxon:5691	20020603	TIGR	
+TIGR_Tba1	Tb927.2.3520	28H13.110		GO:0005575	GO_REF:nd	ND		C	T. brucei family hypothetical protein		protein	taxon:5691	20020603	TIGR	
+TIGR_Tba1	Tb927.2.3580	28H13.140		GO:0003677	TIGR_Tba1:annotation	ISS	INTERPRO:IPR001222	F	Transcription elongation factor S-II, putative		protein	taxon:5691	20020610	TIGR	
+TIGR_Tba1	Tb927.2.3580	28H13.140		GO:0003700	TIGR_Tba1:annotation	ISS	INTERPRO:IPR001222	F	Transcription elongation factor S-II, putative		protein	taxon:5691	20020610	TIGR	
+TIGR_Tba1	Tb927.2.3580	28H13.140		GO:0005634	TIGR_Tba1:annotation	ISS	INTERPRO:IPR001222	C	Transcription elongation factor S-II, putative		protein	taxon:5691	20020610	TIGR	
+TIGR_Tba1	Tb927.2.3620	28H13.160		GO:0005575	GO_REF:nd	ND		C	GTP-binding elongation factor Tu family, putative		protein	taxon:5691	20020524	TIGR	
+TIGR_Tba1	Tb927.2.3720	28H13.210		GO:0006464	PMID:7768995|TIGR_Tba1:annotation	ISS	SWISS-PROT:P40984|INTERPRO:IPR000608	P	Ubiquitin-conjugating enzyme, putative		protein	taxon:5691	20020523	TIGR	
+TIGR_Tba1	Tb927.2.3720	28H13.210		GO:0005634	PMID:7768995	ISS	SWISS-PROT:P40984	C	Ubiquitin-conjugating enzyme, putative		protein	taxon:5691	20020523	TIGR	
+TIGR_Tba1	Tb927.2.3780	28H13.240		GO:0008150	GO_REF:nd	ND		P	Translation initiation factor IF-2, putative		protein	taxon:5691	20020524	TIGR	
+TIGR_Tba1	Tb927.2.3780	28H13.240		GO:0005575	GO_REF:nd	ND		C	Translation initiation factor IF-2, putative		protein	taxon:5691	20020524	TIGR	
+TIGR_Tba1	Tb927.2.3880	28H13.290		GO:0005634	TIGR_Tba1:annotation	ISS	INTERPRO:IPR000504	C	Ribonucleoprotein F, putative		protein	taxon:5691	20020610	TIGR	
+TIGR_Tba1	28H13.30	28H13.30		GO:0008150	GO_REF:nd	ND		P	T. brucei family hypothetical protein		protein	taxon:5691	20020531	TIGR	
+TIGR_Tba1	28H13.30	28H13.30		GO:0003674	GO_REF:nd	ND		F	T. brucei family hypothetical protein		protein	taxon:5691	20020531	TIGR	
+TIGR_Tba1	28H13.30	28H13.30		GO:0005575	GO_REF:nd	ND		C	T. brucei family hypothetical protein		protein	taxon:5691	20020531	TIGR	
+TIGR_Tba1	Tb927.2.3910	28H13.305		GO:0003824	TIGR_Tba1:annotation	ISS	INTERPRO:IPR000794	F	Beta-ketoacyl synthase family protein, putative		protein	taxon:5691	20020610	TIGR	
+TIGR_Tba1	Tb927.2.3910	28H13.305		GO:0005575	GO_REF:nd	ND		C	Beta-ketoacyl synthase family protein, putative		protein	taxon:5691	20020610	TIGR	
+TIGR_Tba1	Tb927.2.3930	28H13.315		GO:0003677	TIGR_Tba1:annotation	ISS	SWISS-PROT:P49739	F	MCM family protein, putative		protein	taxon:5691	20020611	TIGR	
+TIGR_Tba1	Tb927.2.3930	28H13.315		GO:0005575	GO_REF:nd	ND		C	MCM family protein, putative		protein	taxon:5691	20020611	TIGR	
+TIGR_Tba1	Tb927.2.3960	28H13.330		GO:0008150	GO_REF:nd	ND		P	DnaJ family protein, putative		protein	taxon:5691	20020531	TIGR	
+TIGR_Tba1	Tb927.2.3960	28H13.330		GO:0005575	GO_REF:nd	ND		C	DnaJ family protein, putative		protein	taxon:5691	20020531	TIGR	
+TIGR_Tba1	Tb927.2.4020	28H13.360		GO:0003824	TIGR_Tba1:annotation	ISS	INTERPRO:IPR000594|SWISS-PROT:Q13564	F	Amyloid precursor protein-binding protein 1 (APP-BP1), putative		protein	taxon:5691	20020611	TIGR	
+TIGR_Tba1	Tb927.2.4020	28H13.360		GO:0005575	GO_REF:nd	NAS		C	Amyloid precursor protein-binding protein 1 (APP-BP1), putative		protein	taxon:5691	20020611	TIGR	
+TIGR_Tba1	Tb927.2.4020	28H13.360		GO:0008150	GO_REF:nd	ND		P	Amyloid precursor protein-binding protein 1 (APP-BP1), putative		protein	taxon:5691	20020611	TIGR	
+TIGR_Tba1	Tb927.2.4050	28H13.375		GO:0008150	GO_REF:nd	ND		P	T. brucei family hypothetical protein		protein	taxon:5691	20020529	TIGR	
+TIGR_Tba1	Tb927.2.4050	28H13.375		GO:0003674	GO_REF:nd	ND		F	T. brucei family hypothetical protein		protein	taxon:5691	20020529	TIGR	
+TIGR_Tba1	Tb927.2.4050	28H13.375		GO:0005575	GO_REF:nd	ND		C	T. brucei family hypothetical protein		protein	taxon:5691	20020529	TIGR	
+TIGR_Tba1	Tb927.2.4060	28H13.380		GO:0008150	GO_REF:nd	ND		P	Dynein intermediate chain, putative		protein	taxon:5691	20020603	TIGR	
+TIGR_Tba1	Tb927.2.4060	28H13.380		GO:0003774	TIGR_Tba1:annotation	ISS	SWISS-PROT:O14576	F	Dynein intermediate chain, putative		protein	taxon:5691	20020603	TIGR	
+TIGR_Tba1	Tb927.2.4060	28H13.380		GO:0005856	TIGR_Tba1:annotation	ISS	SWISS-PROT:O14576	C	Dynein intermediate chain, putative		protein	taxon:5691	20020603	TIGR	
+TIGR_Tba1	Tb927.2.4090	28H13.395		GO:0008150	GO_REF:nd	ND		P	hypothetical protein, conserved		protein	taxon:5691	20020605	TIGR	
+TIGR_Tba1	Tb927.2.4090	28H13.395		GO:0003674	GO_REF:nd	ND		F	hypothetical protein, conserved		protein	taxon:5691	20020605	TIGR	
+TIGR_Tba1	Tb927.2.4090	28H13.395		GO:0005575	GO_REF:nd	ND		C	hypothetical protein, conserved		protein	taxon:5691	20020605	TIGR	
+TIGR_Tba1	Tb927.2.4110	28H13.405		GO:0005739	TIGR_Tba1:annotation	IC	GO:0004240	C	Mitochondrial processing peptidase alpha subunit, putative		protein	taxon:5691	20020611	TIGR	
+TIGR_Tba1	Tb927.2.4130	28H13.415		GO:0008152	TIGR_Tba1:annotation	ISS	SWISS-PROT:P55100	P	Enoyl-CoA hydratase/Enoyl-CoA isomerase/3-hydroxyacyl-CoA dehydrogenase, putative		protein	taxon:5691	20020611	TIGR	
+TIGR_Tba1	Tb927.2.4130	28H13.415		GO:0005575	GO_REF:nd	ND		C	Enoyl-CoA hydratase/Enoyl-CoA isomerase/3-hydroxyacyl-CoA dehydrogenase, putative		protein	taxon:5691	20020611	TIGR	
+TIGR_Tba1	Tb927.2.4200	28H13.450		GO:0004672	TIGR_Tba1:annotation	ISS	INTERPRO:IPR001245	F	Protein kinase, putative		protein	taxon:5691	20020524	TIGR	
+TIGR_Tba1	Tb927.2.4230	28H13.465		GO:0008150	GO_REF:nd	ND		P	NUP-1 protein, putative		protein	taxon:5691	20030312	TIGR	
+TIGR_Tba1	Tb927.2.4230	28H13.465		GO:0003674	GO_REF:nd	ND		F	NUP-1 protein, putative		protein	taxon:5691	20030312	TIGR	
+TIGR_Tba1	Tb927.2.4240	28H13.470		GO:0008150	GO_REF:nd	ND		P	GTP binding protein, putative		protein	taxon:5691	20020530	TIGR	
+TIGR_Tba1	Tb927.2.4240	28H13.470		GO:0003674	GO_REF:nd	ND		F	GTP binding protein, putative		protein	taxon:5691	20020530	TIGR	
+TIGR_Tba1	Tb927.2.4240	28H13.470		GO:0005575	GO_REF:nd	ND		C	GTP binding protein, putative		protein	taxon:5691	20020530	TIGR	
+TIGR_Tba1	Tb927.2.4280	28H13.490		GO:0005575	GO_REF:nd	ND		C	Dual specificity phosphatase (MKP), putative		protein	taxon:5691	20020611	TIGR	
+TIGR_Tba1	Tb927.2.4330	28H13.515		GO:0005198	PMID:9627992	ISS	NCBI_gi:3293267	F	Paraflagellar rod protein, putative		protein	taxon:5691	20020524	TIGR	
+TIGR_Tba1	Tb927.2.4330	28H13.515		GO:0005575	GO_REF:nd	ND		C	Paraflagellar rod protein, putative		protein	taxon:5691	20020524	TIGR	
+TIGR_Tba1	28H13.540	28H13.540		GO:0005829	PMID:1444271	TAS		C	Trypanothione synthetase, putative		protein	taxon:5691	20020603	TIGR	
+TIGR_Tba1	28H13.560	28H13.560		GO:0005634	TIGR_Tba1:annotation	IC	GO:0003690	C	Endo/exonuclease Mre11, putative		protein	taxon:5691	20020611	TIGR	
+TIGR_Tba1	Tb927.2.3440	28H13.70		GO:0003674	GO_REF:nd	ND		F	T. brucei family hypothetical protein		protein	taxon:5691	20020531	TIGR	
+TIGR_Tba1	Tb927.2.3440	28H13.70		GO:0008150	GO_REF:nd	ND		P	T. brucei family hypothetical protein		protein	taxon:5691	20020531	TIGR	
+TIGR_Tba1	Tb927.2.3440	28H13.70		GO:0005575	GO_REF:nd	ND		C	T. brucei family hypothetical protein		protein	taxon:5691	20020531	TIGR	
+TIGR_Tba1	Tb927.2.3460	28H13.80		GO:0003674	GO_REF:nd	ND		F	T. brucei family hypothetical protein		protein	taxon:5691	20020531	TIGR	
+TIGR_Tba1	Tb927.2.3460	28H13.80		GO:0008150	GO_REF:nd	ND		P	T. brucei family hypothetical protein		protein	taxon:5691	20020531	TIGR	
+TIGR_Tba1	Tb927.2.3460	28H13.80		GO:0005575	GO_REF:nd	ND		C	T. brucei family hypothetical protein		protein	taxon:5691	20020531	TIGR	
+TIGR_Tba1	Tb927.2.5120	30J2.10		GO:0005886	TIGR_Tba1:annotation	ISS	INTERPRO:IPR001388	C	Vesicle-associated membrane protein (VAMP), putative		protein	taxon:5691	20020528	TIGR	
+TIGR_Tba1	Tb927.2.5120	30J2.10		GO:0003674	GO_REF:nd	ND		F	Vesicle-associated membrane protein (VAMP), putative		protein	taxon:5691	20020528	TIGR	
+TIGR_Tba1	Tb927.2.5300	30J2.100		GO:0008150	GO_REF:nd	ND		P	T. brucei family hypothetical protein		protein	taxon:5691	20020603	TIGR	
+TIGR_Tba1	Tb927.2.5300	30J2.100		GO:0003674	GO_REF:nd	ND		F	T. brucei family hypothetical protein		protein	taxon:5691	20020603	TIGR	
+TIGR_Tba1	Tb927.2.5300	30J2.100		GO:0005575	GO_REF:nd	ND		C	T. brucei family hypothetical protein		protein	taxon:5691	20020603	TIGR	
+TIGR_Tba1	Tb927.2.5150	30J2.25		GO:0008150	GO_REF:nd	ND		P	TPR-repeat protein, putative		protein	taxon:5691	20020528	TIGR	
+TIGR_Tba1	Tb927.2.5150	30J2.25		GO:0003674	GO_REF:nd	ND		F	TPR-repeat protein, putative		protein	taxon:5691	20020528	TIGR	
+TIGR_Tba1	Tb927.2.5150	30J2.25		GO:0005575	GO_REF:nd	ND		C	TPR-repeat protein, putative		protein	taxon:5691	20020528	TIGR	
+TIGR_Tba1	Tb927.2.5180	30J2.40		GO:0008150	GO_REF:nd	ND		P	Aldo-keto reductase, putative		protein	taxon:5691	20020605	TIGR	
+TIGR_Tba1	Tb927.2.5180	30J2.40		GO:0005575	GO_REF:nd	ND		C	Aldo-keto reductase, putative		protein	taxon:5691	20020605	TIGR	
+TIGR_Tba1	Tb927.2.5210	30J2.55		GO:0008152	TIGR_Tba1:annotation	ISS	INTERPRO:IPR002198	P	3-oxoacyl-(acyl-carrier protein) reductase, putative		protein	taxon:5691	20020605	TIGR	
+TIGR_Tba1	Tb927.2.5210	30J2.55		GO:0005575	GO_REF:nd	ND		C	3-oxoacyl-(acyl-carrier protein) reductase, putative		protein	taxon:5691	20020605	TIGR	
+TIGR_Tba1	Tb927.2.5230	30J2.65		GO:0004672	TIGR_Tba1:annotation	ISS	INTERPRO:IPR001245|INTERPRO:IPR002290|SWISS-PROT:P25323	F	Protein kinase, putative		protein	taxon:5691	20020524	TIGR	
+TIGR_Tba1	Tb927.2.5240	30J2.70		GO:0008150	GO_REF:nd	ND		P	Cell cycle control protein (CWF8), putative		protein	taxon:5691	20020603	TIGR	
+TIGR_Tba1	Tb927.2.5240	30J2.70		GO:0003674	GO_REF:nd	ND		F	Cell cycle control protein (CWF8), putative		protein	taxon:5691	20020603	TIGR	
+TIGR_Tba1	Tb927.2.5240	30J2.70		GO:0005575	GO_REF:nd	ND		C	Cell cycle control protein (CWF8), putative		protein	taxon:5691	20020603	TIGR	
+TIGR_Tba1	Tb927.2.5250	30J2.75		GO:0008150	GO_REF:nd	ND		P	Tubulin-tyrosine ligase, putative		protein	taxon:5691	20020529	TIGR	
+TIGR_Tba1	Tb927.2.5250	30J2.75		GO:0005575	GO_REF:nd	ND		C	Tubulin-tyrosine ligase, putative		protein	taxon:5691	20020529	TIGR	
+TIGR_Tba1	Tb927.2.5270	30J2.85		GO:0005575	GO_REF:nd	NAS		C	Dynein heavy chain, putative		protein	taxon:5691	20020605	TIGR	
+TIGR_Tba1	Tb927.2.5280	30J2.90		GO:0008150	GO_REF:nd	ND		P	Trans-sialidase, putative		protein	taxon:5691	20020531	TIGR	
+TIGR_Tba1	Tb927.2.5280	30J2.90		GO:0005575	GO_REF:nd	ND		C	Trans-sialidase, putative		protein	taxon:5691	20020531	TIGR	
+TIGR_Tba1	Tb927.2.5280	30J2.90		GO:0003674	GO_REF:nd	ND		F	Trans-sialidase, putative		protein	taxon:5691	20020531	TIGR	
+TIGR_Tba1	Tb927.2.5290	30J2.95		GO:0008150	GO_REF:nd	ND		P	T. brucei family hypothetical protein		protein	taxon:5691	20020603	TIGR	
+TIGR_Tba1	Tb927.2.5290	30J2.95		GO:0003674	GO_REF:nd	ND		F	T. brucei family hypothetical protein		protein	taxon:5691	20020603	TIGR	
+TIGR_Tba1	Tb927.2.5290	30J2.95		GO:0005575	GO_REF:nd	ND		C	T. brucei family hypothetical protein		protein	taxon:5691	20020603	TIGR	
+TIGR_Tba1	Tb927.2.4930	30M24.115		GO:0008150	GO_REF:nd	ND		P	Esterase, putative		protein	taxon:5691	20020606	TIGR	
+TIGR_Tba1	Tb927.2.4930	30M24.115		GO:0003824	TIGR_Tba1:annotation	ISS	INTERPRO:IPR001087|SWISS-PROT:P41734	F	Esterase, putative		protein	taxon:5691	20020606	TIGR	
+TIGR_Tba1	Tb927.2.4930	30M24.115		GO:0005575	GO_REF:nd	ND		C	Esterase, putative		protein	taxon:5691	20020606	TIGR	
+TIGR_Tba1	Tb927.2.4920	30M24.120		GO:0008150	GO_REF:nd	ND		P	T. brucei family hypothetical protein		protein	taxon:5691	20020603	TIGR	
+TIGR_Tba1	Tb927.2.4920	30M24.120		GO:0003674	GO_REF:nd	ND		F	T. brucei family hypothetical protein		protein	taxon:5691	20020603	TIGR	
+TIGR_Tba1	Tb927.2.4920	30M24.120		GO:0005575	GO_REF:nd	ND		C	T. brucei family hypothetical protein		protein	taxon:5691	20020603	TIGR	
+TIGR_Tba1	Tb927.2.4910	30M24.125		GO:0008150	GO_REF:nd	ND		P	T. brucei family hypothetical protein		protein	taxon:5691	20020603	TIGR	
+TIGR_Tba1	Tb927.2.4910	30M24.125		GO:0003674	GO_REF:nd	ND		F	T. brucei family hypothetical protein		protein	taxon:5691	20020603	TIGR	
+TIGR_Tba1	Tb927.2.4910	30M24.125		GO:0005575	GO_REF:nd	ND		C	T. brucei family hypothetical protein		protein	taxon:5691	20020603	TIGR	
+TIGR_Tba1	Tb927.2.4900	30M24.130		GO:0008150	GO_REF:nd	ND		P	T. brucei family hypothetical protein		protein	taxon:5691	20020530	TIGR	
+TIGR_Tba1	Tb927.2.4900	30M24.130		GO:0003674	GO_REF:nd	ND		F	T. brucei family hypothetical protein		protein	taxon:5691	20020530	TIGR	
+TIGR_Tba1	Tb927.2.4900	30M24.130		GO:0005575	GO_REF:nd	ND		C	T. brucei family hypothetical protein		protein	taxon:5691	20020530	TIGR	
+TIGR_Tba1	Tb927.2.4890	30M24.135		GO:0005840	TIGR_Tba1:annotation	ISS	INTERPRO:IPR000911	C	Ribosomal protein L11, putative		protein	taxon:5691	20020528	TIGR	
+TIGR_Tba1	Tb927.2.4890	30M24.135		GO:0005622	TIGR_Tba1:annotation	ISS	INTERPRO:IPR000911	C	Ribosomal protein L11, putative		protein	taxon:5691	20020528	TIGR	
+TIGR_Tba1	Tb927.2.4890	30M24.135		GO:0008150	GO_REF:nd	ND		P	Ribosomal protein L11, putative		protein	taxon:5691	20020528	TIGR	
+TIGR_Tba1	Tb927.2.4890	30M24.135		GO:0003674	GO_REF:nd	ND		F	Ribosomal protein L11, putative		protein	taxon:5691	20020528	TIGR	
+TIGR_Tba1	Tb927.2.4880	30M24.140		GO:0008150	GO_REF:nd	ND		P	T. brucei family hypothetical protein		protein	taxon:5691	20020529	TIGR	
+TIGR_Tba1	Tb927.2.4880	30M24.140		GO:0003674	GO_REF:nd	ND		F	T. brucei family hypothetical protein		protein	taxon:5691	20020529	TIGR	
+TIGR_Tba1	Tb927.2.4880	30M24.140		GO:0005575	GO_REF:nd	ND		C	T. brucei family hypothetical protein		protein	taxon:5691	20020529	TIGR	
+TIGR_Tba1	Tb927.2.4870	30M24.145		GO:0005575	GO_REF:nd	ND		C	Dual specificity protein phosphatase, putative		protein	taxon:5691	20020606	TIGR	
+TIGR_Tba1	Tb927.2.4840	30M24.160		GO:0008150	GO_REF:nd	ND		P	hypothetical protein, conserved		protein	taxon:5691	20020604	TIGR	
+TIGR_Tba1	Tb927.2.4840	30M24.160		GO:0003674	GO_REF:nd	ND		F	hypothetical protein, conserved		protein	taxon:5691	20020604	TIGR	
+TIGR_Tba1	Tb927.2.4840	30M24.160		GO:0005575	GO_REF:nd	ND		C	hypothetical protein, conserved		protein	taxon:5691	20020604	TIGR	
+TIGR_Tba1	Tb927.2.4810	30M24.175		GO:0008150	GO_REF:nd	ND		P	conserved/T. brucei family hypothetical protein		protein	taxon:5691	20020603	TIGR	
+TIGR_Tba1	Tb927.2.4810	30M24.175		GO:0005575	GO_REF:nd	ND		C	conserved/T. brucei family hypothetical protein		protein	taxon:5691	20020603	TIGR	
+TIGR_Tba1	30M24.20	30M24.20		GO:0003674	GO_REF:nd	ND		F	Vesicle-associated membrane protein (VAMP), putative		protein	taxon:5691	20020528	TIGR	
+TIGR_Tba1	30M24.20	30M24.20		GO:0005886	TIGR_Tba1:annotation	ISS	INTERPRO:IPR001388	C	Vesicle-associated membrane protein (VAMP), putative		protein	taxon:5691	20020528	TIGR	
+TIGR_Tba1	Tb927.2.4760	30M24.200		GO:0008150	GO_REF:nd	ND		P	T. brucei family hypothetical protein		protein	taxon:5691	20020603	TIGR	
+TIGR_Tba1	Tb927.2.4760	30M24.200		GO:0003674	GO_REF:nd	ND		F	T. brucei family hypothetical protein		protein	taxon:5691	20020603	TIGR	
+TIGR_Tba1	Tb927.2.4760	30M24.200		GO:0005575	GO_REF:nd	ND		C	T. brucei family hypothetical protein		protein	taxon:5691	20020603	TIGR	
+TIGR_Tba1	Tb927.2.4750	30M24.205		GO:0008150	GO_REF:nd	ND		P	T. brucei family hypothetical protein		protein	taxon:5691	20020530	TIGR	
+TIGR_Tba1	Tb927.2.4750	30M24.205		GO:0003674	GO_REF:nd	ND		F	T. brucei family hypothetical protein		protein	taxon:5691	20020530	TIGR	
+TIGR_Tba1	Tb927.2.4750	30M24.205		GO:0005575	GO_REF:nd	ND		C	T. brucei family hypothetical protein		protein	taxon:5691	20020530	TIGR	
+TIGR_Tba1	Tb927.2.4740	30M24.210		GO:0008150	GO_REF:nd	ND		P	Ribosomal protein L11, putative		protein	taxon:5691	20020528	TIGR	
+TIGR_Tba1	Tb927.2.4740	30M24.210		GO:0005622	TIGR_Tba1:annotation	ISS	INTERPRO:IPR000911	C	Ribosomal protein L11, putative		protein	taxon:5691	20020528	TIGR	
+TIGR_Tba1	Tb927.2.4740	30M24.210		GO:0005840	TIGR_Tba1:annotation	ISS	INTERPRO:IPR000911	C	Ribosomal protein L11, putative		protein	taxon:5691	20020528	TIGR	
+TIGR_Tba1	Tb927.2.4740	30M24.210		GO:0003674	GO_REF:nd	ND		F	Ribosomal protein L11, putative		protein	taxon:5691	20020528	TIGR	
+TIGR_Tba1	Tb927.2.4730	30M24.215		GO:0008150	GO_REF:nd	ND		P	T. brucei family hypothetical protein		protein	taxon:5691	20020529	TIGR	
+TIGR_Tba1	Tb927.2.4730	30M24.215		GO:0003674	GO_REF:nd	ND		F	T. brucei family hypothetical protein		protein	taxon:5691	20020529	TIGR	
+TIGR_Tba1	Tb927.2.4730	30M24.215		GO:0005575	GO_REF:nd	ND		C	T. brucei family hypothetical protein		protein	taxon:5691	20020529	TIGR	
+TIGR_Tba1	Tb927.2.4720	30M24.220		GO:0008150	GO_REF:nd	ND		P	hypothetical protein, conserved		protein	taxon:5691	20020604	TIGR	
+TIGR_Tba1	Tb927.2.4720	30M24.220		GO:0003674	GO_REF:nd	ND		F	hypothetical protein, conserved		protein	taxon:5691	20020604	TIGR	
+TIGR_Tba1	Tb927.2.4720	30M24.220		GO:0005575	GO_REF:nd	ND		C	hypothetical protein, conserved		protein	taxon:5691	20020604	TIGR	
+TIGR_Tba1	Tb927.2.4710	30M24.225		GO:0003674	PMID:11522358	TAS		F	RNA-binding protein, putative		protein	taxon:5691	20020606	TIGR	
+TIGR_Tba1	Tb927.2.4710	30M24.225		GO:0005575	GO_REF:nd	ND		C	RNA-binding protein, putative		protein	taxon:5691	20020606	TIGR	
+TIGR_Tba1	Tb927.2.4660	30M24.250		GO:0008150	GO_REF:nd	ND		P	T. brucei family hypothetical protein		protein	taxon:5691	20020531	TIGR	
+TIGR_Tba1	Tb927.2.4660	30M24.250		GO:0003674	GO_REF:nd	ND		F	T. brucei family hypothetical protein		protein	taxon:5691	20020531	TIGR	
+TIGR_Tba1	Tb927.2.4660	30M24.250		GO:0005575	GO_REF:nd	ND		C	T. brucei family hypothetical protein		protein	taxon:5691	20020531	TIGR	
+TIGR_Tba1	Tb927.2.4610	30M24.275		GO:0005739	TIGR_Tba1:annotation	ISS	SWISS-PROT:O15382	C	Branched-chain amino acid aminotransferase, putative		protein	taxon:5691	20020529	TIGR	
+TIGR_Tba1	Tb927.2.4590	30M24.285		GO:0005739	TIGR_Tba1:annotation	ISS	SWISS-PROT:O15382	C	Branched-chain amino acid aminotransferase, putative		protein	taxon:5691	20020529	TIGR	
+TIGR_Tba1	Tb927.2.4580	30M24.290		GO:0008150	GO_REF:nd	ND		P	hypothetical protein, conserved		protein	taxon:5691	20020606	TIGR	
+TIGR_Tba1	Tb927.2.4580	30M24.290		GO:0003674	GO_REF:nd	ND		F	hypothetical protein, conserved		protein	taxon:5691	20020606	TIGR	
+TIGR_Tba1	Tb927.2.4580	30M24.290		GO:0005575	GO_REF:nd	ND		C	hypothetical protein, conserved		protein	taxon:5691	20020606	TIGR	
+TIGR_Tba1	Tb927.2.4560	30M24.300		GO:0008150	GO_REF:nd	ND		P	conserved/T. brucei family hypothetical protein		protein	taxon:5691	20020528	TIGR	
+TIGR_Tba1	Tb927.2.4560	30M24.300		GO:0003674	GO_REF:nd	ND		F	conserved/T. brucei family hypothetical protein		protein	taxon:5691	20020528	TIGR	
+TIGR_Tba1	Tb927.2.4560	30M24.300		GO:0005575	GO_REF:nd	ND		C	conserved/T. brucei family hypothetical protein		protein	taxon:5691	20020528	TIGR	
+TIGR_Tba1	Tb927.2.4550	30M24.305		GO:0003674	GO_REF:nd	ND		F	FtsJ cell division protein, putative		protein	taxon:5691	20020521	TIGR	
+TIGR_Tba1	Tb927.2.4550	30M24.305		GO:0008150	GO_REF:nd	ND		P	FtsJ cell division protein, putative		protein	taxon:5691	20020521	TIGR	
+TIGR_Tba1	Tb927.2.4550	30M24.305		GO:0005575	GO_REF:nd	ND		C	FtsJ cell division protein, putative		protein	taxon:5691	20020521	TIGR	
+TIGR_Tba1	Tb927.2.4540	30M24.310		GO:0005634	PMID:10900267	TAS		C	Small nuclear ribonucleoprotein protein, putative		protein	taxon:5691	20020528	TIGR	
+TIGR_Tba1	Tb927.2.4510	30M24.325		GO:0004672	TIGR_Tba1:annotation	ISS	INTERPRO:IPR001245|INTERPRO:IPR002290	F	Protein kinase, putative		protein	taxon:5691	20020524	TIGR	
+TIGR_Tba1	Tb927.2.4445	30M24.357		GO:0008150	GO_REF:nd	ND		P	hypothetical protein,  conserved		protein	taxon:5691	20030320	TIGR	
+TIGR_Tba1	Tb927.2.4445	30M24.357		GO:0003674	GO_REF:nd	ND		F	hypothetical protein,  conserved		protein	taxon:5691	20030320	TIGR	
+TIGR_Tba1	Tb927.2.4445	30M24.357		GO:0005575	GO_REF:nd	ND		C	hypothetical protein,  conserved		protein	taxon:5691	20030320	TIGR	
+TIGR_Tba1	Tb927.2.4410	30M24.375		GO:0003674	GO_REF:nd	ND		F	hypothetical protein, conserved		protein	taxon:5691	20020606	TIGR	
+TIGR_Tba1	Tb927.2.4410	30M24.375		GO:0008150	GO_REF:nd	ND		P	hypothetical protein, conserved		protein	taxon:5691	20020606	TIGR	
+TIGR_Tba1	Tb927.2.4410	30M24.375		GO:0005575	GO_REF:nd	ND		C	hypothetical protein, conserved		protein	taxon:5691	20020606	TIGR	
+TIGR_Tba1	Tb927.2.4370	30M24.395		GO:0005829	PMID:1444271	TAS		C	Trypanothione synthetase, putative		protein	taxon:5691	20020603	TIGR	
+TIGR_Tba1	30M24.415	30M24.415		GO:0005198	PMID:9627992	ISS	NCBI_gi:3293267	F	Paraflagellar rod protein, putative		protein	taxon:5691	20020524	TIGR	
+TIGR_Tba1	30M24.415	30M24.415		GO:0005575	GO_REF:nd	ND		C	Paraflagellar rod protein, putative		protein	taxon:5691	20020524	TIGR	
+TIGR_Tba1	30M24.5	30M24.5		GO:0008150	GO_REF:nd	ND		P	TPR-repeat protein, putative		protein	taxon:5691	20020528	TIGR	
+TIGR_Tba1	30M24.5	30M24.5		GO:0003674	GO_REF:nd	ND		F	TPR-repeat protein, putative		protein	taxon:5691	20020528	TIGR	
+TIGR_Tba1	30M24.5	30M24.5		GO:0005575	GO_REF:nd	ND		C	TPR-repeat protein, putative		protein	taxon:5691	20020528	TIGR	
+TIGR_Tba1	Tb927.2.5060	30M24.50		GO:0008150	GO_REF:nd	ND		P	GTP binding protein, putative		protein	taxon:5691	20020530	TIGR	
+TIGR_Tba1	Tb927.2.5060	30M24.50		GO:0003674	GO_REF:nd	ND		F	GTP binding protein, putative		protein	taxon:5691	20020530	TIGR	
+TIGR_Tba1	Tb927.2.5060	30M24.50		GO:0005575	GO_REF:nd	ND		C	GTP binding protein, putative		protein	taxon:5691	20020530	TIGR	
+TIGR_Tba1	Tb927.2.5050	30M24.55		GO:0007165	PMID:9869399	ISS		P	Protein phosphatase 2C, putative		protein	taxon:5691	20020604	TIGR	
+TIGR_Tba1	Tb927.2.5050	30M24.55		GO:0005575	GO_REF:nd	ND		C	Protein phosphatase 2C, putative		protein	taxon:5691	20020605	TIGR	
+TIGR_Tba1	Tb927.2.5040	30M24.60		GO:0008150	GO_REF:nd	ND		P	conserved/T. brucei family hypothetical protein		protein	taxon:5691	20020604	TIGR	
+TIGR_Tba1	Tb927.2.5040	30M24.60		GO:0003674	GO_REF:nd	ND		F	conserved/T. brucei family hypothetical protein		protein	taxon:5691	20020604	TIGR	
+TIGR_Tba1	Tb927.2.5040	30M24.60		GO:0005575	GO_REF:nd	ND		C	conserved/T. brucei family hypothetical protein		protein	taxon:5691	20020604	TIGR	
+TIGR_Tba1	Tb927.2.5030	30M24.65		GO:0005840	TIGR_Tba1:annotation	ISS	INTERPRO:IPR000302	C	Transcription initiation protein, putative		protein	taxon:5691	20020611	TIGR	
+TIGR_Tba1	Tb927.2.5020	30M24.70		GO:0005777	TIGR_Tba1:annotation	IC	GO:0003997|NCBI_gi:3044212	C	Acyl-CoA oxidase, putative		protein	taxon:5691	20020606	TIGR	
+TIGR_Tba1	36E18.10	36E18.10		GO:0005886	PMID:3745171	IDA		C	Glycosylphosphatidylinositol-specific phospholipase C		protein	taxon:5691	20020528	TIGR	
+TIGR_Tba1	Tb927.2.6210	36E18.105		GO:0009058	TIGR_Tba1:annotation	ISS	Pfam:PF03171	P	Iron/ascorbate oxidoreductase family protein, putative		protein	taxon:5691	20020605	TIGR	
+TIGR_Tba1	Tb927.2.6210	36E18.105		GO:0005737	TIGR_Tba1:annotation	IC	GO:0016491	C	Iron/ascorbate oxidoreductase family protein, putative		protein	taxon:5691	20020605	TIGR	
+TIGR_Tba1	Tb927.2.6230	36E18.115		GO:0009058	TIGR_Tba1:annotation	ISS	Pfam:PF03171	P	Iron/ascorbate oxidoreductase family protein, putative		protein	taxon:5691	20020605	TIGR	
+TIGR_Tba1	Tb927.2.6230	36E18.115		GO:0005737	TIGR_Tba1:annotation	IC	GO:0016491	C	Iron/ascorbate oxidoreductase family protein, putative		protein	taxon:5691	20020605	TIGR	
+TIGR_Tba1	Tb927.2.6250	36E18.125		GO:0008150	GO_REF:nd	ND		P	T. brucei family hypothetical protein		protein	taxon:5691	20020530	TIGR	
+TIGR_Tba1	Tb927.2.6250	36E18.125		GO:0003674	GO_REF:nd	ND		F	T. brucei family hypothetical protein		protein	taxon:5691	20020530	TIGR	
+TIGR_Tba1	Tb927.2.6250	36E18.125		GO:0005575	GO_REF:nd	ND		C	T. brucei family hypothetical protein		protein	taxon:5691	20020530	TIGR	
+TIGR_Tba1	Tb927.2.6260	36E18.130		GO:0008150	GO_REF:nd	ND		P	T. brucei family hypothetical protein		protein	taxon:5691	20020530	TIGR	
+TIGR_Tba1	Tb927.2.6260	36E18.130		GO:0003674	GO_REF:nd	ND		F	T. brucei family hypothetical protein		protein	taxon:5691	20020530	TIGR	
+TIGR_Tba1	Tb927.2.6260	36E18.130		GO:0005575	GO_REF:ND	ND		C	T. brucei family hypothetical protein		protein	taxon:5691	20020530	TIGR	
+TIGR_Tba1	Tb927.2.6270	36E18.135		GO:0009058	TIGR_Tba1:annotation	ISS	Pfam:PF03171	P	Iron/ascorbate oxidoreductase family protein, putative		protein	taxon:5691	20020605	TIGR	
+TIGR_Tba1	Tb927.2.6270	36E18.135		GO:0005737	TIGR_Tba1:annotation	IC	GO:0016491	C	Iron/ascorbate oxidoreductase family protein, putative		protein	taxon:5691	20020605	TIGR	
+TIGR_Tba1	Tb927.2.6290	36E18.145		GO:0008150	GO_REF:nd	ND		P	T. brucei family hypothetical protein		protein	taxon:5691	20020530	TIGR	
+TIGR_Tba1	Tb927.2.6290	36E18.145		GO:0003674	GO_REF:nd	ND		F	T. brucei family hypothetical protein		protein	taxon:5691	20020530	TIGR	
+TIGR_Tba1	Tb927.2.6290	36E18.145		GO:0005575	GO_REF:nd	ND		C	T. brucei family hypothetical protein		protein	taxon:5691	20020530	TIGR	
+TIGR_Tba1	Tb927.2.6300	36E18.150		GO:0008150	GO_REF:nd	ND		P	T. brucei family hypothetical protein		protein	taxon:5691	20020530	TIGR	
+TIGR_Tba1	Tb927.2.6300	36E18.150		GO:0003674	GO_REF:nd	ND		F	T. brucei family hypothetical protein		protein	taxon:5691	20020530	TIGR	
+TIGR_Tba1	Tb927.2.6300	36E18.150		GO:0005575	GO_REF:ND	ND		C	T. brucei family hypothetical protein		protein	taxon:5691	20020530	TIGR	
+TIGR_Tba1	Tb927.2.6310	36E18.155		GO:0009058	TIGR_Tba1:annotation	ISS	Pfam:PF03171	P	Iron/ascorbate oxidoreductase family protein, putative		protein	taxon:5691	20020605	TIGR	
+TIGR_Tba1	Tb927.2.6310	36E18.155		GO:0005737	TIGR_Tba1:annotation	IC	GO:0016491	C	Iron/ascorbate oxidoreductase family protein, putative		protein	taxon:5691	20020605	TIGR	
+TIGR_Tba1	Tb927.2.6330	36E18.165		GO:0008150	GO_REF:nd	ND		P	T. brucei family hypothetical protein		protein	taxon:5691	20020530	TIGR	
+TIGR_Tba1	Tb927.2.6330	36E18.165		GO:0003674	GO_REF:nd	ND		F	T. brucei family hypothetical protein		protein	taxon:5691	20020530	TIGR	
+TIGR_Tba1	Tb927.2.6330	36E18.165		GO:0005575	GO_REF:nd	ND		C	T. brucei family hypothetical protein		protein	taxon:5691	20020530	TIGR	
+TIGR_Tba1	Tb927.2.6410	36E18.205		GO:0005886	PMID:9574923	TAS		C	Variant surface glycoprotein		protein	taxon:5691	20020523	TIGR	
+TIGR_Tba1	Tb927.2.6050	36E18.25		GO:0005794	PMID:11377739	IDA		C	Beta prime COP protein		protein	taxon:5691	20020612	TIGR	
+TIGR_Tba1	Tb927.2.6090	36E18.45		GO:0006412	TIGR_Tba1:annotation	ISS	INTERPRO:IPR000552	P	Ribosomal protein L44		protein	taxon:5691	20020611	TIGR	
+TIGR_Tba1	36E18.5	36E18.5		GO:0005575	GO_REF:nd	ND		C	Heat shock protein 100 (clp protein)		protein	taxon:5691	20020524	TIGR	
+TIGR_Tba1	Tb927.2.6130	36E18.65		GO:0006810	TIGR_Tba1:annotation	ISS	SWISS-PROT:P18767	P	ABC transporter family protein (multidrug resistance), putative		protein	taxon:5691	20020521	TIGR	
+TIGR_Tba1	Tb927.2.6130	36E18.65		GO:0005575	GO_REF:nd	ND		C	ABC transporter family protein (multidrug resistance), putative		protein	taxon:5691	20020531	TIGR	
+TIGR_Tba1	Tb927.2.6170	36E18.85		GO:0008150	GO_REF:nd	ND		P	T. brucei family hypothetical protein		protein	taxon:5691	20020530	TIGR	
+TIGR_Tba1	Tb927.2.6170	36E18.85		GO:0003674	GO_REF:nd	ND		F	T. brucei family hypothetical protein		protein	taxon:5691	20020530	TIGR	
+TIGR_Tba1	Tb927.2.6170	36E18.85		GO:0005575	GO_REF:ND	ND		C	T. brucei family hypothetical protein		protein	taxon:5691	20020530	TIGR	
+TIGR_Tba1	Tb927.2.6180	36E18.90		GO:0009058	TIGR_Tba1:annotation	ISS	Pfam:PF03171	P	Iron/ascorbate oxidoreductase family protein, putative		protein	taxon:5691	20020605	TIGR	
+TIGR_Tba1	Tb927.2.6180	36E18.90		GO:0005737	TIGR_Tba1:annotation	IC	GO:0016491	C	Iron/ascorbate oxidoreductase family protein, putative		protein	taxon:5691	20020605	TIGR	
+TIGR_Tba1	Tb927.2.110	3B10.10		GO:0008150	GO_REF:nd	ND		P	T. brucei family hypothetical protein		protein	taxon:5691	20020529	TIGR	
+TIGR_Tba1	Tb927.2.110	3B10.10		GO:0003674	GO_REF:nd	ND		F	T. brucei family hypothetical protein		protein	taxon:5691	20020529	TIGR	
+TIGR_Tba1	Tb927.2.110	3B10.10		GO:0005575	GO_REF:nd	ND		C	T. brucei family hypothetical protein		protein	taxon:5691	20020529	TIGR	
+TIGR_Tba1	Tb927.2.290	3B10.100		GO:0008150	GO_REF:nd	ND		P	T. brucei family hypothetical protein		protein	taxon:5691	20020530	TIGR	
+TIGR_Tba1	Tb927.2.290	3B10.100		GO:0003674	GO_REF:nd	ND		F	T. brucei family hypothetical protein		protein	taxon:5691	20020530	TIGR	
+TIGR_Tba1	Tb927.2.290	3B10.100		GO:0005575	GO_REF:nd	ND		C	T. brucei family hypothetical protein		protein	taxon:5691	20020530	TIGR	
+TIGR_Tba1	Tb927.2.310	3B10.110		GO:0008150	GO_REF:nd	ND		P	T. brucei family hypothetical protein		protein	taxon:5691	20020531	TIGR	
+TIGR_Tba1	Tb927.2.310	3B10.110		GO:0003674	GO_REF:nd	ND		F	T. brucei family hypothetical protein		protein	taxon:5691	20020531	TIGR	
+TIGR_Tba1	Tb927.2.310	3B10.110		GO:0005575	GO_REF:nd	ND		C	T. brucei family hypothetical protein		protein	taxon:5691	20020531	TIGR	
+TIGR_Tba1	Tb927.2.330	3B10.120		GO:0008150	GO_REF:nd	ND		P	T. brucei family hypothetical protein		protein	taxon:5691	20020531	TIGR	
+TIGR_Tba1	Tb927.2.330	3B10.120		GO:0003674	GO_REF:nd	ND		F	T. brucei family hypothetical protein		protein	taxon:5691	20020531	TIGR	
+TIGR_Tba1	Tb927.2.330	3B10.120		GO:0005575	GO_REF:nd	ND		C	T. brucei family hypothetical protein		protein	taxon:5691	20020531	TIGR	
+TIGR_Tba1	Tb927.2.340	3B10.125		GO:0008150	GO_REF:nd	ND		P	Retrotransposon hot spot protein, RHS4-a		protein	taxon:5691	20020523	TIGR	
+TIGR_Tba1	Tb927.2.340	3B10.125		GO:0005634	BIOSIS:200200247281	TAS		C	Retrotransposon hot spot protein, RHS4-a		protein	taxon:5691	20020523	TIGR	
+TIGR_Tba1	Tb927.2.340	3B10.125		GO:0003674	GO_REF:nd	ND		F	Retrotransposon hot spot protein, RHS4-a		protein	taxon:5691	20020523	TIGR	
+TIGR_Tba1	Tb927.2.360	3B10.135		GO:0008150	GO_REF:nd	ND		P	T. brucei family hypothetical protein		protein	taxon:5691	20020529	TIGR	
+TIGR_Tba1	Tb927.2.360	3B10.135		GO:0003674	GO_REF:nd	ND		F	T. brucei family hypothetical protein		protein	taxon:5691	20020529	TIGR	
+TIGR_Tba1	Tb927.2.360	3B10.135		GO:0005575	GO_REF:nd	ND		C	T. brucei family hypothetical protein		protein	taxon:5691	20020529	TIGR	
+TIGR_Tba1	Tb927.2.370	3B10.140		GO:0008150	GO_REF:nd	ND		P	Retrotransposon hot spot protein, RHS1-a		protein	taxon:5691	20020523	TIGR	
+TIGR_Tba1	Tb927.2.370	3B10.140		GO:0005634	BIOSIS:200200247281	TAS		C	Retrotransposon hot spot protein, RHS1-a		protein	taxon:5691	20020523	TIGR	
+TIGR_Tba1	Tb927.2.370	3B10.140		GO:0003674	GO_REF:nd	ND		F	Retrotransposon hot spot protein, RHS1-a		protein	taxon:5691	20020523	TIGR	
+TIGR_Tba1	Tb927.2.380	3B10.145		GO:0008150	GO_REF:nd	ND		P	Retrotransposon hot spot protein, RHS2-b		protein	taxon:5691	20020523	TIGR	
+TIGR_Tba1	Tb927.2.380	3B10.145		GO:0005634	BIOSIS:200200247281	TAS		C	Retrotransposon hot spot protein, RHS2-b		protein	taxon:5691	20020523	TIGR	
+TIGR_Tba1	Tb927.2.380	3B10.145		GO:0003674	GO_REF:nd	ND		F	Retrotransposon hot spot protein, RHS2-b		protein	taxon:5691	20020523	TIGR	
+TIGR_Tba1	Tb927.2.120	3B10.15		GO:0003674	GO_REF:nd	ND		F	T. brucei family hypothetical protein		protein	taxon:5691	20020604	TIGR	
+TIGR_Tba1	Tb927.2.120	3B10.15		GO:0008150	GO_REF:nd	ND		P	T. brucei family hypothetical protein		protein	taxon:5691	20020604	TIGR	
+TIGR_Tba1	Tb927.2.120	3B10.15		GO:0005575	GO_REF:nd	ND		C	T. brucei family hypothetical protein		protein	taxon:5691	20020604	TIGR	
+TIGR_Tba1	Tb927.2.390	3B10.150		GO:0008150	GO_REF:nd	ND		P	T. brucei family hypothetical protein		protein	taxon:5691	20020530	TIGR	
+TIGR_Tba1	Tb927.2.390	3B10.150		GO:0003674	GO_REF:nd	ND		F	T. brucei family hypothetical protein		protein	taxon:5691	20020530	TIGR	
+TIGR_Tba1	Tb927.2.390	3B10.150		GO:0005575	GO_REF:nd	ND		C	T. brucei family hypothetical protein		protein	taxon:5691	20020530	TIGR	
+TIGR_Tba1	Tb927.2.400	3B10.155		GO:0008150	GO_REF:nd	ND		P	Retrotransposon hot spot protein, RHS2-a		protein	taxon:5691	20020523	TIGR	
+TIGR_Tba1	Tb927.2.400	3B10.155		GO:0005634	BIOSIS:200200247281	TAS		C	Retrotransposon hot spot protein, RHS2-a		protein	taxon:5691	20020523	TIGR	
+TIGR_Tba1	Tb927.2.400	3B10.155		GO:0003674	GO_REF:nd	ND		F	Retrotransposon hot spot protein, RHS2-a		protein	taxon:5691	20020523	TIGR	
+TIGR_Tba1	Tb927.2.410	3B10.160		GO:0008150	GO_REF:nd	ND		P	T. brucei family hypothetical protein		protein	taxon:5691	20020530	TIGR	
+TIGR_Tba1	Tb927.2.410	3B10.160		GO:0003674	GO_REF:nd	ND		F	T. brucei family hypothetical protein		protein	taxon:5691	20020530	TIGR	
+TIGR_Tba1	Tb927.2.410	3B10.160		GO:0005575	GO_REF:nd	ND		C	T. brucei family hypothetical protein		protein	taxon:5691	20020530	TIGR	
+TIGR_Tba1	Tb927.2.430	3B10.170		GO:0008150	GO_REF:nd	ND		P	T. brucei family hypothetical protein		protein	taxon:5691	20020531	TIGR	
+TIGR_Tba1	Tb927.2.430	3B10.170		GO:0003674	GO_REF:nd	ND		F	T. brucei family hypothetical protein		protein	taxon:5691	20020531	TIGR	
+TIGR_Tba1	Tb927.2.430	3B10.170		GO:0005575	GO_REF:nd	ND		C	T. brucei family hypothetical protein		protein	taxon:5691	20020531	TIGR	
+TIGR_Tba1	Tb927.2.440	3B10.175		GO:0008150	GO_REF:nd	ND		P	T. brucei family hypothetical protein		protein	taxon:5691	20020531	TIGR	
+TIGR_Tba1	Tb927.2.440	3B10.175		GO:0003674	GO_REF:nd	ND		F	T. brucei family hypothetical protein		protein	taxon:5691	20020531	TIGR	
+TIGR_Tba1	Tb927.2.440	3B10.175		GO:0005575	GO_REF:nd	ND		C	T. brucei family hypothetical protein		protein	taxon:5691	20020531	TIGR	
+TIGR_Tba1	Tb927.2.450	3B10.180		GO:0008150	GO_REF:nd	ND		P	Retrotransposon hot spot protein, RHS4-b		protein	taxon:5691	20020523	TIGR	
+TIGR_Tba1	Tb927.2.450	3B10.180		GO:0005634	BIOSIS:200200247281	TAS		C	Retrotransposon hot spot protein, RHS4-b		protein	taxon:5691	20020523	TIGR	
+TIGR_Tba1	Tb927.2.450	3B10.180		GO:0003674	GO_REF:nd	ND		F	Retrotransposon hot spot protein, RHS4-b		protein	taxon:5691	20020523	TIGR	
+TIGR_Tba1	Tb927.2.470	3B10.190		GO:0008150	GO_REF:nd	ND		P	Retrotransposon hot spot protein, RHS4-c		protein	taxon:5691	20020523	TIGR	
+TIGR_Tba1	Tb927.2.470	3B10.190		GO:0005634	BIOSIS:200200247281	TAS		C	Retrotransposon hot spot protein, RHS4-c		protein	taxon:5691	20020523	TIGR	
+TIGR_Tba1	Tb927.2.470	3B10.190		GO:0003674	GO_REF:nd	ND		F	Retrotransposon hot spot protein, RHS4-c		protein	taxon:5691	20020523	TIGR	
+TIGR_Tba1	Tb927.2.130	3B10.20		GO:0005575	GO_REF:nd	ND		C	T. brucei family hypothetical protein		protein	taxon:5691	20020603	TIGR	
+TIGR_Tba1	Tb927.2.130	3B10.20		GO:0008150	GO_REF:nd	ND		P	T. brucei family hypothetical protein		protein	taxon:5691	20020603	TIGR	
+TIGR_Tba1	Tb927.2.130	3B10.20		GO:0003674	GO_REF:nd	ND		F	T. brucei family hypothetical protein		protein	taxon:5691	20020603	TIGR	
+TIGR_Tba1	Tb927.2.510	3B10.210		GO:0008150	GO_REF:nd	ND		P	Retrotransposon hot spot protein, RHS4-g		protein	taxon:5691	20020523	TIGR	
+TIGR_Tba1	Tb927.2.510	3B10.210		GO:0005634	BIOSIS:200200247281	TAS		C	Retrotransposon hot spot protein, RHS4-g		protein	taxon:5691	20020523	TIGR	
+TIGR_Tba1	Tb927.2.510	3B10.210		GO:0003674	GO_REF:nd	ND		F	Retrotransposon hot spot protein, RHS4-g		protein	taxon:5691	20020523	TIGR	
+TIGR_Tba1	Tb927.2.530	3B10.220		GO:0008150	GO_REF:nd	ND		P	T. brucei family hypothetical protein		protein	taxon:5691	20020531	TIGR	
+TIGR_Tba1	Tb927.2.530	3B10.220		GO:0003674	GO_REF:nd	ND		F	T. brucei family hypothetical protein		protein	taxon:5691	20020531	TIGR	
+TIGR_Tba1	Tb927.2.530	3B10.220		GO:0005575	GO_REF:nd	ND		C	T. brucei family hypothetical protein		protein	taxon:5691	20020531	TIGR	
+TIGR_Tba1	Tb927.2.560	3B10.235		GO:0008150	GO_REF:nd	ND		P	Retrotransposon hot spot protein, RHS4-f		protein	taxon:5691	20020523	TIGR	
+TIGR_Tba1	Tb927.2.560	3B10.235		GO:0005634	BIOSIS:200200247281	TAS		C	Retrotransposon hot spot protein, RHS4-f		protein	taxon:5691	20020523	TIGR	
+TIGR_Tba1	Tb927.2.560	3B10.235		GO:0003674	GO_REF:nd	ND		F	Retrotransposon hot spot protein, RHS4-f		protein	taxon:5691	20020523	TIGR	
+TIGR_Tba1	Tb927.2.570	3B10.240		GO:0008150	GO_REF:nd	ND		P	T. brucei family hypothetical protein		protein	taxon:5691	20020529	TIGR	
+TIGR_Tba1	Tb927.2.570	3B10.240		GO:0005575	GO_REF:nd	ND		C	T. brucei family hypothetical protein		protein	taxon:5691	20020529	TIGR	
+TIGR_Tba1	Tb927.2.570	3B10.240		GO:0003674	GO_REF:nd	ND		F	T. brucei family hypothetical protein		protein	taxon:5691	20020529	TIGR	
+TIGR_Tba1	Tb927.2.590	3B10.250		GO:0003674	GO_REF:nd	ND		F	T. brucei family hypothetical protein		protein	taxon:5691	20020604	TIGR	
+TIGR_Tba1	Tb927.2.590	3B10.250		GO:0008150	GO_REF:nd	ND		P	T. brucei family hypothetical protein		protein	taxon:5691	20020604	TIGR	
+TIGR_Tba1	Tb927.2.590	3B10.250		GO:0005575	GO_REF:nd	ND		C	T. brucei family hypothetical protein		protein	taxon:5691	20020604	TIGR	
+TIGR_Tba1	Tb927.2.600	3B10.255		GO:0005575	GO_REF:nd	ND		C	T. brucei family hypothetical protein		protein	taxon:5691	20020603	TIGR	
+TIGR_Tba1	Tb927.2.600	3B10.255		GO:0008150	GO_REF:nd	ND		P	T. brucei family hypothetical protein		protein	taxon:5691	20020603	TIGR	
+TIGR_Tba1	Tb927.2.600	3B10.255		GO:0003674	GO_REF:nd	ND		F	T. brucei family hypothetical protein		protein	taxon:5691	20020603	TIGR	
+TIGR_Tba1	Tb927.2.640	3B10.275		GO:0003674	GO_REF:nd	ND		F	T. brucei family hypothetical protein		protein	taxon:5691	20020603	TIGR	
+TIGR_Tba1	Tb927.2.640	3B10.275		GO:0005575	GO_REF:nd	ND		C	T. brucei family hypothetical protein		protein	taxon:5691	20020603	TIGR	
+TIGR_Tba1	Tb927.2.640	3B10.275		GO:0008150	GO_REF:nd	ND		P	T. brucei family hypothetical protein		protein	taxon:5691	20020603	TIGR	
+TIGR_Tba1	Tb927.2.650	3B10.280		GO:0008150	GO_REF:nd	ND		P	T. brucei family hypothetical protein		protein	taxon:5691	20020604	TIGR	
+TIGR_Tba1	Tb927.2.650	3B10.280		GO:0005575	GO_REF:nd	ND		C	T. brucei family hypothetical protein		protein	taxon:5691	20020604	TIGR	
+TIGR_Tba1	Tb927.2.650	3B10.280		GO:0003674	GO_REF:nd	ND		F	T. brucei family hypothetical protein		protein	taxon:5691	20020604	TIGR	
+TIGR_Tba1	Tb927.2.670	3B10.290		GO:0005575	GO_REF:nd	ND		C	T. brucei family hypothetical protein		protein	taxon:5691	20020603	TIGR	
+TIGR_Tba1	Tb927.2.670	3B10.290		GO:0003674	GO_REF:nd	ND		F	T. brucei family hypothetical protein		protein	taxon:5691	20020603	TIGR	
+TIGR_Tba1	Tb927.2.670	3B10.290		GO:0008150	GO_REF:nd	ND		P	T. brucei family hypothetical protein		protein	taxon:5691	20020603	TIGR	
+TIGR_Tba1	Tb927.2.680	3B10.295		GO:0008150	GO_REF:nd	ND		P	T. brucei family hypothetical protein		protein	taxon:5691	20020604	TIGR	
+TIGR_Tba1	Tb927.2.680	3B10.295		GO:0003674	GO_REF:nd	ND		F	T. brucei family hypothetical protein		protein	taxon:5691	20020604	TIGR	
+TIGR_Tba1	Tb927.2.680	3B10.295		GO:0005575	GO_REF:nd	ND		C	T. brucei family hypothetical protein		protein	taxon:5691	20020604	TIGR	
+TIGR_Tba1	Tb927.2.690	3B10.300		GO:0005515	PMID:2247064	TAS		F	Leucine-rich repeat protein 1 (LRRP1)		protein	taxon:5691	20020524	TIGR	
+TIGR_Tba1	Tb927.2.690	3B10.300		GO:0005575	GO_REF:nd	ND		C	Leucine-rich repeat protein 1 (LRRP1)		protein	taxon:5691	20020524	TIGR	
+TIGR_Tba1	Tb927.2.690	3B10.300		GO:0003676	PMID:2247064	ISS		F	Leucine-rich repeat protein 1 (LRRP1)		protein	taxon:5691	20020524	TIGR	
+TIGR_Tba1	Tb927.2.690	3B10.300		GO:0008150	GO_REF:nd	ND		P	Leucine-rich repeat protein 1 (LRRP1)		protein	taxon:5691	20020524	TIGR	
+TIGR_Tba1	Tb927.2.700	3B10.305		GO:0003674	GO_REF:ND	ND		F	T. brucei family hypothetical protein		protein	taxon:5691	20020530	TIGR	
+TIGR_Tba1	Tb927.2.700	3B10.305		GO:0008150	GO_REF:nd	ND		P	T. brucei family hypothetical protein		protein	taxon:5691	20020530	TIGR	
+TIGR_Tba1	Tb927.2.700	3B10.305		GO:0005575	GO_REF:nd	ND		C	T. brucei family hypothetical protein		protein	taxon:5691	20020530	TIGR	
+TIGR_Tba1	Tb927.2.710	3B10.310		GO:0008150	GO_REF:nd	ND		P	T. brucei family hypothetical protein		protein	taxon:5691	20020531	TIGR	
+TIGR_Tba1	Tb927.2.710	3B10.310		GO:0003674	GO_REF:nd	ND		F	T. brucei family hypothetical protein		protein	taxon:5691	20020531	TIGR	
+TIGR_Tba1	Tb927.2.710	3B10.310		GO:0005575	GO_REF:nd	ND		C	T. brucei family hypothetical protein		protein	taxon:5691	20020531	TIGR	
+TIGR_Tba1	Tb927.2.750	3B10.330		GO:0008150	GO_REF:nd	ND		P	T. brucei family hypothetical protein		protein	taxon:5691	20020529	TIGR	
+TIGR_Tba1	Tb927.2.750	3B10.330		GO:0003674	GO_REF:nd	ND		F	T. brucei family hypothetical protein		protein	taxon:5691	20020529	TIGR	
+TIGR_Tba1	Tb927.2.750	3B10.330		GO:0005575	GO_REF:nd	ND		C	T. brucei family hypothetical protein		protein	taxon:5691	20020529	TIGR	
+TIGR_Tba1	Tb927.2.160	3B10.35		GO:0008150	GO_REF:nd	ND		P	T. brucei family hypothetical protein		protein	taxon:5691	20020604	TIGR	
+TIGR_Tba1	Tb927.2.160	3B10.35		GO:0003674	GO_REF:nd	ND		F	T. brucei family hypothetical protein		protein	taxon:5691	20020604	TIGR	
+TIGR_Tba1	Tb927.2.160	3B10.35		GO:0005575	GO_REF:nd	ND		C	T. brucei family hypothetical protein		protein	taxon:5691	20020604	TIGR	
+TIGR_Tba1	Tb927.2.810	3B10.360		GO:0003674	GO_REF:nd	ND		F	T. brucei family hypothetical protein		protein	taxon:5691	20020603	TIGR	
+TIGR_Tba1	Tb927.2.810	3B10.360		GO:0008150	GO_REF:nd	ND		P	T. brucei family hypothetical protein		protein	taxon:5691	20020603	TIGR	
+TIGR_Tba1	Tb927.2.810	3B10.360		GO:0005575	GO_REF:nd	ND		C	T. brucei family hypothetical protein		protein	taxon:5691	20020603	TIGR	
+TIGR_Tba1	Tb927.2.840	3B10.375		GO:0003674	GO_REF:nd	ND		F	T. brucei family hypothetical protein		protein	taxon:5691	20020604	TIGR	
+TIGR_Tba1	Tb927.2.840	3B10.375		GO:0008150	GO_REF:nd	ND		P	T. brucei family hypothetical protein		protein	taxon:5691	20020604	TIGR	
+TIGR_Tba1	Tb927.2.840	3B10.375		GO:0005575	GO_REF:nd	ND		C	T. brucei family hypothetical protein		protein	taxon:5691	20020604	TIGR	
+TIGR_Tba1	Tb927.2.850	3B10.380		GO:0005575	GO_REF:nd	ND		C	T. brucei family hypothetical protein		protein	taxon:5691	20020603	TIGR	
+TIGR_Tba1	Tb927.2.850	3B10.380		GO:0008150	GO_REF:nd	ND		P	T. brucei family hypothetical protein		protein	taxon:5691	20020603	TIGR	
+TIGR_Tba1	Tb927.2.850	3B10.380		GO:0003674	GO_REF:nd	ND		F	T. brucei family hypothetical protein		protein	taxon:5691	20020603	TIGR	
+TIGR_Tba1	3B10.395	3B10.395		GO:0003674	GO_REF:nd	ND		F	T. brucei family hypothetical protein		protein	taxon:5691	20020603	TIGR	
+TIGR_Tba1	3B10.395	3B10.395		GO:0005575	GO_REF:nd	ND		C	T. brucei family hypothetical protein		protein	taxon:5691	20020603	TIGR	
+TIGR_Tba1	3B10.395	3B10.395		GO:0008150	GO_REF:nd	ND		P	T. brucei family hypothetical protein		protein	taxon:5691	20020603	TIGR	
+TIGR_Tba1	Tb927.2.170	3B10.40		GO:0005515	PMID:2247064	TAS		F	Leucine-rich repeat protein 1 (LRRP1)		protein	taxon:5691	20020524	TIGR	
+TIGR_Tba1	Tb927.2.170	3B10.40		GO:0005575	GO_REF:nd	ND		C	Leucine-rich repeat protein 1 (LRRP1)		protein	taxon:5691	20020524	TIGR	
+TIGR_Tba1	Tb927.2.170	3B10.40		GO:0003676	PMID:2247064	ISS		F	Leucine-rich repeat protein 1 (LRRP1)		protein	taxon:5691	20020524	TIGR	
+TIGR_Tba1	Tb927.2.170	3B10.40		GO:0008150	GO_REF:nd	ND		P	Leucine-rich repeat protein 1 (LRRP1)		protein	taxon:5691	20020524	TIGR	
+TIGR_Tba1	3B10.400	3B10.400		GO:0008150	GO_REF:nd	ND		P	T. brucei family hypothetical protein		protein	taxon:5691	20020604	TIGR	
+TIGR_Tba1	3B10.400	3B10.400		GO:0003674	GO_REF:nd	ND		F	T. brucei family hypothetical protein		protein	taxon:5691	20020604	TIGR	
+TIGR_Tba1	3B10.400	3B10.400		GO:0005575	GO_REF:nd	ND		C	T. brucei family hypothetical protein		protein	taxon:5691	20020604	TIGR	
+TIGR_Tba1	Tb927.2.180	3B10.45		GO:0008150	GO_REF:nd	ND		P	T. brucei family hypothetical protein		protein	taxon:5691	20020531	TIGR	
+TIGR_Tba1	Tb927.2.180	3B10.45		GO:0003674	GO_REF:nd	ND		F	T. brucei family hypothetical protein		protein	taxon:5691	20020531	TIGR	
+TIGR_Tba1	Tb927.2.180	3B10.45		GO:0005575	GO_REF:nd	ND		C	T. brucei family hypothetical protein		protein	taxon:5691	20020531	TIGR	
+TIGR_Tba1	Tb927.2.100	3B10.5		GO:0008150	GO_REF:nd	ND		P	Retrotransposon hot spot protein, RHS1		protein	taxon:5691	20020523	TIGR	
+TIGR_Tba1	Tb927.2.100	3B10.5		GO:0005634	BIOSIS:200200247281	TAS		C	Retrotransposon hot spot protein, RHS1		protein	taxon:5691	20020523	TIGR	
+TIGR_Tba1	Tb927.2.100	3B10.5		GO:0003674	GO_REF:nd	ND		F	Retrotransposon hot spot protein, RHS1		protein	taxon:5691	20020523	TIGR	
+TIGR_Tba1	Tb927.2.230	3B10.70		GO:0008150	GO_REF:nd	ND		P	T. brucei family hypothetical protein		protein	taxon:5691	20020530	TIGR	
+TIGR_Tba1	Tb927.2.230	3B10.70		GO:0003674	GO_REF:nd	ND		F	T. brucei family hypothetical protein		protein	taxon:5691	20020530	TIGR	
+TIGR_Tba1	Tb927.2.230	3B10.70		GO:0005575	GO_REF:nd	ND		C	T. brucei family hypothetical protein		protein	taxon:5691	20020530	TIGR	
+TIGR_Tba1	Tb927.2.240	3B10.75		GO:0008150	GO_REF:nd	ND		P	Retrotransposon hot spot protein, RHS5-d		protein	taxon:5691	20020523	TIGR	
+TIGR_Tba1	Tb927.2.240	3B10.75		GO:0005634	BIOSIS:200200247281	TAS		C	Retrotransposon hot spot protein, RHS5-d		protein	taxon:5691	20020523	TIGR	
+TIGR_Tba1	Tb927.2.240	3B10.75		GO:0003674	GO_REF:nd	ND		F	Retrotransposon hot spot protein, RHS5-d		protein	taxon:5691	20020523	TIGR	
+TIGR_Tba1	Tb927.2.280	3B10.95		GO:0008150	GO_REF:nd	ND		P	Retrotransposon hot spot protein, RHS2-c		protein	taxon:5691	20020523	TIGR	
+TIGR_Tba1	Tb927.2.280	3B10.95		GO:0005634	BIOSIS:200200247281	TAS		C	Retrotransposon hot spot protein, RHS2-c		protein	taxon:5691	20020523	TIGR	
+TIGR_Tba1	Tb927.2.280	3B10.95		GO:0003674	GO_REF:nd	ND		F	Retrotransposon hot spot protein, RHS2-c		protein	taxon:5691	20020523	TIGR	
+TIGR_Tba1	3H15.110	3H15.110		GO:0005886	PMID:9574923	TAS		C	Variant surface glycoprotein		protein	taxon:5691	20020523	TIGR	
+TIGR_Tba1	3H15.120	3H15.120		GO:0005886	PMID:9574923	TAS		C	Variant surface glycoprotein		protein	taxon:5691	20020523	TIGR	
+TIGR_Tba1	3H15.130	3H15.130		GO:0003674	GO_REF:nd	ND		F	T. brucei family hypothetical protein		protein	taxon:5691	20020530	TIGR	
+TIGR_Tba1	3H15.130	3H15.130		GO:0008150	GO_REF:nd	ND		P	T. brucei family hypothetical protein		protein	taxon:5691	20020530	TIGR	
+TIGR_Tba1	3H15.130	3H15.130		GO:0005575	GO_REF:nd	ND		C	T. brucei family hypothetical protein		protein	taxon:5691	20020530	TIGR	
+TIGR_Tba1	3H15.145	3H15.145		GO:0008150	GO_REF:nd	ND		P	T. brucei family hypothetical protein		protein	taxon:5691	20020531	TIGR	
+TIGR_Tba1	3H15.145	3H15.145		GO:0003674	GO_REF:nd	ND		F	T. brucei family hypothetical protein		protein	taxon:5691	20020531	TIGR	
+TIGR_Tba1	3H15.145	3H15.145		GO:0005575	GO_REF:nd	ND		C	T. brucei family hypothetical protein		protein	taxon:5691	20020531	TIGR	
+TIGR_Tba1	3H15.160	3H15.160		GO:0005886	PMID:9574923	TAS		C	Variant surface glycoprotein, putative		protein	taxon:5691	20020523	TIGR	
+TIGR_Tba1	3H15.195	3H15.195		GO:0005886	PMID:9574923	TAS		C	Variant surface glycoprotein, fragment (3' end)		protein	taxon:5691	20020523	TIGR	
+TIGR_Tba1	3H15.230	3H15.230		GO:0005886	PMID:9574923	TAS		C	Variant surface glycoprotein		protein	taxon:5691	20020523	TIGR	
+TIGR_Tba1	3H15.265	3H15.265		GO:0005886	PMID:9574923	TAS		C	Variant surface glycoprotein		protein	taxon:5691	20020523	TIGR	
+TIGR_Tba1	3H15.30	3H15.30		GO:0005886	PMID:9574923	TAS		C	Variant surface glycoprotein, putative		protein	taxon:5691	20020523	TIGR	
+TIGR_Tba1	3H15.50	3H15.50		GO:0008150	GO_REF:nd	ND		P	T. brucei family hypothetical protein		protein	taxon:5691	20020529	TIGR	
+TIGR_Tba1	3H15.50	3H15.50		GO:0003674	GO_REF:nd	ND		F	T. brucei family hypothetical protein		protein	taxon:5691	20020529	TIGR	
+TIGR_Tba1	3H15.50	3H15.50		GO:0005575	GO_REF:nd	ND		C	T. brucei family hypothetical protein		protein	taxon:5691	20020529	TIGR	
+TIGR_Tba1	3H15.80	3H15.80		GO:0005886	PMID:9574923	TAS		C	Variant surface glycoprotein (fragment), putative		protein	taxon:5691	20020529	TIGR	

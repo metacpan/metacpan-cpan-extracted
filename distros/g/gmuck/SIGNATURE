@@ -1,0 +1,39 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.55.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 5b0385313ddfbbbd37768199bc861c4ce16c0e2f BUGS
+SHA1 a6d4aa00a6afbd225e0d46bb4b5c88acea2afbec ChangeLog
+SHA1 14c6d45b5756fe7a4c28a574f2e6977a69797976 MANIFEST
+SHA1 bb0026becb29c50ef33b30bc8f31aca98756dd52 META.yml
+SHA1 dfdf575507e1db16517e6c60dfc4e5ecfda5c0ce Makefile.PL
+SHA1 3ddf3652b44b78b12b5ec8238be0f1e81bb75516 README
+SHA1 85dd58ca4acda0c40d2c0fd1d1593beab525fcc5 SPECS
+SHA1 dc968e7e3d3d1d6ca53505a8b4514285e152a648 TODO
+SHA1 ee0028cf2bdabcf7f64430ae940e3c94c53a2160 bin/gmuck
+SHA1 9d6ab7eecddc1ab64127728d90206fff9c51a5d1 bin/gmuck.pod
+SHA1 bbf4ae4bd08f9620e44a55f74b6b93a04b103917 etc/genregexps.PL
+SHA1 a80721e3d0360400435e551af63597e359c7e155 etc/gmuck.spec
+SHA1 12e255e78d3e565e1ab67e741199eebd1fe22b23 lib/HTML/GMUCK.pm
+SHA1 9c5dfced08acbbad8cf799280eb31e3feadc4181 lib/HTML/GMUCK.pod
+SHA1 2a60bc71b0372742cf2653539bd2e0cfe56de389 lib/HTML/GMUCK/regexps.pl
+SHA1 67f1dd5e1177ff0a5f07fce3fb6727fc028a4257 test.pl
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.7 (GNU/Linux)
+
+iD8DBQFGEBk62YzWNbzSQcsRAk1sAJ9EQ1cD0MQXorz49XrmWRtLPmEX/gCfbkQe
+YOGFHaBik8XAanRtAwTnJTU=
+=1wZT
+-----END PGP SIGNATURE-----

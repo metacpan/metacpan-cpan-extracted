@@ -1,0 +1,58 @@
+GCrypt version 0.3
+==================
+
+GCrypt is a Perl interface to the gcrypt library of cryptographic functions.
+
+Symmetric encryption and decryption is complete (supporting most
+popular ciphers: AES/Rijndael, Twofish, Triple DES, ...). Digests and
+assymmetric cryptography are on the TODO.
+
+
+* Why this module?
+
+There are a number of Perl modules available that provide some crypto
+functions. A few do it fully in Perl, others rely on their own C code,
+still others use a library. Some implement only one algorithm, and
+there are also very comprehensive Perl libraries out there.
+
+My main motivation was that I already had gcrypt on my computer -- why
+use still another crypto implementation when I can just share this
+one. Many people will be in a similar situation. If you have GNOME
+installed you probably also have gcrypt.
+
+I also partly wrote a interface to the crypto functions in OpenSSL
+(which is even more widespread), but this library's license was not
+compatible with the one in my project.
+
+
+* Usage example
+
+my $cipher = new GCrypt::Cipher('aes', 'cbc');
+$cipher->setkey($key);
+$ciphertext = $cipher->encrypt($plaintext);
+    ### ... or, on the other end:
+$plaintext  = $cipher->decrypt($ciphertext);
+
+
+* Installation
+
+Standard. Either use CPAN.pm or do by hand:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+
+* Dependencies
+
+For obvious reasons the gcrypt library is needed. You can fetch it from
+<URL:ftp://ftp.gnupg.org/gcrypt/alpha/libgcrypt/>
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2002 Robert Bihlmeyer
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 
+

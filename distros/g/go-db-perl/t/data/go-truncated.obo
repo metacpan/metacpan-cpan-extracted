@@ -1,0 +1,227 @@
+format-version: 1.0
+date: 30:03:2004 14:23
+saved-by: gwg
+auto-generated-by: DAG-Edit 1.415
+default-namespace: gene_ontology
+remark: 
+
+[Typedef]
+id: part_of
+name: Part of
+
+[Term]
+id: GO:0008150
+name: biological_process
+namespace: process
+def: "A phenomenon marked by changes that lead to a particular result\, mediated by one or more gene products." [GO:curators]
+
+[Term]
+id: GO:0007610
+name: behavior
+namespace: process
+def: "The specific actions or reactions of an organism in response to external or internal stimuli. Patterned activity of a whole organism in a manner dependent upon some combination of that organism's internal state and external conditions." [WB:ems, ISBN:0395448956]
+synonym: "behaviour" []
+is_a: GO:0008150
+
+[Term]
+id: GO:0030534
+name: adult behavior
+namespace: process
+def: "Behavior (GO\:0007610) in a fully developed and mature organism." [GO:mah, ISBN:0877797099]
+is_a: GO:0007610
+
+[Term]
+id: GO:0008343
+name: adult feeding behavior
+namespace: process
+def: "Feeding behavior (GO\:0007631) in a fully developed and mature organism." [GO:mah]
+is_a: GO:0007631
+is_a: GO:0030534
+
+[Term]
+id: GO:0008344
+name: adult locomotory behavior
+namespace: process
+def: "Locomotory behavior (GO\:0007626) in a fully developed and mature organism." [GO:ai]
+is_a: GO:0007626
+is_a: GO:0030534
+
+[Term]
+id: GO:0007628
+name: adult walking behavior
+namespace: process
+def: "The actions or reactions of an adult relating to the progression of that organism along the ground by the process of lifting and setting down each leg." [GO:jic, ISBN:0198606907]
+is_a: GO:0008344
+
+[Term]
+id: GO:0007629
+name: flight behavior
+namespace: process
+def: "The actions or reactions of an individual relating to the movement of that organism through the air." [GO:jic, ISBN:0198606907]
+is_a: GO:0008344
+
+[Term]
+id: GO:0007630
+name: jump response
+namespace: process
+def: "The sudden\, usually upward\, movement off the ground or other surface through sudden muscular effort in the legs\, following the sudden exposure to an external stimulus." [GO:jic, ISBN:0198606907]
+is_a: GO:0008344
+
+[Term]
+id: GO:0007636
+name: chemosensory jump behavior
+namespace: process
+def: "The sudden\, usually upward\, movement off the ground or other surface through sudden muscular effort in the legs\, following the sudden exposure to a chemical substance." [GO:jic]
+is_a: GO:0007630
+is_a: GO:0007635
+
+[Term]
+id: GO:0048148
+name: behavioral response to cocaine
+namespace: process
+def: "A change in the behavior of an organism as a result of exposure to cocaine." [GO:jic]
+is_a: GO:0030534
+is_a: GO:0042220
+
+[Term]
+id: GO:0048149
+name: behavioral response to ethanol
+namespace: process
+def: "A change in the behavior of an organism as a result of exposure to ethanol." [GO:jic]
+is_a: GO:0030534
+is_a: GO:0045471
+
+[Term]
+id: GO:0048150
+name: behavioral response to ether
+namespace: process
+def: "A change in the behavior of an organism as a result of exposure to ether." [GO:jic]
+is_a: GO:0030534
+is_a: GO:0045472
+
+[Term]
+id: GO:0035095
+name: behavioral response to nicotine
+namespace: process
+def: "A change in the behavior of an organism as a result of the perception of nicotine \[(S)(-)-3-(1-methyl-2-pyrrolidinyl)pyridine\]." [ISBN:0198506732, FB:bf]
+is_a: GO:0030534
+is_a: GO:0035094
+
+[Term]
+id: GO:0001662
+name: behavioral fear response
+namespace: process
+def: "An acute behavioral change resulting from a perceived external threat." [MGI:dph, MEDLINE:99119440]
+is_a: GO:0007610
+is_a: GO:0042596
+
+[Term]
+id: GO:0048266
+name: behavioral response to pain
+namespace: process
+def: "A change in the behavior of an organism as a result of nociceptor activation\, or nociception. Nociceptors\, which are peripheral receptors for pain\, include receptors which are sensitive to painful mechanical stimuli\, extreme heat or cold\, and chemical stimuli. Nociception is the perception of pain." [GO:jic, http://cancerweb.ncl.ac.uk]
+is_a: GO:0007610
+is_a: GO:0048265
+
+[Term]
+id: GO:0042630
+name: behavioral response to water deprivation
+namespace: process
+def: "A change in the behavior of an organism as a result of a prolonged deprivation of water." [GO:jl]
+synonym: "behavioral response to drought" []
+synonym: "behavioral response to thirst" []
+is_a: GO:0007610
+is_a: GO:0009414
+
+[Term]
+id: GO:0007635
+name: chemosensory behavior
+namespace: process
+def: "Behavior that is dependent upon the sensation of chemicals." [GO:curators]
+is_a: GO:0007610
+
+[Term]
+id: GO:0042048
+name: olfactory behavior
+namespace: process
+def: "The actions or reactions of an organism in response to an odour." [GO:jic]
+is_a: GO:0007635
+
+[Term]
+id: GO:0007637
+name: proboscis extension reflex
+namespace: process
+def: "The extension\, through direct muscle actions\, of the proboscis (the trunk-like extension of the mouthparts on the adult external head) in response to a sugar stimulus." [GO:jic, FBrf:0044924, http://fbserver.gen.cam.ac.uk]
+is_a: GO:0007635
+
+[Term]
+id: GO:0007631
+name: feeding behavior
+namespace: process
+def: "Behavior (GO\:0007610) associated with the intake of food." [GO:mah]
+synonym: "drinking" []
+synonym: "eating" []
+is_a: GO:0007610
+
+[Term]
+id: GO:0042595
+name: behavioral response to starvation
+namespace: process
+def: "A change in the behavior of an organism as a result of deprivation of nourishment." [GO:curators]
+is_a: GO:0007631
+is_a: GO:0042594
+
+[Term]
+id: GO:0042756
+name: drinking behavior
+namespace: process
+def: "The specific actions or reactions of an organism relating to the intake of liquids\, especially water." [http://cancerweb.ncl.ac.uk/, GO:jl]
+is_a: GO:0007631
+
+[Term]
+id: GO:0042755
+name: eating behavior
+namespace: process
+def: "The specific actions or reactions of an organism relating to the intake of food\, any substance (usually solid) that can be metabolized by an organism to give energy and build tissue." [ISBN:01928006X, GO:jl]
+is_a: GO:0007631
+
+[Term]
+id: GO:0043050
+name: pharyngeal pumping
+namespace: process
+def: "The contraction and relaxation movements of the pharyngeal muscle that mediate feeding in nematodes." [PMID:2181052, WB:cab]
+synonym: "pumping behavior" []
+is_a: GO:0042755
+
+[Term]
+id: GO:0043051
+name: regulation of pharyngeal pumping
+namespace: process
+def: "Any process that modulates the contraction and relaxation movements of the pharyngeal muscle that mediates feeding in nematodes." [WB:cab, PMID:2181052]
+relationship: part_of GO:0043050
+
+[Term]
+id: GO:0050983
+name: spermidine catabolism to deoxyhypusine, using deoxyhypusine synthase
+namespace: process
+def: "The breakdown of spermidine to form deoxyhypusine by the enzyme \[eIF-5A\]-deoxyhypusine synthase. The reaction occurs in four steps\: 1. spermidine + NAD+ = dehydrospermidine + NADH + H+; 2. dehydrospermidine + \[enzyme\]-lysine = 1\,3-diaminopropane + \[enzyme\]-lysine-N6=CH(CH2)3NH2; 3. \[enzyme\]-lysine-N6=CH(CH2)3NH2 = \[eIF-5A\]-lysine-N6=CH(CH2)3NH2; 4. \[eIF-5A\]-lysine-N6=CH(CH2)3NH2 + NADH + H+ = \[eIF-5A\]-deoxyhypusine + NAD+." [MetaCyc:1.1.1.249-RXN]
+comment: Note that this reaction is catalyzed by a single enzyme but since it has multiple steps\, it appears in the process ontology.
+synonym: "\[eIF-5A\]-deoxyhypusine synthase" []
+synonym: "deoxyhypusine synthase" []
+synonym: "spermidine dehydrogenase" []
+xref_analog: EC:2.5.1.46
+xref_analog: MetaCyc:2.5.1.46-RXN
+is_a: GO:0046203
+
+[Term]
+id: GO:0004431
+name: 1-phosphatidylinositol-4-phosphate kinase
+namespace: function
+def: "OBSOLETE. Catalysis of the reaction\: ATP + 1-phosphatidyl-1D-myo-inositol 4-phosphate = ADP + 1-phosphatidyl-1D-myo-inositol 4\,5-bisphosphate." [GO:curators, EC:2.7.1.68]
+comment: To update annotations\, consider the molecular function term '1-phosphatidylinositol-4-phosphate 5-kinase activity ; GO\:0016308'.
+synonym: "class I PI3K" []
+is_obsolete: true
+alt_id: FAKE:0001
+exact_synonym: "fake synonym" []
+
+

@@ -1,0 +1,198 @@
+2007-04-01  Ville Skyttä  <ville.skytta at iki.fi>
+
+	* Release 1.12.
+
+	* etc/genregexps.PL, lib/HTML/GMUCK.pm: Bring valid values of
+	width and height of td and th up to date with XHTML 1.0 2nd ed.
+
+	* etc/genregexps.PL, lib/HTML/GMUCK.pm: Check fixed attribute
+	values case sensitively in XHTML.
+
+	* etc/genregexps.PL: Fix valid values for hr/@align.
+
+2007-03-11  Ville Skyttä  <ville.skytta at iki.fi>
+
+	* Release 1.11.
+
+	* lib/HTML/GMUCK.*: Align warnings about scripting media types
+	with RFC 4329.
+
+	* etc/genregexps.PL: Output version of Regex::PreSuf in use.
+
+	* bin/gmuck, etc/genregexps.PL, lib/HTML/GMUCK.pm: Cleanups
+	suggested by Perl::Critic.
+
+2004-08-08  Ville Skyttä  <ville.skytta at iki.fi>
+
+	* Release 1.10.
+
+	*: Split regexp generation into genregexps.PL which is used to
+	generate lib/HTML/GMUCK/regexps.pl in order to avoid
+	Regexp::PreSuf and HTML::Tagset dependencies for users.
+
+	* bin/gmuck.pod, lib/HTML/GMUCK.pod: Convert to UTF-8.
+
+	* SIGNATURE: New.
+
+2004-03-24  Ville Skyttä  <ville.skytta at iki.fi>
+
+	* Makefile.PL (dist): Make files in dist tarball owned by root.
+
+2003-09-05  Ville Skyttä  <ville.skytta at iki.fi>
+
+	* etc/gmuck.spec: Fix required perl version.
+
+2003-09-04  Ville Skyttä  <ville.skytta at iki.fi>
+
+	* Release 1.09.
+
+	* lib/HTML/GMUCK.pm: Even more improved attribute lookup
+	regexp (should work better with 2 elements on the same line),
+	list item types were incorrectly sought using the "style"
+	attribute (thanks to <ni at 3soft.de>).
+
+2003-09-04  Ville Skyttä  <ville.skytta at iki.fi>
+
+	* Release 1.08.
+
+	* lib/HTML/GMUCK.pm: Somewhat improved attribute lookup regexp,
+	avoid UTF-8 warnings, require Perl 5.6.0 or later.
+
+2002-07-08  Ville Skyttä  <ville.skytta at iki.fi>
+
+	* Various documentation improvements.
+
+2002-07-07  Ville Skyttä  <ville.skytta at iki.fi>
+
+	* Release 1.07.
+
+	* lib/HTML/GMUCK.pm (_mime_types), lib/HTML/GMUCK.pod (CAVEATS):
+	Add information about MSIE 6.0 and "application/x-javascript".
+
+2002-05-18  Ville Skyttä  <ville.skytta at iki.fi>
+
+	* README, bin/gmuck.pod: Rephrased description.
+
+2002-05-17  Ville Skyttä  <ville.skytta at iki.fi>
+
+	* Released 1.06.
+
+2002-05-12  Ville Skyttä  <ville.skytta at iki.fi>
+
+	* lib/HTML/GMUCK.pm (&_attributes):
+	Fixed required attribute check, simplified special case code.
+
+2002-04-30  Ville Skyttä  <ville.skytta at iki.fi>
+
+	* Released 1.05.
+
+	* lib/HTML/GMUCK.pm (@Fixed_Attrs, &_attributes):
+	Add input->type, html->xmlns and pre,script,style->xml:space
+	to fixed attribute checks.
+
+2002-04-21  Ville Skyttä  <ville.skytta at iki.fi>
+
+	* lib/HTML/GMUCK.pm (&_attributes):
+	Check number, length and fixed attribute values.
+	(@Int_Attrs, @Length_Attrs, @Fixed_Attrs): New.
+
+	* SPECS: New file.
+
+	* TODO: Brought up to date.
+
+2002-04-20  Ville Skyttä  <ville.skytta at iki.fi>
+
+	* bin/gmuck, bin/gmuck.pod:
+	New option, --[no]minattributes.
+
+	* lib/HTML/GMUCK.pm, lib/HTML/GMUCK.pod:
+	New method, min_attributes().
+	New constructor option, min_attributes.
+
+	* bin/gmuck, lib/HTML/GMUCK.pm: Added function prototypes.
+
+2002-04-18  Ville Skyttä  <ville.skytta at iki.fi>
+
+	* bin/gmuck, bin/gmuck.pod:
+	New option, --[no]binary.
+
+	* bin/gmuck:
+	Output warnings of dirs and binaries if in verbose mode.
+
+2002-04-17  Ville Skyttä  <ville.skytta at iki.fi>
+
+	* lib/HTML/GMUCK.pm:
+	($Tag_Start): Allow also end tags, like "</foo".
+	(&_deprecated): Find deprecated element end tags too.
+
+	* t/010elem.t, etc/gmuck.spec: New files.
+
+2002-04-11  Ville Skyttä  <ville.skytta at iki.fi>
+
+	* lib/HTML/GMUCK.pm:
+	Tuned error messages, readability enhancements.
+
+2002-04-09  Ville Skyttä  <ville.skytta at iki.fi>
+
+	* Released 1.04.
+	
+	* lib/HTML/GMUCK.pm:
+	($Non_Tag_End, @MIME_Types, &_attributes, &_doctype):
+	Better detection of (non-)tag-ending ">".
+
+2002-04-08  Ville Skyttä  <ville.skytta at iki.fi>
+
+	* lib/HTML/GMUCK.pm:
+	($Tag_End): Had some historical backslashing, fixed.
+	(&_elements): Fixed column number output in 'missing " />"'.
+	($End_Omit): Removed the <p> element, it causes much bogus output.
+	(@MIME_Attrs, %Req_Attrs, @Depr_Attrs, &_attributes, &_entities):
+	We need whitespace before attribute name, \b is not enough.
+
+	* t/009attr.t: New file.
+
+2002-04-07  Ville Skyttä  <ville.skytta at iki.fi>
+
+	* Released 1.03 (under the dist name "gmuck").
+
+	* bin/gmuck:
+	New option, --verbose.
+	$VERSION no longer comes from the CVS version.
+
+	* lib/HTML/GMUCK.pm:
+	(&full_version): New.
+	(&_deprecated, @Depr_Attrs): Check for deprecated attributes.
+	($MIME_Types): Fixed the badly broken regexp.
+
+	* bin/gmuck.pod: Documented --verbose, other tunings.
+
+	* lib/HTML/GMUCK.pod:
+	Documented full_version(), expanded check descriptions a bit.
+
+	* TODO:	Brought up to date.
+
+	* README: Tuning.
+
+	* Makefile.PL:
+	Changed dist name to gmuck.
+	Version from bin/gmuck.
+	Abstract from bin/gmuck.pod.
+	
+2002-04-06  Ville Skyttä  <ville.skytta at iki.fi>
+
+	* lib/HTML/GMUCK.pm:
+	(&tab_width): Ensure tab width gets set to an integer.
+	(&_attributes): Fixed variable interpolation bug in message.
+	(&_deprecated): Skip deprecated element checks in XML mode.
+	
+	* README:
+	Corrected requirements (HTML::Tagset _is_ needed).
+	
+	* README, bin/gmuck.pod, lib/HTML/GMUCK.pod:
+	Copyright and URL tuning.
+
+	* t/008tabwidth.t: New file.
+
+2002-04-05  Ville Skyttä  <ville.skytta at iki.fi>
+
+	* Released 1.02, initial public release.

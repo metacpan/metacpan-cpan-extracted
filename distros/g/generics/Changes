@@ -1,0 +1,23 @@
+Revision history for Perl extension generics.
+
+0.04  Wed April 19th 2004
+    - Apparently my tests had been breaking, but no emails
+      had gotten to me from cpan-testers. I got them today
+      and the problem was easily fixed.
+
+0.03  Wed April 18th 2004
+    - Pretty much complete reworking of the documentation. 
+
+0.02  Wed April 14th 2004
+    - fixed some documentation. The last version of Devel::Cover
+	  had an issue with modules that didnt load properly. It has 
+	  since been fixed, (currently by a Devel::Cover snapshot 
+	  the author sent me, but it should be up soon i would think).
+	  
+	- Forgot some files in the MANIFEST, so 0.01 probably doesnt
+	  install correctly, Duh!
+
+0.01  Mon Apr 12 14:58:17 2004
+	- original version; created by h2xs 1.22 with options
+		-X -n generics
+

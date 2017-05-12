@@ -1,0 +1,125 @@
+0.26  Thu Jan 5 18:18:05 UTC 2012
+    - Update spec document urls
+
+0.25  Thu Dec 9 09:05:18 GMT 2010
+    - Skip testing S26, since Perl6::Perldoc currently can't parse it
+
+0.24  Mon Dec 6 03:27:30 GMT 2010
+    - Depend on Perl6::Doc 0.47 to avoid test failures
+
+0.23  Fri Dec 3 07:34:21 GMT 2010
+    - Update hyperlinks to the Synopses
+
+0.22  Tue Aug 17 22:51:04 GMT 2010
+    - Use Dist::Zilla
+    - Make all warnings fatal
+
+0.21 Wed Jun 16 19:36:56 GMT 2010
+    - Add -U/--update to download latest versions of documents from the web
+
+0.20 Tue Jun 15 14:02:57 GMT 2010
+    - Fixed an error in a regex when matching Synopses et al
+    - Added (simplified) parsing of some u4x terms
+    - Prevent duplicate test error from Module::Install
+    - Remove Module::Install::AuthorTests, M::I does it for us now
+
+0.19 Wed Aug 12 17:42:49 GMT 2009
+    - Depend on a Pod::Text::Ansi 0.04
+    - Added dependency on Pod::Parser 1.36, because earlier versions
+      don't recognize =encoding
+    - Assume Pod 6 is UTF-8 encoded
+
+0.18_02 Sun Jul 26 13:37:21 GMT 2009
+    - Forgot Pod::Parser
+
+0.18_01 Sun Jul 26 13:26:36 GMT 2009
+    - Add some diagnostics to figure out some test failures
+
+0.17 Sun Jul 26 00:17:16 GMT 2009
+    - Small Pod fixes
+    - Depend on Perl6::Doc 0.43
+    - Use UTF-8 encoding for Pod in Functions and Table resources
+
+0.16_02 Fri Jul 24 15:19:07 GMT 2009
+    - Added Win32::Console::ANSI as a recommended dep
+    - Make sure we die if the target is not recognized
+    - Fix small S32 parsing bug, causing Pod errors
+    - Look up man pages (perlintro, etc)
+    - Added test for -l/--locate
+
+0.16_01 Fri Jul 24 13:22:42 GMT 2009
+    - Rename -l/--only option to -l/--locate
+    - Move parsers to the App::Grok::Parser:: namespace
+    - Move all resource backends to App::Grok::Resource::*
+
+0.15 Fri Jul 24 11:47:30 GMT 2009
+    - Fix logic error causing 'ansi' not to be the default on non-Win32
+
+0.14 Fri Jul 24 09:20:07 GMT 2009
+    - Remove Module::Install::AuthorRequires for now, it's not working right
+    - Make Win32::Console::ANSI optional
+
+0.13 Thu Jul 16 06:14:13 GMT 2009
+    - Look up things from the Perl 6 Table Index
+
+0.12 Tue Jul 14 13:24:47 EDT 2009
+    - Depend on latest Perl6::Perldoc::To::Ansi and Pod::Text::Ansi
+      for a consistent look
+    - Fix a bug causing "grok s32-str" to deliver s32-abstraction instead
+      of s32-str
+    - If the pager is less(1), tell it to display colors without a fuss
+    - Removed all docs from the distribution, rely on Perl6::Doc instead
+
+0.11 Mon Jul  6 23:36:06 EDT 2009
+    - Use PAGER environment variable if set
+    - Fix bug which was causing it to only accept 's02' but not 's02-bits'
+    - Make target_index (and, by extension, --index) return function list
+      in sorted order
+
+0.10 Thu Jul  2 16:49:16 GMT 2009
+    - Add 'pod' output format for Pod 5, and u-/--unformatted
+    - Rename -f/--format to -o/--output like perldoc(1)
+    - Support looking up functions from Synopsis 29
+
+0.09 Wed Jul  1 17:05:31 GMT 2009
+    - Add some author tests (Pod, Perl::Critic, etc)
+    - Detect whether a file contains Pod 5 or Pod 6
+    - Add homepage and source repository to Makefile.PL
+    - Refactor the code a bit and document public methods
+
+0.08 Wed Jul  1 14:14:10 GMT 2009
+    - Add -i/--index to list known targets
+    - Rename -v (--version) option to -V
+    - Support xhtml output, depend on Pod::Xhtml
+    - Depend on latest Perl6::Perldoc::To::Ansi
+    - Fix pager execution on Win32. azawawi++
+    - Depend on Win32::Console::ANSI on Win32 systems
+
+0.07 Tue Jun 30 12:06:37 GMT 2009
+    - Explicitly call grok with $^X in tests, needed on Win32
+
+0.06 Fri Jun 26 08:19:06 GMT 2009
+    - Add -l/--only option to print the path to the target file
+    - Bail out with an error message when target is unknown
+
+0.05 Fri Jun 26 05:48:02 GMT 2009
+    - Fix location of shared files (synopses)
+
+0.04 Fri Jun 26 05:11:13 GMT 2009
+    - Use a pager when interactive, can be turned off with -T
+    - Support Pod 5
+    - Support arguments like 's02', 's26', and 's32-exception'
+    - Bundled Synopsis documents
+
+0.03 Thu May 28 15:49:00 GMT 2009
+    - Declare a package other than main, so "cpanp -i grok" should work
+    - Added a TODO file
+    - Added -h, -v, and --version options
+
+0.02 Mon May  4 00:40:23 GMT 2009
+    - Ship a README file generated from the Pod source
+    - Exit with better diagnostics on failure
+    - Print usage information when --help is used
+
+0.01 Sun May  3 18:17:29 GMT 2009
+    - Initial release

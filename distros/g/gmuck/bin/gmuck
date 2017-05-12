@@ -1,0 +1,214 @@
+#!/usr/bin/perl -w
+
+# $Id: gmuck,v 1.18 2007/04/01 20:41:05 scop Exp $
+
+use strict;
+
+require 5.00503;
+
+use vars qw($VERSION);
+
+use Getopt::Long ();
+use HTML::GMUCK ();
+
+$VERSION = '1.12';
+
+$| = 1;
+
+# ----- Arguments -------------------------------------------------------------
+
+my $Opt_Help          = 0;   # Output help
+my $Opt_Quick         = 0;   # Quick mode
+my $Opt_Verbose       = 1;   # Verbose mode
+my $Opt_Tab_Width     = 4;   # TAB width
+my $Opt_Stdin    = 'STDIN';  # Defult file name for STDIN input.
+my $Opt_Mode     = 'XHTML';  # Default mode.
+my $Opt_Quote         ='D';  # Quote style.
+my $Opt_Binary        = 0;   # Check binary files too.
+
+my $Opt_Elements      = 1;   # Element checks.
+my $Opt_Attributes    = 1;   # Attribute checks.
+my $Opt_MinAttributes = 1;   # Minimized attribute checks.
+my $Opt_Entities      = 1;   # Entity checks.
+my $Opt_Doctype       = 1;   # DOCTYPE checks.
+my $Opt_Mimetypes     = 1;   # MIME type checks.
+my $Opt_Deprecated    = 1;   # Deprecation checks.
+
+Getopt::Long::GetOptions('help!'           => \$Opt_Help,
+                         'quick!'          => \$Opt_Quick,
+                         'tabwidth=i'      => \$Opt_Tab_Width,
+                         'stdin=s'         => \$Opt_Stdin,
+                         'mode=s'          => \$Opt_Mode,
+                         'quote=s'         => \$Opt_Quote,
+                         'verbose!'        => \$Opt_Verbose,
+                         'binary!'         => \$Opt_Binary,
+
+                         'elements!'       => \$Opt_Elements,
+                         'attributes!'     => \$Opt_Attributes,
+                         'minattributes!'  => \$Opt_MinAttributes,
+                         'entities!'       => \$Opt_Entities,
+                         'doctype!'        => \$Opt_Doctype,
+                         'mimetypes!'      => \$Opt_Mimetypes,
+                         'deprecated!'     => \$Opt_Deprecated,
+                        );
+
+qprint("gmuck version $VERSION");
+qprint(HTML::GMUCK::full_version());
+
+if ($Opt_Help) {
+  print <<"EOF";
+
+Usage: gmuck [OPTION...] [--] [FILE...]
+
+General OPTIONs are:
+  --[no]help            Output this help and exit.
+  --mode=<mode>         Mode of operation.  XHTML (default), HTML, XML.
+  --tabwidth=<n>        TAB width for error output.
+  --stdin=<filename>    File name for STDIN messages.
+  --quote=<char>        Preferred quote char; D=double, S=single, N=none.
+  --[no]quick           Quick mode (max 1 failed check per line).
+  --[no]verbose         Verbose mode.
+  --[no]binary          Check binary files.
+
+Per-check OPTIONs are (all on by default):
+  --[no]elements        Element checks.
+  --[no]attributes      Attribute checks.
+  --[no]minattributes   Minimized attribute checks.
+  --[no]entities        Entity checks.
+  --[no]doctype         DOCTYPE checks.
+  --[no]mimetypes       MIME type checks.
+  --[no]deprecated      Deprecation checks.
+
+See the gmuck(1) and HTML::GMUCK(3) manpages for more details.
+
+Exit status is 0 if no checks failed, else 1.
+
+EOF
+  exit(0);
+}
+
+if ($Opt_Quote =~ /^[Ss]/) {
+  $Opt_Quote = "'";
+} elsif ($Opt_Quote =~ /^[Nn]/) {
+  $Opt_Quote = '';
+} else {
+  if ($Opt_Quote !~ /^[Dd]/) {
+    warn("** Quote character must be one of D, S, N.\n");
+  }
+  $Opt_Quote = '"';
+}
+
+$Opt_Tab_Width = 4 unless ($Opt_Tab_Width > 0);
+
+# ----- initialization --------------------------------------------------------
+
+my $Line_Count          = 0;
+my $File_Count          = 0;
+my $Skip_Count          = 0;
+
+# ----- Main processing -------------------------------------------------------
+
+my $gmuck = HTML::GMUCK->new(tab_width      => $Opt_Tab_Width,
+                             mode           => uc($Opt_Mode),
+                             quote          => $Opt_Quote,
+                             min_attributes => $Opt_MinAttributes,
+                            );
+
+qprint('Settings: mode=', $gmuck->mode(), ', tab=', $gmuck->tab_width(),
+       ', quote={', $gmuck->quote(), '}',  ($Opt_Quick ? ', quick' : ''));
+
+if (@ARGV) {
+  foreach my $filename (@ARGV) {
+    if (-d $filename) {
+      warn("** '$filename' looks like a dir, skipping.\n") if $Opt_Verbose;
+      $Skip_Count++;
+    } elsif (!$Opt_Binary && -B _) {
+      warn("** '$filename' seems binary, skipping.\n")     if $Opt_Verbose;
+      $Skip_Count++;
+    } elsif (open(FILE, '<', $filename)) {
+      $File_Count++;
+      process_lines($gmuck, \*FILE, $filename);
+      close(FILE) or warn("** Error closing '$filename': $!\n");
+    } else {
+      warn("** Can't open '$filename' for reading: $!\n");
+      $Skip_Count++;
+    }
+  }
+} else {
+  qprint('Reading from STDIN, ',
+         'use --help for options if you didn\'t want this.');
+  $File_Count++;
+  process_lines($gmuck, \*STDIN, $Opt_Stdin);
+}
+
+my ($errors, $warnings) = $gmuck->stats();
+
+qprint("Done. $File_Count files, $Skip_Count skipped, ",
+       "$Line_Count lines, $errors errors, $warnings warnings.");
+
+exit(($errors + $warnings > 0) ? 1 : 0);
+
+# ----- The workhorse ---------------------------------------------------------
+
+sub process_lines
+{
+  my $gmuck = shift;
+  my $fh = shift or $Skip_Count++ and return;
+  my $filename = shift;
+  my $line = 0;
+
+ LINE:
+  while (<$fh>) {
+    $line++;
+    $Line_Count++;
+    output($filename, $line, $gmuck->doctype($_))
+        and next LINE if $Opt_Doctype;
+    output($filename, $line, $gmuck->attributes($_))
+        and next LINE if $Opt_Attributes;
+    output($filename, $line, $gmuck->elements($_))
+        and next LINE if $Opt_Elements;
+    output($filename, $line, $gmuck->mime_types($_))
+        and next LINE if $Opt_Mimetypes;
+    output($filename, $line, $gmuck->entities($_))
+        and next LINE if $Opt_Entities;
+    output($filename, $line, $gmuck->deprecated($_))
+        and next LINE if $Opt_Deprecated;
+  }
+
+  return;
+}
+
+# ----- Utilities -------------------------------------------------------------
+
+sub output
+{
+  my $ret = 0;
+  my $filename = shift;
+  my $line = shift;
+  foreach my $err (@_) {
+    print STDERR join(':', $filename, ($line + $err->{line}), $err->{col}),
+        ": [$err->{type}] ";
+    if ($err->{elem} || $err->{attr}) {
+      print STDERR '<';
+      if ($err->{elem}) {
+        print STDERR $err->{elem};
+        print STDERR '/' if $err->{attr};
+      }
+      if ($err->{attr}) {
+        print STDERR "\@$err->{attr}";
+      }
+      print STDERR '> ';
+    }
+    print STDERR "$err->{mesg}\n";
+    $ret++;
+  }
+  return ($ret && $Opt_Quick);
+}
+
+sub qprint
+{
+  print '[ ', @_, " ]\n" if $Opt_Verbose;
+  return;
+}
+
+# ----- EOF -------------------------------------------------------------------

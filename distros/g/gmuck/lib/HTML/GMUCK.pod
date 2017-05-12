@@ -1,0 +1,279 @@
+$Id: GMUCK.pod,v 1.9 2007/03/11 16:16:42 scop Exp $
+
+=head1 NAME
+
+HTML::GMUCK - The Generated MarkUp ChecKer
+
+=head1 SYNOPSIS
+
+ use HTML::GMUCK ();
+
+ my $gmuck = HTML::GMUCK->new( mode           => 'XHTML',
+                               tab_width      => 4,
+                               quote          => '"',
+                               min_attributes => 1,
+                             );
+
+ my @elem_errors = $gmuck->elements  ($string);
+ my @attr_errors = $gmuck->attributes($string);
+ my @ent_errors  = $gmuck->entities  ($string);
+ my @doct_errors = $gmuck->doctype   ($string);
+ my @mime_errors = $gmuck->mime_types($string);
+ my @depr_errors = $gmuck->deprecated($string);
+
+ my $mode      = $gmuck->mode();
+ my $mode      = $gmuck->mode('HTML');
+
+ my $tab_width = $gmuck->tab_width();
+ my $tab_width = $gmuck->tab_width(2);
+
+ my $min_attrs = $gmuck->min_attributes();
+ my $min_attrs = $gmuck->min_attributes(1);
+
+ my ($num_errors, $num_warnings) = $gmuck->stats();
+ my ($num_errors, $num_warnings) = $gmuck->reset();
+
+ my $version = $gmuck->full_version();
+
+=head1 DESCRIPTION
+
+HTML::GMUCK is the module part of gmuck.  It contains the logic for the
+checks and provides an OO interface to them.
+
+=head1 CONSTRUCTORS
+
+The following constructor is available:
+
+=over 4
+
+=item B<new>
+
+  $gmuck = HTML::GMUCK->new( %options );
+
+Class method, constructs a new C<HTML::GMUCK> object and returns
+a reference to it.
+
+Options may be specified in key/value pairs:
+
+I<mode> sets the initial mode of the GMUCK object,
+the default is 'XHTML'. See L<mode()>.
+
+I<tab_width> the initial value of TAB width, the default is 4.
+See L<tab_width()>.
+
+I<quote> sets your preferred character for attribute quoting,
+the default is '"' (the double quote).
+See L<quote()>.
+
+I<min_attributes> enables or disables minimized attribute checks,
+the default is enabled.
+See L<min_attributes()> and L<attributes()>.
+
+=back
+
+=head1 CHECKER METHODS
+
+The checker methods contain the functionality of HTML::GMUCK.
+All of them are instance methods, take a list of lines as an argument,
+and return a list of errors.
+
+B<For now>, the lines passed as arguments will be checked one by one,
+but in the future, the meaning is that they will be checked as one
+logical entity.  The idea is to provide a bit of context for checking.
+So to ensure future compatibility, pass only one line at a time.
+
+The errors in the returned list are hash references, with the following
+keys:
+
+I<line> contains the line number (in the argument array of lines)
+where the error was found.  Never undefined; the first line number is 0.
+
+I<col> contains the column (character) number where the error was found.
+Never undefined; the first column number is 0.
+This will also be 0 in the rare cases that the column could not be
+resolved.
+
+I<type> contains the type of the error.
+Never undefined, 'E' for errors, 'W' for warnings.
+
+I<elem> contains the element name (string) of the error.
+Undefined if not available.
+
+I<attr> contains the attribute name (string) of the error.
+Undefined if not available.
+
+I<mesg> contains the message for the error.
+Never undefined.
+
+The following checker instance methods are available:
+
+=over 4
+
+=item B<elements>
+
+  @errors = $gmuck->elements(@lines);
+
+Checks elements;  eg. the CasE of the elements and end tags.
+
+=item B<attributes>
+
+  @errors = $gmuck->attributes(@lines);
+
+Checks attributes.
+
+=item B<entities>
+
+  @errors = $gmuck->entities(@lines);
+
+Checks entities;  eg. illegal '&' vs. '&amp;' in URIs.
+
+=item B<doctype>
+
+  @errors = $gmuck->doctype(@lines);
+
+Checks DOCTYPE declarations.
+
+=item B<mime_types>
+
+  @errors = $gmuck->mime_types(@lines);
+
+Checks MIME types;  eg. unregistered ones.
+
+=item B<deprecated>
+
+  @errors = $gmuck->deprecated(@lines);
+
+Checks deprecated things;  eg. deprecated elements and attributes.
+
+=back
+
+=head1 ACCESSORS, MUTATORS
+
+The following accessor and mutator instance methods are available:
+
+=over 4
+
+=item B<mode>
+
+  $mode = $gmuck->mode( [$mode] );
+
+Gets, or if called with an optional argument, sets the mode of the
+object.  Valid modes are 'XHTML', 'HTML' and 'XML'.
+
+The mode of an HTML::GMUCK object affects the tests; you should set
+this corresponding to the kind of markup you are generating (or
+checking).
+
+Note that setting the mode when the current mode is 'HTML' and the
+current quote character is '' (the empty string) will also set the
+quote character to '"' (the double quote).
+
+=item B<tab_width>
+
+  $tab_width = $gmuck->tab_width( [$tab_width] );
+
+Gets, or if called with the optional argument, sets the TAB width
+of the object.  Valid values are integers > 0.
+
+TAB width is used when calculating the line position for an error or
+warning message, ie. how many spaces does one TAB character count as.
+
+=item B<quote>
+
+  $quote = $gmuck->quote( [$quote] );
+
+Gets, or if called with an optional argument, sets the preferred
+quote character of the object.  Valid values are '"' (the double quote),
+''' (the single quote) and '' (the empty string).
+
+=item B<min_attributes>
+
+  $min_attrs = $gmuck->min_attributes( [$min_attrs] );
+
+Gets, or if called with an optional argument, sets whether minimized
+attributes will be checked when attributes() is called.  A true value
+enables the checks, a non-true disables them.  It is not allowed to
+turn off checks for minimized attributes in XML-based modes (XHTML, XML).
+
+=item B<stats>
+
+  ($errors, $warnings) = $gmuck->stats();
+
+Retrieves the count of errors and warnings that the object has found.
+
+=item B<reset>
+
+  ($errors, $warnings) = $gmuck->reset();
+
+Similar to stats(), but also resets the error and warning counts to 0.
+
+=item B<full_version>
+
+  $version = $gmuck->full_version();
+  $version = HTML::GMUCK::full_version();
+
+Gets the version, with information about other packages in use.
+You can also call this as a function.
+
+=back
+
+=head1 EXPORT
+
+Nothing at the moment.
+
+=head1 CAVEATS
+
+You may get warnings about script media types, and a recommendation to
+use something else for them.  However, some browsers, notably Microsoft
+Internet Explorer 6.0 has been reported not to execute scripts that use
+some of the recommended registered scripting media types.  See
+E<lt>http://www.rfc-editor.org/rfc/rfc4329.txtE<gt> and
+E<lt>http://www.robinlionheart.com/stds/html4/scripts.htmlE<gt> for more
+information.  If this is a concern, one solution is to use some of the
+media types marked as obsolete in RFC 4329 for interoperability purposes
+and ignore related messages from gmuck.
+
+=head1 BUGS
+
+Due to the impossible task of this tool, there are and will be bugs,
+lots of them.  There is a thin line between reporting lots of bogus
+errors and spotting enough real ones.
+
+See F<BUGS> in the distribution for an up to date list.
+
+=head1 TODO
+
+See F<TODO> in the distribution for an up to date list.
+
+=head1 SEE ALSO
+
+L<gmuck(1)>
+
+The gmuck homepage,
+ E<lt>http://gmuck.sourceforge.net/E<gt>
+
+The W3C MarkUp Validation Service
+ E<lt>http://validator.w3.org/E<gt>
+
+WDG HTML Validator
+ E<lt>http://www.htmlhelp.com/tools/validator/E<gt>
+
+Site Valet
+ E<lt>http://valet.htmlhelp.com/E<gt>
+
+L<HTML::Validator>
+
+=head1 AUTHOR
+
+Ville Skyttä E<lt>ville.skytta at iki.fiE<gt>
+
+=head1 COPYRIGHT
+
+Copyright (C) 2001-2007 Ville Skyttä.  All rights reserved.
+
+This program is free software, you can redistribute it and/or modify
+it under the terms of The Artistic License or the GNU General Public
+License ("GPL") as published by the Free Software Foundation; either
+version 2 of the GPL, or (at your option) any later version.
+
+=cut

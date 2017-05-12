@@ -1,0 +1,201 @@
+NAME
+    GD::RPPNG - Package for generating human only readable images
+
+DESCRIPTION
+    GD::RPPNG - Package for generating human-only readable images
+
+    The GD::RPPNG (Random Password PNG) module was created to provide an
+    easy access to human-only readable images. This is very usefull to avoid
+    automatic processing of authentication. (ie: subscription to free email
+    accounts).
+
+SYNOPSIS
+        use GD::RPPNG;
+
+        # create a new image
+        $myimage = new GD::RPPNG;
+
+        # configure the image
+        $myimage->Config (
+            Xsize            => 400,
+            Ysize            => 75,
+            CharSet          => 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789',
+            CodeLen          => 8,
+            FontMinPT        => 12,
+            FontMaxPT        => 28,
+            yDivert          => 10,
+            Angle            => 45,
+            XLinesFactor     => 10,
+            YLinesFactor     => 10,
+            Transparent      => 0,
+            Colors           => 1,
+            bgColor          => 'FFFFFF',
+            fgColor          => '000000',
+            Code             => 'mypasswd',
+            DebugCode        => 0,
+            );
+
+        # add TrueType(C) fonts
+        $myimage->AddFonts (
+            '/usr/X11R6/lib/X11/fonts/truetype/arial.ttf',
+            '/usr/X11R6/lib/X11/fonts/truetype/courier.ttf',
+        );
+
+        # generate the image
+        ( $mycode, $mypng ) = $image->GenImage();
+
+METHODS
+    $object = new GD::RPPNG
+        Creates a new object and sets all default options (see next METHOD
+        for detailed description):
+
+            Xsize         => 400
+            Ysize         => 75
+            CharSet       => 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'
+            CodeLen       => 8
+            FontMinPT     => 12
+            FontMaxPT     => 28
+            yDivert       => 10
+            Angle         => 45
+            XLinesFactor  => 10
+            YLinesFactor  => 10
+            Transparent   => 0
+            Colors        => 1
+            bgColor       => 'FFFFFF'
+            fgColor       => '000000'
+            Code          => ''
+            DebugCode     => 0
+
+    $object->Config()
+        With this method you can override all the default options shown
+        above.
+
+        'Xsize' defines the width of the image in pixels. here's an example:
+
+            $object->Config( Xsize => 400 )
+
+        'Ysize' defines the height of the image in pixels. here's an
+        example:
+
+            $object->Config( Ysize => 75 )
+
+        'CharSet' defines the list of chars which may be used to generate
+        the "code". Depending on the fonts you will use, its recommended to
+        skip I,L,0,O and 1 as they might be confusing. here's an example:
+
+            $object->Config( CharSet => 'ABCDEFGHJKMNOPQRSTUVWXYZ23456789%$#@' )
+
+        'CodeLen' defines the number of chars to be used to generate the
+        "code". here's an example:
+
+            $object->Config( CodeLen => 8 )
+
+        'FontMinPT' defines the minimal font size to use. here's an example:
+
+            $object->Config( FontMinPT => 12 )
+
+        'FontMaxPT' defines the maximal font size to use. here's an example:
+
+            $object->Config( FontMaxPT => 24 )
+
+        'yDivert' defines, in percent of the image height, the vertical
+        range in which chars may be printed. here's an example:
+
+            $object->Config( yDivert => 10 )
+
+        'Angle' defines, in degree, the angle range in which chars may be
+        rotated. As an example, 90 will allow chars to be rotated from -45
+        to +45 degrees. here's an example:
+
+            $object->Config( Angle => 45 )
+
+        'XLinesFactor' defines, in percent, the amount of horizontal lines
+        to be draw. As an example, 50 on a 400 pixels wide image will draw
+        about 200 lines. here's an example:
+
+            $object->Config( XLinesFactor => 20 )
+
+        'YLinesFactor' defines, in percent, the amount of vertical lines to
+        be draw. As an example, 50 on a 100 pixels high image will draw
+        about 50 lines. here's an example:
+
+            $object->Config( YLinesFactor => 20 )
+
+        'Transparent' defines if the background has to be transparent or
+        not. here's an example:
+
+            $object->Config( Transparent => 0 )
+
+        'Colors' defines if the image will use random colors or not. here's
+        an example:
+
+            $object->Config( Colors => 1 )
+
+        'bgColor' defines, in RRGGBB (hex) format, the background color to
+        use. here's an example:
+
+            $object->Config( bgColor => 'FFFFFF' )
+
+        'fgColor' defines, in RRGGBB (hex) format, the foreground color to
+        use. here's an example:
+
+            $object->Config( fgColor => '000000' )
+
+        'Code' defines the "code". If not set, a random code will be
+        generated using the CharSet and the CodeLen options. If set, CharSet
+        and CodeLen will be ignored. here's an example:
+
+            $object->Config( Code => 'q12we34r' )
+
+        NOTE: You may specify multiple options at the same time here's an
+        example:
+
+            $object->Config(
+                Xsize => 400,
+                Ysize => 75,
+                Colors => 1
+           );
+
+        'DebugCode' defines if the "code" will be displayed on the top left
+        of the image or not. NOTE: Do only use this for debugging purpose!
+        here's an example:
+
+    $object->AddFonts()
+        With this method you can add TrueType fonts. Those fonts will be
+        randomly used to draw the "code" on the image. here's an example:
+
+            $object->AddFonts(
+                '/usr/X11R6/lib/X11/fonts/truetype/arial.ttf',
+                '/usr/X11R6/lib/X11/fonts/truetype/courier.ttf'
+            );
+
+    $object->GenImage()
+        With this method you will generate the image. The method will return
+        the "code" and the image in an array. here's an example:
+
+            ($mycode, $myimage) = $object->GenImage();
+            print "Content-type: image/png\n\n";
+            print $myimage;
+
+EXAMPLES
+    Many examples may be found at http://www.spale.com/gd-rppng
+
+AUTHOR
+    Pascal Gloor <spale@cpan.org>
+
+    The GD::RPPNG module was written by Pascal Gloor.
+
+VERSION
+    Version 0.9, released on 11 Dec 2003.
+
+COPYRIGHT
+    GD::RPPNG Copyright (C) 2003 Pascal Gloor <spale@cpan.org>
+
+    GD Copyright (C) 1995-2000, Lincoln D. Stein.
+
+    This module is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+SEE ALSO
+    the GD::RPPNG manpage
+

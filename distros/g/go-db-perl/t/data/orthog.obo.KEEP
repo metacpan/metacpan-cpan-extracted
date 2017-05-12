@@ -1,0 +1,59 @@
+[ontology]
+name:test orthogonal ontology
+
+[term]
+acc: animal
+name: animal
+property: has_size size
+namerule: [$has_size] $NAME
+defrule: An animal [of $has_size size]
+
+[term]
+acc: dog
+name: dog
+relationship: is_a animal
+defrule: A woofing animal [which is $has_size]
+
+[term]
+acc: cat
+name: cat
+relationship: is_a animal
+
+[term]
+acc: rodent
+name: rodent
+relationship: is_a animal
+
+[term]
+acc: mouse
+name: mouse
+relationship: is_a rodent
+
+[term]
+acc: animal_tail
+name: animal_tail
+relationship: part_of animal
+
+! size ont
+[term]
+acc: size
+name: size
+
+[term]
+acc: big
+relationship: is_a size
+name: big
+
+[term]
+acc: small
+relationship: is_a size
+name: small
+
+
+[term]
+acc: enormous
+relationship: is_a big
+name: enormous
+
+
+

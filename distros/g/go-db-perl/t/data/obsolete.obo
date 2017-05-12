@@ -1,0 +1,100 @@
+format-version: 1.2
+date: 03:08:2007 15:52
+saved-by: midori
+auto-generated-by: OBO-Edit 1.101
+subsetdef: goslim_generic "Generic GO slim"
+subsetdef: goslim_goa "GOA and proteome slim"
+subsetdef: goslim_plant "Plant GO slim"
+subsetdef: goslim_yeast "Yeast GO slim"
+subsetdef: gosubset_prok "Prokaryotic GO subset"
+default-namespace: gene_ontology
+remark: cvs version: $Revision: 1.1 $
+
+[Term]
+id: GO:0000005
+name: ribosomal chaperone activity
+namespace: molecular_function
+def: "OBSOLETE. Assists in the correct assembly of ribosomes or ribosomal subunits in vivo, but is not a component of the assembled ribosome when performing its normal biological function." [GOC:jl, PMID:12150913]
+comment: This term was made obsolete because it refers to a class of gene products and a biological process rather than a molecular function.
+is_obsolete: true
+consider: GO:0042254
+consider: GO:0051082
+
+[Term]
+id: GO:0000008
+name: thioredoxin
+namespace: molecular_function
+alt_id: GO:0000013
+def: "OBSOLETE. A small disulfide-containing redox protein that serves as a general protein disulfide oxidoreductase. Interacts with a broad range of proteins by a redox mechanism, based on the reversible oxidation of 2 cysteine thiol groups to a disulfide, accompanied by the transfer of 2 electrons and 2 protons. The net result is the covalent interconversion of a disulfide and a dithiol." [GOC:kd]
+comment: This term was made obsolete because it represents gene products.
+is_obsolete: true
+consider: GO:0030508
+
+[Term]
+id: GO:0000020
+name: negative regulation of recombination within rDNA repeats
+namespace: biological_process
+def: "OBSOLETE. Any process that stops, prevents or reduces the frequency, rate or extent of genetic recombination within the DNA of the genes coding for ribosomal RNA." [GOC:go_curators, ISBN:0198506732 "Oxford Dictionary of Biochemistry and Molecular Biology"]
+comment: This term was made obsolete because it describes a substrate-specific process.
+is_obsolete: true
+consider: GO:0045950
+
+[Term]
+id: GO:0000039
+name: plasma membrane long-chain fatty acid transporter
+namespace: molecular_function
+def: "OBSOLETE (was not defined before being made obsolete)." [GOC:ai]
+comment: This term was made obsolete because it describes a gene product and it contains component information.
+is_obsolete: true
+consider: GO:0005324
+consider: GO:0005886
+
+format-version: 1.2
+date: 03:08:2007 15:52
+saved-by: midori
+auto-generated-by: OBO-Edit 1.101
+subsetdef: goslim_generic "Generic GO slim"
+subsetdef: goslim_goa "GOA and proteome slim"
+subsetdef: goslim_plant "Plant GO slim"
+subsetdef: goslim_yeast "Yeast GO slim"
+subsetdef: gosubset_prok "Prokaryotic GO subset"
+default-namespace: gene_ontology
+remark: cvs version: $Revision: 1.1 $
+
+[Term]
+id: GO:0000174
+name: inactivation of MAPK (mating sensu Saccharomyces)
+namespace: biological_process
+def: "OBSOLETE. Downregulation of MAP kinase activity in the context of transduction of mating pheromone signal, as described for Saccharomyces." [PMID:9561267]
+comment: This term was made obsolete because it is a gene product specific term.
+is_obsolete: true
+replaced_by: GO:0000750
+
+[Term]
+id: GO:0000259
+name: intracellular nucleoside transmembrane transporter activity
+namespace: molecular_function
+def: "OBSOLETE. Enables the directed movement of a nucleoside, a nucleobase linked to either beta-D-ribofuranose (ribonucleoside) or 2-deoxy-beta-D-ribofuranose (a deoxyribonucleotide) within a cell." [GOC:ai]
+comment: This term was made obsolete because it contains component and function information.
+is_obsolete: true
+replaced_by: GO:0005337
+replaced_by: GO:0005622
+
+[Term]
+id: GO:0000260
+name: hydrogen-translocating V-type ATPase activity
+namespace: molecular_function
+def: "OBSOLETE. Catalysis of the reaction: ATP + H2O + H+(in) = ADP + phosphate + H+(out). Found in vacuoles of eukaryotes and in bacteria." [TC:3.A.2.2.1, TC:3.A.2.2.3]
+comment: This term was made obsolete because it represents a gene product.
+is_obsolete: true
+replaced_by: GO:0046961
+
+[Term]
+id: GO:0000261
+name: sodium-translocating V-type ATPase activity
+namespace: molecular_function
+def: "OBSOLETE. Catalysis of the reaction: ATP + H2O + Na+(in) = ADP + phosphate + Na+(out). Found in vacuoles of eukaryotes and in bacteria." [TC:3.A.2.2.2]
+comment: This term was made obsolete because it represents a gene product.
+is_obsolete: true
+replaced_by: GO:0046962
+

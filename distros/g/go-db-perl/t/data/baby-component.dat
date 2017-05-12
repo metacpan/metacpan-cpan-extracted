@@ -1,0 +1,21 @@
+!THIS IS TEST DATA
+! Even if the biology in this becomes superceded, please DO NOT edit
+! this file, it is here as part of the test suite
+! and lives in database go_mini
+$Gene_Ontology ; GO:0003673
+ $cellular_component ; GO:0005575
+  %extracellular ; GO:0005576
+   <fibrinogen ; GO:0005577
+    <fibrinogen alpha chain ; GO:0005972
+    <fibrinogen beta chain ; GO:0005973
+    <fibrinogen gamma chain ; GO:0005974
+   <extracellular matrix ; GO:0005578
+    <membrane attack complex ; GO:0005579
+     <membrane attack complex protein alpha<down>M</down> chain ; GO:0005580
+     <membrane attack complex protein beta<down>2</down> chain ; GO:0008008
+    <collagen ; GO:0005581
+     %collagen type XV ; GO:0005582
+     %fibrillar collagen ; GO:0005583
+      %collagen type I ; GO:0005584
+      %collagen type II ; GO:0005585
+      %collagen type III ; GO:0005586

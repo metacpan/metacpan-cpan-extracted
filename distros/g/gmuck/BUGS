@@ -1,0 +1,6 @@
+$Id: BUGS,v 1.2 2002/04/05 21:31:54 scop Exp $
+
+o doctype() matches DOCTYPES only if the ending ">" is found on the line.
+  Maybe not worth to fix, providing more context should be enough (see TODO).
+o attributes() does not report non-lowercase, minimized elements as
+  non-lowercase.  The minimization is reported though.

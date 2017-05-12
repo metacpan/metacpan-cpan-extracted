@@ -1,0 +1,7 @@
+=head1 C<Foo>
+
+=head1 Bar
+
+=head2 Baz
+
+=cut

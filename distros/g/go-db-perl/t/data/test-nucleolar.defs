@@ -1,0 +1,10 @@
+!THIS IS TEST DATA
+! Even if the biology in this becomes superceded, please DO NOT edit
+! this file, it is here as part of the test suite
+
+term: snoRNA transcription
+goid: GO:0009302
+definition: The synthesis of small nucleolar RNA (snoRNA) from a DNA template.
+definition_reference: GO:curators
+definition_reference: testdb:001
+comment: test comment

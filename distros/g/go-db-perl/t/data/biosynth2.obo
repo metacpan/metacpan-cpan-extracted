@@ -1,0 +1,42 @@
+[ontology]
+name: process
+
+[term]
+acc: process
+
+[term]
+acc: biosynthesis
+property: synthesizes protein
+relationship: is_a process
+namerule: [$synthesizes] $NAME
+defrule: involved in synthesis [of $synthesizes]
+
+[term]
+acc: regulation
+property: part_of process
+namerule: regulation of [$part_of]
+defrule: regulation of [$part_of]
+
+! protein ont
+[ontology]
+name: protein
+
+[term]
+acc: protein
+
+[term]
+acc: cytokine
+relationship: is_a protein
+
+[term]
+acc: interleukin13
+relationship: is_a cytokine
+
+[ontology]
+name: xp
+
+! assume xp terms already exists...
+[term]
+acc: X:001
+name: IL13 biosynthesis
+cross_product: biosynthesis (synthesizes interleukin13)

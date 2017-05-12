@@ -1,0 +1,2 @@
+FB	FBgn0000011	ab		GO:0003704	FB:FBrf0105495	ISS	EMBL:AF032676	F	testname	testsynonym	gene	taxon:7227	20030101	FB
+FB	bogus	yyyy		GO:9999999	FB:FBrf0105495	ISS	PIR:A29942	F			gene	taxon:7227
