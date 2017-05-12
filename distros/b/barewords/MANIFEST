@@ -1,0 +1,7 @@
+Changes
+lib/barewords.pm
+Makefile.PL
+MANIFEST
+README
+t/barewords.t
+META.yml                                 Module meta-data (added by MakeMaker)

@@ -1,0 +1,200 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+  <title>PCX Payroll System</title>
+                    
+  <meta http-equiv="content-type" content="text/html; charset=ISO-8859-1">
+</head>
+  <body>
+   <b>StateIncome.pm</b><br>
+   <br>
+   StateIncome-&gt;calculate( 	<br>
+  &nbsp;&nbsp;&nbsp; gross,&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; 
+&nbsp;# - gross pay 	<br>
+  &nbsp;&nbsp;&nbsp; date, &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; 
+#- date of payment 	format YYYYMMDD<br>
+  &nbsp;&nbsp;&nbsp; method, &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; #- specifies 
+mthod to use. currently only 1 	<br>
+  &nbsp;&nbsp;&nbsp; allowances&nbsp;&nbsp;&nbsp; #, - state allowances claimed, 
+integer<br>
+  &nbsp;&nbsp;&nbsp; period, &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; 
+#- annual, semiannual, quarterly, monthly, semimonthly, biweekly, weekly, 
+daily 	<br>
+  &nbsp;&nbsp;&nbsp; marital, &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; 
+#- single, married, spouseWorks, head<br>
+ &nbsp;&nbsp;&nbsp; federal, &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; 
+#- amount of federal tax withheld here<br>
+  &nbsp;&nbsp;&nbsp; fYTD, &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; 
+#- total federal tax withheld yeart to date<br>
+ &nbsp;&nbsp;&nbsp; round, &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; 
+#yes, no - defaults to yes<br>
+ )<br>
+  {<br>
+ &nbsp;&nbsp;&nbsp; #Step 1.1<br>
+ &nbsp;&nbsp;&nbsp; if period ne "annual"<br>
+ &nbsp; &nbsp; &nbsp; aGross = annualize(gross, period)<br>
+ &nbsp;&nbsp;&nbsp; #Step 1.2 <br>
+ &nbsp;&nbsp;&nbsp; aGross -= dataTables{$foundDate}-&gt;{standardDeduction}-&gt;{marital}<br>
+ &nbsp;&nbsp;&nbsp; #Step 1.3<br>
+ &nbsp; &nbsp; if allowances &gt;= 1<br>
+ &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; aGross -= dataTables{$foundDate}-&gt;{allowance1}-&gt;{marital}<br>
+ &nbsp; &nbsp; if allowances &gt;= 2<br>
+ &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; aGross -= dataTables{$foundDate}-&gt;{allowance2}-&gt;{marital}<br>
+ &nbsp; &nbsp; if allowances &gt;= 3<br>
+ &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; aGross -= dataTables{$foundDate}-&gt;{allowance3}-&gt;{marital}<br>
+ &nbsp; &nbsp; if allowances &gt;= 4<br>
+ &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; aGross -= dataTables{$foundDate}-&gt;{allowance4}-&gt;{marital}<br>
+ &nbsp; &nbsp; if allowances &gt;= 5<br>
+ &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; aGross -= (dataTables{$foundDate}-&gt;{allowance5}-&gt;{marital} 
+* (allowances -4))<br>
+ &nbsp;&nbsp;&nbsp; #Step 1.4<br>
+ &nbsp;&nbsp;&nbsp; aFed = annualize(federal, period) - dataTables{$foundDate}-&gt;{federalLimit}-&gt;{marital}<br>
+ &nbsp;&nbsp;&nbsp; #Step 1.5 done along the way and finished here<br>
+ &nbsp;&nbsp;&nbsp; aGross -= aFed<br>
+ <br>
+ &nbsp;&nbsp;&nbsp; #Step 2.1 &nbsp; lookup tables for percentages<br>
+ #need to place table in reverse oder so that we can know the top is <br>
+&nbsp; &nbsp;mGross = aGross<br>
+&nbsp;&nbsp;&nbsp; for (in reverse) <br>
+&nbsp; &nbsp; &nbsp; &nbsp;if mGross &gt;= bottom[x]<br>
+&nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp;&nbsp; if bottom[x] == 0<br>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; tax+= (mGross) *
+percent[x]<br>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; mGross = 0<br>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp; else<br>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; tax += (mGross -
+bottom[x] + .01) * percent[x] &nbsp;#bottom is inclusive<br>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; mGross = bottom[x]
+- .01<br>
+&nbsp; <br>
+ &nbsp;&nbsp;&nbsp; #Step 2.2<br>
+ &nbsp;&nbsp;&nbsp; tax = reverseAnnualize(tax, period)<br>
+ &nbsp;&nbsp; &nbsp;<br>
+ &nbsp;&nbsp;&nbsp; if round eq "no"<br>
+ &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; return tax<br>
+ &nbsp; &nbsp; else<br>
+ &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; return round(tax) #to whole number<br>
+ }<br>
+ <br>
+ #############!!!!!!!!!!!!!!!make the &nbsp;='s &nbsp; into &nbsp; =&gt;'s<br>
+  new()<br>
+  {<br>
+  &nbsp; &nbsp; $dataTables-&gt;{tables}<br>
+  &nbsp;&nbsp;&nbsp; dataTables{'20020101' =&gt; <br>
+ &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; { standardDeduction 
+=&gt; {single = '4700', married = '7850' , spouseworks = '3925', head ='6900' 
+},<br>
+ &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp; allowance1 
+=&gt; { single = '1200', married = '1200' , spouseworks = '1200', head = '3500'},<br>
+ &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp; allowance2 
+=&gt; { single = '1200', married = '1200' , spouseworks = '1200', head = '0'},<br>
+ &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp; allowance3 
+=&gt; { single = '1200', married = '1200' , spouseworks = '1200', head = '0'},<br>
+ &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp; allowance4 
+=&gt; { single = '1200', married = '1200' , spouseworks = '1200', head = '0'},<br>
+ &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp; allowance5 
+=&gt; { single = '1200', married = '1200' , spouseworks = '1200', head = '1200'},<br>
+ &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; 
+federalLimit = '5000', married = '10000' , spouseworks = '5000', head = '10000'} 
+,<br>
+ &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; 
+percentTable =&gt; <br>
+ &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; 
+&nbsp;&nbsp;&nbsp; {top = '1000.00', percent = '1.5' },<br>
+ &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; 
+&nbsp;&nbsp;&nbsp; {top = '2000.00', percent = '2.0' },<br>
+ &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; 
+&nbsp;&nbsp;&nbsp; {top = '3000.00', percent = '2.5' },<br>
+ &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; 
+&nbsp;&nbsp;&nbsp; {top = '4000.00', percent = '3.0' },<br>
+ &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; 
+&nbsp;&nbsp;&nbsp; {top = '5000.00', percent = '3.5' },<br>
+ &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; 
+&nbsp;&nbsp;&nbsp; {top = '6000.00', percent = '4.0' },<br>
+ &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; 
+&nbsp;&nbsp;&nbsp; {top = '7000.00', percent = '4.5' },<br>
+ &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; 
+&nbsp;&nbsp;&nbsp; {top = '8000.00', percent = '5.0' },<br>
+ &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; 
+&nbsp;&nbsp;&nbsp; {top = '9000.00', percent = '5.5' },<br>
+ &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; 
+&nbsp;&nbsp;&nbsp; {top = '-1', percent = '6.0' }<br>
+ &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; }<br>
+ &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; }<br>
+  &nbsp;&nbsp;&nbsp; dataTables{$foundDate}-&gt;{allowance1}-&gt;{marital}<br>
+ <br>
+   The periodDays hash holds the number of days in a period<br>
+ 
+<table cellpadding="2" cellspacing="2" border="0" width="50%">
+   <tbody>
+     <tr>
+       <td valign="top">periodDays-&gt;<br>
+       </td>
+       <td valign="top">{annual}<br>
+       </td>
+       <td valign="top">= 1<br>
+       </td>
+     </tr>
+     <tr>
+       <td valign="top"><br>
+       </td>
+       <td valign="top">{semiannual}<br>
+       </td>
+       <td valign="top">= 2<br>
+       </td>
+     </tr>
+     <tr>
+       <td valign="top"><br>
+       </td>
+       <td valign="top">{quarterly}<br>
+       </td>
+       <td valign="top">= 4<br>
+       </td>
+     </tr>
+     <tr>
+       <td valign="top"><br>
+       </td>
+       <td valign="top">{monthly}<br>
+       </td>
+       <td valign="top">= 12       </td>
+     </tr>
+     <tr>
+       <td valign="top"><br>
+       </td>
+       <td valign="top">{semimonthly}<br>
+       </td>
+       <td valign="top">= 24<br>
+       </td>
+     </tr>
+     <tr>
+       <td valign="top"><br>
+       </td>
+       <td valign="top">{biweekly}<br>
+       </td>
+       <td valign="top">= 26<br>
+       </td>
+     </tr>
+     <tr>
+       <td valign="top"><br>
+       </td>
+       <td valign="top">{weekly}<br>
+       </td>
+       <td valign="top">= 52<br>
+       </td>
+     </tr>
+     <tr>
+       <td valign="top"><br>
+       </td>
+       <td valign="top">{daily}<br>
+       </td>
+       <td valign="top">= 260<br>
+       </td>
+     </tr>
+   
+  </tbody> 
+</table>
+ <br>
+  }<br>
+     
+</body>
+</html>

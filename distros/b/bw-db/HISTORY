@@ -1,0 +1,11 @@
+2010-03-09 bw 1.1.1 -- bugfix - initializations for SQLite
+2010-03-08 bw 1.1.0 -- added experimental support for SQLite
+2010-02-02 bw 1.0.5 -- updated documentation
+2010-02-02 bw 1.0.4 -- first CPAN version - some cleanup and documenting
+2007-10-15 bw 1.0   -- fixed a small bug in sql_select - should now return
+                        empty data sets properly
+2007-07-16 bw 0.4   -- added sql_select_column and sql_select_value methods
+                    -- added 'socket' property for use in connecting database
+2007-05-18 bw       -- added insert method and fixed a few bugs
+2007-03-14 bw       -- initial release.
+

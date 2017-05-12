@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<payroll type="raw" version="1.1" date="20040730" period="semimonthly" genSysId="1234" startPeriod="20040716" endPeriod="20040730">
+  <person id="123456789" name="John Doe" marital="single">
+    <country name="US" gross="850.00" allow="1" withHold="5.00" grossYTD="0.00" federalYTD="0.00" method="">
+      <state name="MO" gross="850.00" allow="1" withHold="5.00" method="">
+        <local name="St. Louis" gross="0.00" allow="0" withHold="0.00" method=""/>
+        <local name="Kansas City" gross="0.00" allow="0" withHold="0.00" method=""/>
+      </state>
+      <mileage>96</mileage>
+    </country>
+    <adjustment name="Supply Expense" comment="Sharpees" value="5.25"/>
+    <adjustment name="Supply Expense" comment="Expect Book" value="35.75"/>
+    <adjustment name="Payroll" comment="Overpay for 20020915" value="-15.75"/>
+  </person>
+  <person id="234567890" name="Jason Doe" marital="single">
+    <country name="US" gross="0.00" allow="0" withHold="0.00" grossYTD="0.00" federalYTD="0.00" method="">
+    </country>
+  </person>
+</payroll>

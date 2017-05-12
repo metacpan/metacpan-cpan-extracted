@@ -1,0 +1,125 @@
+NAME
+    bitflag::ct - = bitflag + grouping
+
+SYNOPSIS
+   Group of Flags by handle variable
+    "package A1;"
+            require Exporter;
+            EXPPORT_OK = qw( getmask $mc1 $mc2 );
+            our ($mc1,$mc2);
+            use bitflag::ct {handle=>\$mc1}, qw(I1 I2 I3 ...);
+            use bitflag::ct {handle=>\$mc2}, qw(J1 J2 J3 ...);
+
+    "package C1;"
+            use A1 qw(getmask $mc1 $mc2);
+            $u = $mc1->getmask(qw(K3 K5 K11 ...));
+            $v = $mc2->getmask(qw(L3 L8 L5 ...));
+
+   Group of Flags by handle constant
+    "package A2;"
+            require Exporter;
+            EXPPORT_OK = qw( getmask fgroupG fgroupH );
+            use bitflag::ct { handle => 'fgroupG' }, qw(I1 I2 I3 ...);
+            use bitflag::ct { handle => 'fgroupH' }, qw(J1 J2 J3 ...);
+
+    "package C2;"
+            use A2 qw( getmask fgroupG fgroupH );
+            $u = fgroupG->getmask(qw(K3 K5 K11 ...));
+            $v = fgroupH->getmask(qw(L3 L8 L5 ...));
+
+   Group associated to module name
+    "package A3; "
+            use bitflag::ct qw(K1 K2 ...);
+
+        Series of constants "K1,K2,K3 ..." now available with values
+        "1,2,4,.."
+
+            do  something with constants K1, K3|~K4 and the like
+            sub f
+            {
+                $v = getmask A @_
+                ...
+            }
+
+    "package B3; "
+            use bitflag::ct qw(L1 L2 ...);
+
+            sub g
+            {
+                $w = getmask B @_
+                ...
+            }
+
+    "package C3;"
+            use A3;
+            use B3;
+            A3::f(qw(K3 K5 K11 ...));    # sample choices
+            B3::g(qw(L3 L8 L5 ...));
+
+        Inside "A3::f" from "$v=getmask A3 @_" the arguments arrive as
+        "K3|K5|K11", Likewise "B3::g" from "$w=getmask B3 @_" as "L3|L8|L5".
+
+DESCRIPTION
+    Have a look at pragma 'bitflag' before reading this. If just one group
+    of names for different bitflag are considered in an application then
+    module 'bitflag' is the slim solution. Only if different groups of
+    bitflag need either distinct namespaces or individual options this
+    class is the right solution.
+
+    When necessity arise to upgrade from using 'bitflag' to 'bitflag::ct'
+    this can easily be done: If a second group will be required in the same
+    package, handles must be introduced, one for each group. This handle can
+    be referred to either by a variable or a constant. Code-snippets before
+    upgrade look like
+
+        package A;
+        use bitflag qw(V1 V2 ...);         (1)     define in package A
+
+        package C;
+        A:getmask qw(...);                  (2)     call from package C
+
+    upgrading replaces above code lines (1),(2) by
+
+        use bitflag::ct {handle=>\$vhandle} qw(V1 V2 ...); (1)
+        $vhandle->getmask qw(...);                          (2)
+
+    or by
+
+        use bitflag::ct {handle=>'hc'} qw(V1 V2 ...);      (1)
+        hc->getmask qw(...);                                (2)
+
+    If the second group is located in another package, say "B", the clause
+    "use bitflag::ct" can be applied without 'handle' in which case the
+    package names "A, B" shall replace the handle object in front of its
+    method "getmask". Doing so, a default handle is automatically created
+    for the surrounding package. When expression "A->gethandle(...)" gets
+    evaluated by the interpreter, the token "A" first will be substituted by
+    the default handle provided in package "A".
+
+OPTIONS
+    As with bitflag a hash may be given as first argument in order to
+    specify options. Option names "sm" and "ic" are described in manpage
+    bitflag, the new option "handle" was presented now. A further new
+    option is
+
+        alias => \&reducer
+
+    Similar to 'ic' this allow using alias definitions of the flagnames when
+    used as arguments of "getmask". That is, if a bitflag name, say
+    'CHECK_X', is introduced with
+
+        use bitflag::ct ... CHECK_X ...
+
+    a string $cx is accepted as "CHECK_X", if
+    "reducer($cx)=reducer('CHECK_X')". The string representation of the
+    builtin functions "uc,lc,ucfirst" can be used as reducers in place of
+    "sub {uc $_[0]}, ...".
+
+AUTHOR
+    Josef Schönbrunner <j.schoenbrunner@schule.at>
+
+COPYRIGHT AND LICENSE
+    Copyright (c) 2008 by Josef Schönbrunner This library is free software;
+    you can redistribute it and/or modify it under the same terms as Perl
+    itself, either Perl version 5.8.7 or, at your option, any later version
+    of Perl 5 you may have available.

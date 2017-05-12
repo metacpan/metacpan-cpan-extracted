@@ -1,0 +1,44 @@
+BUGS
+CHANGES
+lib/bigint.pm
+lib/bignum.pm
+lib/bigrat.pm
+lib/Math/BigFloat/Trace.pm
+lib/Math/BigInt/Trace.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+README
+t/00sig.t
+t/01load.t
+t/02pod.t
+t/03podcov.t
+t/author-bigint-hex.t
+t/author-bigint-oct.t
+t/big_e_pi.t
+t/bigexp.t
+t/bigint.t
+t/bignum.t
+t/bigrat.t
+t/bii_e_pi.t
+t/biinfnan.t
+t/bir_e_pi.t
+t/bn_lite.t
+t/bninfnan.t
+t/br_lite.t
+t/brinfnan.t
+t/in_effect.t
+t/infnan.inc
+t/option_a.t
+t/option_l.t
+t/option_p.t
+t/overrides.t
+t/ratopt_a.t
+t/scope_f.t
+t/scope_i.t
+t/scope_r.t
+TODO
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)
+SIGNATURE                                Public-key signature (added by MakeMaker)

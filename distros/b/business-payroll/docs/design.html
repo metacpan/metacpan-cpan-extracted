@@ -1,0 +1,70 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+  <title>PCX Payroll System</title>
+                    
+  <meta http-equiv="content-type"
+ content="text/html; charset=ISO-8859-1">
+</head>
+  <body>
+   <b>Payroll Design notes</b><br>
+   <br>
+   <b>modules</b><br>
+   <br>
+ <a href="Payroll.html">  Payroll</a><br>
+   Payroll::XML<br>
+   Payroll::US<br>
+   <a href="StateIncome.html">Payroll::US::MO::StateIncome</a><br>
+   <a href="FedIncome.html">Payroll::US::FedIncome</a><br>
+   <a href="FICA.html">Payroll::US::FICA</a><br>
+   <a href="Medicare.html">Payroll::US::Medicare</a><br>
+   Payroll::US::MO::&lt;local&gt;<br>
+   Payroll::Canada<br>
+   <br>
+   All withholding modules should return negative numbers.  Any crediting 
+modules should return positive numbers.<br>
+   <br>
+   Payroll<br>
+   The Payroll module's new method will setup the Payroll system. &nbsp;The
+process() method will call Payroll::XML::Parser modules to change the XML
+input into the Perl data object (Payroll::XML::Data) that  the countries
+can then work with. &nbsp;It will then call the  proper country module passing
+in the data object and the output object/hash.  The resulting object is the
+XML module Payroll::XML::Output.  Calling the  generate() method will create
+the output XML document. &nbsp;Pass in a list  of supported countries to
+the Parser.<br>
+   <br>
+ Payroll-&gt;new()<br>
+  Payroll-&gt;process(fileName =&gt; , string =&gt;)<br>
+  <br>
+   Payroll::XML::Parser<br>
+   Validates and then changes XML input to data object. <br>
+  <br>
+   Payroll::XML::Data<br>
+   The data object that XML is turned into. <br>
+  <br>
+   Payroll::XML::Output<br>
+   Changes output object into XML.  Holds the output data and generate the
+ output XML based on that data. <br>
+  <br>
+  The US module may be configured to call the proper sub modules and return
+ a shallow hash of the data:<br>
+  Payroll::US-&gt;calculate(gross, date, method, allowances, period, marital, 
+grossYTD)<br>
+  &nbsp; returns hash of {FedIncome} = X, {Medicate} = Y, {FICA} = Z<br>
+  <br>
+ <b>API</b> for individual tax modules. &nbsp;These modules will simply take 
+ the data given and figure out the tax. &nbsp;Of course the date will affect 
+ which rates are used.  The modules will return a float (rounded to 2 decimals)
+ or <i>undef</i><br>
+   <br>
+   <a href="FedIncome.html">FedIncome-&gt;calculate( gross, date, method, 
+allowances, period, marital)</a><br>
+   <a href="StateIncome.html">StateIncome-&gt;calculate( gross, date, method,
+ allowances, period, marital, federal, fYTD)</a><br>
+   <a href="FICA.html">FICA-&gt;calculate( gross, date, YTD)</a><br>
+   <a href="Medicare.html">Medicare-&gt;calculte( gross, date )</a> <br>
+  <br>
+ <br>
+</body>
+</html>

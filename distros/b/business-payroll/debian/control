@@ -1,0 +1,18 @@
+Source: libbusiness-payroll-perl
+Section: perl
+Priority: optional
+Build-Depends-Indep: debhelper (>= 3.0.5), perl (>= 5.8.0-7)
+Maintainer: James A. Pattie <james@pcxperience.com>
+Standards-Version: 3.6.1
+
+Package: libbusiness-payroll-perl
+Architecture: all
+Depends: perl (>= 5.8.0), libxml2 (>= 2.4.22), libxml-sax-perl (>= 0.10), libxml-namespacesupport-perl (>= 1.07), libxml-libxml-perl (>= 1.51)
+Conflicts: libpayroll-perl
+Description:  Business::Payroll
+ The Business::Payroll modules provide the routines and data structures 
+ necessary to calculate federal, state and local taxes.  It is designed to be 
+ globally useful, but only US support has been implemented.  
+ .
+ If you are in any other state than Missouri, we would appreciate your state
+ supported. :)

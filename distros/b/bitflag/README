@@ -1,0 +1,82 @@
+NAME
+    bitflag - Simplify export of bitflag names
+
+SYNOPSIS
+    "package SomeModule;"
+            use bitflag qw(V1 V2 ...);
+
+        Series of constants "V1,V2,V3 ..." now available with values
+        "1,2,4,.."
+
+            do  something with constants V1, V3|~V4 and the like ;
+            sub anyFunc
+            {
+                $v = getmask @_;
+                ...
+            }
+
+    "package AnotherModule;"
+            use SomeModule;
+            SomeModule::anyFunc(qw(V3 V5 V11 ...))
+
+        Inside "SomeModule::anyFunc" with assignment "$v=getmask(@_)" these
+        arguments arrive as "V3|V5|V11"
+
+DESCRIPTION
+   Core Features
+    "use bitflag qw(V1 V2 ...)" defines a series of constants which denote
+    different bitflag in the calling module, say "package SomeModule". The
+    constants are used as ordinary names, usually making up boolean
+    expressions by bitwise operation-combinations. If "AnotherModule" calls
+    "SomeModule" and refers to the flagnames, export of the names would be
+    demanded. Yet unlike in "SomeModule" the binary 'or' will be the only
+    opreation needed to combine the flags. E.g., if "alfa, beta, gamma,
+    delta, fi" are names for "1,2,4,8,16", a choice term "beta|delta|fi"
+    could be used in "AnotherModule". Pragma "bitflag" makes the export of
+    the flagnames dispensable, as it represents the choice term as
+    "getmask(qw(beta delta fi))". "getmask()" converts a list of strings
+    containing names of flags into the boolean union of those flags. Thus
+    the export of a lot of symbols is reduced to the export of a sole
+    subname, "getmask()", which is defined in "package bitflag" and
+    exported by default to "SomeModule". Coupling of packages is diminished
+    this way.
+
+   Special Features
+    Multiple uses of ""bitflag"" may occur in a package. "use bitflag
+    @thislist" and "use bitflag @thatlist", regardless whether adjacent or
+    separated in code, do the same as "use bitflag @thislist,@thatlist".
+    However, a second statement could also determine values of a separate
+    range. If, in contrast to above specifications, the first argument of
+    "use bitflag" is a hash and not a string, it represents a collection of
+    options that can
+
+    1.  override the value of the starting flag -- apply option "sm=>$m"
+
+    2.  allow deviation of the case of characters in arguments of "getmask"
+        -- with option "ic=>1".
+
+    One can write, e.g., "use bitflag {sm=>128, ic=>1}..."
+
+    Furthermore, "use bitflag {sm=>$m}..." can be abbreviated to "use
+    bitflag $m...".
+
+   Multiple uses
+    By option "sm=>$number" one can define another name for a value already
+    assigned by a prior "use bitflag".
+
+    Furthermore "use bitflag" could be called from different packages in
+    one application run. If so, the module loaded later shall continue
+    counting where the earlier module stopped, i.e. if "ModuleA::LASTFLAG"
+    is 256, calling "use bitflag FIRSTFLAG, ..." in "ModuleB" makes
+    "ModuleB::FIRSTFLAG" being 512. If "ModuleB" use other names
+    independently to "ModuleA" it makes sense to restart with value 1 by
+    using "{sm=>1}" as first parameter.
+
+AUTHOR
+    Josef Schönbrunner <j.schoenbrunner@schule.at>
+
+COPYRIGHT AND LICENSE
+    Copyright (c) 2008 by Josef Schönbrunner This library is free software;
+    you can redistribute it and/or modify it under the same terms as Perl
+    itself, either Perl version 5.8.7 or, at your option, any later version
+    of Perl 5 you may have available.

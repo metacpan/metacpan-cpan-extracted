@@ -1,0 +1,10 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/BBPerl.t
+t/hostname.t
+t/localhost.t
+t/fqdn.t
+t/maxmsgs.t
+lib/BBPerl.pm

@@ -1,0 +1,360 @@
+2016-12-13 v0.47 pjacklam
+
+ * Add more logic to Makefile.PL regarding INSTALLDIRS (CPAN RT #119199
+   and #119225).
+
+2016-12-11 v0.46 pjacklam
+
+ * Fix Makefile.PL so that this module installs over the core version.
+
+2016-12-03 v0.45 pjacklam
+
+ * Use ExtUtils::MakeMaker rather than Module::Install in Makefile.PL
+
+ * Remove INSTALL file. The information is in the README file.
+
+ * Improve documentation in BUGS and SUPPORT sections in POD in bignum.pm,
+   bigint.pm, and bigrat.pm.
+
+ * Remove unused variables in Math/BigInt/Trace.pm and Math/BigFloat/Trace.pm
+
+ * Update README and BUGS files.
+
+ * Remove code that was accidentally left in t/infnan.inc after debugging.
+
+ * Remove author information in LICENSE file.
+
+ * Trim whitespace.
+
+ * CHANGES file now has the same formatting as other Math::BigInt-related
+   distributions.
+
+2016-11-15 v0.44 pjacklam
+
+ * Update bundled Module::Install from version 1.16 to version 1.17.
+
+ * Replace function calls with method calls.
+
+ * Include patch for CPAN RT #116506.
+
+2016-07-09 v0.43 pjacklam
+
+ * Replace function calls with method calls.
+
+2016-01-05 v0.42 pjacklam
+
+ * "use strict" and "use warnings" everywhere.
+
+ * Reformat some if the code according to the "perlstyle" man page. It makes
+   the code easier for read, for me at least.
+
+ * Add descriptions to tests.
+
+ * Reorder CHANGES to chronological order.
+
+ * Use bpi() as a class method, not a function.
+
+ * Replace "use vars ..." with "our ...".
+
+ * More descriptive variable names.
+
+ * Start POD sections with =pod
+
+ * Allow "nan", "inf", and "infinity", and ingore case, since core Perl allows
+   these. We want to be compatible. Add tests to "infnan.inc".
+
+2015-09-25 v0.41 pjacklam
+
+ * hex() and oct() now have the same semantics as the corresponding core
+   functions. E.g., hex("cat") returns 202 and a warning "Illegal hexadecimal
+   digit 't' ignored at ..." rather than NaN.
+
+ * Added test files auth-bigint-hex.t and auth-bigint-oct.t.
+
+ * Minimum required version of the Math-BigInt distro is now 1.992.
+
+2015-09-22 v0.40 pjacklam
+
+ * Sync with blead.
+
+ * Update author information in Makefile.PL.
+
+2015-09-14 v0.39 pjacklam
+
+ * bignum tests: use eval-block instead of eval-string
+
+ * bignum tests: use eval block to load Math::BigInt::Lite
+
+ * Set version number in all .pm files to 0.39.
+
+ * Display information about module versions in 01load.t.
+
+2015-08-28 v0.38 pjacklam
+
+ * Synchronise with blead perl.
+
+ * Minimum required Math-BigInt is v1.88.
+
+ * Update bundled Module::Install from v1.08 to v1.16.
+
+2014-04-03 v0.37 pjacklam
+
+ * Synchronise with blead perl.
+
+ * Added new '00sig.t', '01load.t', '02pod.t', and '03pod_cov.t'.
+
+ * Removed old 'pod.t' and 'podcov.t'
+
+2012-09-11 rafl 0.30 302 tests
+
+ * Synchronise with blead perl.
+
+2011-08-08 rafl 0.29 302 tests
+
+ * Synchronise with blead perl.
+
+2011-07-09 rafl 0.28 302 tests
+
+ * Synchronise with blead perl.
+
+2010-09-15 rafl 0.25 302 tests
+
+ * Synchronise with blead perl
+   Only changes in the tests.
+
+2010-09-04 rafl 0.24 301 tests
+
+ * Apply changes from blead perl
+   Mostly POD fixes and minor test tweaks.
+
+2008-04-05 Tels 0.23 301 tests
+
+ * require Math::BigInt v1.88
+
+ * require Math::BigRat v0.21
+
+ * update bundles Module::Install
+
+ * require Perl 5.006 (vs. 5.006002), should work with that
+
+2007-06-30 Tels 0.22 301 tests
+
+ * make the pragmas lexical, so that "no bigint;" etc. works
+
+ * make "use bigint; use bignum;" not warn about redefining "inf" and "NaN"
+   This also means a "use bigint;" will not override any already existing
+   "inf" or "NaN" routine
+
+ * require Math::BigInt v1.87
+
+ * fix #27059: t/option_l.t fails
+
+ * on Perl 5.9.4 or later: "overload" hex() and oct() with lexical routines
+   that also handle arbitrary big integers
+
+ * for all Perls: make "use bigint qw/hex oct/" export global hex() and oct()
+   routines that work with big integers
+
+ * make bignum.pm and bigrat.pm re-use code from bigint.pm
+
+ * add exportable bpi() and bexp() methods
+
+ * add exportable PI and e constants
+
+2007-04-17 Tels 0.21 205 tests
+
+ * require Math::BigInt v1.83
+
+ * require Math::BigRat v0.19
+
+ * add support for "try" and "only"
+
+ * fix licence field back to "perl"
+
+2007-04-09 Tels 0.20 198 tests
+
+ * require Math::BigInt v1.82
+
+ * require Math::BigRat v0.18
+
+ * add a test for bug #18025:
+   "bignum/bigrat can lead to a number that is both 1 and 0"
+
+ * POD test needs Test::Pod::Coverage 1.08 to work
+
+2007-02-03 Tels 0.19 194 tests
+
+ * require Math::BigInt v1.79
+
+ * require Perl v5.6.2
+
+ * add Build.PL
+
+ * use Module::Install
+
+ * remove PREREQ_FATAL since the toolchain is broken
+
+ * apply spelling fixes to POD
+
+2007-01-27 Tels 0.18 194 tests
+
+ * require Math::BigInt 1.78
+
+ * add support for octal constants
+
+ * use PREREQ_FATAL
+
+ * add POD tests
+
+2005-04-03 Tels 0.17 184 tests
+
+ * remove the default library 'Calc', and let Bigint et. al. decide instead
+   which library to load as default
+
+2005-01-01 Tels 0.16 184 tests
+
+ * option "l", "a", and "p" did not work under -Mbigrat
+
+ * little doc fixes
+
+ * add more tests, convert some testfiles to Test::More
+
+2004-03-12 Tels 0.15 175 tests
+
+ * small nitpick fix for Math::BigInt v1.70
+
+2003-07-04 Tels 0.14 175 tests (released)
+
+ * small nits fixed
+
+ * allow parameters a and p for bigrat
+
+2002-12-12 Tels 0.14a 175 tests (not released)
+
+ * added doc about shallow copies like $x = $y and method calls
+
+ * precision()/accuracy()/round_mode() save now one call and are thus faster
+
+ * bigrat() now calls Math::BigRat->precision|accuracy|round_mode, too
+
+ * distribution is now signed, go to http://bloodgate.com/tels.asc for key
+
+2002-08-24 v0.13 Tels
+
+ * added a LOT to the documentation
+
+ * tests don't go "huh" anymore
+
+ * bninfnan.t has the correct setup for testing in the core
+
+2002-08-13 v0.12 Tels
+
+ * INSTALLDIRS => perl
+
+ * document that use bignum/bigint/bigrat is global, not only in current block
+
+ * added default exported inf() and NaN() routines to fix the second example:
+   perl -Mbignum -e 'print 1 + inf,"\n"'
+   perl -Mbignum -e 'print inf + inf,"\n"'
+
+ * tests for inf()/NaN()
+
+2002-03-25 v0.11 Tels
+
+ * testsuite failed under Lite due to specific tests for MBI
+
+ * removed the printing of "Loading ..." to STDERR (interfered w/ something)
+
+ * more tests for bigrat and bignum
+
+ * trace.t remvoed due to VMS problems
+
+2002-03-17 v0.10 Tels
+
+ * bigint: handle floating point constants like '4.5', '45e-1', '4.56e1' by
+           truncating them to integer, so:
+   perl -Mbigint -le 'print 4.5+4.5'
+   8
+
+2002-03-12 v0.09 Tels
+
+ * added bigint.pm as a better way of perl -MMath::BigInt=:constant
+
+ * tests for that
+
+ * bigrat: some typos
+
+2002-03-11 v0.08 Tels
+
+ * doc fixes/types and 'l' is equal to 'lib' (thanx to Dan Sullivan)
+
+ * added tests for l, lib, and foo (the latter is expected to die)
+
+ * uses Math::BigInt::Lite when it finds it, otherwise just plain M::BI
+
+ * added tests for loading of Lite
+
+ * version output includes Math::BigInt::Lite when it was used
+
+ * rewritten README and INSTALL document
+
+2002-03-05 v0.07 Tels
+
+ * new options: a (accuracy) and p (precision)
+
+ * doc and tests improved quite a lot
+
+2002-02-26 v0.06 Tels
+
+ * options can now be in short (one letter) or long form
+
+ * new option: t or trace
+
+ * old option: v or version
+
+ * included Math::BigInt::Trace for trace
+
+2002-02-24 v0.05 Tels
+
+ * Comes now in two flavours: Normal (bignum) and Rat-flavoured (bigrat)
+       te@null:~ > perl -Mbignum=v
+       Math::BigInt     v1.52 lib => Math::BigInt::Calc v0.23
+       Math::BigFloat   v1.29
+       te@null:~ > perl -Mbigrat=v
+       Math::BigInt     v1.52 lib => Math::BigInt::Calc v0.23
+       Math::BigFloat   v1.29
+       Math::BigRat     v0.02
+
+2002-02-21 v0.04 Tels
+
+ * added :constant to Math::BigFloat loading and tests for it
+
+ * added v to import to print version and exit:
+
+       te@null:~ > perl -Mbignum=v
+       Math::BigInt     v1.51 lib => Math::BigInt::Calc v0.22
+       Math::BigFloat   v1.28
+       Math::BigRat     v0.02
+       te@null:~ > perl -Mbignum=v,lib,Pari
+       Math::BigInt     v1.51 lib => Math::BigInt::Pari v1.07
+       Math::BigFloat   v1.28
+       Math::BigRat     v0.02
+
+2002-02-10 v0.03 Tels
+
+ * renamed to bignum
+
+ * added dependency and loading of Math::BigRat
+
+2002-01-29 v0.02 Tels
+
+ * AUTOLOAD, cleaned up a bit
+
+2002-01-29 v0.01 Tels
+
+ * first version
+
+Please send me test-reports, your experiences with this and your ideas - I love
+to hear about my work!
+
+Tels <http://bloodgate.com/>

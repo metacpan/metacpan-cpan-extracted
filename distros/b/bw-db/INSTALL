@@ -1,0 +1,16 @@
+BW::DB by Bill Weinman
+http://bw.org/
+
+17 February 2010
+
+-------------------------------------------------------------------------
+
+To install BW::DB:
+
+    tar zxf bw-db-1.0.4.tar.gz
+    cd bw-db-1.0.4
+    perl Makefile.PL
+    make
+    make test
+    make install    
+

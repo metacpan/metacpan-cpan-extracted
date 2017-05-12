@@ -1,0 +1,20 @@
+Build.PL
+Changes
+lib/basis.pm
+Makefile.PL
+MANIFEST
+META.json
+META.yml			# Will be created by "make dist"
+README
+t/00-load.t
+t/01-import.t
+t/02-load-parent.t
+t/03-import-with-parent.t
+t/05-die_without_sub_uplevel.t
+t/06-file1.t
+t/lib/Biga.pm
+t/lib/Boo.pm
+xt/boilerplate.t
+xt/pod-coverage.t
+xt/pod-spelling.t
+xt/pod.t

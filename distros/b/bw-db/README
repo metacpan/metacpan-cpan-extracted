@@ -1,0 +1,20 @@
+BW::DB by Bill Weinman
+http://bw.org/
+
+17 February 2010
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as Perl itself.
+
+-------------------------------------------------------------------------
+BW::DB is the dataabse module for BW-Lib. 
+
+BW::DB provides a simple wrapper for DBI. Currently it only supports 
+DBD::mysql. PostgreSQL and SQLite support is planned for the near
+future. 
+
+NOTE: Please do not use BW::DB::CRUD for any new coding. It's unfinished 
+and the interface WILL change in the future. 
+
+See INSTALL for installation instructions. 
+

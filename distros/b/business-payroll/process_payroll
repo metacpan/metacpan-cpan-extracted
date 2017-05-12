@@ -1,0 +1,64 @@
+#! /usr/bin/perl
+# process_payroll - Uses the Business::Payroll module to actually process the 
+# specified raw XML document and spits out the result on stdout.  Any errors on 
+# stderr.
+use strict;
+use Business::Payroll;
+
+my $debug = 0;
+my $file = "";
+my $outfile = "";
+
+if (defined @ARGV[0])
+{
+  $file=@ARGV[0];
+}
+else
+{
+  die "Usage: process_payroll <file.xml>\nYou must specify the file to process.\n";
+}
+if (defined @ARGV[1])
+{
+  $outfile = @ARGV[1];
+}
+
+print "Using file: $file\n\n" if $debug;
+my $errStr = "(process_payroll) - Error:";
+
+# do error checking
+if ($file ne "-" && ! -e $file)
+{
+  die "$errStr  file = '$file' does not exist!\n";
+}
+if ($outfile eq "-")
+{
+  die "$errStr  outfile = '$outfile' is invalid!\n";
+}
+
+my $payrollObj = Business::Payroll->new();
+
+my $dataObj = undef;
+
+eval { $dataObj = $payrollObj->process(file => $file); };
+if ($@)
+{
+  die "$errStr  Eval failed: $@\n";
+}
+
+my $result = "";
+eval { $result = $dataObj->generateXML; };
+if ($@)
+{
+  die "$errStr  Eval failed: $@\n";
+}
+
+if ($outfile)
+{
+  open FILE, ">$outfile" or die "$errStr  Could not create file '$outfile'!";
+  print FILE $result;
+  close FILE;
+}
+else
+{
+  print $result;
+}

@@ -1,0 +1,9 @@
+Revision history for Perl extension bare.pm
+
+0.02 Tue Apr 29 21:52:13 EDT 2014 r3842
+   - fix test scripts to account for lack of utf8 sub names
+     on perl <= 5.8.1
+
+0.01 Sun Apr 27 00:18:12 EDT 2014 r3834
+   - initial release
+

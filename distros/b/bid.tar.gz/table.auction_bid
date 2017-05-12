@@ -1,0 +1,17 @@
+#------------------------------------------------------------------------------
+#
+# Modification History
+#
+# Auth    Date       Description
+# ------  ---------  ----------------------------------------------------------
+# mwk     17 Oct 01  Wrote this  
+#------------------------------------------------------------------------------ 
+CREATE TABLE auction_bid (
+ bid_id     BIGINT(20) UNSIGNED NULL AUTO_INCREMENT,
+ itemid     MEDIUMINT(8) unsigned not null default '0',
+ bid        BIGINT(20) unsigned not null default 0,
+ bid_date   DATE NOT NULL default '',
+ bid_time   TIME NOT NULL default '',
+ customerid BIGINT(20) unsigned not null default '0',
+ PRIMARY KEY (bid_id)
+)

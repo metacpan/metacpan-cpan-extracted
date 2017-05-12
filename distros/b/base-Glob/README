@@ -1,0 +1,36 @@
+Status:
+
+First release of base::Glob.  Suggestions/bug reports/patches greatly 
+appreciated.
+
+Description:
+
+This module allows you to extend base.pm to form IS-A relationships 
+with the use of globbing patterns on packages in the symbol table.
+
+Installation:
+
+base::Glob has dependencies on these modules, all available from CPAN:
+
+ Text::Glob      - see the Text::Glob POD for types of glob to use
+ Devel::Symdump  - used to walk the symbol table and find packages
+ Sub::Uplevel    - to trick base::import into letting us mangle @_
+
+Usual CPAN installation rules apply:
+
+ perl Makefile.PL 
+ make
+ make test
+ make install
+
+There is documentation - including sample usage - in Glob.pm itself. 
+
+Copyright:
+
+Copyright (c) 2002 Chris J. Ball.  All rights reserved.  This
+package is free software; you can redistribute it and/or modify 
+it under the same terms as Perl itself.
+
+--  
+Chris Ball.
+chris@cpan.org || http://printf.net/

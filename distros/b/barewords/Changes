@@ -1,0 +1,6 @@
+Revision history for Perl extension barewords.
+
+0.01  Wed Jul  6 18:19:12 2005
+	- original version; created by h2xs 1.23 with options
+		-AXn barewords
+

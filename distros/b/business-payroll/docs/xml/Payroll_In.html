@@ -1,0 +1,88 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head><title>Payroll In</title>
+  
+                                       
+  <meta http-equiv="content-type" content="text/html; charset=ISO-8859-1"></head>
+<body>
+    Incoming Payroll XML Document<br>
+    <br>
+   &lt;payroll type="raw" version="1.1" date="" period="" genSysId="" startPeriod="" endPeriod=""&gt;<br>
+    &nbsp;&nbsp;&nbsp; &lt;person id="" name="" marital="single"&gt;<br>
+    &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &lt;country name="" gross="" allow=""
+ withHold="" grossYTD="" federalYTD="" method=""&gt;<br>
+     &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &lt;state name=""
+ gross="" allow="" withHold="" method=""&gt;<br>
+    &nbsp;&nbsp;&nbsp; &nbsp;&nbsp; &nbsp; &nbsp;&nbsp; &nbsp;&nbsp;&nbsp;
+ &lt;local name="" gross="" allow="" withHold="" method=""/&gt;<br>
+    &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &lt;/state&gt;<br>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &lt;mileage&gt;value&lt;/mileage&gt;<br>&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &lt;/country&gt;<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &lt;adjustment name="" value=""
+comment=""/&gt;<br>
+&nbsp; &nbsp; &lt;/person&gt;<br>
+     &lt;/payroll&gt;<br>
+   <br>
+    specify a &lt;location&gt; for each country, state, local combination
+that  applies to the person's payroll entry.<br>
+    local does not have to be defined.<br>
+   <br>
+   state does not have to be defined.<br>
+<br>
+mileage does not have to be defined, but can only be defined once per country.<br>
+<br>
+adjustment does not have to be defined, but can be defined more than once.<br>
+    <br>
+    Ex.<br>
+    <br>
+    &lt;payroll type="raw" version="1.1" date="20020415" period="semimonthly"
+genSysId="12345" startPeriod="20020401" endPeriod="20020415"&gt;<br>
+    &nbsp;&nbsp;&nbsp; &lt;person id="123456789" name="John Doe" marital="single"&gt;<br>
+    &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &lt;country name="US" gross="1000.00"
+ allow="1" withHold="1.00" grossYTD="3000.00" federalYTD="100.00" method=""&gt;<br>
+     &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &lt;state name="MO"
+ gross="400.00" allow="0" withHold="5.00" method=""&gt;<br>
+    &nbsp;&nbsp;&nbsp; &nbsp;&nbsp; &nbsp; &nbsp;&nbsp; &nbsp;&nbsp;&nbsp;
+ &lt;local name="St. Louis" gross="0.00" allow="0" withHold="1.00" method=""/&gt;<br>
+    &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &lt;/state&gt;<br>
+     &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &lt;state name="IL"
+ gross="600.00" allow="0" withHold="5.00" method=""&gt;<br>
+     &nbsp;&nbsp;&nbsp; &nbsp;&nbsp; &nbsp; &nbsp;&nbsp; &nbsp;&nbsp;&nbsp;
+ &lt;local name="E. St. Louis" gross="10.00" allow="1" withHold="0.00" method=""/&gt;<br>
+     &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &lt;/state&gt;<br>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &lt;mileage&gt;30&lt;/mileage&gt;<br>
+&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &lt;/country&gt;<br>
+&nbsp; &nbsp; &nbsp; &nbsp; &lt;adjustment name="Reimbursement" value="5.25"
+comment="Sharpees"/&gt;<br>
+&nbsp; &nbsp; &nbsp; &nbsp; &lt;adjustment name="Correction" value="-15.75"
+comment="Overpay for 20020915"/&gt;<br>
+    &nbsp; &nbsp; &lt;/person&gt;<br>
+     &lt;/payroll&gt;<br>
+   <br>
+    Perl data structure:<br>
+    <br>
+    data = { version, date, persons, period, genSysId, startPeriod, endPeriod }<br>
+    where persons =&nbsp; array of persons.<br>
+genSysId is an identifier that the generating system associated with this
+payroll.<br>
+startPeriod and endPeriod are dates that define the start and end date of the payroll period being processed.<br>
+    <br>
+    In each person, { id, name, countries, marital, adjustments }<br>
+    where countries = array of country entries.<br>
+where adjustments = array of adjustment entries.<br>
+    <br>
+    In each country , {name,&nbsp; states,&nbsp; gross, allow, withHold,
+grossYTD,  federalYTD, method, mileage }<br>
+    In each state , {name,&nbsp; locals,&nbsp; gross, allow, withHold, method}<br>
+   <br>
+   In each local, { name, gross, allow, withHold, method }<br>
+       <br>
+In each adjustment, { name, value, comment }<br>
+The comment does not have to have a value and will only be output if a value
+is specified.<br>
+<br>
+Changes from 1.0 -&gt; 1.1:<br>
+
+<ul>
+<li>Added startPeriod, endPeriod attributes to the &lt;payroll&gt; tag.</li>
+</ul>
+
+<br>
+</body></html>

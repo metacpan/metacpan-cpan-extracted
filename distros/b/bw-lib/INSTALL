@@ -1,0 +1,16 @@
+BW-Lib by Bill Weinman
+http://bw.org/
+
+17 February 2010
+
+-------------------------------------------------------------------------
+
+To install BW-Lib:
+
+    tar zxf BW-Lib-1.3.tar.gz
+    cd BW-Lib-1.3
+    perl Makefile.PL
+    make
+    make test
+    make install    
+

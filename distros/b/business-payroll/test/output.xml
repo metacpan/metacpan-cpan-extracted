@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<payroll type="cooked" version="1.1" date="20040730" period="semimonthly" genSysId="1234" startPeriod="20040716" endPeriod="20040730">
+  <person id="123456789" name="John Doe">
+    <item name="US Federal" value="-84.00"/>
+    <item name="US Medicare" value="-12.33"/>
+    <item name="US FICA" value="-52.70"/>
+    <item name="US MO" value="-27.00"/>
+    <item name="US Mileage" value="34.56"/>
+    <item name="Supply Expense" value="5.25" comment="Sharpees"/>
+    <item name="Supply Expense" value="35.75" comment="Expect Book"/>
+    <item name="Payroll" value="-15.75" comment="Overpay for 20020915"/>
+    <item name="gross" value="850.00"/>
+    <item name="net" value="733.78"/>
+  </person>
+  <person id="234567890" name="Jason Doe">
+    <item name="US Federal" value="0.00"/>
+    <item name="US Medicare" value="0.00"/>
+    <item name="US FICA" value="0.00"/>
+    <item name="gross" value="0.00"/>
+    <item name="net" value="0.00"/>
+  </person>
+</payroll>

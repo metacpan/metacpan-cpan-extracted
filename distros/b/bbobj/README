@@ -1,0 +1,28 @@
+BigBrother/Object version 0.50
+==============================
+
+INSTALLATION
+
+To install this module type the following:
+
+   As any user 
+     perl Makefile.PL
+     make
+     make test
+
+   As super-user
+     make install
+
+DEPENDENCIES
+
+This module has no other required modules or libraries:
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2002 Donald R. Shanks. All rights reserved.
+
+This library is free software; you can distribute it and/or 
+modify it under the same terms as PERL itself.
+
+
+$Id: README,v 1.1.1.1 2002/07/14 04:13:51 dshanks Exp $

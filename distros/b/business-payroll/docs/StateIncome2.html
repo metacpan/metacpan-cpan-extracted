@@ -1,0 +1,312 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+  <title>Federal Income</title>
+             
+  <meta http-equiv="content-type" content="text/html; charset=ISO-8859-1">
+</head>
+  <body>
+  <b>Payroll::US::StateIncome.pm</b><br>
+  <br>
+  StateIncome-&gt;calculate( 	<br>
+ &nbsp;&nbsp;&nbsp; gross,&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;
+&nbsp;# - gross pay 	<br>
+ &nbsp;&nbsp;&nbsp; date, &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;
+#- date of payment 	format YYYYMMDD<br>
+ &nbsp;&nbsp;&nbsp; method, &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; #- specifies
+mthod to use. currently only 1 	<br>
+ &nbsp;&nbsp;&nbsp; allowances&nbsp;&nbsp;&nbsp; #, - state allowances claimed,
+integer<br>
+ &nbsp;&nbsp;&nbsp; period, &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;
+#- annual, semiannual, quarterly, monthly, semimonthly, biweekly, weekly,
+daily 	<br>
+ &nbsp;&nbsp;&nbsp; marital, &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;
+#- single, married<br>
+ &nbsp;&nbsp;&nbsp; federal, &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;
+#- amount of federal tax withheld here<br>
+ &nbsp;&nbsp;&nbsp; fYTD &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;
+#- total federal tax withheld yeart to date<br>
+)<br>
+  The data will be stored by date in a hash, so that calculations will use
+ the proper rates.<br>
+  <br>
+  iterate over sorted keys descending in data hash. &nbsp;<br>
+ &nbsp; Compare $date to keys. &nbsp;<br>
+ &nbsp; Stop when $date &gt;= key. &nbsp;<br>
+ &nbsp; set $foundDate = $key. <br>
+ &nbsp; If date &lt; all keys, that is an error. &nbsp; <br>
+  <br>
+   
+<table cellpadding="2" cellspacing="2" border="0" width="75%">
+    <tbody>
+      <tr>
+        <td valign="top">data{$foundDate}-&gt;<br>
+        </td>
+        <td valign="top">{tables}<br>
+        </td>
+        <td valign="top"><br>
+        </td>
+      </tr>
+      <tr>
+        <td valign="top">ex. data{20010101}-&gt;<br>
+        </td>
+        <td valign="top">{dailyWithholdingAllowance}<br>
+        </td>
+        <td valign="top">= 11.15<br>
+        </td>
+      </tr>
+      <tr>
+        <td valign="top"><br>
+        </td>
+        <td valign="top">{dailyTableRows}[X]<br>
+        </td>
+        <td valign="top"><br>
+        </td>
+      </tr>
+       
+  </tbody>  
+</table>
+  <br>
+  The periodDays hash holds the number of days in a period<br>
+   
+<table cellpadding="2" cellspacing="2" border="0" width="50%">
+    <tbody>
+      <tr>
+        <td valign="top">periodDays-&gt;<br>
+        </td>
+        <td valign="top">{annual}<br>
+        </td>
+        <td valign="top">= 260<br>
+        </td>
+      </tr>
+      <tr>
+        <td valign="top"><br>
+        </td>
+        <td valign="top">{semiannual}<br>
+        </td>
+        <td valign="top">= 130<br>
+        </td>
+      </tr>
+      <tr>
+        <td valign="top"><br>
+        </td>
+        <td valign="top">{quarterly}<br>
+        </td>
+        <td valign="top">= 65<br>
+        </td>
+      </tr>
+      <tr>
+        <td valign="top"><br>
+        </td>
+        <td valign="top">{monthly}<br>
+        </td>
+        <td valign="top">= 21.67<br>
+        </td>
+      </tr>
+      <tr>
+        <td valign="top"><br>
+        </td>
+        <td valign="top">{semimonthly}<br>
+        </td>
+        <td valign="top">= 10.84<br>
+        </td>
+      </tr>
+      <tr>
+        <td valign="top"><br>
+        </td>
+        <td valign="top">{biweekly}<br>
+        </td>
+        <td valign="top">= 10<br>
+        </td>
+      </tr>
+      <tr>
+        <td valign="top"><br>
+        </td>
+        <td valign="top">{weekly}<br>
+        </td>
+        <td valign="top">= 5<br>
+        </td>
+      </tr>
+      <tr>
+        <td valign="top"><br>
+        </td>
+        <td valign="top">{daily}<br>
+        </td>
+        <td valign="top">= 1<br>
+        </td>
+      </tr>
+       
+  </tbody>  
+</table>
+ <br>
+  To calculate the withholding allowance<br>
+  withholdingAllowance = periodDays-&gt;{$period} * data-&gt;{$foundDate}-&gt;{dailyWithholdingAllowance}<br>
+  modifiedGross = gross - (allowances * withholdingAllowance)<br>
+  <br>
+  Use modifiedGross value to determine tax bracket and subsequent percentage
+ by looking up in data{$foundDate}-&gt;{tables}. &nbsp;Only generate withholding
+ tables as needed. &nbsp;This will allow for caching type functionality and
+ speed optimizations.<br>
+  <br>
+  How to generate a table.<br>
+  <br>
+  generate_table ( period, marital, table=&gt;data{$foundDate}-&gt;{tables}
+ )<br>
+  {<br>
+  &nbsp; &nbsp;@dailyTableRows = $data-&gt;{$foundDate}-&gt;{$dailyTableRows}<br>
+  &nbsp; &nbsp;for $row = 0; row &lt; scalar ($dailyTableRows); row++<br>
+  &nbsp; &nbsp;{<br>
+  &nbsp; &nbsp; &nbsp; if $row == 0<br>
+  &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;$base = 0;<br>
+  &nbsp; &nbsp; &nbsp;else<br>
+  &nbsp; &nbsp; &nbsp;{<br>
+  &nbsp; &nbsp; &nbsp; &nbsp; base = $dailyTableRows[row -1]-&gt;percent
+*  <br>
+  &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;($dailyTableRows[row]-&gt;top
+ - $dailyTableRows[row -1]-&gt;top)<br>
+  &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; + $dailyTableRows[row-1]-&gt;base<br>
+  &nbsp; &nbsp; &nbsp;} <br>
+  &nbsp; &nbsp;&nbsp; $top = $row-&gt;{top} * periodDays{period}<br>
+  &nbsp; &nbsp; &nbsp;$top *= $row-&gt;{marriedRatio} if $marital eq "married"<br>
+  <br>
+  &nbsp; &nbsp; &nbsp;%tempRow = { top =&gt; $top, <br>
+  &nbsp; &nbsp; &nbsp; &nbsp; base =&gt; base , &nbsp;<br>
+  &nbsp; &nbsp; &nbsp; &nbsp; percent =&gt; $row-&gt;{percent} } ;<br>
+  &nbsp; &nbsp; &nbsp;#dont forget to create array single first&nbsp; &nbsp;
+ &nbsp; &nbsp; <br>
+  &nbsp; &nbsp; &nbsp;push($table-&gt;{$period}-&gt;{$marital}, \%tempRow)<br>
+  &nbsp; }<br>
+  }<br>
+  <br>
+  The lookuptables are generated from the data stored in the daily table. 
+&nbsp;<br>
+  There is an array for the rows sorted <i>descending</i>. &nbsp;This allows
+ us to check the greatest case first. &nbsp;No corner cases.<br>
+   
+<table cellpadding="2" cellspacing="2" border="1" width="50%">
+    <tbody>
+      <tr>
+        <td valign="top">{dailyTableRows}<br>
+        </td>
+        <td valign="top">[$row]-&gt;<br>
+        </td>
+        <td valign="top">{top}<br>
+        </td>
+      </tr>
+      <tr>
+        <td valign="top"><br>
+        </td>
+        <td valign="top"><br>
+        </td>
+        <td valign="top">{percent}<br>
+        </td>
+      </tr>
+      <tr>
+        <td valign="top"><br>
+        </td>
+        <td valign="top"><br>
+        </td>
+        <td valign="top">{marriedRatio}<br>
+        </td>
+      </tr>
+       
+  </tbody>  
+</table>
+  <br>
+  generated tables look like this<br>
+  <br>
+   
+<table cellpadding="2" cellspacing="2" border="0" width="75%">
+    <tbody>
+      <tr>
+        <td>tables<br>
+        </td>
+        <td valign="top">{<i>$period</i> =&gt;<br>
+        </td>
+        <td valign="top">{ single =&gt;<br>
+        </td>
+        <td valign="top">[<br>
+        </td>
+      </tr>
+      <tr>
+        <td valign="top"><br>
+        </td>
+        <td valign="top"><br>
+        </td>
+        <td valign="top"><br>
+        </td>
+        <td valign="top">{top =&gt; , base =&gt; , percent =&gt; } ,<br>
+        </td>
+      </tr>
+      <tr>
+        <td valign="top"><br>
+        </td>
+        <td valign="top"><br>
+        </td>
+        <td valign="top"><br>
+        </td>
+        <td valign="top">] , <br>
+        </td>
+      </tr>
+      <tr>
+        <td valign="top"><br>
+        </td>
+        <td valign="top"><br>
+        </td>
+        <td valign="top">married =&gt;<br>
+        </td>
+        <td valign="top">[<br>
+        </td>
+      </tr>
+      <tr>
+        <td valign="top"><br>
+        </td>
+        <td valign="top"><br>
+        </td>
+        <td valign="top"><br>
+        </td>
+        <td valign="top">{top =&gt; , base =&gt; , percent =&gt; } ,<br>
+        </td>
+      </tr>
+      <tr>
+        <td valign="top"><br>
+        </td>
+        <td valign="top"><br>
+        </td>
+        <td valign="top"><br>
+        </td>
+        <td valign="top">]<br>
+        </td>
+      </tr>
+      <tr>
+        <td valign="top"><br>
+        </td>
+        <td valign="top"><br>
+        </td>
+        <td valign="top">},<br>
+        </td>
+        <td valign="top"><br>
+        </td>
+      </tr>
+      <tr>
+        <td valign="top"><br>
+        </td>
+        <td valign="top">}<br>
+        </td>
+        <td valign="top"><br>
+        </td>
+        <td valign="top"><br>
+        </td>
+      </tr>
+       
+  </tbody>  
+</table>
+  <br>
+  <br>
+  these variables will be lookups from the above generated table.<br>
+  if !tableexists<br>
+  &nbsp; generate_table(period, marital, table =&gt;)<br>
+  tax = $base + (( modifiedGross - $top) &nbsp;* $percent)<br>
+   
+</body>
+</html>

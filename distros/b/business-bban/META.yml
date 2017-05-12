@@ -1,0 +1,22 @@
+---
+abstract: 'helpers to compute BBAN key and generate an BBAN.'
+author:
+  - 'Marc Chantreux <khatar@phear.org>'
+build_requires:
+  Test::Pod: '1.22'
+  Test::Pod::Coverage: '1.10'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.036, CPAN::Meta::Converter version 2.142690'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: business-bban
+requires:
+  Carp: '0'
+resources:
+  homepage: https://github.com/eiro/p5-business-bban
+  repository: https://github.com/eiro/p5-business-bban.git
+version: '0.0'

@@ -1,0 +1,54 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+  <title>Payroll.html</title>
+  <meta http-equiv="content-type"
+ content="text/html; charset=ISO-8859-1">
+</head>
+<body>
+<b>Payroll.pm</b><br>
+<br>
+  The Payroll module's new method will call Payroll::XML::Parser modules
+to change the XML input into the Perl data object (Payroll::XML::Data) that 
+the countries can then work with.  The process() method will then call the 
+proper country module passing in the data object and the output object/hash.
+ The resulting object is the XML module Payroll::XML::Output.  Calling the 
+generate() method will create the output XML document. &nbsp;Pass in a list 
+of supported countries to the Parser.<br>
+<br>
+<b>methods</b><br>
+<br>
+PayrollObject new()<br>
+string process(string =&gt; $data, file =&gt; $file, outFile =&gt; $outputFile)<br>
+&nbsp; string will take precedence over file, &nbsp;<br>
+&nbsp; if outFile is given it will try to output to a file of that name and
+the return string will be undef if error or 1 for success<br>
+&nbsp; if no outputFile is given the return string will be the output<br>
+<br>
+string errorMessage()<br>
+string didErrorOccur()<br>
+<br>
+<b>variables</b><br>
+periods = hash of daily, monthly, etc<br>
+Countries = hash of US #eventually this should check the Perl Tree (maybe
+an ls) and gather all installed Countries<br>
+<br>
+<br>
+sub process<br>
+{<br>
+&nbsp; #validate inputs<br>
+&nbsp; #run XML validation<br>
+&nbsp;#run XML parser<br>
+&nbsp; #use resulting Perl Object to process data<br>
+&nbsp; &nbsp; #for each person<br>
+&nbsp; &nbsp; &nbsp; #for each country<br>
+&nbsp; &nbsp; &nbsp; &nbsp; #for each state<br>
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;#for each local<br>
+&nbsp; #run XML parser on resulting perl Object to convert back to XML<br>
+&nbsp; #if outFile ne ""<br>
+&nbsp; &nbsp; &nbsp;# attempt to write to file<br>
+&nbsp; #else<br>
+&nbsp; &nbsp; #return XML<br>
+}<br>
+</body>
+</html>

@@ -1,0 +1,187 @@
+#! /usr/bin/perl
+# update_payroll - Uses the Business::Payroll module to process the specified 
+# last input and output XML documents and spits out the result on stdout.
+# Any errors on stderr.
+use strict;
+use Time::localtime;
+use Time::Local;
+use Business::Payroll;
+
+my $debug = 0;
+my $oldinfile = "";
+my $oldoutfile = "";
+my $newinfile = "";
+
+if (defined @ARGV[0])
+{
+  $oldinfile=@ARGV[0];
+}
+else
+{
+  die "Usage: update_payroll <oldinfile.xml> <oldoutfile.xml> [<newinfile.xml>]\nYou must specify the oldinfile to process.\n";
+}
+if (defined @ARGV[1])
+{
+  $oldoutfile = @ARGV[1];
+}
+else
+{
+  die "Usage: update_payroll <oldinfile.xml> <oldoutfile.xml> [<newinfile.xml>]\nYou must specify the oldoutfile to process.\n";
+}
+if (defined @ARGV[2])
+{
+  $newinfile = @ARGV[2];
+}
+
+if ($debug)
+{
+  print "Using old input file: $oldinfile\n";
+  print "     old output file: $oldoutfile\n";
+  if ($newinfile ne "")
+  {
+    print "      new input file: $newinfile\n";
+  }
+  print "\n";
+}
+my $errStr = "(update_payroll) - Error:";
+
+# do error checking
+if ($oldinfile ne "-" && ! -e $oldinfile)
+{
+  die "$errStr  file = '$oldinfile' does not exist!\n";
+}
+if ($oldoutfile ne "-" && ! -e $oldoutfile)
+{
+  die "$errStr  file = '$oldoutfile' does not exist!\n";
+}
+if ($newinfile eq "-")
+{
+  die "$errStr  file = '$newinfile' is invalid!\n";
+}
+
+my $payrollObj = Business::Payroll->new();
+
+# periodNames hash with real number of days assigned to each value
+my %periodNames = ( "annual" => 365, "semiannual" => 183, "quarterly" => 91, "monthly" => 30, "semimonthly" => 15, "biweekly" => 14, "weekly" => 7,"daily" => 1 );
+
+#------------------------------------------------
+
+my $rawDataObj = undef;
+eval { $rawDataObj = $payrollObj->{parserObj}->parse(file => $oldinfile); };
+if ($@)
+{
+  die "$errStr  Parse of XML data failed!\n$@";
+}
+my @result = $rawDataObj->isValid();
+if (!$result[0])
+{
+  die "$errStr  Payroll File not valid!\n\n" . join("\n", @{$result[1]}) . "\n";
+}
+
+my $cookedDataObj = undef;
+eval { $cookedDataObj = $payrollObj->{parserObj}->parse(file => $oldoutfile); };
+if ($@)
+{
+  die "$errStr  Parse of XML data failed!\n$@";
+}
+my @result = $cookedDataObj->isValid();
+if (!$result[0])
+{
+  die "$errStr  Payroll File not valid!\n\n" . join("\n", @{$result[1]}) . "\n";
+}
+
+# change date to current date
+my $currentDate = localtime;
+my $time = $currentDate->hour.":".$currentDate->min.":".$currentDate->sec;
+
+$rawDataObj->{date} = sprintf("%04d%02d%02d", ($currentDate->year) + 1900, ($currentDate->mon) + 1, $currentDate->mday);
+
+# generate new genSysId values
+# 	new genSysId(first field) = (old genSysId(last field) + 1 day)
+# 	new genSysId(last field) = (old genSysId(last field) + period)
+my $lastEndPeriod = $rawDataObj->{endPeriod};
+my $lastYear = "";
+my $lastMonth = "";
+my $lastDay = "";
+if ($lastEndPeriod =~ /^(\d{4,})(\d{2})(\d{2})$/)
+{
+  $lastYear = $1;
+  $lastMonth = $2;
+  $lastDay = $3;
+}
+else
+{
+  die "$errStr Invalid last field of genSysId = " . $lastEndPeriod . "\n";
+}
+
+my $startPeriod = "";
+my $endPeriod = "";
+$startPeriod = $endPeriod = timelocal(0, 0, 0, $lastDay, $lastMonth - 1, $lastYear - 1900);
+# add 1 day to $startPeriod
+$startPeriod += 1*60*60*24;
+# add $periodNames{$rawDataObj->{period}} days to $endPeriod
+$endPeriod += $periodNames{$rawDataObj->{period}}*60*60*24;
+
+my $startPeriodFormatted = localtime($startPeriod);
+my $endPeriodFormatted = localtime($endPeriod);
+
+$rawDataObj->{genSysId} = "PCX Payroll $rawDataObj->{date} $time";
+$rawDataObj->{startPeriod} = sprintf("%04d%02d%02d", ($startPeriodFormatted->year + 1900), ($startPeriodFormatted->mon + 1), $startPeriodFormatted->mday);
+$rawDataObj->{endPeriod} = sprintf("%04d%02d%02d", ($endPeriodFormatted->year + 1900), ($endPeriodFormatted->mon + 1), $endPeriodFormatted->mday);
+
+# run through each person in the input file that also exists in the output file
+foreach my $rawPerson (@{$rawDataObj->{persons}})
+{
+  foreach my $cookedPerson (@{$cookedDataObj->{persons}})
+  {
+    if ($rawPerson->{id} eq $cookedPerson->{id})
+    {
+      # 	- mark those that do not exist in both files (later version)
+      foreach my $rawCountry (@{$rawPerson->{countries}})
+      {
+        if ($rawCountry->{name} eq "US")
+	{
+          # 	- new grossYTD = old grossYTD + old gross
+          $rawCountry->{grossYTD} += $rawCountry->{gross};
+	  $rawCountry->{grossYTD} = sprintf("%.2f", $rawCountry->{grossYTD});
+          foreach my $cookedItem (@{$cookedPerson->{items}})
+          {
+            if ($cookedItem->{name} eq "US Federal")
+            {
+              # - new federalYTD = old federalYTD + (oldoutfile) |"US Federal"|
+              $rawCountry->{federalYTD} += abs($cookedItem->{value});
+	      $rawCountry->{federalYTD} = sprintf("%.2f", $rawCountry->{federalYTD});
+
+              last;
+            }
+          }
+
+	  last;
+	}
+      }
+      # 	- ask for this person's gross amount (later version)
+
+      last;
+    }
+  }
+}
+
+#------------------------------------------------
+
+my $result = "";
+eval { $result = $rawDataObj->generateXML; };
+if ($@)
+{
+  die "$errStr  Eval failed: $@\n";
+}
+
+if ($newinfile)
+{
+  open FILE, ">$newinfile" or die "$errStr  Could not create file '$newinfile'!";
+  print FILE $result;
+  close FILE;
+}
+else
+{
+  print $result;
+}

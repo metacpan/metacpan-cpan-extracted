@@ -1,0 +1,29 @@
+---
+abstract: 'Boolean support for Perl'
+author:
+  - 'Ingy döt Net <ingy@cpan.org>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.047, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: boolean
+no_index:
+  directory:
+    - example
+    - inc
+    - t
+    - xt
+recommends:
+  JSON::MaybeXS: '0'
+requires:
+  perl: v5.8.1
+resources:
+  bugtracker: https://github.com/ingydotnet/boolean-pm/issues
+  homepage: https://github.com/ingydotnet/boolean-pm
+  repository: https://github.com/ingydotnet/boolean-pm.git
+version: '0.46'

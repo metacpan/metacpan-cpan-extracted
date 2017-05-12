@@ -1,0 +1,43 @@
+v1.3 - 2005-12-30
+ - Updated for 2006 data
+v1.2 - 2005-02-22
+ - Fixed the 2005 mileage rates.
+v1.1 - 2005/1/15
+ - Added 2005 federal and MO tables
+ - Fixed the dates in the FICA table for 2003, 2004, 2005.
+v1.0 - 2004-10-09
+ - Name change to Business::Payroll so it will be officially added to the list
+   of perl modules on CPAN and bumped to version 1.0.
+ - Created the Business::Payroll::Base module that provides the Base class to
+   derive all Business::Payroll modules from for centralized error handling.
+v0.8 - 2004-08-12
+ - Updated the update_payroll script to use the startPeriod/endPeriod values.
+v0.7 - 2004-07-30
+ - Changed XML version to 1.1, added startPeriod/endPeriod values to the
+   <payroll> tag to allow the dates the payroll is covering to be specified.
+v0.6 - 2004-01-05
+ - Debianized!
+ - Updated the rates for 2004 and fixed some 2003 rates for FICA.
+v0.5 - 2003-09-05
+ - Changed cap in Medicare to be 0 instead of -1 
+ - added rateCap function to FICA and Medicare
+ - Improved README contents in regards to installation instructions and added
+   a REQUIREMENTS section.
+v0.4 - 2003-06-25
+ - moved testing scripts to subdir to stop pollution of perl tree
+ - added the t/use.t file so CPAN is happy.
+ - updated the rpm spec file.
+v0.3 - 2003-6-24
+ - changed data structure internally to solve married obfuscation
+v0.2 - 2003-03-20
+ - Made adjustments allow multiple of the same name to be specified.
+ - Added process_payroll script to the distro.
+v0.1 - 2002-10-15
+ - First really usable release.  Fleshed out the XML parsing code.
+ - Currently only Country = US is available.
+ - Currently only State = MO is available for country = US.
+ - You can specify the Federal and State allowances and extra WithHoldings.
+ - You can specify miles to calculate for each country.
+ - You can specify adjustments that get applied to the net total after all
+   tax calculations, etc. are done.
+

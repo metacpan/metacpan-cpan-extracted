@@ -1,0 +1,134 @@
+NAME
+    blt - bash loves twitter - command-line client for twitter
+
+SYNOPSIS
+     blt eating ice-cream and loving python
+     blt "It's all in a day's work when you protect apostrophes"
+     blt --check --public --sync
+
+DESCRIPTION
+    blt is a command-line client for twitter.com, designed to integrate
+    helpfully with bash(1). It makes sending messages simple, and receiving
+    them as simple as with the old biff(1) program which told you when you
+    had new mail.
+
+WHAT IS TWITTER?
+    Twitter is a blogging system which limits posts (known as "tweets") to
+    140 characters. This means that users can receive them easily over text
+    messaging, instant messaging, and so on.
+
+    Twitter allows you to send three kinds of messages:
+
+    Public The ordinary kind, directed at everyone, to tell them what you're
+    currently doing or thinking.
+    Directed which are pointed at one particular user, but still public.
+    These contain "@username". A user can opt to not be told about directed
+    messages not aimed at people they know.
+    Private These are only seen by the sender and the recipient. blt can
+    send these using the "d" notation (see the -s mode below) but does not
+    yet show them when you ask it to check.
+
+MODES
+    These are all lowercase letters, and you may have exactly one of them.
+    The default mode is s. You may "bundle" the short forms of modes and
+    switches together.
+
+    -s, --set
+        Send a message to Twitter. The rest of the line is the message to
+        send. If this begins with "d" and a space, and then a username and a
+        space, this will send a private message to that user. This is a
+        Twitter convention and not part of the design of blt.
+
+    -c, --check
+        Checks whether recent messages have come in for you.
+
+    -a user, --as=user
+        Uses the given user's details rather than the default user. This
+        makes no difference on the public timeline.
+
+    -v, --version
+        Prints the current version number and exits.
+
+    -h, --help
+        Prints some basic help and exits.
+
+SWITCHES
+    These are all capitals; you may combine as many as you wish.
+
+    -F, --force
+        Check even if we checked recently. Overuse of this option may
+        transgress Twitter's acceptable use policy. This is silently ignored
+        if we're reading the public timeline, because there is no cache
+        requirement there anyway.
+
+    -S, --sync
+        Don't return until all the information has been gathered and
+        printing (see ASYNCHRONICITY below).
+
+    -P, --public
+        Read the public timeline, and not a user's timeline. This may only
+        be combined with checking, not setting; an attempt to set on the
+        public timeline causes an error.
+
+        No caching is required. Nor is any authentication; hence this is the
+        only instance when ~/.bltrc.xml need not exist, and blt will not
+        attempt to create it if it is not found.
+
+THE PUBLIC TIMELINE
+        The public timmeline is a list of all public posts made to twitter
+        in the last few seconds. Unlike all other modes, the public timeline
+        does not require any authentication on your part.
+
+        You can read the public timeline with no configuration file. This
+        will mean that the minimum time between fetching each new set of
+        information from Twitter is 60 seconds.
+
+ASYNCHRONICITY
+        If you are checking a timeline on Twitter, you can run blt either
+        synchronously (with -S) or asynchronously (without -S). If you run
+        it synchronously, it will go away and fetch the information from
+        twitter.com and not return until it's done.
+
+        If you run it asynchronously, though, one of three things will
+        happen:
+
+        *   There can be twitter information stored in blt's cache; if so,
+            it will print this and exit.
+
+        *   Otherwise, if no blt background process is running, blt will
+            start one and exit. The background process will get the
+            information from twitter and then exit.
+
+        *   Otherwise there b<is> a background process running, so blt
+            leaves it alone and exits.
+
+        Asynchronous mode exists because Twitter can be very slow to respond
+        sometimes, although this has been improving recently.
+
+HOW BASH CALLS BLT
+        bash(1) calls the program given in the variable PROMPT_COMMAND every
+        time you press return. When you create a ~/.bltrc.xml, blt also
+        attempts to insert a line into ~/.bashrc setting this variable so
+        that blt will be called every time you press return.
+
+THE CONFIGURATION FILE
+        The configuration file is a simple piece f XML called ~/.bltrc.xml.
+        Its root node is bltrc, which has one attribute, interval. This is
+        the minimum time that must pass between fetching information from
+        Twitter. (The Twitter acceptable use policy requires this to be at
+        least 52 seconds.)
+
+        Within this root element are a number of ac elements, each
+        representing an account, with id and pass elements. On initial
+        creation, only one account exists. You may add new accounts in the
+        same format and select them using the -a switch; see above under
+        SWITCHES.
+
+BUGS
+        * It can send but not receive private/direct messages.
+        * blt is pretty fast, but you still might not want to run blt from
+        ~/.bashrc on a particularly slow computer.
+
+AUTHOR
+        Thomas Thurman, tthurman at gnome dot org.
+

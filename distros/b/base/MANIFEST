@@ -1,0 +1,23 @@
+Changes
+lib/base.pm
+lib/fields.pm
+Makefile.PL
+MANIFEST			This list of files
+t/base-open-chunk.t
+t/base-open-line.t
+t/base.t
+t/compile-time.t
+t/core-global.t
+t/fields-5_6_0.t
+t/fields-5_8_0.t
+t/fields-base.t
+t/fields.t
+t/isa.t
+t/lib/Broken.pm
+t/lib/Dummy.pm
+t/lib/HasSigDie.pm
+t/sigdie.t
+t/version.t
+t/warnings.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

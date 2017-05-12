@@ -1,0 +1,22 @@
+Revision history for bareword::filehandles
+
+0.005     2017-04-20 16:27:24+01:00 Europe/London
+ - Switch to Dist::Zilla::PluginBundle::Starter
+   and ::Plugin::DymamicPrereqs
+ - Use Devel::PPPort insted of hand-rolled compat macros
+
+0.004     2016-05-16 19:18:36+01:00 Europe/London
+ - fix POD typo (RT#76421)
+ - Use "bareword::filehandles/disabled" as the hint hash key
+ - Fix building on -DPERL_OP_PARENT perls (RT#114394)
+
+0.003     2011-03-15 13:03:07 Europe/London
+ - use ppport.h for backwards compatibility
+ - work around erroneous op descriptions in perl < 5.8.8
+ - eliminate const warnings
+
+0.002     2011-03-14 18:00:51 Europe/London
+ - fix perl 5.8 compatibility
+
+0.001     2011-02-13 20:13:15 Europe/London
+ - initial release

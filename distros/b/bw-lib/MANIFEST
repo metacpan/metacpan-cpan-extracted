@@ -1,0 +1,18 @@
+MANIFEST
+Makefile.PL
+README
+INSTALL
+HISTORY
+lib/BW/AddressCodes.pm
+lib/BW/Base.pm
+lib/BW/CGI.pm
+lib/BW/Common.pm
+lib/BW/Config.pm
+lib/BW/Constants.pm
+lib/BW/Email.pm
+lib/BW/Include.pm
+lib/BW/Jumptable.pm
+lib/BW/XML/Out.pm
+lib/BW/XML/HTML.pm
+t/all.t
+META.yml                                 Module meta-data (added by MakeMaker)

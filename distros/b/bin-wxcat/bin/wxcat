@@ -1,0 +1,216 @@
+#!/usr/bin/perl
+
+# Copyright (C) 2008 Eric L. Wilhelm
+
+use warnings;
+use strict;
+
+=head1 NAME
+
+wxcat - pipe output to an unfocussed window
+
+=head1 SYNOPSIS
+
+This program use wxwidgets to print stdout to a window which does not
+steal keyboard focus.
+
+  ssh webserver tail -f error.log | wxcat --size 400x200
+
+The window goes away when the output stops (or you can use Ctrl+C.)
+
+Extra screen space is recommended.
+
+=cut
+
+package bin::wxcat;
+
+use Wx ();
+use base 'Wx::App';
+
+use IO::Handle;
+use Getopt::Helpful;
+
+use Class::Accessor::Classy;
+ri 'frame';
+ro 'handle';
+ri 'closing';
+no  Class::Accessor::Classy;
+
+sub main {
+  my (@args) = @_;
+
+  my %opt = (
+    size       => '400x200',
+    scrollbar => 1,
+  );
+  my $hopt = Getopt::Helpful->new(
+    usage => 'foo | CALLER',
+    ['size=s' => \$opt{size}, '400x200', 'WxH size'],
+    # ['scrollbar!', => \$opt{scrollbar}, '', 'use scrollbar'],
+    ['version' => sub {
+      require bin::wxcat;
+      print __PACKAGE__->VERSION, "\n"; exit},
+      '','print package version and exit'],
+    '+help',
+  );
+  $hopt->Get_from(\@args);
+
+  # TODO open file from @args
+
+  my $fh = IO::Handle->new;
+  $fh->fdopen(fileno(STDIN), "r");
+  $fh->autoflush;
+
+  my $app = __PACKAGE__->new(handle => $fh, %opt);
+  $app->MainLoop;
+}
+sub new {
+  my $package = shift;
+  my $self = $package->SUPER::new;
+  $self->setup(@_); # ugh
+  return($self);
+}
+# this is useless to me because I can't pass arguments to OnInit
+sub OnInit {1};
+sub setup {
+  my $self = shift;
+  my %args = @_;
+
+  $self->{handle} = delete($args{handle});
+
+  my $frame = $self->set_frame(wxcat::Frame->new(%args));
+  $frame->Show(1);
+
+  my $fh = $self->handle or die "no handle!";
+  my $text_ctrl = $self->frame->text_ctrl;
+  {
+    my $is = {in => 0};
+    my $closing = 0;
+    Wx::Event::EVT_IDLE($self, sub {
+      my ($obj, $evt) = @_;
+
+      # Im in ur idle
+      return if($is->{in});
+      local $is->{in} = 1;
+
+      # and the get-out (TODO a timer?)
+      return if($closing);
+      #warn "idle\n";
+
+      # now a soft read for the slow pipes
+      $fh->blocking(0);
+      if(! $fh->eof) {
+        $fh->blocking(1);
+        my $line = readline($fh);
+        $text_ctrl->AppendText($line);
+        # warn $line;
+      }
+      else {
+        unless($fh->error) {
+          warn "closing";
+          $closing = 1;
+          for(1..5) {sleep(1); Wx::Yield();}
+          $self->frame->Close; $self->ExitMainLoop;
+        }
+        # warn "eof (", $fh->error, ")";
+        $fh->clearerr;
+        Wx::Yield();
+        use Time::HiRes; Time::HiRes::sleep(0.1);
+      }
+      #Wx::WakeUpIdle(); # XXX wx 2.8.7 differences!
+      $evt->RequestMore;
+    });
+  }
+
+}
+
+=head1 AUTHOR
+
+Eric Wilhelm @ <ewilhelm at cpan dot org>
+
+http://scratchcomputing.com/
+
+=head1 BUGS
+
+If you found this module on CPAN, please report any bugs or feature
+requests through the web interface at L<http://rt.cpan.org>.  I will be
+notified, and then you'll automatically be notified of progress on your
+bug as I make changes.
+
+If you pulled this development version from my /svn/, please contact me
+directly.
+
+=head1 COPYRIGHT
+
+Copyright (C) 2008 Eric L. Wilhelm, All Rights Reserved.
+
+=head1 NO WARRANTY
+
+Absolutely, positively NO WARRANTY, neither express or implied, is
+offered with this software.  You use this software at your own risk.  In
+case of loss, no person or entity owes you anything whatsoever.  You
+have been warned.
+
+=head1 LICENSE
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+=cut
+
+########################################################################
+package wxcat::Frame;
+
+use warnings;
+use strict;
+
+use wxPerl::Constructors;
+use wxPerl::Styles qw(style wxVal);
+
+use base qw(wxPerl::Frame);
+
+use Class::Accessor::Classy;
+ri qw(text_ctrl);
+no  Class::Accessor::Classy;
+
+sub new {
+  my $class = shift;
+  my (%opts) = @_;
+  $opts{size} = $opts{size} ? [split('x', $opts{size})] : [400,200],
+
+  # XXX I can't really do much about this or what?!
+  delete($opts{scrollbar});
+
+  my $parent;
+  my $title = '';
+  # TODO no_border as an option?
+  my $self = $class->SUPER::new($parent, $title, %opts,
+    style(
+      'stay_on_top|transparent_window',
+      frame => 'no_taskbar',
+    )
+  );
+  # XXX doubt I want to use such a plain text widget
+  $self->set_text_ctrl(wxPerl::TextCtrl->new($self, '',
+    style(
+      te => 'readonly|multiline',
+    ),
+  ));
+  #$self->text_ctrl->EnableScrolling(0,0);
+  $self->text_ctrl->SetScrollbar(&Wx::wxVERTICAL, 0, 0, 0, 1);
+  $self->text_ctrl->SetFont(
+    Wx::Font->new(10, 75, wxVal('normal'), wxVal('bold'), 0, '')
+  );
+
+  return($self);
+}
+
+########################################################################
+package main;
+
+if($0 eq __FILE__) {
+  bin::wxcat::main(@ARGV);
+}
+
+# vi:ts=2:sw=2:et:sta
+my $package = 'bin::wxcat';

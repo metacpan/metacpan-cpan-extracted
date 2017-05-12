@@ -1,0 +1,53 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+  <title>PCX Payroll System</title>
+      
+  <meta http-equiv="content-type" content="text/html; charset=ISO-8859-1">
+</head>
+ <body>
+<b>Medicare.pm</b><br>
+ <br>
+Medicare-&gt;calculate( <br>
+&nbsp;&nbsp;&nbsp; gross, &nbsp;# gross pay<br>
+&nbsp;&nbsp;&nbsp; date, &nbsp;&nbsp; # date of payment<br>
+)<br>
+{<br>
+&nbsp;&nbsp;iterate over sorted keys descending in data hash. &nbsp;<br>
+&nbsp; &nbsp; Compare $date to keys. &nbsp;<br>
+&nbsp; &nbsp; Stop when $date &gt;= key. &nbsp;<br>
+&nbsp; &nbsp; set $foundDate = $key. <br>
+&nbsp; &nbsp; If date &lt; all keys, that is an error. &nbsp; <br>
+<br>
+&nbsp; return data{$foundDate}-&gt;{rate} * gross<br>
+}<br>
+<br>
+<table cellpadding="2" cellspacing="2" border="0" width="30%">
+  <tbody>
+    <tr>
+      <td valign="Top">data{$foundDate}-&gt;<br>
+      </td>
+      <td valign="Top">{rate}<br>
+      </td>
+    </tr>
+    <tr>
+      <td valign="Top">ex. data{20010101}-&gt;<br>
+      </td>
+      <td valign="Top"><br>
+      </td>
+    </tr>
+  </tbody>
+</table>
+<br>
+sub new()<br>
+{<br>
+&nbsp; &nbsp; #create tables for lookup<br>
+#when did they set it at 1.45%?<br>
+&nbsp; data{<br>
+&nbsp; &nbsp; '19990101' =&gt; {rate =&gt; 0.0145},<br>
+&nbsp; &nbsp; '20000101' =&gt; {rate =&gt; 0.0145}<br>
+&nbsp; } &nbsp; &nbsp;<br>
+}<br>
+ 
+</body>
+</html>

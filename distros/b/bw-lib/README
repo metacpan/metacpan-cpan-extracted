@@ -1,0 +1,50 @@
+BW-Lib by Bill Weinman
+http://bw.org/
+
+11 March 2010
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as Perl itself.
+
+-------------------------------------------------------------------------
+
+BW-Lib (collectively, the BW::* module tree) is a set of perl modules
+developed by Bill Weinman over the course of about 15 years. It provides
+a uniform interface for a number of common functions, most of which are
+available elsewhere with other interfaces.
+
+The purpose of this library is to provide a common set of functions for
+use in developing applications in Perl without having to use a lot of
+different libraries with different requirements and different
+interfaces. The commonality of the interfaces works for me.
+
+Please note: This library duplicates the functionality of a number of
+other common modules, so there is very little here that is unique. It's
+not designed to be "better" -- only more uniform, and therefor easier to
+use (at least I find it so).
+
+I've submitted it to CPAN so that it can be easily installed for the
+various applications that I distribute that use it.
+
+
+This library provides: 
+
+    BW::Base - Base routines for BW::* modules
+    BW::AddressCodes - US States and Country codes
+    BW::Constants - Commonly used constants
+    BW::Common - Some common utility functions
+    BW::CGI - Simple OO CGI (this is NOT a CGI.pm plugin replacement!)
+    BW::Config - Support for simple configuration files
+    BW::Email - Support for sending email messages
+    BW::Include - Apache SSI-compatible Include file processing (Templates)
+    BW::Jumptable - Jump table support (for simple state machines)
+    BW::XML::Out - Simple XML output
+    BW::XML::HTML - Small subset X/HTML output using BW::XML::Out
+
+
+The emphasis here is on *simple*. All of these modules are intended to 
+do their job simply and effectively. Most of this was written independent
+of and often before the popular modules that they may duplicate in CPAN. 
+
+See INSTALL for installation instructions. 
+

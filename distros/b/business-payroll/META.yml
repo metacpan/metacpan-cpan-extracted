@@ -1,0 +1,13 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         business-payroll
+version:      1.3
+version_from: Payroll.pm
+installdirs:  site
+requires:
+    File::Temp:                    0.12
+    XML::LibXML:                   1.51
+    XML::SAX:                      0.10
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.17

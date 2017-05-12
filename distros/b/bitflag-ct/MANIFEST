@@ -1,0 +1,10 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+lib\bitflag\ct.pm
+t\01_usecase.t
+t\TestCase1a.pm
+t\TestCase1b.pm
+t\TestCase2a.pm
+t\TestHelp.pm

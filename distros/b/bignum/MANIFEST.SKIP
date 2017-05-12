@@ -1,0 +1,12 @@
+.*\.tar\.gz
+^blib.*
+^\w+\.(html|txt|png|dot|pl|svg|old|bak|org)
+^Makefile\z
+^Makefile.(old|bak)\z
+^MANIFEST.(old|bak)\z
+^MYMETA\.(yml|json)\z
+\.*tmp
+.*\.patch\z
+pm_to_blib
+\.git.*
+^bignum-[0-9]

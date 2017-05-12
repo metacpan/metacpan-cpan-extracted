@@ -1,0 +1,26 @@
+For an updated list of bugs, see
+
+  https://rt.cpan.org/Public/Dist/Display.html?Name=bignum
+
+The following list is not up to date:
+
+Known bugs:
+
+* print 2 + 4.5,"\n";			# produces "6.5" but should be actually 65/10
+
+* perl -Mbignum=t -le 'print 2.0'
+ Loading Math::BigInt::Trace
+ MBI import Math::BigInt::Trace :constant upgrade Math::BigFloat::Trace lib Calc
+ Loading Math::BigFloat::Trace
+ MBF import Math::BigFloat::Trace :constant downgrade Math::BigInt::Trace
+ MBI new '2' => '2' (Math::BigInt::Trace)
+ MBF new '2.0' => '2' (Math::BigInt::Trace)
+ 2
+
+The order of MBI and MBF is reversed, since the output is done *after* the new,
+but the new of MBF downgrades internally to MBI. No solution yet.
+
+Please send me test-reports, your experiences with this and your ideas - I love
+to hear about my work!
+
+Tels <http://bloodgate.com/>

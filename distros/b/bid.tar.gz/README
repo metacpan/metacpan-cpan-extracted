@@ -1,0 +1,48 @@
+Introduction
+
+This is set of simple modules to aid the writing of dinky
+little cgi scripts to run an auction on a site. All the 
+documentation you need are included as pod in the modules.
+
+There is only one snag. I use this with mySQL, and Class::DBI.
+I have not tested this with any other platforms, due to having a
+job to go to everyday. Ah well.
+
+So, you will need Class::DBI, which is a good thing anyway. And, out
+of interest, the author of Class::DBI has sworn at me before. I feel
+so proud.
+
+INSTALLATION
+
+To install this module, cd to the directory that contains this README
+file and type the following:
+
+   perl Makefile.PL
+   make test
+   make install
+
+The Tables.
+
+I have included the table definitions, I am so helpful!
+
+The Connection.
+
+OK, the one thing I can't do for you is know how you connect to your
+database, or indeed your password/username combo. So you will have to
+get yourself a database handle. Sorry! I wanted this to be a black box
+solution, but couldn't think of how, as I know not your circumstances.
+
+The Scripts.
+
+You don't really need me to write them, do you? ;-) I do have example ones,
+if you really want. All done with the ever-lovely and fragrant CGI object. Which
+I find useful, as I don't like writing HTML. At all.
+
+
+
+Copyright (C) 2001 mwk. All rights reserved.
+ 
+This library is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+ 
+MWKerr, <coder@stray-toaster.co.uk>     

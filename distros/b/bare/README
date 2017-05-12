@@ -1,0 +1,17 @@
+This is version 0.02 of the Perl 5 bare.pm module.
+
+It provides access to scalar variables without a leading sigil.
+
+----------
+
+To install the module, enter these commands:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+----------
+
+For more information:
+perldoc bare

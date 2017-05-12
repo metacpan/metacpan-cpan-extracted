@@ -1,0 +1,54 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head><title>Payroll Out</title>
+  
+                               
+  <meta http-equiv="content-type" content="text/html; charset=ISO-8859-1"></head><body>
+  Output Payroll XML Document<br>
+  <br>
+  &lt;payroll type="cooked" version="1.1" date="" period="" genSysId="" startPeriod="" endPeriod=""&gt;<br>
+  &nbsp; &lt;person id="" name=""&gt;<br>
+  &nbsp; &nbsp; &lt;item name="" value="" comment=""/&gt;<br>
+  &nbsp; &lt;/person&gt;<br>
+  &lt;/payroll&gt;<br>
+  <br>
+  <br>
+  specify a &lt;item&gt; for each item that applies to the person's payroll
+ entry.<br>
+  Ex:<br>
+  <br>
+&nbsp; &lt;person id="123456789" name="John Doe"&gt;<br>
+  &nbsp; &nbsp; &lt;item name="gross" value="500.00"/&gt;<br>
+  &nbsp; &nbsp; &lt;item name="US Federal" value="-10.00"/&gt;<br>
+  &nbsp; &nbsp; &lt;item name="US Medicare" value="-5.00"/&gt;<br>
+&nbsp; &nbsp; &lt;item name="US FICA" value="-5.00"/&gt;<br>
+  &nbsp; &nbsp; &lt;item name="US MO" value="-10.00"/&gt;<br>
+  &nbsp; &nbsp; &lt;item name="US IL" value="-2.00"/&gt;<br>
+&nbsp; &nbsp; &lt;item name="US Mileage" value="5.25"/&gt;<br>&nbsp; &nbsp; &lt;item name="Reimbursement" value="5.25" comment="Sharpees"/&gt;<br>
+&nbsp; &nbsp; &lt;item name="Correction" value="-15.75" comment="Overpay
+for 20020915"/&gt;<br>
+  &nbsp; &nbsp; &lt;item name="net" value="466.75"/&gt;<br>
+  &nbsp; &lt;/person&gt;<br>
+  <br>
+  <br>
+  The output perl data structure:<br>
+  <br>
+  data = { version, date, persons, period, genSysId, startPeriod, endPeriod }<br>
+  where persons =&nbsp; array of persons.<br>
+  genSysId is an identifier that the generating system associated with this
+payroll.<br>
+startPeriod and endPeriod are dates that define the start and end date of the payroll period being processed.<br>
+  In each person, { id, name, items }<br>
+  where items = array of item entries.<br>
+  <br>
+  In each item, { name, value, comment }<br>
+If the comment is empty, we do not have to output it in the xml document.
+&nbsp;If the comment does not exist in the item tag, then we assume it is
+empty.<br>
+   <br>
+Changes from 1.0 -&gt; 1.1:<br>
+<ul>
+  <li>Added startPeriod, endPeriod attributes to the &lt;payroll&gt; tag.</li>
+</ul>
+
+<br>
+</body></html>

@@ -1,0 +1,4 @@
+TODO:
+
+- Add checks for errors into function
+- Improve IBAN formating in order to manage IBAN from other state than France.

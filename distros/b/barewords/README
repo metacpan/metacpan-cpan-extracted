@@ -1,0 +1,29 @@
+barewords version
+=================
+
+creates 'use strict'-friendly barewords
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+   Test::More
+   constant
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2005 by Salvador Fandino
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+

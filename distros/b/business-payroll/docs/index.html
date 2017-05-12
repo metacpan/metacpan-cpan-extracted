@@ -1,0 +1,61 @@
+<html>
+<head>
+  <title>Perl Payroll Modules</title>
+  <style type="text/css" title="Style 1"><!--
+    a:link    { text-decoration: none; color: blue }
+    a:visited { text-decoration: none; color: blue }
+    a:hover   { text-decoration: underline; color: blue }
+    a:active  { text-decoration: none; color: blue }
+    p.header { margin-left: 2in; margin-right: 2in; padding: 2mm; background-color : lightblue; }
+    p.content { margin-left: 2.25in; margin-right: 2.25in; }
+    ul.content { margin-left: 2.25in; margin-right: 2.25in; }
+  -->
+  </style>
+</head>
+<body>
+  <table border="0" width="100%" cellpadding="2" cellspacing="0">
+    <tr>
+        <td align="left"><a href="http://www.pcxperience.org/"><img src="http://www.pcxperience.com/images/logo.gif" alt="Xperience, Inc." border=0></a></td>
+        <td align="left"><h1><font color="black">Perl Payroll Modules</font></h1></td>
+    </tr>
+  </table>
+  <p>
+Business::Payroll is a series of Perl Modules that provides an API for working with
+multiple countries federal, state and local taxes.  It also supports calculating
+mileage reimbursement values and can handle adjustment entries.
+</p>
+<p>
+The Business::Payroll module starts with an xml document in the Input format and if 
+everything is successfull, outputs the results in the Output XML format.
+
+</p>
+<p>
+Currently only the US is supported and MO is the only supported state.  We are
+not supporting any cities in MO yet.  Federal Income, FICA, Medicare and 
+Mileage Rates are all being calculated.  We take into account the number of
+allowances people can claim and the fact that you can withhold more for 
+federal and state.
+
+</p>
+<p>
+Federal Income tables are only available for any date >= 07/01/2001.
+
+</p>
+<p>
+See the payroll_test.pl script and input.xml file for a sample implementation.
+</p>
+<p>
+Use process_payroll (in the /usr/bin directory after an rpm install, otherwise
+in the payroll-x.y directory) to actually process payroll files for real.
+</p>
+<p>
+process_payroll will take the specified raw xml file and process it.  If no
+errors occured, then you get the result on stdout.  If you specify 2 file names
+the result will go into the second file.  You can specify - (for the first file)
+and it will know to work with stdin.  I.e.  you can pipe the file to be 
+processed.  Ex. 'cat input.xml | process_payroll -' would process input.xml from
+the stdin and then output the result to stdout.
+</p>
+<p>The files can be downloaded from <a href="http://search.cpan.org/author/JAMESP/">CPAN</a>.</p>
+</body>
+</html>

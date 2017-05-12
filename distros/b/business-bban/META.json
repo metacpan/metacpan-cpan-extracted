@@ -1,0 +1,45 @@
+{
+   "abstract" : "helpers to compute BBAN key and generate an BBAN.",
+   "author" : [
+      "Marc Chantreux <khatar@phear.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.036, CPAN::Meta::Converter version 2.142690",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "business-bban",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Pod" : "1.22",
+            "Test::Pod::Coverage" : "1.10"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "homepage" : "https://github.com/eiro/p5-business-bban",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/eiro/p5-business-bban.git",
+         "web" : "https://github.com/eiro/p5-business-bban"
+      }
+   },
+   "version" : "0.0"
+}
+
