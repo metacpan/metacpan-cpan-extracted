@@ -1,0 +1,7 @@
+#PROC srvWhoAmI
+"HTPL Server";
+#END PROC
+
+#PROC srvSquare a
+$a ** 2;
+#END PROC

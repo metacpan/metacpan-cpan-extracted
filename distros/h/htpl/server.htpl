@@ -1,0 +1,105 @@
+<#
+use HTML::HTPL::Client;
+use strict qw(vars subs);
+use vars qw($func $params $fn $mod $sub $src $users $cipher $key $call $found
+        $bin $code @params $res $type $REMOTE_USER);
+
+&rewind;
+
+if ($call =~ /^(.*?)\((.*?)\)$/) {
+    $func = lc($1);
+    $params = $2;
+} else {
+    &err("Syntax error");
+}
+
+open(C, "server_procs") || &err("Can't open server_procs");
+while(<C>) {
+    chop;
+    my @fields;
+    if (/,/) {
+        @fields = splitline($_);
+    } else {
+        @fields = split(/\s+/);
+    }
+    ($fn, $mod, $sub, $src, $users, $key) = @fields;
+    if (lc($fn) eq $func) {
+        $found = 1;
+        last;
+    }
+}
+&err("Illegal function call: $func") unless ($found);
+
+&err("Permission denied") unless (!$users ||
+               $REMOTE_USER =~ /^$users$/);
+
+if ($src) {
+    my ($srcdate, $moddate);
+    $srcdate = &lastmodified($src);
+    $moddate = &lastmodified($mod);
+    if ($moddate < $srcdate) {
+        $bin = $HTML::HTPL::Config::dbgbin;
+        $code = `$bin -t -w -o $mod $src`;
+        &err("Error when translating module: $code") if ($code);
+    }
+}
+
+@params = splitline($params);
+
+$@ = undef;
+eval qq!require "$mod";!;
+&err("Error when loading module: $@") if ($@);
+
+&err("Taint subname: $sub") if ($sub =~ /[^a-zA-Z0-9_]/);
+
+my $coderef= UNIVERSAL::can(__PACKAGE__, $sub);
+
+&err("Function not found: $sub") unless $coderef;
+
+$@ = undef;
+# Support prototyped functions
+my $p = join(", ", map {"'" . quotemeta($_) . "'";} @params);
+eval "\$res = $sub($p);";
+
+&err("Runtime error: $@") if ($@);
+
+$type = $RESPONSE_SIMPLE;
+if (ref($res)) {
+    require Storable;
+    import Storable;
+    $res = freeze($res);
+    $type = $RESPONSE_FREEZETHAW;
+}
+
+if ($key) {
+    unless ($key =~ /^(\w+?):(.*)$/) {
+        die "Old cipher format obsolete. Must be: Algorithm:Key";
+    }
+    require Crypt::CBC;
+    my $cipher = new Crypt::CBC($2, $1);
+
+    $res = $cipher->encrypt($res);
+}
+
+require Compress::Zlib;
+my $zcmp = Compress::Zlib::deflateInit();
+my $out = $zcmp->deflate($res);
+$out .= $zcmp->flush;
+
+if (length($out) < length($res)) {
+    $res = $out;
+    $type = $RESPONSE_ZLIB . $type;
+}
+
+&setmimetype("application/$RESPONSE_PREFIX$type");
+&addheader("$VERSION_HEADER: $VERSION");
+print $res;
+exit;
+
+sub err {
+    rewind;
+    setmimetype("application/$RESPONSE_PREFIX$RESPONSE_ERROR");
+    print shift;
+    exit;
+}
+>

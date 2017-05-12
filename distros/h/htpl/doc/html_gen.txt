@@ -1,0 +1,77 @@
+You can use the following wrapper classes:
+HTML::HTPL::Table for html_table_rows
+HTML::HTPL::Template for subhash
+HTML::HTPL::Select for html_selectbox
+
+Main usage:
+
+Tables:
+
+$table = &new_table(cols => 4);
+$table->add(qw(1 2 3 4));
+$table->add(qw(a b c d));
+print $table->asstring;
+
+Templates:
+
+$temp = &new_template('file1.tem');
+$temp->vars(%hash);
+print $temp->asstring;
+$temp->vars(%hash2);
+print $temp->asstring;
+
+Templates are defined with key substitution, for example:
+$text = "Coordinates are #X# and #Y#";
+$temp = &newtemplate(\$text); # Scalar reference to supply text and not
+                              # file
+$temp->vars('x' => 12, 'y' => 34);
+print $temp->ashtml;
+To loop over an array of hashrefs with identical keys:
+$table = [{'a' => 1, 'b' => 2}, {qw(a 3 b 6)}];
+%hash = ('ab_table' => $table, 'sign' => 2);
+$template = <<EOM;
+#sign# signs
+#?if sign gt 10#
+More than 10!!!<BR>
+#?end#
+#?foreach ab_table#
+A is #a# and B is #b#<BR>
+#?end#
+<A HREF="#self#">Search again</A>
+EOM
+
+If you have a result set,
+$temp->vars(%vars);
+$temp->fromresult('ab_table', $myresultset);
+
+Select boxes:
+$sel = &new_select('country');
+$sel->add(qw(SE Sweden DK Denmark NO Norway FI Finland IS Iceland));
+$sel->default('SE');
+print $sel->asstring;
+
+html_treeview
+This is a very problem oriented tree view, that assumes a single page used
+for viewing the tree.
+Example:
+&html_treeview(['key1', 'Section 1', {'choice' => 'key1'}, [
+                      ['key1_1', 'Section 1.1', {}, []],
+                      ['key1_2', 'Section 1.2', {'x' => 1}, []],
+                ]], 'expanded');
+
+Second parameter is the CGI variable used to store which nodes are opened.
+They will be identified by the keys. If called to return a value, returns
+the HTML code, otherwise prints it.
+First parameter is the root node. Every node is an array ref of 4
+elements:
+1) Key for node
+2) Caption, including HTML
+3) Attribute list.
+If ommited, field 2 will be displayed with no changes. If a hashref, field
+2 will be inside a link to the same page, with the variables in the hash
+added to the query field. If a scalarref, the value of the scalar will be
+used as the name of the extra parameter, its value will be the key of this
+node.
+4) Arrayref of children.
+Collsapsing and expanding will be implemented by HREFs to the same page,
+with the parameter noted above changed.

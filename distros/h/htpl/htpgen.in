@@ -1,0 +1,114 @@
+#!@PERL@
+
+$| = 1;
+
+use HTML::HTPL::Sys;
+use HTML::HTPL::Lib;
+use HTML::HTPL::Config;
+
+$dbgbin = $HTML::HTPL::Config::dbgbin;
+
+die "Usage: $0 filename" if ($#ARGV);
+
+$filename = $ARGV[0];
+
+use XML::Parser;
+
+$parser = new XML::Parser(Style => 'Tree');
+
+
+$result = $parser->parsefile($filename);
+
+$root = $result->[0];
+
+die "Root must be GEN" unless (uc($root) eq 'GEN');
+
+$children = $result->[1];
+
+$attrs = shift @$children;
+
+die "Unexpected attributes for GEN" if (%{$attrs});
+
+while (@$children) {
+    $tag = shift @$children;
+    $grand = shift @$children;
+    next if ($tag eq '0' && $grand =~ /^\s*$/);
+    die "Unexpected free text" if ($tag eq '0');
+    $attr = shift @$grand;
+    &HTML::HTPL::Sys::safehash($attr);
+    $tag =~ tr/a-z/A-Z/;
+    if ($tag eq 'SCHEME') {
+        $name = $attr->{'name'};
+        die "Unnamed scheme" unless ($name);
+        delete $attr->{'name'};
+        die "Unexpected attributes for SCHEME" if (%$attr);
+        &addscheme($name, $grand);
+        next;
+    }
+    if ($tag eq 'FILE') {
+        $name = $attr->{'name'};
+        die "Unnamed file" unless ($name);
+        delete $attr->{'name'};
+        die "Unexpected attributes for FILE" if (%$attr);
+        push(@files, $name);
+        print "Adding file $name\n";
+        next;
+    }
+    die "Unrecognized tag $tag";
+}
+
+&generate();
+
+sub addscheme {
+    my ($name, $grand) = @_;
+    print "Creating scheme $name\n";
+    my @children = @$grand;
+    my %vars;
+    while (@children) {
+        my $tag = shift @children;
+        my $args = shift @children;
+        next if ($tag eq '0' && $args =~ /^\s*$/);
+        die "Unexpected free text" if ($tag eq '0');
+        $attr = shift @$args;
+        &HTML::HTPL::Sys::safehash($attr);
+        if (uc($tag) eq 'VAR') {
+            die "Unexpected children for VAR" if (@$args);
+            my $name = $attr->{'name'};
+            die "Unnamed variable" unless ($name);
+            delete $attr->{'name'};
+            my $val = $attr->{'value'};
+            delete $attr->{'value'};
+            die "Unrecognized attributes for VAR" if (%$attr);
+            $vars{$name} ||= [];
+            push (@{$vars{$name}}, $val);
+        }
+    }
+    mkdir $name, 0755;
+    push(@schemes, [$name, \%vars]);
+}
+
+sub generate {
+    my %save = %ENV;
+    $ENV{'REQUEST_METHOD'} = 'GET';
+    foreach my $file (@files) {
+        print "Generating $file: ";
+        die "$file not found" unless (-f $file);
+        my $filename = &HTML::HTPL::Lib::tempfilename;
+        my $code = `$dbgbin -t -o $filename $file`;
+        die "Could not translate $file: $code" if ($code);
+        my $dest = $file;
+        $dest .= "." unless ($dest =~ /\./);
+        $dest =~ s/\.\w*$/.html/;
+        foreach my $scheme (@schemes) {
+            my ($name, $vars) = @$scheme;
+            print "$name, ";
+            my $query = &HTML::HTPL::Lib::querystring(%$vars);
+            $ENV{'QUERY_STRING'} = $query;
+            my $code = system("$^X $filename > $name/$dest");
+            die "Script exited abnormally" if (int($code / 256));
+        }
+        unlink $filename;
+        print "\010\010.\n";
+    }    
+    %ENV = %save;
+}

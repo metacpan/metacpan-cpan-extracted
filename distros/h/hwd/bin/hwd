@@ -1,0 +1,627 @@
+#!/usr/bin/perl -w
+
+use strict;
+use warnings;
+use Getopt::Long;
+use Pod::Usage;
+use App::HWD;
+use Text::CSV_XS;
+use Text::Wrap;
+
+our $wrap = 72;
+
+if ( -t STDOUT ) { # If we're not redirecting
+    eval "use Term::ReadKey";
+    if ( !$@ ) {
+        $wrap = (Term::ReadKey::GetTerminalSize(*STDOUT))[0];
+    }
+}
+
+MAIN: {
+    my $show_nextid;
+    my $show_started;
+    my $show_tasks;
+    my $show_burndown;
+    my $show_todo;
+    my $csv;
+    my $notes = 1;
+    my $strict = 1;
+
+    Getopt::Long::Configure( "no_ignore_case" );
+    Getopt::Long::Configure( "bundling" );
+    GetOptions(
+        'nextid'        => \$show_nextid,
+        'todo'          => \$show_todo,
+        'started:s'     => \$show_started,
+        'tasks:s'       => \$show_tasks,
+        'burndown'      => \$show_burndown,
+        'wrap:i'        => \$wrap,
+        'csv!'          => \$csv,
+        'notes!'        => \$notes,
+        'strict!'       => \$strict,
+        'h|help|?'      => sub { pod2usage({-verbose => 1}); exit; },
+        'H|man'         => sub { pod2usage({-verbose => 2}); exit; },
+        'V|version'     => sub { print_version(); exit; },
+    ) or exit 1;
+    #die "Must specify input files\n" unless @ARGV;
+
+    # XXX the --started and --tasks options with no argument eats the filename.
+    # Attempt to compensate.
+    for my $var ($show_started, $show_tasks) {
+        if ($var and -e $var) {
+            unshift @ARGV, $var;
+            $var = '';
+        }
+    }
+
+    my ($tasks,$works,$tasks_by_id,$errors) = App::HWD::get_tasks_and_work( *ARGV );
+    if ( @$errors ) {
+        print join( "\n", @$errors, "" );
+        die if $strict;
+    }
+
+    if ( $show_nextid ) {
+        my $max = (sort {$a <=> $b} keys %$tasks_by_id )[-1];
+        $max = $max ? $max+1 : 101;
+        print "Next task ID: $max\n";
+        exit;
+    }
+
+    my $show_full_dump = 1;
+    my $filter = undef;
+
+    if ( $csv ) {
+        show_full_dump( $tasks, $filter, $wrap, $csv, $notes );
+        $show_full_dump = 0;
+    }
+
+    if ( defined $show_tasks ) {
+        show_tasks( $show_tasks, $tasks, $works, $tasks_by_id );
+        $show_full_dump = 0;
+    }
+
+    if ( $show_burndown ) {
+        show_burndown( $tasks, $works, $tasks_by_id );
+        $show_full_dump = 0;
+    }
+
+    if ( defined $show_started ) {
+        show_started( $show_started, $tasks, $works, $tasks_by_id );
+        $show_full_dump = 0;
+    }
+
+    if ( $show_todo ) {
+        $filter = sub {
+            my $task = shift;
+            return $task->is_todo;
+        };
+        show_full_dump( $tasks, $filter, $wrap, $csv, $notes );
+        $show_full_dump = 0;
+    }
+
+    if ( $show_full_dump ) {
+        show_full_dump( $tasks, $filter, $wrap, $csv, $notes );
+        print "\n";
+        show_totals( $tasks );
+    }
+}
+
+
+sub show_full_dump {
+    my $tasks = shift;
+    my $filter = shift;
+    my $wrap = shift;
+    my $csv = shift;
+    my $notes = shift;
+    my @notes = shift;
+
+    my @fields = qw( estimated velocity started unstarted deleted );
+
+    my %total;
+    $total{$_} = 0 for @fields;
+
+    print "Task  Est.   Vel.  X Description\n";
+    print "----  ----   ----  - -----------\n";
+    for my $task ( @$tasks ) {
+        my $points = $task->estimate || 0;
+        if ( $task->date_deleted ) {
+            $total{deleted} += $points;
+        }
+        else {
+            if ( $points ) {
+                $total{estimated}   += $points;
+                $total{velocity}    += $points if $task->completed;
+                $total{started}     += $points if $task->started && !$task->completed;
+                $total{unstarted}   += $points if !$task->started;
+            }
+            if ( !$filter || $filter->( $task ) ) {
+                print_task( $task, $wrap, $csv, $notes );
+            }
+        }
+    }
+
+    if ( !$csv ) {
+        print "\n";
+        for my $type ( @fields ) {
+            printf "%6.2f %s\n", $total{$type}, $type;
+        }
+    }
+}
+
+sub print_task {
+    my $task = shift;
+    my $wrap = shift;
+    my $csv = shift;
+    my $notes = shift;
+
+    my $level = $task->level;
+    my $name = $task->name;
+    my $id = $task->id;
+    my @notes = $notes ? $task->notes : ();
+
+    if ( $id || $task->estimate ) {
+        my $worked = $task->hours_worked;
+        my $estimate = $task->estimate;
+
+        unless ( $csv ) {
+            $worked = fractiony( $worked );
+            $estimate = fractiony( $estimate );
+        }
+        my $x = $task->completed ? "X" : " ";
+        print_cols( $wrap, $csv, $level, $id, $estimate, $worked, $x, $name, @notes );
+    }
+    else {
+        print_cols( $wrap, $csv, $level, ("") x 4, $name, @notes );
+    }
+}
+
+sub print_cols {
+    my $wrap = shift;
+    my $csv = shift;
+    my $level = shift;
+    my @cols = splice( @_, 0, 5 );
+    my @notes = @_;
+
+    for ( @cols[0..0] ) {
+        $_ = $_ ? sprintf( "%4d", $_ ) : "";
+    }
+    for ( @cols[2..5] ) {
+        $_ = "" unless defined $_;
+    }
+
+    if ( $csv ) {
+        my $csv = Text::CSV_XS->new;
+        s/^\s+// for @cols;
+        s/\s+$// for @cols;
+        $csv->combine( @cols ) or die "Can't create a CSV string!";
+        print join( ",", $csv->string ), "\n";
+    }
+    else {
+        my $indent = " " x (($level-1)*4);
+        my $desc = $cols[4];
+
+        my $leader1 = sprintf( "%4s %6.6s %6.6s %1s %s", @cols[0..3], $indent );
+        my $spacing = (" " x 21) . $indent;
+        if ( $wrap ) {
+
+            local $Text::Wrap::columns = $wrap;
+            print wrap( $leader1, $spacing, $desc ), "\n";
+
+            if ( @notes ) {
+                print wrap( "$spacing    * ", "$spacing      ", @notes ), "\n";
+            }
+        }
+        else {
+            print "$leader1$desc\n";
+            print "$spacing  * @notes\n";
+        }
+    } # not CSV
+}
+
+
+sub fractiony {
+    my $n = shift;
+    my $str;
+
+    if ( $n ) {
+        my $frac = $n - int($n);
+        $str = sprintf( "%4d", int($n) );
+        $str .= $frac ? "+" : " ";
+    }
+    else {
+        $str = "";
+    }
+    return $str;
+}
+
+sub show_started {
+    my ( $who, $tasks, $works, $tasks_by_id ) = @_;
+
+    my %started;
+    foreach my $w (@$works) {
+        next if $who && ($who ne $w->who);
+        my $t = $tasks_by_id->{$w->task};
+        if ( !$t->completed() ) {
+            $started{$w->who}{$t->id}++;
+        }
+    }
+    my %unique_tasks;
+    foreach my $w (sort keys %started) {
+        print "$w is working on...\n";
+        my $points = 0;
+        foreach my $key (sort { $a <=> $b } keys %{$started{$w}}) {
+            my $task = $tasks_by_id->{$key};
+            print "  " . $task->summary . "\n";
+            $points += $task->estimate;
+            $unique_tasks{ $key } = $task->estimate;
+        }
+        print "$w has $points points open\n";
+        print "\n";
+    }
+    if ( !$who ) {
+        my $total_points = 0;
+        $total_points += $unique_tasks{$_} for keys %unique_tasks;
+        print "$total_points points open on the project\n";
+    }
+} # show_started
+
+
+sub show_tasks {
+    my ( $who, $tasks, $works, $tasks_by_id ) = @_;
+
+    my %worker;
+    foreach my $t (@$tasks) {
+        foreach my $w ($t->work) {
+            $worker{ $w->who }{$t->id}++;
+        }
+    }
+
+    my @who = $who ? ($who) : keys %worker;
+    foreach my $w (@who) {
+        if ( !$worker{$w} ) {
+            print "$w has no tasks!\n";
+            next;
+        }
+        print "$w worked on:\n";
+        foreach my $id (keys %{$worker{$w}}) {
+            my $task = $tasks_by_id->{$id};
+            print "  ", $task->summary, "\n";
+        }
+        print "\n";
+    }
+} # show_tasks
+
+
+sub show_burndown {
+    my ( $tasks, $works, $tasks_by_id ) = @_;
+
+    my %day;
+
+    # ASSUMPTION: projects will finish before Jan 1, 2100
+    my $earliest = ParseDate("2100/1/1"); 
+
+    # determine the earliest date work has been done and keep track
+    # of finished task points
+    foreach my $w (@$works) {
+        my $date = ParseDate($w->when)
+            or die "Work " . $w->task . " has an invalid date: " . $w->when;
+        if (Date_Cmp($date, $earliest) < 0) {
+            $earliest = $date;
+        }
+        if ( $w->completed ) {
+            my $est = $tasks_by_id->{ $w->task }->estimate;
+            $day{$date}{finished} += $est;
+        }
+    }
+
+    # determine the total for each date
+    foreach my $t (@$tasks) {
+        next if $t->date_deleted;
+        my $date = ParseDate( $t->date_added ) || $earliest;
+        if ( !$date ) {
+            die "Task " . $t->name . " has no date!";
+        }
+        $day{$date}{total} += $t->estimate;
+    }
+
+    # Print the running task and finished totals
+    my $total;
+    my $finished;
+    my $format = "\%10s\t\%-5s\t\%-s\n";
+    printf $format, qw(YYYY/MM/DD Total Todo);
+    foreach my $date (sort keys %day) {
+        $total += $day{$date}{total} || 0;
+        $finished += $day{$date}{finished} || 0;
+        $date =~ s#^(\d{4})(\d\d)(\d\d).+#$1/$2/$3#
+            or die "Invalid date ($date)";
+        printf $format, $date, $total, $total - $finished;
+    }
+}
+
+sub show_totals {
+    my ( $tasks, $works, $tasks_by_id ) = @_;
+
+    my @totals;
+    my $curr_total;
+
+    for my $task ( @$tasks ) {
+        if ( $task->level eq 1 ) {
+            push( @totals, $curr_total = [ 0, $task->name ] );
+        }
+        if ( !$task->date_deleted ) {
+            $curr_total->[0] += $task->estimate;
+        }
+    }
+
+    for $curr_total ( @totals ) {
+        printf( "%4d %s\n", $curr_total->[0], $curr_total->[1] );
+    }
+}
+
+sub print_version {
+    printf( "hwd v%s\n", $App::HWD::VERSION, $^V );
+}
+
+__END__
+
+=head1 NAME
+
+hwd -- The How We Doin'? project tracking tool
+
+=head1 SYNOPSIS
+
+hwd [options] schedule-file(s)
+
+Options:
+
+        --nextid    Display the next highest task ID
+        --todo      Displays tasks left to do, started or not.
+        --started   Displays tasks that have been started
+        --started=person
+                    Displays tasks started by person
+        --tasks     Displays tasks sorted by person
+        --tasks[=person]
+                    Displays tasks for a given user
+        --burndown  Display a burn-down table
+
+        --wrap=n    Wrap output at n columns, or 0 for no wrapping.
+                    Default is 72, or terminal width if available.
+        --csv       Output in CSV format
+        --nonotes   Omit the notes from the output
+        --strict    Die on problems in the input file (default)
+        --nostrict  Print output even if there are non-fatal errors
+
+    -h, --help      Display this help
+    -H, --man       Longer manpage for prove
+    -V, --version   Display version info
+
+=head1 COMMAND LINE OPTIONS
+
+=head2 --todo
+
+Limit the dump of tasks to only those that are left to do, whether or
+not they've been started.
+
+=head2 --started[=who]
+
+Shows what tasks have been started by the person specified, or by everyone
+if no one one is specified.
+
+    Ape is working on...
+      104 - Add FK constraints between FOOHEAD and BARDETAIL (2/2)
+
+    Chimp is working on...
+      107 - Refactor (1/1)
+
+=head2 --tasks[=person]
+
+Shows the list of tasks and their status sorted by user.  If a person is
+specified, only the tasks for that person will be shown.
+
+=head2 --nextid
+
+Shows the next ID available.
+
+=head2 --burndown
+
+Print a "burn down" graph:
+
+    YYYY/MM/DD      Total   Todo
+    2005/07/15      100     98
+    2005/07/17      100     77
+    2005/07/18      100     75
+    2005/07/19      100     70
+
+That is, how fast is the amount of work left "burning down" to zero?
+
+=head2 --strict, --nostrict
+
+By default, C<--strict> is on and hwd will not print output if there
+are errors in the input.  You can use the C<--nostrict> for when you're
+getting your first schedule pulled together and don't mind the errors
+and the inaccuracies they cause, in the name of seeing some output.
+
+=head2 -V, --version
+
+Display version info.
+
+=head1 HWD FILE FORMAT
+
+The HWD file format is intentionally very simple.  It's designed to be
+usable in plain ol' text editors, and merge easily in a version control
+system like Subversion.
+
+The order of lines in the file are significant, except for work lines
+that correspond to a numbered task.
+
+=head2 TASKS
+
+The core of an .hwd file is the task line.  Each task line corresponds to one task.
+Here are some sample task lines:
+
+    -Report printing
+    --Data entry screen (4h, #101)
+    --Data entry validation (6h, #102)
+        Needs to handle Canadian postcodes, too.
+    --Data marshalling
+    ---Design temp tables (2h, #67, added 2006-01-05)
+    ---SQL queries (4h, #103)
+    --Report generation
+    ---Install Report-o-gram (2h, #105, deleted 2006-02-08)
+        Not needed for this project.  We'll work with what we have.
+    ---Write report code (2h, #106)
+
+The number of dashes before each line indicate the depth in the work
+outline.  The text up to the parentheses is the name/description of
+the task.  Lines beginning with whitespace are notes (see below).
+
+The parenthetical block is control information for the task,
+and may include any of the following, separated by commas, in any order:
+
+=over 4
+
+=item * Task number
+
+The task number is an optional, unique, arbitrary, numeric key for the task.  If you're not doing task
+tracking, you don't need one.  The task number must match C</^#\d+$/>.
+
+=item * Time estimate
+
+Estimated amount of actual work to be done on the task.  Rollup tasks,
+or tasks with subtasks, may not have time estimates on them.  Times must
+match C</^(\d+\.)?\d+h$/> for hours, or C</^\d+m$> for minutes.
+
+=item * Date added
+
+Tells the date the task was added to the schedule
+
+=item * Date deleted
+
+Tells the date the task was deleted from the schedule.  Note that it
+appears in the file, but if you just delete the line from the file,
+you won't have that history to tell that your amount of work went down.
+
+=back
+
+=head2 NOTES AND COMMENTS
+
+Any line that starts with whitespace is seen as a note for the task
+immediately preceding it.
+
+Any line that begins with a C<#> is a comment in the file, and is ignored
+during processing.
+
+=head2 TRACKING WORK
+
+If you want to use F<hwd> as just an outliner/scheduler, that's fine.
+However, you can then put your work entries into the F<.hwd> file and
+have F<hwd> tell you how you're doing on the project.
+
+Work is recorded with work lines that follow this format:
+
+    Who     Date    Task#   Time X?
+
+All fields are separated by whitespace, and the Who column cannot contain
+spaces.  The optional C<X> tells whether the task was completed or not.
+
+Here are some examples.
+
+    --Do some stuff (#105)
+    --Do some other stuff (#253)
+    Arlo    3/09    105     3h
+    Arlo    3/09    253     15m X
+
+Arlo worked on March 9th on task 105 for 3 hours, and then on task 253
+for 15 minutes, and completed it.  At this point, task 105 is open and
+253 is closed.
+
+Later, we find these work entries.
+
+    Arlo    3/10    105     2 X
+    Arlo    3/10    253     5
+
+Arlo finished up 105, but found bugs in task 253 and went back to work
+on it.  Now, task 105 is closed, and 253 has been re-opened because more
+work was done on it without having been completed.  Note that without
+specifying "h" for hours or "m" for minutes, I<hwd> assumes hours.
+
+It's not necessary to have numbered tasks to use the work tracking.
+If you don't want to hassle with numbering, you can use the magic task
+number of C<^> (caret) to apply the work to the most recent task in
+the file.  For example, our previous examples could have been written as
+
+    --Do some stuff (#105)
+    Arlo    3/09    ^       3
+    Arlo    3/10    ^       2 X
+    --Do some other stuff (#253)
+    Arlo    3/09    ^       .25h X
+    Arlo    3/10    ^       5h
+
+Note that for unnumbered tasks, the relative order of the lines
+is important so that the work is applied to the appropriate tasks.
+For numbered tasks, tasks and work can appear in any order.  Also,
+you can combine numbered and unnumbered, so that you can have:
+
+    --Do some stuff (#105)
+    --Do some other stuff (#253)
+    Arlo    3/09    105     2 X
+    Arlo    3/10    ^       5
+    Arlo    3/10    105     15m X
+    Arlo    3/09    ^       3
+
+=head1 TODO
+
+=over 4
+
+=item * Better documentation
+
+=item * Samples so that prospective users can see what it will do.
+
+=item * Tutorial showing different commands and output
+
+=item * Add support for HWDFILE environment variable so those of us who
+are only ever using one file don't have to keep retyping the name all
+the time.
+
+=item * Make sure a rollup task has no hours, and that any task with no
+hours has tasks below it.
+
+=item * Add support for changing estimates on a task
+
+=item * Open tasks are doubling up if two people have it open.
+
+=item * Show task history
+
+=item * Show tasks that are too big.
+
+=item * Show tasks that have gone over
+
+=item * Weekly burndown
+
+The C<--burndown> flag gives totals as they happen.  I want them to give
+a Monday-morning total since I like to plot weekly, not daily.
+
+=back
+
+=head1 BUGS
+
+Please use the CPAN bug ticketing system at L<http://rt.cpan.org/>.
+You can also mail bugs, fixes and enhancements to 
+C<< <bug-app-hwd at rt.cpan.org> >>.
+
+=head1 AUTHORS
+
+Andy Lester C<< <andy at petdance.com> >>
+
+=head1 COPYRIGHT
+
+Copyright 2006 by Andy Lester C<< <andy at petdance.com> >>.
+
+This program is free software; you can redistribute it and/or 
+modify it under the same terms as Perl itself.
+
+See L<http://www.perl.com/perl/misc/Artistic.html>.
+
+=cut
+
+# vim: expandtab

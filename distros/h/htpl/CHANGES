@@ -1,0 +1,50 @@
+Versions:
+
+3.14: Added result set merging feature.
+3.13: Added multi word tokens for the macro processor.
+3.12: Tie-Tools is no more a separate package.
+3.11: Rewrote HTPL.net with Crypt::CBC, it is not compatible with old HTPL.net.
+3.10: Rewrote all C functions that used varargs. Upgraded configure to guess defaults for RedHat Linux.
+3.08: Fixed bugs in the component support
+3.07: Fixed mod_perl support for contemporary versions of Apache.
+3.06: Added perl one liners.
+3.05: Added ACL database and multiple database connections
+3.02: Added macros and utility functions
+3.00: Debug screens added
+2.96: Perl subroutine post processor added
+2.95: Improved configure script supports caching
+2.94: Improved macro parser generator, improved transaction
+implementation.
+2.85: PTS ceased, due to memory management impossibility.
+2.81: Experimental middle-ware architecture: PTS, with the htplss
+packager.
+2.80: Tie-Tools as a seperate package
+2.79: htreporter can be configured with XML via the XML::Conf module.
+2.77: Result sets can be dumped to an HTML Table (via a Table object) or
+XML.
+2.76: Locale date strings are supported via the Date::Language module.
+2.71: Introduced HTGenerator
+2.70: Fixed bugs in HTPL.net and HTReporter
+2.69: Added preprocessor, post processor and inprocessor.
+2.68: LDAP support resumed, perl lines beginning with a hash sign can be
+      continued next line if ended with a backslash. (For the sake of
+      macros)
+2.66: HTML::HTPL::Select working.
+2.65: htplsrvc working.
+2.64: improved subhash working, html_treeview working.
+2.63: Deprecated Crypt::Simple and Parse::TopDown.
+2.61: Reporter generator, security checks for sendmail exploit.
+2.60WIN: Experimental.
+2.60: Database component compiler, new date-time functions, list
+      functions, HTML::HTPL::Table, persistent objects, cookies,
+      web client, log and buffer dump functions, directory recursion,
+      directory and file handling functions,  self reference functions.
+2.50: HTPL.net, new macros, HTML generation, improved result sets,
+      Extensions to XPL (XML macro language for HTPL), module includes,
+      line oriented pre-processor, multiple fields form processing,
+      mail, web and internet functions, socket functions, one command
+      page coutner, obsolette GD support, Hebrew forms support, wrapping,
+      splitting and text processing.
+2.20: Macros, memory result sets, improved result sets.
+2: Result sets, HTML generation. URL Redirection & MIME types. 
+1: HTML/Perl preprocessor.

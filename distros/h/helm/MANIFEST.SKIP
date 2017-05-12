@@ -1,0 +1,12 @@
+\.swp$
+\.swo$
+_build
+^Build$
+\.bak$
+\.git
+blib
+\.svn
+\.helmrc
+^MYMETA.yml$
+\.conf$
+\.log$

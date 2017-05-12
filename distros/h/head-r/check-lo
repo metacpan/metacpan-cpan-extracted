@@ -1,0 +1,103 @@
+#!/usr/bin/perl
+### check-lo --- Check whether we the local loopback is usable  -*- Perl -*-
+## The idea is as per libwww-perl-6.05/talk-to-ourself.
+
+### Ivan Shmakov, 2013
+
+## To the extent possible under law, the author(s) have dedicated all
+## copyright and related and neighboring rights to this software to the
+## public domain worldwide.  This software is distributed without any
+## warranty.
+
+## You should have received a copy of the CC0 Public Domain Dedication
+## along with this software.  If not, see
+## <http://creativecommons.org/publicdomain/zero/1.0/>.
+
+### Code:
+
+use common::sense;
+use English qw (-no_match_vars);
+
+use lib '.';
+
+require t::Socket;
+my $class
+    = $t::Socket::Class
+    or die ("Huh?  No IO::Socket::INET6 or similar available?");
+
+my $test_s
+    = pack ("h*", "243F6A8885A308D313198A2E03707344");
+
+if (@ARGV >= 2 && $ARGV[0] eq "--port") {
+    ## This is the client
+    my $port
+        = $ARGV[1];
+    foreach my $h  (qw (ip6-localhost ::1 localhost),
+                    do {
+                        require Sys::Hostname;
+                        ## .
+                        Sys::Hostname::hostname ();
+                    }) {
+        ## .
+        my $socket
+            = $class->new ("PeerHost" => $h, "PeerPort" => $port,
+                           "Timeout"  => 7)
+            or next;
+        require IO::Select;
+        ## .
+        next
+            unless (IO::Select->new ($socket)->can_read (3));
+        my $buf;
+        my $n
+            = $socket->sysread ($buf, 1 + length ($test_s));
+        ## .
+        next
+            unless (defined ($n));
+        if ($buf eq $test_s) {
+            ## print the working hostname for localhost
+            print ($h, "\n");
+            ## .
+            exit;
+        }
+        warn ("Wrong server at ", $h, " port ", $port, "?\n");
+    }
+
+    die ("Unable to connect\n");
+} elsif (@ARGV != 0) {
+    die ("Usage: ", $PROGRAM_NAME, " [--port PORT]\n");
+}
+
+## This is the server
+my $socket
+    = $class->new ("Listen" => 1, "Timeout" => 7)
+    or die ($!);
+my $port
+    = $socket->sockport ();
+my @cmd
+    = ($EXECUTABLE_NAME, $PROGRAM_NAME, "--port", $port);
+open (my $client, "-|", @cmd)
+    or die ("Cannot run ", join (" ", @cmd), ": ", $!);
+
+my $c_socket
+    = $socket->accept ()
+    or die ("Test server timeout\n");
+
+$c_socket->print ($test_s);
+$c_socket->close ()
+    or die ("Cannot close client socket: ", $!);
+
+## print the class and the hostname the client used
+print ($class, "\n", <$client>);
+
+## .
+exit
+    if ($client->close ());
+die ($PROGRAM_NAME, ": Unable to wait for the client: ", $!,
+     " (", $?, ")\n",
+     $PROGRAM_NAME, ": Test failed");
+
+### Emacs trailer
+## Local variables:
+## coding: us-ascii
+## End:
+### check-lo ends here

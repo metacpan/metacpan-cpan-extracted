@@ -1,0 +1,56 @@
+{
+   "abstract" : "Converts an XHTML file into DocBook.",
+   "author" : [
+      "Kathryn Andersen"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4214",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "html2dbk",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.42"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Cwd" : "0",
+            "File::Basename" : "0",
+            "File::Spec" : "0",
+            "Getopt::ArgvFile" : "1.09",
+            "Getopt::Long" : "2.34",
+            "HTML::SimpleParse" : "0",
+            "Pod::Usage" : "0",
+            "XML::LibXML" : "0",
+            "XML::LibXSLT" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "HTML::ToDocBook" : {
+         "file" : "lib/HTML/ToDocBook.pm",
+         "version" : "0.0301"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "homepage" : "http://github.com/rubykat/html2dbk",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/rubykat/html2dbk.git"
+      }
+   },
+   "version" : "0.0301"
+}

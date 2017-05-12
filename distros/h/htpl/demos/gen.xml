@@ -1,0 +1,18 @@
+<GEN>
+<SCHEME NAME="English">
+<VAR NAME="hello" VALUE="Hi"/>
+</SCHEME>
+<SCHEME NAME="Swedish">
+<VAR NAME="hello" VALUE="Hej"/>
+</SCHEME>
+<SCHEME NAME="Norwegian">
+<VAR NAME="hello" VALUE="Hei"/>
+</SCHEME>
+<SCHEME NAME="Finnish">
+<VAR NAME="hello" VALUE="Moi"/>
+</SCHEME>
+<SCHEME NAME="Dutch">
+<VAR NAME="hello" VALUE="Hoi"/>
+</SCHEME>
+<FILE NAME="hello.htpt"/>
+</GEN>

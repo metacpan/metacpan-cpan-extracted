@@ -1,0 +1,8 @@
+.htpl - HTPL pages
+.htpr - HTPL scripts to run on command line
+.htpm - HTPL modules
+.htpc - HTPL database modules
+.htpt - HTPL templates for offline generation
+.htps - HTPL Server page
+.perl - cached scripts for .htpl files
+.ht.pl - cached scripts for other files

@@ -1,0 +1,8 @@
+You can use CF notation to substitute perl vars. HTPL will change them to
+regular variable notation:
+Example:
+
+<#
+$x = 1;
+>
+X is #x# now

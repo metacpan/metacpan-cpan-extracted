@@ -1,0 +1,24 @@
+Shalom!<BR>
+Key: $akey<BR>
+<#
+
+$key = \"akey";
+
+$tree = [
+            ['shalom', 'Shalom', {}, [
+                  ['peace', 'Sichot', $key, []],
+                  ['dove', 'Yona', {}, [
+                      ['black', 'Shchora', $key, []],
+                      ['white', 'Levana', $key, []]
+                  ]],
+                  ['shabbath', 'Levo Shabath', $key, []]
+            ]],
+            ['land', 'Eretz', {}, [
+                ['deer', 'Hatzvi', $key, []],
+                ['fire', 'Haesh', $key, []]
+            ]]
+         ];
+
+&html_treeview($tree, "t");
+
+>

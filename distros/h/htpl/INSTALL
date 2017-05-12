@@ -1,0 +1,54 @@
+To configure:
+
+a) Create script cache
+1) If your web server is allowed to write files in the same directory
+where your HTPL documents will be stored, you don't have to do anything.
+Continue to step b.
+1a) Option 1 is always preferred. Try to run your webserver with SUEXEC.
+If you are a virtual hosting user, ask your administrator to install
+cgiwrap, and edit the .htaccess file created by HTPL, substituting
+/cgi-bin/htpl.cgi according to the instructions that come with cgiwrap.
+2) If you are installing HTPL as root, and are going to use it only as a
+mod_perl extension, substitute ./configure by ./configure --enable-modperl
+Continue to step b.
+3) Running the CGI mode with a non previlleged httpd, you will have to
+create a cache directory to cache preprocessed scripts. 
+Under each directory you want to enable for htpl, create a world writable
+htpl-cache directory:
+mkdir htpl-cache
+chmod 733 htpl-cache
+Since your scripts will be world writable, it is necessary that you use
+the dependency database to ensure the integrity of your scripts. Using the
+dependency database, your runtime script will always be recreated if it
+has changed since created. You must have Berkeley DB 1.85 installed for
+it. Substitute ./configure --enable-depdb
+
+b) Install the binary
+1) To install HTPL on your machine:
+
+./configure
+make
+make install
+make build
+
+Have your CPAN.pm module configured and type:
+make CPAN
+
+2) To install HTPL on a virtual hosting account:
+./configure
+make
+make install
+make build
+
+Experimental module installation can be used by having CPAN.pm configure
+itself, then run: make CPAN
+to install the modules in the cgi-bin dir.
+
+3) To install HTPL on a virtual server kernel account:
+./configure --with-vserver
+make
+make install
+make build
+make CPAN NOPREREQ=NOPREREQ
+
+

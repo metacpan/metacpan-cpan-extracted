@@ -1,0 +1,21 @@
+Build.PL
+Changes
+MANIFEST
+MANIFEST.SKIP
+META.yml # Will be created by "make dist"
+META.json # Will be created by "make dist"
+README
+TODO
+lib/HTML/ToDocBook.pm
+scripts/html2dbk
+t/00_dist.t
+t/01_load.t
+t/02_pod.t
+t/03_pod-coverage.t
+t/20tfiles.t
+tfiles/test1.html
+tfiles/good_test1.xml
+tfiles/test2.html
+tfiles/good_test2.xml
+tfiles/default_xslt.xml
+META.json

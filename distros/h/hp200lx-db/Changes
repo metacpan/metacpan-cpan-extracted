@@ -1,0 +1,49 @@
+Revision history for Perl extension HP200LX::DB.
+$Id: $
+
+0.01  Tue Jun 16 20:02:09 1998
+        - original version; created by h2xs 1.16
+
+0.02  Sun Jun 21 11:11:00 1998
+        - minor changes
+
+0.03  Sun Jun 28 11:11:00 1998
+        - added a test script and few more examples, demo scripts
+
+0.04  Sat Jul 25  9:41:00 1998
+        - renamed sub packages DBvpt.pm, DBcard.pm, and DBlist.pm to
+          DB/vpt.pm, DBgui/card.pm, and DBgui/list.pm
+      Sun Sep 20  8:00:00 1998
+        - expanded support for appointment book format
+        - includes catadb.pl, export appointment book to vCalendar format
+          see also: http://clubs.yahoo.com/clubs/perlcalsch
+      Sun Sep 27 21:10:48 1998
+        - preparing interim release (BSCW only)
+
+0.05  Sun Sep 27 22:10:00 1998
+       (- begin of next development step)
+      Mon 28 Sep 12:12:36 1998
+          using binmode to open DB files for non-Unix platforms
+      Mon Feb 22 20:43:41 1999
+          more cosmetics
+
+0.06  Sun Mar  7 10:00:00 1999
+        - consolidation, data structure fixups, documentation
+      Sun May  2 10:00:00 1999
+        - converted to CVS archive
+      Sun May  9 10:00:00 1999
+        - DBgui group: patches by Rod Whitby
+
+0.07  Sun May 23 11:20:11 1999
+        - various improvements and fixes, see docs/announce-0.07.txt
+
+0.08  Sun Dec  5 15:00:00 1999
+        - various improvements and fixes, see docs/announce-0.08.txt
+      Fri Feb 11 17:00:00 2000
+        - size of storage are for Radio Buttons should be 2 byte instead of 1
+
+0.09  Sun Mar  3 10:00:00 2001
+        - various bug fixes in the vpt.pm code
+      Sun Mar 11  3:00:00 2001
+        - cleanup to get a full Version 0.09 ready for inclusion
+          in FreeBSD 4.3 Release

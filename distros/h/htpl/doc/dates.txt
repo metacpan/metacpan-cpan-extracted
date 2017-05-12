@@ -1,0 +1,47 @@
+($d, $m, $y) = &getdmy;
+($d, $m, $y) = &getdmy(76487487);
+($m, $d, $y) = &getmdy;
+print &monthname($m);
+$w = &getweekday($d, $m, $y);
+print &weekdayname($w);
+
+&convyear(99) = 1999
+&convyear(100) = 2000
+&convyear(1999) = 1999
+&convyear(2000) = 2000
+
+($jd, $jm, $jy) = &jewishdate;
+(Adar B = 13)
+
+&daysin(1) = 31
+&daysin(11) = 30
+&daysin(2, 1999) = 28
+&daysin(2, 2000) = 29
+
+&isleep(1999) = false
+&isleap(1996) = true
+&isleep(1900) = false
+&isleap(2000) = true
+
+$week_number = &calcweek;
+$utc = &maketime($d, $m, $y, $h, $mm, $s);
+&ampm(9) = '09AM'
+&ampm(23) = '11PM'
+
+
+&pusht;
+(some slow procedure)
+&pusht;
+(another one)
+print &popt;
+print &popt;
+
+foreach (1 .. 10) {
+    print &timestep . " left since last check";
+(do something that takes time)
+}
+
+$seconds_running =  &elapsed;
+
+
+

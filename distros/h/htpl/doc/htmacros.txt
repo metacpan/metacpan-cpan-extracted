@@ -1,0 +1,25 @@
+Macros can be embedded inside HTML code without the need to escape to
+perl.
+
+These two are the same:
+
+<UL>
+<#
+#SQL CURSOR crs SELECT id FROM CUSTOMERS
+#FETCH crs
+>
+<LI> $id
+<#
+#LOOP
+>
+</UL>
+
+and:
+<UL>
+<HTSQL CURSOR crs SELECT id FROM CUSTOMERS>
+<HTFETCH crs>
+<LI> #id#
+</HTFETCH>
+</UL>
+
+(hint: #LOOP is identical to #END FETCH)

@@ -1,0 +1,19 @@
+There are 3 steps:
+
+1. Install HTML::Latex - 'cd HTML/Latex' and then read it's INSTALL. 
+
+2. Copy html2latex to anywhere you like (/usr/bin is a good place for
+a UNIX machine).
+
+3. Copy html2latex.1 to /usr/man/man1/ (for unix machines only).
+
+So, here is an example of what you might type (Assuming everything goes ok):
+
+cd HTML/Latex
+perl Makefile.PL
+make install
+cd ../..
+cp html2latex /usr/bin
+chmod +rx /usr/bin/html2latex
+cp html2latex.1.bz2 /usr/man 
+chmod +r /usr/man/html2latex.1.bz2 

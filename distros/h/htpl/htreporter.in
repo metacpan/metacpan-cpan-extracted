@@ -1,0 +1,126 @@
+#!@PERL@
+
+use Getopt::Std;
+use DBI;
+use HTML::HTPL::Lib;
+use strict;
+
+use vars qw($opt_x $opt_h $opt_a $opt_p $opt_u $opt_o $opt_c $dbh);
+
+my $cfg;
+
+getopts('xahco:u:p:');
+
+my $filename = $ARGV[0];
+my $query = $ARGV[1] || 'default';
+
+die "No input file" unless ($filename);
+
+die "Input file not found" unless (-f $filename);
+
+unless ($opt_x) {
+    require IniConf;
+    import IniConf;
+    $cfg = new IniConf(-file => $filename, -nocase => 1) || die "Could not parse $filename";
+} else {
+    require XML::Conf;
+    import XML::Conf;
+    $cfg = new XML::Conf($filename, 'case' => 'lc') || die "Could not parse $filename";
+}
+
+my $sql = $cfg->val('sql', $query);
+my $dsn = $cfg->val('sql', 'dsn');
+$opt_h ||= $cfg->val('report', 'html');
+my $auto = $opt_a || $cfg->val('report','auto');
+my $header = $cfg->val('report', 'header');
+my $footer = $cfg->val('report', 'footer');
+my $template = $cfg->val('report', 'template');
+$opt_p ||= $cfg->val('sql', 'password');
+$opt_u ||= $cfg->val('sql', 'user');
+
+my $sth = &getsql($dsn, $sql);
+my @cols = @{$sth->{NAME}} if ($sth);
+
+my $out = $opt_o || "&STDOUT";
+open(REP, ">$out");
+
+select REP;
+
+if ($opt_h) {
+    print "Content-type: text/html\n\n" if ($opt_c);
+    unless ($sth) {
+        print "Error:<BR>$DBI::errstr";
+        exit;
+    }
+
+    if ($auto) {
+        $header = "<HTML>\n<HEAD>\n<TITLE>Generated report</TITLE>\n</HEAD>\n<BODY BGCOLOR=#FFFFFF>\n" .
+           "<TABLE>\n  <TR>\n" . join("", map {"    <TH>\n" .
+           &proper($_) . "\n    </TH>\n";} @cols)
+                 . "  </TR>\n";
+        $template = "  <TR>\n" . join("" ,map {"    <TD>\n      #$_#\n" .
+                    "    </TD>\n";} @cols)
+                 . "  </TR>\n";
+        $footer = "</TABLE>\n</BODY>\n</HTML>\n";
+    }
+    print "$header\n";
+    while (my $hash = $sth->fetchrow_hashref) {
+        print HTML::HTPL::Lib::subhash("$template\n", '#', %$hash);
+    }
+    print "$footer\n";
+    select STDOUT;
+    close(REP);
+    $sth->finish;
+    $dbh->disconnect;
+    exit;
+}
+
+my $page = $cfg->val('report', 'page');
+
+if ($auto) {}
+
+die $DBI::errstr unless ($sth);
+$@ = undef;
+eval "format REP=\n$template\n.\n1;" || die "Template: $@";
+eval "format REP_TOP=\n$header\n.\n1;" || die "Header: $@";
+#eval "format REP_BOTTOM=\n$footer\n.\n1;" || die "Footer: $@";
+
+
+format NEWLINE=
+
+.
+
+
+my $hash;
+my $fetch = join("", map {"local (\$$_) = \$hash->{'$_'};\n"} @cols);
+my $code = eval "sub {$fetch write REP;}";
+$= = $page;
+
+while ($hash = $sth->fetchrow_hashref) {
+    &$code;
+}
+
+eval "write REP, REP_BOTTOM;";
+
+select STDOUT;
+close(REP);
+
+$sth->finish;
+$dbh->disconnect;
+ 
+sub getsql {
+    my ($dsn, $sql) = @_;
+    eval { $dbh = DBI->connect($dsn, $opt_u, $opt_p);};
+    return undef unless ($dbh && !$@ && !$DBI::err);
+    my $sth = $dbh->prepare($sql);
+    return undef unless ($sth);
+    return undef unless ($sth->execute);
+    $sth;
+}
+
+sub proper {
+    $_ = shift;
+    s/([A-Z])/_$1/ if (/[a-z]/);
+    my @words = split(/[-_]/);
+    join(" ", map {ucfirst(lc($_));} @words);
+}

@@ -1,0 +1,29 @@
+Revision history for html2dbk
+=============================
+
+0.03 Wed 22 March 2006
+----------------------
+
+  * (22 Mar 2006) external stylesheet
+  	Enabled the use of an external stylesheet in place of the built-in
+  default one.
+
+  * (22 Mar 2006) doc fix
+  	Forgot to document the chapter title change!
+
+  * (22 Mar 2006) html and fixes
+  	- chapter title comes from <title> tag
+  	- new --html option uses the LibXML parse HTML facility
+  	- fixed bugs with tables
+
+0.02 Tue 21 March 2006
+----------------------
+
+  * (21 Mar 2006) tweaks
+  	- make the distribution be the html2dbk not the module name.
+  	- added a bit more documentation.
+
+0.01 Tue 21 March 2006
+----------------------
+
+  * (21 Mar 2006) initial checkin

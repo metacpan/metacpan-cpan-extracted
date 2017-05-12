@@ -1,0 +1,296 @@
+#!/usr/bin/perl
+### head-r  -*- Perl -*-
+
+### Copyright (C) 2013 Ivan Shmakov
+
+## This program is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or (at
+## your option) any later version.
+
+## This program is distributed in the hope that it will be useful, but
+## WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+
+## You should have received a copy of the GNU General Public License
+## along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+### Code:
+
+use common::sense;
+use English qw (-no_match_vars);
+
+require App::HeadR;
+require Carp;
+# require Data::Dump;
+require Getopt::Long;
+require IO::Uncompress::AnyUncompress;
+require List::Util;
+require LWP::RobotUA;
+require Scalar::Util;
+require URI;
+
+## FIXME: this is to work-around Net::HTTP bug #29468
+require Net::HTTP;
+if (eval { require IO::Socket::INET6; }) {
+    my $warn_p
+        = 1;
+    for (my $i = 0; $i <= $#Net::HTTP::ISA; $i++) {
+        next
+            unless ("IO::Socket::INET" eq $Net::HTTP::ISA[$i]);
+        $Net::HTTP::ISA[$i]
+            =       "IO::Socket::INET6";
+        warn ("W: Using a work-around for Net::HTTP bug #29468")
+            if ($warn_p);
+        $warn_p
+            = 0;
+    }
+}
+
+$SIG{"__DIE__"}
+    = \&Carp::confess;
+
+sub open_file {
+    my ($fn, $write_p) = @_;
+    ## .
+    return (($fn ne "-")
+            ? IO::File->new ($fn, ($write_p ? "w" : "r"))
+            : $write_p ? \*STDOUT : \*STDIN);
+}
+
+Getopt::Long::Configure (qw (gnu_compat));
+my ($out_fn)
+    = ("-");
+my @inputs
+    = ();
+my ($bzip2_p, $gzip_p)
+    = (0, 0);
+our $verbose_p
+    = 0;
+my ($no_proxy_p)
+    = (0);
+my ($ua_s)
+    = (undef);
+my ($max_depth, $wait)
+    = (1, exp ());
+my ($descend_re_str, $exclude_re_str, $include_re_str, $info_re_str)
+    = (undef, undef, undef, undef);
+my $parsable_p
+    = Getopt::Long::GetOptions ("i|input=s"    => \@inputs,
+                                "j|bzip2"      => \$bzip2_p,
+                                "o|output=s"   => \$out_fn,
+                                "P|no-proxy"   => \$no_proxy_p,
+                                "U|user-agent=s" => \$ua_s,
+                                "v|verbose!"   => \$verbose_p,
+                                "w|wait=s"     => \$wait,
+                                "z|gzip!"      => \$gzip_p,
+                                q (depth=s)      => \$max_depth,
+                                q (descend-re=s) => \$descend_re_str,
+                                q (exclude-re=s) => \$exclude_re_str,
+                                q (include-re=s) => \$include_re_str,
+                                q (info-re=s)    => \$info_re_str)
+    or die ("Cannot parse command line arguments");
+die ("--bzip2 (-j) cannot be used with --gzip (-z)")
+    if ($bzip2_p && $gzip_p);
+die ("--depth= must be positve")
+    unless ($max_depth > 0);
+die ("--wait= must be a valid Perl number")
+    unless (Scalar::Util::looks_like_number ($wait));
+
+my $user_agent
+    = LWP::RobotUA->new ("agent"        => ($ua_s // "HEAD-R-Bot/0.1"),
+                         "from"         => "head-r\@nomail.afraid.org",
+                         "delay"        => ($wait / 60),
+                         "keep_alive"   => 13,
+                         "timeout"      => 42);
+$user_agent->env_proxy ()
+    unless ($no_proxy_p);
+## FIXME: hack the default From: and User-Agent: headers a bit
+$user_agent->from (undef);
+$user_agent->agent (($user_agent->agent ()
+                     . " " . $user_agent->_agent ()))
+    unless (defined ($ua_s));
+
+sub compile_re {
+    my ($str) = @_;
+    ## .
+    return undef
+        unless (defined ($str));
+    ## .
+    qr {${str}};
+}
+
+## NB: include everything by default
+$include_re_str
+    = "."
+    unless  (defined    ($include_re_str)
+             || defined ($exclude_re_str));
+
+my $recurse_options = {
+    "descend-re"    => compile_re ($descend_re_str),
+    "exclude-re"    => compile_re ($exclude_re_str),
+    "include-re"    => compile_re ($include_re_str),
+    "info-re"       => compile_re ($info_re_str),
+    "user-agent"    => $user_agent
+};
+
+my $out_underlay
+    = open_file ($out_fn, 1)
+    or die ($out_fn, ": Cannot open output file: ", $!);
+my $compression
+    = ($bzip2_p   ? "IO::Compress::Bzip2"
+       : $gzip_p  ? "IO::Compress::Gzip"
+       : undef);
+if ($compression) {
+    die ("Will not write compressed data to a terminal")
+        if (-t $out_underlay);
+    eval ("require ${compression};")
+        or die ($@);
+}
+my $out
+    = (defined ($compression)
+       ? $compression->new ($out_underlay)
+       : $out_underlay);
+
+my @re_evaluate
+    = ();
+
+my $rec
+    = App::HeadR->new ($recurse_options);
+## FIXME: should the code query it in a nicer way?
+my $uri_info
+    = $rec->uri_info ();
+
+## process input files
+foreach my $fn (@inputs) {
+    my $in_underlay
+        = open_file ($fn)
+        or die ($fn, ": Cannot open input file: ", $!);
+    ## FIXME: examine $AnyUncompressError on failure
+    my $io_opts = {
+        # "AutoClose"   => 1,
+        "MultiStream" => 1
+    };
+    my ($records, $re_eval, $considered, $ignored)
+        = (0, 0, 0, 0);
+    my $in
+        = IO::Uncompress::AnyUncompress->new ($in_underlay, $io_opts);
+    while (<$in>) {
+        next
+            unless (/^[^#]/);
+        ++$records;
+        chomp ();
+        ## URI, Timestamp, X-Depth, Content-Length:, Code, Options
+        my ($uri_1, @val)
+            = split (/\t/, $_, 6);
+        my $uri
+            = URI->new ($uri_1)->canonical ();
+        my $key
+            = $uri->as_string ();
+        ## FIXME: give the user more control on this
+        ## FIXME: this condition may need more thought
+        ## FIXME: info_extra_cond should probably be private
+        my @extra_cond
+            = App::HeadR::info_extra_cond (\@val, $val[1] // 1);
+        # warn ("D: Re?  ",
+        #       join (", ", $key, @val,
+        #             "X1", $#val < 2, "X2", @extra_cond, "X3",
+        #             str_wanted ($key, $recurse_options, @extra_cond)), "\n");
+        my ($descend_p, $info_p)
+            = $rec->str_wanted ($key, @extra_cond);
+        if ($descend_p
+            || ($#val < 2 && $info_p)) {
+            push (@re_evaluate, $uri);
+            ++$re_eval;
+        }
+        ## NB: do not put no-data items into %$uri_info
+        next
+            unless (@val);
+        ++$considered;
+        ## NB: marking as never recursed into within this session
+        $val[1]
+            = (! defined ($val[1])  ? undef
+               : $val[1] > 0        ? (- $val[1])
+               : 0);
+        my $update_p
+            = (!    exists  ($uri_info->{$key})
+               || ! defined ($uri_info->{$key}->[0])
+               || $val[0]  > $uri_info->{$key}->[0]);
+        # warn ("W: ", $key, ": Newer state known; ignored\n")
+        #     if (exists ($uri_info->{$key}) && ! $update_p);
+        $uri_info->{$key}
+            = \@val
+            if ($update_p);
+        ++$ignored
+            unless ($update_p);
+    }
+    warn ("I: ", $fn, ": ",
+          $records, " records read",
+          " (", $in->input_line_number (), " lines, ",
+          $considered,  " considered, ",
+          $re_eval,     " to be re-evaluated, ",
+          $ignored,     " ignored)\n")
+        if ($verbose_p);
+}
+
+# warn ("D: \@re_evaluate = ", scalar (Data::Dump::dump (@re_evaluate)));
+warn ("I: ", scalar (@re_evaluate), " URIs are to be re-evaluated\n")
+    if ($verbose_p);
+
+sub quit_gracefully {
+    my ($sig) = @_;
+    $out->close ();
+    $out_underlay->close ()
+        if ((Scalar::Util::refaddr ($out_underlay)
+             ne Scalar::Util::refaddr ($out)));
+    ## .
+    exit (0)
+        if (! defined ($sig));
+    warn ("I: Caught SIG", $sig, ", exiting.\n");
+    ## FIXME: what about a sane exit code?
+    ## .
+    exit (42);
+}
+
+local $SIG{"INT"}
+    = \&quit_gracefully;
+local $SIG{"TERM"}
+    = \&quit_gracefully;
+local $SIG{"QUIT"}
+    = \&quit_gracefully;
+
+## process the URIs
+foreach my $uri_str (@ARGV) {
+    $rec->recurse ($out, URI->new ($uri_str),
+                   $max_depth);
+}
+foreach my $uri (@re_evaluate) {
+    my $uri_s
+        = $uri->as_string ();
+    ## FIXME: give the user more control on this
+    my $depth
+        = (exists ($uri_info->{$uri_s})
+           ?  sub {
+                  ## NB: negative depths are from inputs, negated
+                  ## .
+                  return ((defined ($_[0]) && $_[0] < 0)
+                          ? - $_[0]
+                          : undef);
+              }->($uri_info->{$uri_s}->[1])
+           : undef);
+    $rec->recurse ($out, $uri,
+                   List::Util::min ($max_depth, $depth // 0));
+}
+
+## .
+quit_gracefully ();
+
+### Emacs trailer
+## Local variables:
+## coding: us-ascii
+## fill-column: 72
+## indent-tabs-mode: nil
+## ispell-local-dictionary: "american"
+## End:
+### head-r ends here

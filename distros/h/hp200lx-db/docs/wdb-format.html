@@ -1,0 +1,40 @@
+see also: <a href="adb-format.html">adb-format.html</a>
+see also: <a href="ndb-format.html">ndb-format.html</a>
+see also: <a href="pdb-format.html">pdb-format.html</a>
+
+original german WDB file format
+
+<table border=1>
+<tr><th>idx<th>name<th>type<th>x<th>y<th>w<th>h<th>Lsize
+<tr><td align=right>0<td>Stadt<td>STRING<td align=right>10<td align=right>17<td align=right>24<td align=right>1<td align=right>32
+<tr><td align=right>1<td>Land<td>STRING<td align=right>322<td align=right>17<td align=right>23<td align=right>1<td align=right>32
+<tr><td align=right>2<td>Int'l Vorwahl<td>STRING<td align=right>8<td align=right>38<td align=right>9<td align=right>1<td align=right>20
+<tr><td align=right>3<td>Region Vorw.<td>STRING<td align=right>256<td align=right>38<td align=right>9<td align=right>1<td align=right>20
+<tr><td align=right>4<td>Ausw'liste<td>WORDBOOL<td align=right>496<td align=right>39<td align=right>1<td align=right>1<td align=right>1
+<tr><td align=right>5<td>Kategorie<td>CATEGORY<td align=right>16<td align=right>60<td align=right>18<td align=right>1<td align=right>128
+<tr><td align=right>6<td>&nbsp;<td>LIST<td colspan=5>&nbsp;
+<tr><td align=right>7<td>Zeitunterschied zu<td>GROUP<td align=right>306<td align=right>61<td align=right>329<td align=right>37<td align=right>0
+<tr><td align=right>8<td>Std<td>U16<td align=right>308<td align=right>76<td align=right>5<td align=right>1<td align=right>10
+<tr><td align=right>9<td>System<td>RADIO_BUTTON<td align=right>426<td align=right>76<td align=right>1<td align=right>1<td align=right>1
+<tr><td align=right>10<td>Universal<td>RADIO_BUTTON<td align=right>514<td align=right>76<td align=right>1<td align=right>1<td align=right>2
+<tr><td align=right>11<td>Sommerzeit<td>GROUP<td align=right>10<td align=right>82<td align=right>275<td align=right>59<td align=right>0
+<tr><td align=right>12<td>Ja<td>RADIO_BUTTON<td align=right>22<td align=right>95<td align=right>1<td align=right>1<td align=right>1
+<tr><td align=right>13<td>Nein<td>RADIO_BUTTON<td align=right>162<td align=right>95<td align=right>1<td align=right>1<td align=right>2
+<tr><td align=right>14<td>Autom.<td>RADIO_BUTTON<td align=right>22<td align=right>115<td align=right>1<td align=right>1<td align=right>3
+<tr><td align=right>15<td>&nbsp;<td>COMBO<td align=right>144<td align=right>114<td align=right>12<td align=right>1<td align=right>12
+<tr><td align=right>16<td>&nbsp;<td>LIST<td colspan=5>&nbsp;
+<tr><td align=right>17<td>Position<td>GROUP<td align=right>306<td align=right>101<td align=right>328<td align=right>37<td align=right>0
+<tr><td align=right>18<td>Breite<td>NUMBER<td align=right>316<td align=right>115<td align=right>5<td align=right>1<td align=right>10
+<tr><td align=right>19<td>Lnge<td>NUMBER<td align=right>472<td align=right>115<td align=right>5<td align=right>1<td align=right>10
+<tr><td align=right>20<td>Notiz<td>NOTE<td align=right>12<td align=right>146<td align=right>623<td align=right>37<td align=right>0
+</table>
+
+<h2>type U16</h2>
+This field is labled in German "Zeitunterschied zu, Std"
+(time zone difference to, hours) but contains the difference
+in minutes.  The application shows the difference in "HH:MM"
+format.
+
+
+<hr>
+$Id: wdb-format.html,v 1.2 2001/01/01 20:13:59 gonter Exp $

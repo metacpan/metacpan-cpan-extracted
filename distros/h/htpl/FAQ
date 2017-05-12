@@ -1,0 +1,8 @@
+FAQ 1:
+Q: Why do I get a "permission denied" when trying to run HTPL files via
+the web?
+A: HTPL must have a cache for storing compiled scripts. Check the
+installation instructions in INSTALL. If you are on a user machine, create
+an htpl-cache directory under your web directory, and make it world
+writable. This should better be done when HTPL is compiled with dependency
+database, to prevent others of munging your files.

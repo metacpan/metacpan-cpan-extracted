@@ -1,0 +1,17 @@
+Changes
+COPYING
+INSTALL
+Latex.pm
+Makefile.PL
+MANIFEST
+README
+README.win.txt
+TODO
+t/tags.gif
+t/tags.correct
+t/tags.html
+t/tags.png
+t/tags.t
+t/foreigns.html
+t/foreigns.correct
+t/foreigns.t

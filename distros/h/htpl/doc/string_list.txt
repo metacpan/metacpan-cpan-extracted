@@ -1,0 +1,35 @@
+Strings and lists:
+
+&max(qw(1 2 4 3 7 1)) = 7
+&min(qw(1 2 4 3 7 1)) = 1
+&sum(qw(1 2 3)) = 6
+
+&agg {&myfunc($a, $b);} @list;
+
+@list_with_no_repeatitions = &uniq(qw(1 2 3), qw(4 6 8))
+- Preserves the order
+@list_with_no_repeatitions = &undouble(qw(1 2 3), qw(4 6 8))
+- Faster
+
+&rotate(2, qw(1 2 3 4 5)) = 3, 4, 5, 1, 2
+&rotate(-2, qw(1 2 3 4 5)) = 4, 5, 1, 2, 3
+
+&rol(qw(a b c)) = b, c, a
+&ror(qw(a b c)) = c, a, b
+(Fatser)
+
+&intersectlist([qw(1 2 3)], [qw(2, 4, 6)]) = 2
+
+$encrypted =  &encrypt($text, "12345678");
+$text = &decrypt($encrypted, "12345678");
+
+
+$unix_text = dos2unix($dos_text);
+$visual = &hebrewflip($logical);
+
+@fields = &splitline('"the black dog","juped",over,"the brown",fox,12');
+
+&htmlencode("This is a <tag>\n") = "This is a &lt;tag&gt;<BR>";
+
+&trim("  once   upon  a  time ") = "once upon a time"
+

@@ -1,0 +1,32 @@
+# Simple Sample schedule
+
+# Things that start with a dash are Tasks
+-Infrastructure
+--FOO*
+---Startup task that is no longer useful (#100, 7h, deleted 2005-06-10)
+---Add new columns to track by type (#101, 2h)   
+---Add new columns to record new checkout features (#102, 2h)
+---Add FK constraints between FOOHEAD and FOODETAIL (#103, 2h, added 2005-07-15)
+---Add FK constraints between FOOHEAD and BARDETAIL (#104, 2h, added 2005-07-16)
+
+--ORDERFORM
+---Create migration script to modify table automatically (#105, 2h)
+
+-TW::DB::FooForm
+--Review (#106, 1h)
+--Refactor (#107, 1h)
+
+# Thinks that start with a word are Work
+Monkey  2005-07-11    101 2 X   
+Monkey  2005-07-12    102 1
+Monkey  2005-07-13    102 1.5 X
+
+Ape     2005-07-11    105 3
+Ape     2005-07-11    105 2 this is way harder than I thought
+Ape     2005-07-14    105 1 X
+Ape     2005-07-16    104 2
+
+Chimp   2005-07-12    106 1
+Chimp   2005-07-17    106 1 X
+Chimp   2005-07-18    103 2 X
+Chimp   2005-07-18    107 1 I still have more to do on this.

@@ -1,0 +1,144 @@
+#
+# FILE .../CPAN/hp200lx-db/README
+#
+# $VERSION= '0.09';
+#
+# written:       1998-01-10
+# latest update: 2000-01-02 22:06:11
+# $Id: $
+#
+
+Purpose:
+
+  DB.pm implements the perl package HP200LX::DB which is intended
+  to provide a perl 5 interface for files in the generic database
+  format of the HP 200LX palmtop computer.  The perl modules are
+  intended to be used on a work station such as a Unix machine or
+  a PC to read and write data records from and to a database file.
+
+Goals and Non-Goals of this Project:
+
+  The primary goal was to read and write complete generic database
+  files, e.g. GDB, PDB or NDB files on a host computer.  The
+  transfer from and to the palmtop computer, synchronization and
+  reconciliation were not considered at all yet.  Also, other
+  built-in applications operate on slightly different DB files,
+  these are not dealt with yet.  The creation, definition and layout
+  of new databases are not handled yet.
+
+  Project Roadmap:
+  1. read/write GDB, PDB, and NDB files [quite complete]
+  2. a simple GUI to browse the DB files [in progress]
+  3. tools to import/export data in different formats [in progress]
+  4. extend the DB module for ADB and WDB files [in progress]
+  5. creation of DB files including format definitions etc.
+  6. dealing with encrypted DB files [in progress]
+
+Status:
+
+  The package and any other files are in a completely EXPERIMENTAL
+  STATUS and should not be used without proper backup.  Use it at your
+  own risk, no support can be provided but bug reports and suggestions
+  by e-mail are welcome.  Please read the notes below first.
+
+  Note: The package emits all sorts of diagnostic information, these
+        are not errors and change from release to release, depending
+        on the development progress.
+
+  Note: The DB formats have a number of limitations, this package
+        tries to enforce them but most are not dealt with properly yet.
+
+  Note: reading ADB files is fairly complete, an extension which
+        can also write and update ADB files is currently in development.
+
+Installation:
+
+  The usual installation strategy
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+  should produce viable modules.
+
+  Note: Under 4Dos do not run dmake.  "command /c dmake" should work.
+
+Limitations:
+
+  Development has been driven by my own requirements and my needs
+  are not so big, so you should not be surprised if much remains left
+  to be done.  Here is a list of missing things that I'm aware of:
+
+  + Databases can only be read or updated.  It's not possible to
+    create a database from scratch.
+  + Only GDB, PDB and NDB files are covered, the more special formats
+    ADB and WDB need a few more hacks.  As of now, these files can
+    be read but not written!
+  + When storing records to the database, make sure that fieldnames
+    match exactly, including blanks, case, and national characters.
+  + Lines in note fields should be stored with \r\n line endings.
+    This is not checked here.
+  + The viewpoint table is not rebuilt by default when a database is
+    updated.  This must be done explicitly on the HP 200LX after loading
+    the database by starting the "SORT" dialog.
+    Resorting a view point is usually done by pressing F7 and F10.
+    The DB also supports a method to update view points:
+      $db->refresh_viewpt (-1);
+  + Databases with password protection are not handled yet correctly,
+    it is however possible to read the password using the
+      $db->recover_password ();
+    method!
+
+    If you didn't already know, the password protection is not
+    very secure in the HP-LX!
+  + Be also aware of Perl's limited TIEARRAY implementation.
+    Array elements need to be accessed by index.  No push, pop,
+    shift and unshift operators are available.
+
+Examples:
+
+  The directory "demo" contains a few code fragments, working scripts
+  can be found in the "scripts" directory:
+    catadb.pl           export the contents of an ADB file in various formats
+    catgdb.pl           export the contents of GDB, PDB, NDB and WDB files
+    txt2ndb.pl          import text paragraphs into a NDB file
+    xdb.pl              Perl/Tk GUI for DB files
+    leer.ndb            empty german NDB file used for txt2ndb.pl
+
+Availability and Contact:
+
+  This package is available from my FTP archives
+
+    ftp://ftp.wu-wien.ac.at/pub/usr/edvz/gonter/hp200lx/
+    http://falbala.wu-wien.ac.at:8684/pub/english.cgi/0/24065
+
+  and I can be reached as Gerhard.Gonter@wu-wien.ac.at
+  or g.gonter@ieee.org .
+  Redistribution is permitted but it must include the README file.
+
+Copyright:
+
+  Copyright (c) 1998 Gerhard Gonter.  All rights reserved.
+  This is free software; you can redistribute it and or modify
+  it under the same terms as Perl itself.
+
+-----------------------------------------------------------------------------
+
+interface functions
+  $db= HP200LX::DB::openDB ($fnm)     read database and return an DB object
+  $db= HP200LX::DB::new ($fnm)        create database and return an DB object
+  $db->saveDB ($fnm)                  save DB object as a (new) file
+
+array tie implementation to access database data records
+  tie (@dbd, HP200LX::DB, $db);       access database data in array form
+  TIEARRAY                            stub to get an tie for the database
+  FETCH                               retrieve a record
+  STORE                               store a record
+  $db->get_last_index ()              return highest index
+
+Notes:
+All database data are read from file or written back in one burst.
+No attempt has been made to read data when it is accessed by the
+perl application.  This only complicates matters and does not seem
+to be necessary since a type HP 200LX only has about 4 MB to store.

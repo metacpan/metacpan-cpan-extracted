@@ -1,0 +1,83 @@
+#
+# .../CPAN/hp200lx-db/docs/announce-0.07.txt
+#
+# written:       1999-05-24
+# latest update: 1999-05-24 11:47:12
+#
+
+The Perl module familiy HP200LX::DB and HP200LX::DBgui version 0.07
+should be available from any CPAN mirror near you soon.  It was
+uploaded earlier today and confirmed by the CPAN daemons:
+
+  The uploaded file hp200lx-db-0.07.tar.gz has entered CPAN as
+  file: $CPAN/authors/id/G/GG/GGONTER/hp200lx-db-0.07.tar.gz
+  size: 51772 bytes
+   md5: db03e4b26ffe9e86892c46c868c9c31f
+
+This release contains a couple of improvements and bug fixes and
+a bit better error and constraint handling.
+
+1. General DB handling, module DB.pm:
+   a. DB header loader, analyzer, packer improved.
+   b. load DBs whithout lookup table; the lookup table is missing
+      if the DB was created by exporting or by some other tool
+      and if the DB was open while it was saved.  The decoder loop
+      was isolated for possible new applications.
+   c. A few problems with the handling of time stamps were identified
+      and fixed.
+   d. $db->dump_type () method implemented for raw exports in text format.
+   e. update attribute introduced, will be used in saveDB in the future.
+
+2. ADB handling
+   a. DOC: More details and clarifications about the ADB file format.
+   b. recurrence objects now have constructor, packer and decoder
+      methods.  The deocder was isolated from the constructor.
+   c. new module DB/adb.pm to encapsulate some aspects of ADB files.
+      Some code was isolated from catadb.pl
+
+3. Scripts
+   a. catgdb.pl -summary
+      write one line summary about the database
+   b. catgdb.pl -dump
+      Dump the contents of all DB records (data and other parts)
+   c. catadb.pl
+      some code was transfered to DB/adb.pm
+
+4. DBgui.pm
+   a. Applied patches by Rod Whithby for better Perl/Tk compatibility.
+
+
+Next Steps planned for version 0.08:
+1. Use of dump_type method for CVS/RCS based version control e.g.
+   as a backup and archival facility.
+2. ADB importer: Creation of ADB data records and possibly complete
+   databases.
+3. catadb.pl -format yahoo
+   ... to export ADB files in Yahoo! Calendar format.
+4. DB.pm enhancements
+   a. use of update attribute for automatic refresh of view points upon save
+   b. importer to re-create DB from the output of catgdb.pl -dump
+   c. constructors and loaders for other elements of the database.
+      At some time, it should be possible to create a DB from scratch
+      without using pre-fabricated templates.
+
+Work in progress without specific releas plans:
+1. More example scripts will be made available if time permits, e.g.
+   a. getps.pl: a tool to fetch the "Pocket Standard", an online-edition
+      of the Austrian newspaper "Der Standard" for the Palm Pilot
+      which is the dumped into a GDB file using a pre-edited template.
+2. A multiplexer module which encapsulates a collection of DB file
+   into one object.  I'm not sure what this is good for yet, but
+   it might be usable for web servers, query tools or who knows what ;)
+   Maybe this will be useful for a DBI::DBD driver module.     
+3. Scripts dealing with LDIF and vCard, iCalendar objects are currently
+   in their infancy, maybe the grow up to be released some time...
+
+I hope the software is useful for your purposes, but use it at your own
+risk!  Feedback, e.g. bug reports, fixes and other suggestions are
+welcome.  Especially, the "catgdb.pl -dump" and RCS/CVS facilities
+are of great interest for me, suggestions in this area are very much
+welcome!
+
+g.gonter@ieee.org
+

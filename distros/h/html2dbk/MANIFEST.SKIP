@@ -1,0 +1,35 @@
+# Version control files and dirs.
+\bRCS\b
+\bCVS\b
+,v$
+^.git/
+^\.boring$
+
+^darcs_prebuild.pl$
+^mod_devaid.conf$
+^version.txt$
+^old_version.txt$
+^\.todo$
+^\.releases
+
+# distro files
+^html2dbk-*
+
+# ExtUtils::MakeMaker generated files and dirs.
+^Makefile$
+^blib/
+^blibdirs$
+^pm_to_blib$
+^MakeMaker-\d
+                                                                                                                    
+# Module::Build
+^Build$
+^_build/
+                                                                                                                    
+# Temp, old, vi and emacs files.
+~$
+\.old$
+^#.*#$
+^\.#
+\.swp$
+\.bak$

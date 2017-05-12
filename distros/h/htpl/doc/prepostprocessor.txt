@@ -1,0 +1,10 @@
+To have your source preprocessed, create a file called htsource.pre in
+your source directory, and type the preprocessor name.
+For example:
+tee htsource.pre
+gcc -E -x c
+^D
+To assign a post processor (for example, to convert XML to HTML via XSLT)
+do the same with a file called htout.pre.
+Since the latter needs to be called again and again, it is not supported
+in mod_perl.

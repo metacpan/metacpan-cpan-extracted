@@ -1,0 +1,144 @@
+Revision history for hwd
+
+0.20    Wed Mar  1 20:30:52 CST 2006
+        [ENHANCEMENTS]
+        * Allows times for tasks and work to be expressed in minutes.
+          "2h" is the same as "120m".
+
+        * Added column headings to default output
+
+        * Task indent level may now be done with asterisks as well as
+          dashes, and the indent level may have whitespace following it.
+          The following are all valid:
+
+          -Level 1 the old way
+          --Level 2 the old way
+          --- Level 3 with whitespace
+          ***Level 3 the new way
+          ****  Level 4 the new way with whitespace
+          --**IMPORTANT** (Level 2, task name "**IMPORTANT**")
+
+0.18    Tue Feb 21 15:09:29 PST 2006
+        [ENHANCEMENTS]
+        * Better reporting of where errors are found.  Now tells the line
+          number and filename of the file where the error is found.
+
+        * Added new flags: --strict, --nostrict
+
+          By default, C<--strict> is on and hwd will not print output if
+          there are errors in the input.  You can use the C<--nostrict>
+          for when you're getting your first schedule pulled together
+          and don't mind the errors and the inaccuracies they cause,
+          in the name of seeing some output.
+
+
+0.16    Mon Feb 13 18:55:49 CST 2006
+        [ENHANCEMENTS]
+        * Work on tasks may now refer to the most recent task with a
+          task number of "^".  This means you can do tracking without
+          having to have task numbers.
+
+        [DOCUMENTATION]
+        * Much more documentation on the file format.  See "hwd --man".
+
+
+0.14    Thu Feb  9 17:03:15 CST 2006
+        * NO NEW FEATURES: Put out to get new package name in CPAN.
+        * Removed use of Date::Manip
+        * Added more docs to explain file format.
+
+Last release as App-HWD
+0.12    Dec 08 2005
+        [ENHANCEMENTS]
+        * Now word-wraps the output based on the terminal size, or
+          at 72 if output is being redirected.  This may be overridden
+          with --wrap.
+
+        * Now includes notes in the output.  Can be turned off with --nonotes.
+
+        [FIXES]
+        * Added checks to make sure that tasks with estimates do not have children.
+
+        [INTERNALS]
+        * get_tasks_and_work() now returns an error array, rather
+          than dying.
+
+0.10    Mon Oct 24 17:38:00 CDT 2005
+        [ENHANCEMENTS]
+        * Added top-level totaling on the main dump.
+        * --todo now respects subtasks and their doneness.
+        * Added --csv option for printing dumps in an importable form
+        * You can now have notes in a task.  Anything that is indented
+          is assumed to be part of the notes for the task above it.
+
+        [INTERNALS]
+        * Added parent()/children() to App::HWD::Task to support the
+          hierarchy reporting.
+
+0.08    Tue Aug 30 16:43:54 CDT 2005
+        [THINGS THAT MIGHT BREAK YOUR CODE]
+        * Dates must now be in YYYY-MM-DD format.
+
+        [ENHANCEMENTS]
+        * Added --todo option to show only those items needing to be done.
+        * Now handles fractional estimates.
+        * Now handles deletion dates.  We don't DO anything with them,
+          but they're legal, and burndown ignores them.
+        * Franctional estimates and velocities in the main listing now
+          show as "+" rather than the decimals.  For example, "12"
+          shows as "12", but "12.5" shows as "12+".
+
+        [FIXES]
+        * No longer double-counts tasks worked on by multiple people
+          in --started.
+        * Doesn't print a total when a --started person is specified.
+
+0.07_01 Wed Aug 17 15:03:12 CDT 2005
+        [THINGS THAT MIGHT BREAK YOUR CODE]
+        * Previously, a task that was added after coding started was
+          noted like this:
+
+            --Implement widget (#251, 4hrs, @11/7/05)
+
+          Now, we use the word "added" instead of "@"
+
+            --Implement widget (#251, 4hrs, added 11/7/05)
+
+        [ENHANCEMENTS]
+        * Added whitespace to --started output.
+        * Gives total points open on --started.
+
+        [FIXES]
+        * Fixed potentially destructive bug in a test file:
+
+            unlink($started, qr#Chimp is working on.+ 107 - Refactor \(1/1\)#s);
+
+          That "unlink" is, of course, supposed to be "unlike".  OOPS!
+
+        [INTERNALS]
+        * Removed code for handling --detail_level
+        * bin/hwd now has no globals.
+        * Added many items to TODO list.
+
+0.06    Sun Aug 14 21:52:55 CDT 2005
+        [ENHANCEMENTS]
+        * Added a vim syntax file in etc/hwd.vim.
+        * Added --burndown and starting on the burndown graphic.
+          Thanks to Neil & Luke again.
+        * Added a $task->date_added()
+
+0.04    Tue Aug  2 15:47:23 CDT 2005
+        [ENHANCEMENTS]
+        * Added --started feature.  Thanks to Neil Watkiss and Luke
+          Closs from Sophos.
+
+0.02    Mon Aug  1 14:32:29 PDT 2005
+        [FIXES]
+        * Fixes silly syntax bummers.
+
+        [ENHANCEMENTS]
+        * Added --nextid
+
+0.01
+        First version, released on an unsuspecting world.
+

@@ -1,0 +1,4 @@
+#!/bin/sh
+mkdir ../temp 2> /dev/null
+../perl.sh Makefile.PL `cat ../instnonroot.dat | sed -e s#%#$1#g -e s#@#../temp#`
+

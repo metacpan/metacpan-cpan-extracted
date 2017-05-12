@@ -1,0 +1,189 @@
+#!@PERL@
+
+use HTML::HTPL::Config;
+use HTML::HTPL::Lib qw(filedepend);
+use strict;
+
+if ($ARGV[0] ne "--force") {
+	print "htplss does not erase objects yet. If you still want to use it\n";
+	print "type: $0 --force @ARGV\n";
+        die;
+}
+
+shift @ARGV;
+
+die "Usage $0 <file> [<passwd file>]" if (@ARGV < 1 || @ARGV > 2);
+
+my $file = shift @ARGV;
+my $passwd = (shift @ARGV) || "/etc/passwd";
+
+my $pwd = {};
+
+open(P, $passwd) || die "Can't open $passwd";
+while (<P>) {
+    chop;
+    my ($u, $p) = split(/:/);
+    $pwd->{$u} = $p;
+}
+close(P);
+
+$| = 1;
+
+my $methods = {};
+
+my $srv = $file;
+my @tokens = ($file =~ /(\w+)/g);
+$srv = join("_", map {ucfirst(lc($_));} @tokens);
+
+my @inc;
+
+open(I, $file) || die "$file not found";
+
+while (<I>) {
+    chomp;
+    my $f = $_;
+    my $p = "$f.ht.pl";
+    print "Compiling $f.htpm...";
+    system "$HTML::HTPL::Config::pcbin $f" if (&filedepend("$f.htpm",
+                              "$f.htpc"));
+    system "$HTML::HTPL::Config::dbgbin -t -w $f.htpm" if
+		(&filedepend("$p", "$f.htpm"));
+
+    print "\nScanning $f.htpm...";
+
+    my ($pkg, @funcs);
+    open(SRC,  "$f.htpm");
+    while (<SRC>) {
+        my @tok;
+        if (/^\s*\#CLASS\s+(\w+)\s(.*)$/) {
+            $pkg = $1;
+            my @tok = ($2 =~ /(\w+)/g);
+            push(@funcs, @tok);
+        }
+        push(@funcs, $1) if (/^\s*\#METHOD\s(\w+)/);
+    }
+    close(SRC);
+
+    print "\nLoading $p...";
+
+    require $p;
+
+    push(@inc, $p);
+
+    print "\nAnalyzing $pkg...";
+
+    my @funcs2 = HTML::HTPL::Sys::pkglist($pkg, '&');
+
+    $methods->{$pkg} = { map { s/^\&//; ($_, 1); } (@funcs, @funcs2)};
+    print "\n\n";
+}
+
+$methods->{$srv} = {'NewHandle' => 1, 'CallMethod' => 1};
+
+close(I);
+
+use Data::Dumper;
+
+my $mettext = Dumper($methods);
+my $pwdtext = Dumper($pwd);
+my $include = join("\n", map {"require '$_';";} @inc);
+
+$file .= "." unless ($file =~ /\./);
+$file =~ s/\..*?$/.pl/;
+
+print "Creating $file...";
+
+open(O, ">$file") || die "Can't rewrite $file";
+
+while(<DATA>) {
+    s/\@CLASS\@/$srv/;
+    s/\@INCLUDE\@/$include/;
+    s/\@METHODS\@/$mettext/;
+    s/\@USERS\@/$pwdtext/;
+    s/\@PORT\@/$HTML::HTPL::Config::htpl_pts_port/;
+    print O;
+}
+close(O);
+
+chmod 0700, $file;
+
+print "\n\nOk\n";
+
+__DATA__
+#!@PERL@
+use RPC::PlServer;
+use Sys::Syslog;
+use strict;
+
+@INCLUDE@
+
+package @CLASS@;
+
+use vars qw($VERSION @ISA);
+use HTML::HTPL::Table;
+
+$VERSION = '1.00';
+@ISA = qw(RPC::PlServer);
+
+sub new {
+    my $class = shift;
+    my $self = $class->SUPER::new(@_);
+    my $VAR1;
+@METHODS@
+    $self->{'methods'} = $VAR1;
+    bless $self, $class;
+}
+
+sub AcceptApplication {
+1;
+}
+
+sub AcceptVersion {
+1;
+}
+
+sub AcceptUser {
+    my ($self, $u, $p) = @_;
+    my $VAR1;
+@USERS@
+    my $correct = $VAR1->{$u};
+    return undef unless (defined($correct));
+    return 1 unless ($correct);
+    my $cr = crypt($p, $correct);
+    return ($correct eq $cr);
+}
+
+package main;
+my $pid;
+
+$SIG{'ABRT'} = $SIG{'INT'} = $SIG{'STOP'} =
+$SIG{'TERM'} = sub { print "Server @CLASS@ exiting\n"; exit;};
+
+my $server;
+
+sub spawn {
+    if ($pid = fork) {
+        print "Forked server @CLASS@ on port @PORT@ as process $pid\n";
+        exit;
+    }
+}
+
+
+
+&spawn;
+while (1) {
+    $SIG{'HUP'} = sub { die "RELOAD"; };
+    eval { &launch; };
+    die $@ unless ($@ =~ /RELOAD/);
+    print "Server @CLASS@ on PID $$ reloading\n";
+    eval { $server->Close; };
+}
+
+sub launch {
+    $server = new @CLASS@({localport => @PORT@,
+    clients => [{accept => ".*"}],
+    logfile => 0,
+    pidfile => '@CLASS@.pid'}, \@ARGV);
+    $server->Bind;
+}
+

@@ -1,0 +1,116 @@
+\documentclass[10pt]{article}
+\usepackage{fullpage, graphicx, url}
+\setlength{\parskip}{1ex}
+\setlength{\parindent}{0ex}
+\title{Test \#1}
+\begin{document}
+ Table without border 
+
+\begin{tabular}{cc}
+Ampersand &\& \\
+Left Angle &$<$ \\
+Right Angle &$>$ \\
+Dollar Sign &\$\$\$\$ \\
+Forward Slash &/ \\
+Percent &\% \\
+Left Brace &\{ \\
+Back Slash &$\backslash$ \\
+Right Brace &\} \\
+Underscore &\_ \\
+Funny &$\backslash$\$
+
+\end{tabular}
+
+ Nested table with border 
+
+\begin{tabular}{|l|r|}
+\hline 
+align left &align right \\
+ \hline 
+....................................... &....................................... \\
+ \hline 
+align center &
+
+\begin{tabular}{|c|c|}
+\hline 
+1 &2 \\
+ \hline 
+3 &4 \\
+ \hline 
+
+\end{tabular}
+
+ \\
+ \hline 
+
+\end{tabular}
+
+\begin{description}
+\item[Defenition of Recursion ]See Recursion 
+
+\end{description}
+\section*{Header 1}
+\subsection*{Header 2}
+\subsubsection*{Header 3}
+\textbf{Header 4}
+\textbf{Header 5}
+\textbf{Header 6}
+ A small ordered list. \begin{enumerate}
+\item \textbf{Bold}
+
+\item \emph{Italics}
+
+\item \textbf{Strong}
+
+\item \emph{Emph}
+
+
+\end{enumerate}
+ A small unordered list. \begin{itemize}
+\item  !@\#\$\%\^{}\&*()\{\} 
+\item  Nested list \begin{itemize}
+\item  !@\#\$\%\^{}\&*()\{\} 
+\item  bill@bobb.com 
+
+\end{itemize}
+
+
+\end{itemize}
+\emph{This is italisized}
+\\ 
+\emph{This is italisized}
+\\ 
+ This is not.\\ 
+\textbf{This is bold.}
+\\ 
+\textbf{This is bold}
+\\ 
+ This is not.\\ 
+ \$words\{cow\} = ``moo''; \# this is code\\ 
+ This is not.\\ 
+\begin{quote}
+This is a block quote
+\end{quote}
+ This is not.\\ 
+\begin{center}
+This is centered text
+\end{center}
+\\ 
+ This is not.\\ 
+ This is not a comment\\ 
+\begin{center}
+\includegraphics[scale=1]{./tags.png} \\ 
+this is an image that does not work\\ 
+ Both the pictures are centered. 
+\end{center}
+
+
+ This is a paragraph.
+
+
+ This is a new paragraph.
+
+
+ This is a new new paragraph. 
+
+\end{document}

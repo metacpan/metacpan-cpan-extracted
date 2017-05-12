@@ -1,0 +1,4 @@
+>
+Hello world
+It is now <% scalar(localtime) %>
+<#

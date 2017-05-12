@@ -1,0 +1,45 @@
+Revision history for Perl extension HTML::Latex.
+
+1.0   Thurs Sep 14 11:38:12 MST 2000
+	- removed invalids.t from testing and any log testing.  It was
+          stupid to have it in there in the first place.
+	- added 'kill' type
+	- made SCRIPT into 'kill'.  So, anything in SCRIPT /SCRIPT is
+        ignored. In other words, javascript is completely ignored now.
+
+0.9   Mon Aug 28 22:34:15 MST 2000
+	- set_log now accepts IO::File objects or FileHandle objects.
+	- Added support for international characters.
+	- Added quote-expansion
+	- Added ability to pass a FileHandle to html2latex().
+	- Added method parse_string().
+	- ~ doesn't expand to $ENV{HOME} unless $ENV{HOME} exists. 
+
+0.8   Thu Aug 17 00:32:36 2000
+        - Changed handler routine paramater order and got rid of
+	$content_ref.
+	- Ported the conversion of images to ImageMagick
+	- Changed all calls to $html_element->content to
+	$html_element->content_list to deal with undef's (requires
+	HTML::Tree .68).
+	- Changed get_uri and store_uri a lot.
+	- Improved the information printed by &texify when using
+	$option{debug}.
+	- Tried to improve <PRE> and <CODE> behavior.  I don't know what
+	to make it do.  It's sort of difficult.
+	- Fixed the <LI> bug.
+	- Added an HTML-style paragraph option (no indent and 1 line
+	paragraph spacing).
+	- Altered default behavior of \[sub]section to \[sub]section-.
+	- Changed call to texify from array of parents to single parent
+	(more efficient and also can check try attributes).
+	- Added the ban_tag option.
+	- Fixed "^" bug.
+	- Made relative local IMG sources work correcly.  At least, I
+	hope.  All this local/network absolute/relative crap is getting on
+	my nerves.  It never seems to work correctly.
+
+0.01  Thu Aug 17 00:02:34 2000
+	- original version; created by h2xs 1.20 with options
+		-XA -n HTML::Latex
+

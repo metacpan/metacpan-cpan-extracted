@@ -1,0 +1,258 @@
+# Makefile for HTPL
+
+# Autoconf output
+
+PERL = @PRERUN@@PERL@
+PERL_BIN = @PERL@
+TEMP = @PRERUN@@TEMP@
+CCPROG = @CC@
+INSBIN = @INSTALL@
+INSTALLDIR = @PRERUN@@INSTALLDIR@
+HTDOCS = @PRERUN@@HTDOCS@
+HTLOGS = @PRERUN@@HTLOGS@
+CONF = @PRERUN@@HTCONF@
+DEFEMBED = @DEFEMBED@
+EGO = @EGO@
+XML = @XML@
+DEPDBDEF = @DEPDBDEF@
+INSTALLBIN = @PRERUN@/usr/local/bin
+MODDIR = @MODDIR@
+LIBS = @LIBS@
+MODPERL = @MODPERL@
+OBJEMBED = @OBJEMBED@
+FUNCS = @DEFS@
+
+# Defines
+
+BIN = htpl.cgi
+DBG = htpldbg
+RUN = htplrun
+COMP = htplp
+CMP = htplc
+UPD = htplu
+CON = htplcon
+SRVC = htplsrvc
+GEN = htpgen
+SH = /bin/sh
+CONDS = -DTMP_DIR=\"$(TEMP)\" -DPERL_BIN=\"$(PERL_BIN)\" $(DEFEMBED)
+COMPILE = -DCOMPILATION=`$(PERL) -e "print time;"`
+BUILD = -DBUILD=`$(PERL) -e "print ((stat('HTPL-modules/lib/HTML/HTPL.pm'))[9]);"`
+VERSION = -DVERSION=`$(PERL) -e 'require "HTPL-modules/lib/HTML/HTPL.pm"; print $$HTML::HTPL::VERSION;'`
+INFO = $(DEPDBDEF) $(BUILD) $(VERSION) $(COMPILE)  
+CCFLAGS = -O3 $(CONDS) $(INFO) $(FUNCS)
+CC = $(CCPROG) 
+#CS = htpl.c htpl-l.c htpl-sub.c htpl-parse.c perf.c vasprintf.c asprintf.c $(OBJEMBED)
+CS = htpl.c htpl-l.c htpl-sub.c htpl-parse.c perf.c $(OBJEMBED)
+BINOBJ = $(CS:.c=.ob)
+DBGOBJ = $(CS:.c=.od)
+PREDEP = $(CS:.c=.d)
+HS = htpl.h htpl-sh.h
+OBV = Makefile
+DEPBIN = $(BINOBJ) $(HS) $(OBV) 
+DEPDBG = $(DBGOBJ) $(HS) $(OBV) 
+REP = htreporter
+SCRIPTS = $(RUN) $(CMP) $(COMP) $(REP) $(SRVC) $(GEN) $(UPD) $(CON)
+TARGETS = $(BIN) $(DBG) $(PMS) $(SCRIPTS)
+CWD = `pwd`
+PL = @PL@
+MODULES = HTPL-modules HTPL-SQL $(MODPERL)
+
+# Rules
+
+.SUFFIXES: .ob .od .owb .owd .d
+
+.c.d:
+	$(CC) $(CCFLAGS) -MM $< | sed -e 's/^$*.o/$*.ob $*.od $@/' > $@
+
+.c.ob: 
+	$(CC) $(CCFLAGS) -c -o $@ $< $(PL)
+
+.c.od:
+	$(CC) $(CCFLAGS) -c -D__DEBUG__ -o $@ $< $(PL)
+
+all: htpl-parse.c $(TARGETS) $(EGO)
+
+
+clean: clean-modules
+	/bin/rm -f $(TARGETS) $(SCRIPTS) $(BINOBJ) $(DBGOBJ) || true
+	test -n "$(XML)" && /bin/rm -f htpl-sh.h htpl-parse.c htplparse.pm perl.sh htpl-config.pl || true
+
+realclean: clean
+	/bin/rm -f Makefile core || true
+	/bin/rm -f config.status config.cache || true
+	/bin/rm -f core *.perl *.ht.pl perl.sh || true
+
+release: 
+	VERSION=`$(PERL) -e 'require "HTPL-modules/lib/HTML/HTPL.pm"; printf "%.2f", $$HTML::HTPL::VERSION + 0.01;'`; \
+	echo -n "htpl-$$VERSION" > release.name ; \
+	echo $$VERSION | $(PERL) -ne 'chop; print' | $(PERL) -pi -e \
+'s/^\s*\$$VERSION\s+=.*;/"    \$$VERSION = q!". scalar(<STDIN>) . "!;"/e;' \
+	HTPL-modules/lib/HTML/HTPL.pm 
+	touch htpl.c
+
+dist: clean-modules
+	# $(PERL) -e "print time;" > build
+	touch HTPL-modules/lib/HTML/HTPL.pm
+	/bin/rm -rf `cat release.name` 2> /dev/null || true
+	mkdir `cat release.name`
+	cp -r `cat MANIFEST` `cat release.name`
+	tar zcvf `cat release.name`.tar.gz `cat release.name`
+	/bin/rm -rf `cat release.name`
+
+$(BIN): $(DEPBIN) $(BINOBJ)
+	$(CC) -o $(BIN) $(BINOBJ) $(PL) $(LIBS)
+
+$(DBG): $(DEPOBJ) $(DBGOBJ)
+	$(CC) -o $(DBG) $(DBGOBJ) $(PL) $(LIBS)
+
+# Cancel this dependency if you fail to compile with no XML
+htpl-parse.c: macros.xpl htpl-crp.pl htplparse.pm parse-exp.pl
+	if [ -n "$(XML)" ] ; then  \
+		$(PERL) htpl-crp.pl ; \
+	fi
+
+htplparse.pm: htplparse.yp
+	if [ -n "$(XML)" ] ; then  \
+		yapp htplparse.yp ; \
+	fi
+
+htpl-sh.h: htpl-parse.c
+
+htpl-xsi.c: 
+	$(PERL) -MExtUtils::Embed -e xsinit -- -o htpl-xsi.c
+
+$(RUN): $(OBV)
+	echo "#!/bin/sh" > $@
+	echo "$(INSTALLDIR)/$(DBG) -rwb$(INSTALLDIR) \$$*" >> $@
+	chmod 755 $@
+
+$(CMP): $(OBV)
+	echo "#!/bin/sh" > $@
+	echo "$(INSTALLDIR)/$(DBG) -twb$(INSTALLDIR) \$$1" >> $@
+	chmod 755 $@
+
+$(CON): $(OBV)
+	echo "#!/bin/sh" > $@
+	echo "$(INSTALLDIR)/$(DBG) -rcb$(INSTALLDIR) \$$1" >> $@
+	chmod 755 $@
+
+$(UPD): $(OBV)
+	echo "#!/bin/sh" > $@
+	echo "$(INSTALLDIR)/$(DBG) -tb$(INSTALLDIR) \$$1" >> $@
+	chmod 755 $@
+
+install-it: 
+	for f in $(DBG) $(BIN) ; do \
+	$(INSBIN) -m 755 $$f $(INSTALLDIR) ; \
+	done
+	for f in htpl-pm.code htpl-xsub.pl ; do \
+	$(INSBIN) -m 644 $$f $(INSTALLDIR) ; \
+	done
+	$(INSBIN) -m 644 htpl.head $(INSTALLDIR)
+	$(INSBIN) -m 644 htpl.offhead $(INSTALLDIR)
+	for f in htpl.sitehead htpl-config.pl ; do \
+	if [ ! -f $(INSTALLDIR)/$$f ] ; then \
+	$(INSBIN) -m 644 $$f $(INSTALLDIR) ; \
+	fi ; \
+	done
+	touch $(HTLOGS)
+
+install-root: install-it install-samples
+
+install-samples: $(SCRIPTS)
+	if [ -z "$(MODPERL)" ]; then \
+	$(PERL) config-srv.pl $(CONF) $(INSTALLDIR)/$(BIN) $(HTDOCS) ; \
+	else \
+	$(PERL) config-mod.pl $(CONF) ; \
+	fi
+	test -d $(HTDOCS) || mkdir $(HTDOCS)
+	test -d $(HTDOCS)/htpl-cache || mkdir $(HTDOCS)/htpl-cache && chmod 777 $(HTDOCS)/htpl-cache 
+	if [ ! -f $(HTDOCS)/procs.htpm ] ; then \
+		install -m 755 procs.htpm $(HTDOCS) ; \
+	fi
+	if [ ! -f $(HTDOCS)/server_procs ] ; then \
+		install -m 755 server_procs $(HTDOCS) ; \
+	fi
+	install -m 755 server.htpl $(HTDOCS)
+	install -m 755 list.htpl $(HTDOCS)
+	for f in $(SCRIPTS) ; do \
+	$(INSBIN) -m 755 $$f $(INSTALLBIN) ; \
+	if [ ! -f $(INSTALLDIR)/$$f ] ; then \
+	ln -s $(INSTALLBIN)/$$f $(INSTALLDIR) ; \
+	fi ; \
+	done
+	if [ ! -f $(INSTALLBIN)/$(DBG) ]; then \
+	ln -s $(INSTALLDIR)/$(DBG) $(INSTALLBIN) ; \
+	fi
+
+build: @MODMAKE@
+
+install: all @MODINS@
+
+pureinstall: @MODINS@
+	
+htpl-author.ego:
+	touch htpl-author.ego
+	echo "$$USER@$$HOSTNAME installed htpl." | mail htpl@atheist.org.il
+
+build-it:
+	chmod +x perl.sh
+	for pk in $(MODULES) ; do \
+	cd $$pk ; \
+	$(SH) ../instnonroot $(MODDIR) ; \
+	make ; \
+	make test ; \
+	make install ; \
+	cd .. ; \
+	done
+
+build-root:
+	for pk in $(MODULES) ; do \
+	cd $$pk ; \
+	$(PERL) Makefile.PL ; \
+	make ; \
+	make test ; \
+	make install ; \
+	cd .. ; \
+	done
+
+clean-modules:
+	for pk in $(MODULES); do \
+	cd $$pk; \
+	make realclean || true; \
+	cd .. ; \
+	done
+	true
+
+Makefile: Makefile.in config.status
+	./config.status
+
+config.status: configure
+	./config.status --recheck || ./configure
+
+CPAN: @CPANMAKE@
+
+CPAN-root:
+	$(PERL) pre-install.pl $(NOPREREQ)
+
+CPAN-it:
+	$(PERL) pre-install.pl NOPREREQ $(MODDIR)
+
+
+.c.owb:
+	gcc -DHAVE_SETENV -c -o $@ $<
+
+.c.owd:
+	gcc -DHAVE_SETENV -c -D__DEBUG__ -o $@ $< 
+
+WINBINOBJ = \
+ htpl.owb htpl-l.owb htpl-sub.owb htpl-parse.owb $(owbJEMBEDBIN) perf.owb \
+ htpl-win.owb
+WINDBGOBJ = \
+ htpl.owd htpl-l.owd htpl-sub.owd htpl-parse.owd $(owbJEMBEDDBG) perf.owd \
+ htpl-win.owd
+win: $(WINBINOBJ) $(WINDBGOBJ)
+	gcc -DHAVE_SETENV -o htpl.exe $(WINBINOBJ) 
+	gcc -DHAVE_SETENV -D__DEBUG__ -o htpldbg.exe $(WINDBGOBJ) 
+
+include $(PREDEP)

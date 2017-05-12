@@ -1,0 +1,5 @@
+Shalom, page1.
+
+<% scalar(localtime) %>
+
+<A HREF="page2.htpl">Page 2</A>

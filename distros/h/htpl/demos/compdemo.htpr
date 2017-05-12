@@ -1,0 +1,5 @@
+#USE demo
+
+$day = int(rand(7) + 1);
+
+$demo{$day}->emit;

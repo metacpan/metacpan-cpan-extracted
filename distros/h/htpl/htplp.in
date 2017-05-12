@@ -1,0 +1,147 @@
+#!@PERL@
+use HTML::HTPL::Lib;
+use HTML::HTPL::Config;
+use Text::ParseWords;
+use DBI;
+
+foreach $comp (@ARGV) {
+    open(I, "$comp.htpc") || die "Can't open $comp.htpc";
+    %conf = ();
+    $tiepkg = 'DBI';
+    @thirdp = ();
+    $use = '';
+    while (<I>) {
+        chop;
+        s/^(\#)//;
+        die "Directive must begin with #" unless ($1);
+        @tokens = Text::ParseWords::shellwords($_);
+        $op = uc($tokens[0]);
+        last if ($op eq 'BEGIN'); 
+        next if ($op =~ /^;/);
+        if ($op eq 'COMP') {
+            $tiepkg = "DBI::ER";
+            push(@thirdp, "$tokens[1] => \\\%$tokens[2]");
+            $use = "$use\n#USE $tokens[2]";
+            next;
+        }
+        $conf{lc($op)} = $tokens[1];
+        $conf2{lc($op)} = [@tokens[(1 .. $#tokens)]];
+    }
+    $thirdp = @thirdp ? ( ", {" . join(", ", @thirdp) . "}" ) : "";
+    foreach (qw(TABLE INDEX DATABASE)) {
+        die "No value for $_" unless ($conf{lc($_)});
+    }
+    @dsn = @{$conf2{'database'}};
+    push(@dsn, undef, undef, undef);
+    splice(@dsn, 3, scalar(@dsn));
+    $dbh = DBI->connect(@dsn, {RaiseError => 1});
+    foreach (0 .. 1) {
+        $sth = $dbh->prepare("SELECT * FROM $conf{'table'} WHERE 1 = 2");
+        $sth->execute;
+        @fields = @{$sth->{NAME}};
+        $types = $sth->{TYPE};
+        $sth->finish;
+        last if (grep(/^$conf{'index'}$/, @fields));
+        die "Index $conf{'index'} not present" if ($_);
+    }
+    %t = ();    
+
+    @t{@fields} = @$types;
+    $this_t = $t{$conf{'index'}};
+
+    ($hash, @type_info) = @{$dbh->type_info_all};
+    $col1 = $hash->{'TYPE_NAME'};
+    $col2 = $hash->{'DATA_TYPE'};
+    $col3 = $hash->{'AUTO_UNIQUE_VALUE'};
+    %legal = ();
+    %wanted = qw(INT4 1 INT8 1 INT2 1);
+    foreach (@type_info) {
+        $legal{$_->[$col2]} = 1 if (uc($_->[$col1]) =~ /INT/ && !$uc->[$col3]);
+    }
+    $crind = $legal{$this_t};
+    $dbh->disconnect;
+
+
+    @dsn = map {$_ ? "'$_'" : 'undef'} @dsn;
+    $conf{'cachesize'} ||= 100;
+
+    @comps = $conf2{'comp'};
+
+    open(O, ">$comp.htpm");
+    print O "# Generated from $comp.htpc\n";
+    foreach ($tiepkg, qw(Cache Collection Func)) {
+        print O "use Tie::$_;\n";
+    }
+
+    $autocommit = $conf{'autocommit'} || 2;
+    print O <<EOP;
+$use
+use vars qw(\%$comp \%__htpl_db_$comp);
+
+my \$__htpl_tdb_$comp = tied(\%__htpl_db_$comp) ||
+        tie \%__htpl_db_$comp, 'Tie::$tiepkg', 
+    {'AUTOCOMMIT' => $autocommit,
+     'CLOBBER' => 1,
+     'db' => $dsn[0],
+     'user' => $dsn[1],
+     'password' => $dsn[2],
+     'table' => '$conf{table}', 
+     'key' => '$conf{index}'}$thirdp;
+my \$vec_$comp = tied(\%$comp) ||
+        tie \%$comp, 'Tie::Collection', \$__htpl_tdb_$comp, 
+    {'MaxCount' => $conf{'cachesize'}}, '$comp';
+
+sub select_$comp {
+    my \$sql = shift;
+    my \@keys = \$sql ? \$__htpl_tdb_$comp->select_where(\$sql)
+         : keys \%__htpl_db_$comp;
+    return \@keys unless (\@_);
+    map {\$${comp}\{\$_};} \@keys;
+}    
+
+*${comp}::select_$comp = *${comp}::select = *${comp}::selectObject 
+	= \\&select_$comp;
+*${comp}::$comp = \\\%$comp;
+
+package $comp;
+sub getObject {
+    my \$arg = shift;
+    \$arg = shift if (UNIVERSAL::isa(\$arg, __PACKAGE__));
+    \$${comp}{\$arg};
+}
+
+EOP
+
+    @fields = map {lc($_);} @fields;
+    my @atts = &HTML::HTPL::Lib::undouble(@${conf2{'worksection'}}, @fields);
+    my $atts = join(" ", grep /./, @atts);
+
+    print O <<EOP;
+#CLASS $comp $atts
+
+#CONSTRUCTOR
+   my \$max = (sort keys %$comp)[-1];
+   \$max++;
+   \$$conf{'index'} = \$max;
+   \$${comp}{\$max} = \$self;   
+#END CONSTRUCTOR
+
+#METHOD store
+    \$${comp}{\$$conf{'index'}} = \$self;
+#END METHOD
+
+#METHOD purge
+    delete \$${comp}{\$$conf{'index'}};
+#END METHOD
+
+#METHOD index
+    \$$conf{'index'};
+#END METHOD
+
+EOP
+    print O join("", <I>);
+    print O "#END CLASS\n";
+    close(I);
+    close(O);
+    system "$HTML::HTPL::Config::dbgbin -t -w $comp.htpm";
+}

@@ -1,0 +1,259 @@
+# This is an actual schedule and work, with specific names changed to
+# protect confidentiality.  Anything that is "foo", "bar", "baz",
+# "quux" or "wango" has been changed from something else.
+
+
+-Infrastructure
+--FOO*
+---Add new columns to track by type (#101, 2h)
+---Add new columns to record new checkout features (#102, 2h)
+---Add FK constraints between FOOHEAD and FOODETAIL (#103, 2h)
+---Add FK constraints between FOOHEAD and BARDETAIL (#104, 2h)
+
+--ORDERFORM
+---Create migration script to modify table automatically (#105, 2h)
+
+-TW::DB::FooForm
+--Review (#106, 1h)
+--Refactor (#107, 1h)
+
+-TW::DB::FooDefault
+--Review (#108, 1h)
+--Refactor (#109, 1h)
+
+-Foo Entry Wizard
+--Handler
+---API Pod Docs (#110, 4h)
+---Review (#111, 1h)
+---Tests (#112, 8h)
+---Code (#113, 8h)
+---Refactor (#114, 4h)
+--Screens
+---Foo Summary Template Component (#115, 5h)
+---Foo Summary Template - CA & C&P (#228, 2h)
+---Wango Template (#116, 5h)
+---Wango Template - CA & C&P (#229, 2h)
+---Main and List page buttons (#117, 4h)
+---C&P Template (#118, 5h)
+---C&P Template - CA & C&P (#236, 2h)
+---Tango Options Template (#119, 5h)
+---Tango Options Template - CA & C&P (#230, 2h)
+---Ebook Options Template (#120, 5h)
+---Ebook Options Template - CA & C&P (#231, 2h)
+---Contact Information Template (#121, 5h)
+---Contact Information Template - CA & C&P (#232, 2h)
+---Baz Template (#122, 5h)
+---Baz Template - CA & C&P (#233, 2h)
+---Quux Template (#123, 5h)
+---Quux Template - CA & C&P (#234, 2h)
+---Confirm Template (#124, 5h)
+---Confirm Template - CA & C&P (#235, 2h)
+---Thank You Template (#125, 7h)
+--E-mail Confirmation (#126, 7h)
+
+-TW::FooWizard
+--Review (#127, 4h)
+--Tests (#128, 4h)
+--CA & C&P Tests (#226, 4h)
+--Code (#129, 8h)
+--CA & C&P Code (#227, 8h)
+--Refactor (#130, 2h)
+
+-TW::FooMaker
+--API Pod Docs (#131, 12h)
+--Review (#132, 4h)
+--Tests (#133, 8h)
+--Code (#134, 16h)
+---Bar Promotion (#135, 8h)
+--Refactor (#136, 2h)
+
+-TW::DB::FooHead
+--API Pod Docs (#137, 2h)
+--Review (#138, 1h)
+--Tests (#139, 4h)
+--Code (#140, 4h)
+--Refactor (#141, 1h)
+
+-TW::DB::FooDetail
+--API Pod Docs (#142, 2h)
+--Review (#143, 1h)
+--Tests (#144, 4h)
+--Code (#145, 4h)
+--Refactor (#146, 1h)
+
+-TW::DB::BarDetail
+--API Pod Docs (#147, 2h)
+--Review (#148, 1h)
+--Tests (#149, 4h)
+--Code (#150, 4h)
+--Refactor (#151, 1h)
+
+-TW::CP
+--API Pod Docs (#152, 7h)
+--Review (#153, 1h)
+--Tests (#154, 7h)
+--Code
+---Create "new" method for TW::CP (#155, 1h)
+---Refactor interfaces between TW::CP and TW::CPSet (#156, 7h)
+---Convert TW::CP class methods to instance methods (#157, 4h)
+---Change current TW::CP users to using instance methods (#158, 4h)
+---Create accessor methods which delegate appropriately (#160, 4h)
+---Create support for dynamically loading delegatees (#161, 2h)
+---Create method to invalidate dynamically loaded delegatees (#162, 1h)
+---Create method to invalidate dynamically calculated costs (#163, 1h)
+---Create interface definition module for Foo implementors (#164, 1h)
+---Create methods to return delegatees (#165, 1h)
+--Refactor (#166, 2h)
+
+-TW::DB::BarSubset
+--API Pod Docs (#167, 7h)
+--Review (#168, 1h)
+--Tests (#169, 7h)
+--Code
+---Create base Class::DBI module from POD (#170, 1h)
+---Calculate bar from aggregate totals of a supplied object (#171, 4h)
+---Create processing methods to format specs as text or HTML (#172, 8h)
+---Create methods to support delegated accessors interface for TW::CP (#173, 4h)
+--Refactor (#174, 2h)
+
+-TW::CPSet
+--API Pod Docs (#175, 7h)
+--Review (#176, 1h)
+--Tests (#177, 7h)
+--Code
+---Calculate Book C&P costs from aggregate totals of a supplied object (#178, 2h)
+---Create methods to support delegated accessors interface for TW::CP (#179, 4h)
+--Refactor (#180, 2h)
+
+-TW::List
+--Review (#181, 1h)
+--Add Code
+---Refactor (#182, 2h)
+
+-TW::TitleCounts
+--Review (#183, 1h)
+--Refactor (#184, 1h)
+
+-Bar Creation PL/SQL script (#185, 16h)
+
+-Foo Creation PL/SQL script (#186, 16h)
+
+-TW::BarMaker
+--API Pod docs (#223, 4h)
+--Review (#224, 1h)
+--Tests (#187, 7h)
+--Code (#188, 7h)
+--Refactor (#189, 4h)
+
+-TW::Bar
+--API Pod Docs (#190, 14h)
+--Review (#191, 4h)
+--Tests (#192, 14h)
+--Code (#193, 21h)
+--Refactor (#194, 4h)
+
+-TW::DB::BarItem
+--Tests (#195, 2h)
+--Code (#196, 3h)
+--Refactor (#197, 1h)
+
+-TW::DB::BarHead
+--API Pod Docs (#198, 4h)
+--Review (#199, 1h)
+--Tests (#200, 2h)
+--Code (#201, 3h)
+--Refactor (#202, 1h)
+
+-Bar Print
+--TW::Apache::Bar Handler
+---Select List & Request Bar (#203, 7h)
+---Bar Print Options (#204, 7h)
+---Bar Print (#205, 7h)
+--Select List & Request Bar Template
+---Bar Select Template (#207, 7h)
+---Bar Request email (#208, 7h)
+---Bar Request Confirm Template (#209, 7h)
+---Bar Print Options Template (#210, 7h)
+--Bar Print Screen
+---Main Bar Template (#211, 4h)
+---Standard Detail template (#212, 4h)
+---Single Line Detail template (#213, 4h)
+---Annotated Detail template (#214, 4h)
+-Spec Change E-mail (#217, 16h)
+-Custom Foo Email (#218, 16h)
+
+-Rollout
+--Run alter scripts against production database and verify OK (#219, 7h)
+--Merge to trunk (#221, 28h)
+--Rollout internally (#220, 1h)
+--Rollout (#222, 6h)
+
+
+Pete    7/11    195 2 X
+Pete    7/11    196 3 X
+Pete    7/11    198 2
+Pete    7/11    127 .5 X
+Pete    7/11    108 .25 X
+Pete    7/11    106 .25 X
+Pete    7/11    111 .5 X
+Pete    7/12    198 1.25 X
+Pete    7/13    200 2 X
+Pete    7/13    201 1
+Pete    7/13    175 2.75
+Pete    7/14    175 7.5
+Pete    7/15    167 5
+
+Bruce    7/11    185 5
+Bruce    7/11    127 .5 X
+Bruce    7/11    108 .25 X
+Bruce    7/11    106 .25 X
+Bruce    7/11    111 .5 X
+Bruce    7/12    185  6
+Bruce    7/13    185  5 x
+Bruce    7/13    223  1
+Bruce    7/14    185  2 x refactor
+Bruce    7/14    223  1.5
+Bruce    7/14    188  2
+Bruce    7/15    223  3 x
+Bruce    7/15    187  1
+Bruce    7/15    188  1
+
+Bob    7/11    127 .5
+Bob    7/11    108 .75 X
+Bob    7/11    106 .25 X
+Bob    7/11    111 .5 X
+Bob    7/11    127 1.5 X
+Bob    7/11    110 .25 X
+Bob    7/11    117 1
+Bob    7/11    113 1
+Bob    7/12    128 2
+Bob    7/12    129 3.75
+Bob    7/13    128 .75
+Bob    7/13    129 1
+Bob    7/13    116 .5
+Bob    7/13    115 .5
+Bob    7/13    118 .5
+Bob    7/13    119 .5
+Bob    7/13    120 .5
+Bob    7/13    121 .5
+Bob    7/13    122 .5
+Bob    7/13    123 .5
+Bob    7/13    124 .5
+Bob    7/14    128 1
+Bob    7/14    129 1
+Bob    7/14    116 .25 X
+Bob    7/14    115 .25 X
+Bob    7/14    118 .25 X
+Bob    7/14    119 .25 X
+Bob    7/14    120 .25 X
+Bob    7/14    121 .75
+Bob    7/14    122 .75
+Bob    7/14    123 .75
+Bob    7/14    124 .25
+Bob    7/15    128 1 X
+Bob    7/15    129 1 X
+Bob    7/15    113 1 X
+Bob    7/15    121 .25 X
+Bob    7/15    122 .25 X
+Bob    7/15    123 .25 X
+Bob    7/15    124 .25 X

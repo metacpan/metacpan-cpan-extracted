@@ -1,0 +1,90 @@
+#!/usr/bin/perl
+use Chart::Graph::Gnuplot qw(gnuplot);
+use Getopt::Long;
+use Pod::Usage;
+use strict;
+use warnings;
+
+my $title = 'Burndown';
+my $pngname = 'burndown.png';
+GetOptions( 'title=s'   => \$title,
+            'pngname=s' => \$pngname,
+            'help'      => sub {pod2usage({-verbose => 1}); exit},
+          ) or do {pod2usage({-verbose => 1}); exit};
+
+my @dates;
+my @totals;
+my @todos;
+while(<>) {
+    next if /^YYYY/; # ignore header
+    my ($date, $total, $todo) = split /\s+/;
+    push @dates, $date;
+    push @totals, $total;
+    push @todos, $todo;
+}
+die "No data read!\n" unless @totals;
+
+# Make the y range 10% larger than the highest value
+my $ymax = (sort {$a <=> $b} @totals)[-1];
+$ymax *= 1.1; 
+
+gnuplot({"title" => $title,
+         "x-axis label" => "Date",
+         "y-axis label" => "Points",
+         "output type" => "png",
+         "output file" => $pngname,
+         "yrange"  => "[0:$ymax]",
+         "xdata"    => "time",
+         "format"  => ["x", "%m/%d"],
+         "timefmt" => '%Y/%m/%d',
+         },
+         [{title => "Total work",
+           style => "lines",
+           type  => "columns"}, \@dates, \@totals],
+         [{title => "Remaining work",
+           style => "lines",
+           type  => "columns"}, \@dates, \@todos],
+);
+
+__END__
+
+=head1 NAME
+
+hwd-burnchart -- Create burndown charts from hwd burndown output
+
+=head1 SYNOPSIS
+
+  hwd --burndown foo.txt | hwd-burnchart --title "Project Foo"
+
+Options:
+
+  --title       Use the given title (defaults to "Burndown")
+  --pngname     Write the chart to this filename (defaults to burndown.png)
+  --help        Show this help
+
+=head1 OVERVIEW
+
+The burndown chart shows the history of the task totals and of how much
+work remains to be done.  The remaining work should approach zero as the 
+project completes.
+
+=head1 TODO
+
+=head2 Text based graphs
+
+=head1 AUTHORS
+
+Luke Closs C<< <lukec@activestate.com> >>
+
+=head1 COPYRIGHT
+
+Copyright 2005 by Luke Closs C<< <lukec@activestate.com> >>.
+
+This program is free software; you can redistribute it and/or 
+modify it under the same terms as Perl itself.
+
+See L<http://www.perl.com/perl/misc/Artistic.html>.
+
+=cut
+
+

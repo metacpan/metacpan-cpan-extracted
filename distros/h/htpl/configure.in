@@ -1,0 +1,352 @@
+dnl Process this file with autoconf to produce a configure script.
+AC_INIT(htpl.c)
+
+
+
+clear
+cat <<EOM
+
+Welcome to HTPL installation.
+
+EOM
+
+
+dnl Checks for programs.
+AC_LANG_C
+AC_PROG_CC
+AC_PROG_CPP
+AC_PROG_INSTALL
+AC_PROG_LN_S
+AC_PROG_MAKE_SET
+AC_PROG_AWK
+
+AB_PROG_PERL(5.005, , exit)
+AB_CHECK_EMBEDDED_PERL([ 
+OBJEMBED="htpl-xsi.c htpl-perl.c"
+DEFEMBED=-D__PERLEMBED__
+[
+PL="$CCFLAGS `$PERL -MExtUtils::Embed -e ccopts`"
+LIBS="$LIBS `$PERL -MExtUtils::Embed -e ldopts`"
+]
+], [OBJEMBED=
+DEFEMBED=
+PL=
+])
+
+dnl Checks for libraries.
+dnl Replace `main' with a function in -ldb:
+dnl AC_CHECK_LIB(db, main)
+dnl Replace `main' with a function in -le:
+dnl AC_CHECK_LIB(e, main)
+dnl Replace `main' with a function in -lperl:
+dnl AC_CHECK_LIB(perl, main)
+
+dnl Checks for header files.
+AC_HEADER_DIRENT
+AC_HEADER_STDC
+AC_HEADER_SYS_WAIT
+AC_HEADER_TIME
+AC_CHECK_HEADERS(fcntl.h limits.h malloc.h unistd.h string.h)
+
+dnl Checks for typedefs, structures, and compiler characteristics.
+AC_C_CONST
+AC_STRUCT_TM
+
+dnl Checks for library functions.
+AC_FUNC_MEMCMP
+AC_FUNC_VPRINTF
+AC_CHECK_FUNCS(getcwd putenv strdup strstr setenv)
+
+AC_ARG_ENABLE(depdb, [  --enable-depdb	  Include dependency database], [
+    AC_REQUIRE_CPP
+    AC_CHECK_HEADER(db_185.h, [
+        AC_CHECK_LIB(db, dbopen, [ LIBS="$LIBS -ldb"; DEPDBDEF="-D__DEPEND_DB__"
+          echo "Compiling with dependency database" ], [ exit ])
+], [
+        exit])], DEPDBDEF= )
+
+
+AC_ARG_WITH(temp, [  --with-temp=TEMP	  Temp directory], TEMP=$withval, TEMP=/tmp)
+AB_CHECK_TEMP($TEMP, , exit)
+
+AC_ARG_WITH(pipe,  [  --without-pipe	  No | code lines], PIPE=$withval, PIPE=yes)
+
+[
+if [ "$PIPE" != "no" ] ; then
+]
+    AC_DEFINE(PIPE_CMDS)
+[
+fi
+]
+
+AC_ARG_WITH(sharp, [  --without-sharp	  No #var# substitution], SHARP=$withval, SHARP=yes)
+
+[
+
+if [ "$SHARP" != "no" ] ; then
+]
+    AC_DEFINE(SHARP_VARS)
+[
+fi
+
+]
+
+dnl AB_PERL_CHECK(Tie::DeepTied, , [ echo You must get Tie-Tools from CPAN to run this package,
+dnl echo Try \$CPAN/authors/id/S/SC/SCHOP or use CPAN.pm module for Tie::DeepTied.
+dnl exit ]
+dnl )
+
+AB_PERL_CHECK(XML::Parser, [
+    AB_PERL_CHECK(Parse::Lex, [
+       AB_PERL_CHECK(Parse::Yapp, XML=1, )])])
+
+echo -n "Macro file will "
+[ if [ -z "$XML" ]; then ]
+    echo -n "not "
+fi
+echo "be compiled"
+
+
+AC_ARG_ENABLE(modperl, [  --enable-modperl	  Install ModPerl support], [
+
+[
+    if [ ! "$UID" = 0 ]; then
+        echo "ModPerl support must be installed as superuser"
+        exit
+    fi
+    if [ -n "$DEPDBDEF" ]; then
+        echo "Dependency database and ModPerl support can't be used
+together"
+        echo "If you are running HTPL in ModPerl, Dependency database is
+unneeded"
+        exit
+    fi
+    echo "Compiling with ModPerl support"
+    MODPERL=mod_perl
+]
+], MODPERL=)
+
+AC_CACHE_CHECK(for web root, ab_cv_httpdroot, [
+[ 
+echo ""
+HTTPDROOT=""
+if [ ! "$UID" = 0 ] && [ -z "$PRERUN" ]; then
+    MODMAKE=build-it
+    MODINS=install-it
+    CPANMAKE=CPAN-it
+    MODDIR="\$(INSTALLDIR)"
+    echo ""
+else
+    MODINS=install-root
+    CPANMAKE=CPAN-root
+    DEFH=
+    if [ "$UID" = 0 ]; then
+        MODMAKE=build-root
+]
+    AC_CHECK_FILES(/etc/rc.d/init.d/httpd /etc/rc.d/init.d/httpsd,
+        HTTPD_RC=$ac_file; break, [])
+[
+    if [ -n "$HTTPD_RC" ] && [ -f "$HTTPD_RC" ]; then
+        HTTPD=`$AWK -F'=' '($1 == "HTTPD") {print $2; exit}' < $HTTPD_RC`
+    else
+]
+        AC_PATH_PROGS(HTTPD, httpd, , /usr/sbin:/usr/local/bin:$PATH)
+[
+    fi
+    if [ -n "$HTTPD" ] && [ -x "$HTTPD" ]; then
+        DEFH=`$HTTPD -V | sed 's/^ *-D *//' | $AWK -F'=' '($1 == "HTTPD_ROOT") {print $2; exit}'`
+        DEFH=`echo $DEFH | sed 's/^"\(.*\)"$/\1/'`
+    fi
+    else
+        MODMAKE=build-it
+    fi
+    for try in /home/httpd /usr/local/apache /usr/local/etc/apache \
+      /var/www /usr/local/www /usr/local/etc/www /usr/local/stronghold \
+          /usr/local/httpd /usr/local/etc/httpd ; do 
+        if [ -n "$DEFH" ]; then
+            break
+        fi 
+        if [ -d $PRERUN"$try" ] ; then
+            DEFH="$try"
+        fi
+    done
+    echo ""
+    echo "Enter your httpd root"
+    echo -n "Default ["$PREDISP"$DEFH] "
+    read HTTPDROOT
+    if [ -z "$HTTPDROOT" ]; then
+        HTTPDROOT=$DEFH
+    fi
+fi
+]
+ab_cv_httpdroot="HTTPDROOT=${HTTPDROOT} ; MODMAKE=${MODMAKE} ; MODINS=${MODINS} ; CPANMAKE=${CPANMAKE}"
+])
+eval $ab_cv_httpdroot
+[
+HTDOCS=""
+if [ -n "$HTTPDROOT" ] ; then
+    DEFAULT="$HTTPDROOT"/htdocs
+    if [ ! -d "$PRERUN"$DEFAULT ]; then
+        DEFAULT=$HTTPDROOT"/html"
+    fi
+else
+    DEFAULT=
+    for dir in public_html public_www html www . ; do
+        if [ -z "$DEFAULT" ] && [ -d "$HOME/$dir" ]; then
+            DEFAULT=$HOME/$dir
+        fi
+    done
+fi
+NEXTDEF=$DEFAULT
+DEFAULT=$DEFAULT"/htpl"
+]
+AC_CACHE_CHECK(for document directory, ab_cv_htdocs, [
+[
+echo ""
+echo Enter the name of the documents directory where HTPL should install sample files and access scripts
+echo -n "Default ["$PREDISP"$DEFAULT] "
+read HTDOCS
+if [ -z "$HTDOCS" ] ; then
+    HTDOCS=$DEFAULT
+fi
+ab_cv_htdocs=$HTDOCS
+]
+])
+HTDOCS=$ab_cv_htdocs
+[
+if [ -n "$HTTPDROOT" ]; then
+    DEFAULT=$HTTPDROOT"/cgi-bin"
+else
+    DEFAULT=$NEXTDEF
+    if [ ! -d $DEFAULT"/cgi-bin" ]; then
+        DEFAULT=`echo $DEFAULT | sed 's/\/[^/]*$//'`;
+    fi
+    DEFAULT=$DEFAULT"/cgi-bin"
+fi
+]
+AC_CACHE_CHECK(for cgi directory, ab_cv_cgibin, [
+[
+echo ""
+echo Enter the name of the cgi-bin directory where HTPL should be installed
+echo -n "Default ["$PREDISP"$DEFAULT] "
+read INSTALLDIR
+if [ -z "$INSTALLDIR" ] ; then
+    INSTALLDIR=$DEFAULT
+fi
+ab_cv_cgibin=$INSTALLDIR
+]
+])
+INSTALLDIR=$ab_cv_cgibin
+[
+if [ -n "$HTTPDROOT" ]; then
+    DEFAULT=
+    for candidate in /etc/httpd/conf/httpd.conf $HTTPDROOT"/conf/httpd.conf" ; do
+        if [ -f $candidate ]; then
+            DEFAULT=$candidate
+            break
+        fi
+    done
+else
+    DEFAULT=$NEXTDEF"/.htaccess"
+fi
+]
+
+AC_CACHE_CHECK(for config file, ab_cv_conf, [
+[
+echo ""
+echo Enter the name of the config file for your web site
+echo -n "Default ["$PREDISP"$DEFAULT] "
+read HTCONF
+if [ -z "$HTCONF" ] ; then
+    HTCONF=$DEFAULT
+fi
+
+ab_cv_conf=$HTCONF
+]
+])
+HTCONF=$ab_cv_conf
+
+[
+if [ -n "$HTTPDROOT" ]; then
+    DEFAULT=
+    for candidate in $HTTPDROOT"/logs" /var/log ; do
+        if [ -d "$candidate" ] ; then
+            DEFAULT=$candidate"/htpl_log"
+            break
+        fi
+    done
+else
+    DEFAULT=$NEXTDEF"/.htpl.log"
+fi
+]
+
+AC_CACHE_CHECK(for log file, ab_cv_logfile, [
+[
+echo ""
+echo Enter the name of the system log file 
+echo -n "Default ["$PREDISP"$DEFAULT] "
+read HTLOGS
+if [ -z "$HTLOGS" ] ; then
+    HTLOGS=$DEFAULT
+fi
+
+ab_cv_logfile=$HTLOGS
+]
+])
+HTLOGS=$ab_cv_logfile
+
+[
+
+if [ ! -e htpl-author.ego ] ; then
+
+echo  Do you want to send me a short message notifying me of the
+echo -n "installation at your site? [y] "
+read isego
+if [ "$isego" = "no" ] || [ "$isego" = "n" ] ; then
+    EGO=
+else
+    EGO=htpl-author.ego
+fi
+touch htpl-author.ego
+fi
+]
+
+CFLAGS=
+
+AC_SUBST(LIBS)
+AC_SUBST(PERL)
+AC_SUBST(CC)
+AC_SUBST(PRERUN)
+AC_SUBST(CCPROG)
+AC_SUBST(INSTALL)
+AC_SUBST(MODMAKE)
+AC_SUBST(CPANMAKE)
+AC_SUBST(MODINS)
+AC_SUBST(PL)
+AC_SUBST(OBJEMBED)
+AC_SUBST(DEFEMBED)
+AC_SUBST(INSTALLDIR)
+AC_SUBST(EGO)
+AC_SUBST(TEMP)
+AC_SUBST(XML)
+AC_SUBST(HTDOCS)
+AC_SUBST(HTCONF)
+AC_SUBST(HTLOGS)
+AC_SUBST(DEPDBDEF)
+AC_SUBST(MODPERL)
+AC_SUBST(MODDIR)
+
+AC_OUTPUT([Makefile htpl-config.pl perl.sh
+HTPL-modules/lib/HTML/HTPL/Config.pm
+              htplp htreporter htplsrvc htpgen htplss],
+[ chmod +x htplp htreporter htplsrvc htpgen htplss])
+
+#clear
+$PERL -e 'print chr(7);'
+echo "Now issue the commands:"
+echo "make"
+echo "make install"
+echo "make build"
+echo "You can fetch useful modules from CPAN by issuing the command:"
+echo "make CPAN"
+

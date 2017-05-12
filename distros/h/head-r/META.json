@@ -1,0 +1,31 @@
+{
+   "abstract" : "Recurse through Web pages and issue HEAD requests",
+   "author" : [
+      "Ivan Shmakov <oneingray@gmail.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "gpl_3"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "head-r",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "http://am-1.org/~ivan/archives/git/head-r-2013.git/",
+         "web" : "http://am-1.org/~ivan/archives/git/gitweb.cgi?p=head-r-2013.git"
+      }
+   },
+   "version" : "0.1"
+}

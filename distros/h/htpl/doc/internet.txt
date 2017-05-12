@@ -1,0 +1,77 @@
+print "You will not see this";
+&redirect("http://www.site.com/otherpage.htpl");
+
+
+print "Good bye, your job is on process";
+&forkredirect("http://www.site.com/otherpage.htpl");
+(do background jobs)
+
+setmimetype("text/plain");
+print "<BR> will not look like an html tag";
+
+$counter = ++$cookie{"my_cookie"};
+(This is a tied hash! Updating the value will result in a cookie sent, no
+need to call a function)
+
+&sendmail('to' => 'bill@Microsoft.com', 'from' => 'person@hotmail.com',
+        'subject' => 'Blah!', 'msg' => <<EOM);
+Hello Bill!
+EOM
+This uses SMTP connection to localhost. 'Mailhost' => 'mail.omain.com'
+to change.
+
+&getemail("Bill Gates <bill@microsoft.com>") = "bill@microsoft.com"
+&getemail("bill@microsoft.com (Bill Gates)") = "bill@microsoft.com"
+&getemail("/dev/null ; mail hacker@crap.net /etc/passwd")
+will yield an error message to the browser, and log an event in the HTPL
+log file.
+
+$txt = &readfile("/etc/motd");
+$txt = &readfile("http://www.yahoo.com");
+ 
+opendoc(I, "/etc/motd");
+closedoc(I);
+
+while (<I>) ...
+
+opendoc(I, "http://www.yahoo.com");
+closedoc(I);
+
+while (<I>) ...
+
+&isurl("http://altavista.com") = true
+&isurl("http://oj-simpson.barclay-bank.fbi-cia") = true
+&isurl("www.microsoft.com") = false
+
+&validurl("http://altavista.com") = true
+&validurl("http://oj-simpson.barclay-bank.fbi-cia") = false
+
+die unless &fileexists("/etc/passwd");
+die unless &fileexists("http://oj-simpson.barclay-bank.fbi-cia");
+
+&nslookup("localhost") = "127.0.0.1"
+&revnslookup("127.0.0.1") = "localhost"
+
+&saferevnslookp - Returns the input if lookup failed
+
+&validemail("bob@hotmail.com") = true
+&validemail("jfvugfcfuifcfcugkvcugkvk@whitehouse.gov") = true
+&validemail("monica@lweisnky.sex") = false
+&validemail(" fvhj 9 fi4jgh 9876") = false
+
+&isip("yahoo.com") = false
+&isip("198.162.10.10") = true
+
+
+To encode and decode form fields:
+&urlencode("john white") = "john+white"
+&urldecode("john+white") = "john white"
+
+
+$counter = &increasefile("count.dat");
+ 
+$hostname = &hostname;
+
+$url = &selfurl('begin' => $begin + 20);
+print qq!<A HREF="$url">Next 20</A>!;
+

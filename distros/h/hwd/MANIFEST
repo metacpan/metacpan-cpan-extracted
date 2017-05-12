@@ -1,0 +1,26 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+HWD.pm
+Task.pm
+Work.pm
+bin/hwd
+bin/hwd-burnchart
+eg/sked.hwd
+etc/hwd.vim
+t/00-load.t
+t/burndown.t
+t/hwd.t
+t/pod-coverage.t
+t/pod.t
+t/simple.hwd
+t/started.t
+t/task.t
+t/task-relationships.t
+t/task-rollup-error.t
+t/task-structure-error.t
+t/task-subtasks.t
+t/work.t
+t/work-parents.t
+META.yml                                 Module meta-data (added by MakeMaker)

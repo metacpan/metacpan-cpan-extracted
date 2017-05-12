@@ -1,0 +1,14 @@
+%%
+expression: token {$_[1];}
+| token OR expression {['||', $_[1], $_[3]];}
+;
+token: value {$_[1];}
+| value AND token {['&&', $_[1], $_[3]];}
+| NOT token {['!', $_[2]];}
+;
+value: STRING {[$_[1]];}
+| '(' expression ')' {$_[2];}
+| STRING ratio STRING {['', $_[2], $_[1], $_[3]];}
+;
+ratio: '<' | '>' | NOTEQUAL | EQUAL | LIKE | NOTLIKE;
+%%

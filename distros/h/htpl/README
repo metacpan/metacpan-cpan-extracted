@@ -1,0 +1,1512 @@
+Note:
+This documentation is outdated and contains error, yet it gives a good
+description of HTPL.
+To INSTALL, see the INSTALL document.
+
+ 1. What is HTPL?
+ 2. What are the requirements for using HTPL?
+ 3. How do I compile HTPL?
+ 4. How does HTPL work?
+ 4.1. Using HTPL from the shell.
+ 5. Tutorial
+ 5.1. Writing simple HTML
+ 5.2. Embedding simple Perl commands
+ 5.3. Interpreting forms
+ 5.4. Simple internet functions
+ 5.5. HTML generation functions
+ 5.6. Reading a comma delimited file
+ 5.7. Integrating an SQL database
+ 5.8. Various useful macros
+ 5.9. Persistent objects
+ 6. Reference
+ 6.1. HTPL library functions
+ 6.2. HTPL result set
+ 6.3. HTPL macros
+ 6.4. HTPL directives
+ 6.5. Writing your own macros
+ 6.6. Additional information
+ 6.7. Compiling with dependency database.
+ 7. Extensions (To be written)
+ 7.1. Running as mod_perl
+ 7.2. HTPL database components
+ 7.3. HTPL report generator
+ 7.4. HTPL service compiler
+ 7.5. HTPL multiversion generator
+ 7.6. HTPL messages
+ 7.7. HTPL middleware server
+
+1. What is HTPL?
+
+HTPL (Hyper Text Programming Language, or just a lame monogram of HTML and
+PERL) is a Perl based scripting tool for creating web content. It is
+basically a wrapper to CGI. Anything HTPL can do can be basically done
+with Perl and CGI, but HTPL provides rapid development tools. An HTPL file
+is an HTML file with Embedded Perl. Additional commands can be added. (eg,
+C, SQL), but all in all the web server runs a CGI script created from your
+document.
+
+Note: There are three other tools called HTPL. I have no connection with
+them.
+
+* Check 7.1 for differences when running HTPL as a mod_perl extension.
+
+2. What are the requirements for using HTPL?
+
+You must have CGI access on your account, be able to give local directives
+to your web server (ie, .htaccess files on apache), be able to write
+temporary files somewhere and preferably be able to install modules from
+CPAN. (That can be done on your local directory. Modules can also be
+transferred to the same path the HTPL binary resides in). Perl 5.004 or
+later is required. 
+
+3. How do I compile HTPL?
+
+To install type:
+./configure
+make
+make install
+make build
+
+If you are the superuser, consider importing modules from CPAN by:
+make CPAN
+
+*IMPORTANT* * IMPORTANT* IMPORTANT* *IMPORTANT*
+If you intend to install htpl as root, run configure as root!
+*IMPORTANT* * IMPORTANT* IMPORTANT* *IMPORTANT*
+
+*SECURITY NOTE* *SECURITY NOTE* *SECURITY NOTE* *SECURITY NOTE*
+Check appendix 6.7 regarding dependency database if you are installing
+HTPL in a shared UNIX machine.
+*SECURITY NOTE* *SECURITY NOTE* *SECURITY NOTE* *SECURITY NOTE*
+
+
+4. How does HTPL work?
+
+Anytime you access an htpl file the web server activates htpl.cgi as a cgi
+script. htpl.cgi reads the htpl file specified and converts it into a perl
+script with the extension perl. (The file created can be run as a stand
+alone CGI script, but you will not be able to use the redirect function
+for document redirection or mime type settings, nor the cookie functions). 
+The perl file is then executed. (Unless you used the XSUB extensions,
+in which case the page will be available once the XSUB extensions
+finish compiling)  
+
+Once the perl file is created, htpl will not preprocess the source htpl
+again but immediately execute the perl script; that is, unless the htpl
+file is newer than the perl file, in which case the perl file will be
+recreated according to the newer version. 
+If you need to force reprocessing, update the htpl file or just *touch*
+it.
+
+When creating an htpl documented with inline C code, htpl.cgi dumps the
+embedded XSUB functions into a file, creates an installation module for it
+and activates the usual compilation procedure. This can take a long time,
+therefore you better add you C code only once fully functional.
+When the script runs, its output is captured to a file, and only then
+sent. This allows using the redirect function to redirect the browser even
+if the script has already yielded output. Same is true for sending HTTP
+cookies. 
+
+4.1. Using HTPL from the console
+
+Beginning in version 2, you can write HTPL scripts which are not web
+pages. These files start automatically with perl code. Example script:
+
+#!/usr/local/bin/htplrun
+print "Hello world\n!";
+print "This is the " . &increasefile("counter.txt") . "'th time you run me\n";
+
+You can use the following commands:
+htplc <filename> to convert a non web script to perl. Extension of the
+output filename will be .ht.pl
+htplu <filename> to convert an HTPL page to perl. This can be used to
+force recompilation for the file if the web process doesn't succeed for
+some reason.
+htplrun <filename> to run a non web script. (Always compiles before
+running)
+htplcon <filename> to simulate running a page through the console.
+
+I recommend naming non web scripts with the extension .htpr
+Non web scripts will be compile into .ht.pl files and not .perl, and can
+be run directly.
+Other filenames are:
+.htpm - HTPL module
+.htpc - HTPL database component
+.htps - HTPL service procedure
+.app  - HTPL service aggregator
+.pts  - HTPL middleware aggregator
+And off course:
+.htpl - HTPL page
+.htpr - HTPL script
+.ht.pl- Compiled HTPL script
+.perl - Compiled HTPL page
+
+5. Tutorial
+
+5.1 Writing simple HTML
+
+Our first dcoument will display a very well known string.
+Create the file hello.htpl in your web directory:
+
+<HTML>
+<BODY>
+Hello world.
+</BODY>
+</HTML>
+
+The results will be obvious.
+
+5.2 Embedding simple Perl commands
+
+Create the following file:
+<HTML>
+<BODY>
+<#
+	@time = localtime;
+
+	$d = $time[3];
+	$m = $time[4] + 1;
+$y = $time[5] + ($time[5] < 70 ? 2000 : 1900);
+>
+Today is $d/$m/$y!
+</BODY>
+</HTML>
+
+The contents of the perl script between the <# and > tags will be
+evaluated, and the variables inside the perl code will be substituted.
+Remember: If you want to use the  @ symbol (eg, for specifying an email)
+you must escape it with a backslash, for example:
+<A HREF="mailto:bill\@microsoft.com">
+
+Beginning at version 2.60, you can immitate the CFML format of specifying
+variables, for example:
+
+<#
+$PI = 3.14159;
+>
+PI is #PI#
+
+Now, look at this:
+
+<#
+	@t = localtime;
+	if ($t[6] == 6) {
+>
+Today is Shabbath, therefore this site is closed.<BR>
+Please log out and log on again on a working day.
+<HR>
+<#
+	} else {
+print `date`;
+	}
+>
+
+Two reveals:
+1) You can escape to HTML in the middle of your code. HTPL will allow it
+only after a block opening or closing, or an end of statement. Actually,
+you can escape after the characters }, { and ;. Complicated regular
+expressions might be a problem, but even Larry doesn't need that kind of
+complicated regular expressions. =-)
+2) You can specify output using "print" if you don't want to escape to
+HTML and back to PERL. 
+
+5.3 Interpreting forms
+
+Let's create the following form:
+<FORM ACTION="feedback.htpl">
+Name: <INPUT NAME="name"><BR>
+Email: <INPUT NAME="email"><BR>
+<INPUT TYPE=SUBMIT>
+</FORM>
+
+And put the following in the file feedback.htpl:
+<BODY>
+Hello $name &lt;$email&gt;
+</BODY>
+
+Try it for yourself!
+
+For multiple checkboxes or select boxes you can refer to an array. For
+example, if you had a series of checkboxes called "item" you can refer to
+the array @item. For single inputs, an array with one element will be
+created, so you don't need an additional check if the user checked only
+one option.
+
+You can use the %in hash array if you want to iterate over all the url 
+fields, or the %form hash to iterate over the POST fields.
+
+5.4 Simple internet functions
+
+HTPL comes with lots of prewritten plain perl functions.
+Sending mail will be as the following:
+
+<#
+&sendmail (From => 'bill@microsoft.com', To => 
+'president@whitehouse.gov', Subject => 'Hello!', Msg => <<EOM);
+We received your order!
+EOM
+>
+
+This will send a one line message to bill@microsoft.com, with the
+appropriate headers. You don't need to construct the headers.
+
+Now, we can't check for legal mail addresses, but we can check for the
+domain:
+
+<#
+
+unless (&validemail($mail)) {
+>
+<BODY>
+The email $mail seems unreal!
+</BODY>
+<#
+	exit(0);
+>
+	}
+	&sendmail(From => 'sales\@microsoft.com' , To => $mail,
+Subject => 'Hey!', Msg => <<EOM);
+Hello $name,
+Your order has been received.
+EOM
+>
+<BODY>
+Message sent.
+</BODY>
+
+First, we see we could exit the document when we found out we had to.
+The validemail function works by validating the MX record and needs the
+Net::DNS module installed. 
+
+Now, let's create a document that gets a URL and redirects the browser, if
+the URL exists: 
+
+<BODY>
+You will see this only if the URL $url is invalid.
+<#
+	&redirect($url) if (&validurl($url));
+>
+
+The function validurl checks if the URL exists, using the LWP module. The
+function redirect exits the script, and outputs the redirection location
+instead of the script output. 
+
+You can use the functions nslookup and revnslookup for name lookups.
+To set a cookie, use the setcookie function, for examples:
+Setcookie('last-visit', `date`, 'last-ip', $REMOTE_HOST);
+The variable REMOTE_HOST is automatically set with the browser's hostname.
+Next time the document is loaded, the values of $cookies{'last-visit'} and
+$cookies{'last-ip'} will bset accordingly.
+Note: %cookies is a tied hash. You can set and erase cookies by putting
+values into it and erasing keys.
+Example:
+
+$x = $cookies{'counter'}++;
+if ($x > 10) {
+    delete $cookies{'counter'};
+    print "10 times is too much";
+}
+
+Now, suppose we want to read a document from the web:
+<BODY>
+<#
+	&redirect('http://www.disney.com') unless (&validurl($url));
+	opendoc(INP, $url);
+	while (<INP>) {
+		if (/disney/I) $count++;
+	}
+        closedoc(INP);
+>
+$count line(s) contained Disney.
+</BODY>
+
+It's easy as that.
+
+5.5 HTML generation functions
+
+Here is something no fun to type:
+<CENTER>
+<TABLE WIDTH=400>
+	<TR>
+		<TD BGCOLOR=#C0C0C0>
+			<B><CENTER>Hello</CENTER></B>
+		</TD>
+	</TR>
+</TABLE>
+</CENTER>
+
+And all this for one line!
+
+Now:
+&html_format('Hello', 'CENTER| TABLE WIDTH=400|TR|TD|B|CENTER');
+Will do the same.
+
+If the function is called in scalar context, the HTML text will not be
+printed but returned, for example:
+$h = &html_format("Heading", "B|I|U");
+Instead of a pipe delimited list, you can use an array reference:
+html_format("header", [qw(U I B)]);
+
+Now, arranging a list of elements in a table was never easier:
+Create a list first.
+
+@nums = map {&html_format($_, 'I|U');} (1 .. 100);
+
+Now, let's arrange these in columns:
+&html_table_cols(items => \@nums, cols => 10, 
+	tattr => {WIDTH = 100%});
+
+The tags tattr, cattr and rattr contain extra information for TABLE, TR
+and TD tags.
+
+Now, the eval tag causes the table functions to evaluate the strings given
+for tattr, cattr and rattr instead of plain using them.
+Try this:
+
+<#
+	
+@nums = map {&html_format($_, "B|I|U", undef, 1);} (1 .. 100);
+
+
+	&html_table_cols(items => \@nums, cols => 10, 
+		rattr => sub {($y % 2) ? "BGCOLOR=#C0C000" :
+                           "BGCOLOR=#FFFFFF";},
+		cattr => sub {"ALIGN=" . (($x < 5) ? "RIGHT" : "LEFT"))});
+>
+
+I recommend using the class HTML::HTPL::Table to create tables.
+It goes like this:
+$h = new_table(cols => 2); # Creates an object
+$h->add({data => 'a', header => 1}, {data => 'b', header => 1});
+# Adds a line with the elements 'a' and 'b', both will be <TH>
+$h->add(1, 2);
+$h->add(3, 2);
+$h->add(4, 5);
+
+print $h->as_html;
+
+The OO interface just wraps the html_table functions.
+
+5.6 Reading a comma delimited file
+
+All of us CGI programmers have done it.
+
+Let's use the /etc/passwd as input. (Yes, it is wrong to use it for a web
+page)
+
+We are going to now use one of the HTPL bundled macros: TEXT CSV
+
+<BODY>
+<#
+
+#TEXT CSV users /etc/passwd : username password uid gid name
+
+#FETCH users
+
+print "$username is $name<BR>\n";
+
+#LOOP
+
+
+>
+</BODY>
+
+This doesn't look like perl!
+Basically, the first macro, 'TEXT CSV' creates a result set called
+'users'.
+(which will be realized using  the variable $users. You can call methods
+for this variable. See HTML::HTPL::Result manpage), reading the file
+/etc/passwd, with the delimiter : while the rest of the parameters are the
+field names. 
+
+An HTPL result set is always a table with field names and rows. 
+Its sources might be text files (delmited, fixed width, flat multiline)
+DBI databases, LDAP directories, and more.
+
+Now, the #FETCH macro starts a loop, which ends with the #LOOP macro.
+Inside the loop, the fields are populated into the main namespace.
+#LOOP is canonical with #END FETCH
+Every macro that starts a block, can be ended with an END macro.
+For example, if we have a macro called WEEK, we could do
+#WEEK
+print "Hello!\n";
+#END WEEK
+
+Or:
+<HTWEEK>Hello!</HTWEEK>
+Inside the HTML paragraph.
+
+The HTPL macros are converted by htpl.cgi into plain Perl code.
+
+Thus, the above example with the user file could be written as:
+
+<BODY>
+
+<HTTEXT CSV users /etc/passwd : username password uid gid name>
+
+<HTFETCH users>
+
+$username is $name<B>
+
+</HTFETCH>
+
+>
+</BODY>
+
+5.7 Integrating an SQL database
+
+HTPL uses DBI to link external databases. You can connect to any DBI data
+source with the SQL CONNECT macro, for example:
+
+#SQL CONNECT dbi:Oracle:test sysdba secret
+
+There are simplified statements for connecting to several popular databases.
+In this example we will use a local mSQL database called mydb, and we will
+connect by: 
+
+#SQL MSQL mydb
+
+This can be also written inside the HTML code as:
+<HTSQL MSQL mydb>
+
+Now, let's do a simple SELECT.
+We'll assume the database mydb contains a table called customers with the
+fields firstname, lastname  and email.
+
+<BODY>
+<#
+
+	#SQL MSQL mydb
+
+	#SQL CURSOR customers SELECT * FROM customers
+
+	#IFNULL customers
+	print "We are sorry, but no customers were found.<BR>";
+
+	#ELSE
+>
+<TABLE>
+ 	<TR>
+		<TH>
+			First name
+		</TH>
+		<TH>
+			Last name
+		</TH>
+		<TH>
+			Email
+		</TH>
+	</TR>
+<#
+
+	#FETCH customers
+
+>
+
+<TR><TD>$firstname</TD><TD>$lastname</TD><TD>$email</TD>
+<#
+	#LOOP
+
+	print "</TABLE>\n";
+
+	#ENDIF
+
+>
+
+What happened here?
+We connected to the database, and performed a SELECT query, into a result
+set called customers. 
+We checked if the result set was empty. If it was not, we dumped the results.
+
+According to the broad trend, you can access the database without writing
+SQL code. (Obviously writing SQL code will provide many more options)
+
+For example:
+
+#SQL QUERY myquery mytable firstname lastname
+
+Will provide the same as:
+
+#SQL CURSOR myquery SELECT * FROM mytable WHERE firstname = :firstname
+AND lastname = :lastname
+
+In this example you see you could reference variables in your namespace as
+parameters to the query. Do not quote strings! DBI will do it for you.
+
+Important: HTPL assumes the new versions of DBI, therefore when using the
+non script SQL access, you save the need to quote strings and to escape
+quotes. 
+
+#SQL INSERT mytable firstname lastname email
+
+Will be the same as:
+
+#SQL EXEC INSERT INTO mytable (firstname, lastname, email) VALUES \
+(:firstname, :lastname, :email) 
+
+Macro lines, as you could see, can be multiline if you append a backslash
+to all the non terminal lines.
+
+You can prepare a query (using whatever prepare mechanism your DBI driver
+implements) and save it for later use.
+For example.
+
+#SQL DECLARE myquery SELECT id FROM workers WHERE employed_date = NOW
+
+#LOAD myquery
+#FETCH myquery
+print "$id ";
+#LOOP
+sleep(2);
+#LOAD myquery
+#FETCH myquery
+print "($id)";
+#LOOP
+
+If you expect a one line response, you can make the query and import the
+variables immediately:
+
+#SQL IMMEDIATE SELECT MAX(id) AS max FROM data
+print "It is $max!";
+
+If you have a one line resultset (not specifically from a database) you
+can fetch it without a loop.
+#FETCHIT cursor
+(The resultset is called cursor here)
+
+If you expect a series of lines with one field:
+#PROJECT cursor array id
+For a query stored in resultset cursor, all the values of the field id
+will be stored in the array @array
+
+5.8 Some more useful macros
+
+Integrating a textual counter to your page as as easy as this:
+
+<BODY>
+<HTCOUNTER mypage.dat> people visited my page.
+</BODY>
+
+Random quotes were never easier:
+
+<HTSWITCH RND>
+<CASE>Man existence must be some form of mistake.
+<CASE>Where do you want to go today
+<CASE><A HREF="http://www.microsoft.com">One world, no languages</A>
+</HTSWITCH>
+
+Or usual switch statement:
+#SWITCH CASE $s
+#CASE 'abc'
+&proc1();
+#CASE 2 + $j
+&proc2();
+#case 4, 9
+&proc3();
+#END SWITCH
+
+Or a random image:
+
+<HTIMG RND SRC="me.jpg,mygf.jpg" WIDTH=60 HEIGHT=60 BORDER=0>
+
+Exception handling:
+#TRY
+%h = %{[]};
+#CATCH coerce array
+    # Will catch the error "Can't coerce array into hash"
+print "Dereference misusage";
+#END TRY
+
+Or maybe:
+
+#TRY
+if ($x = &doit()) {
+#THROW "yupi:$x"
+}
+#CATCH yupi:(.*)
+&handle($1);
+#CATCH
+print "Unexpected exception";
+#END TRY
+
+5.9 Persistent objects
+
+Edit the htpl-config.pl file to assign a DB_File file for persistent
+objects database.
+Once enabled, the hashes %session and %application will hold values
+(scalars or references to complicated objects) for sessions and the whole
+application. 
+In order to have objects different for various applications, edit the
+htpl-site.pl for different database specification for different sites.
+
+6. Reference
+
+6.1 HTPL Library functions
+
+Check ./doc and ./demos in the HTPL distribution for up to date
+information.
+
+As of version 2.61, all html_* functions will print the result if called
+in null context, and return the result if called in scalar context.
+
+These functions are contained in the module HTML::HTPL::Lib.
+
+&addheader(HTTP_HEADER)
+
+Adds an HTTP header. Unavailable for converted scripts executed outside htpl.cgi.
+
+&closedoc(HANDLE)
+
+Closes file handle HANDLE and disposes the local copy if needed. To be used with &opendoc.
+
+&doconnect(HANDLE, HOST, PORT)
+
+Opens socket to HOST:PORT on handle HANDLE.
+HANDLE should be used with &doread and &dowrite and not standard input/output funcation.
+
+&doread(HANDLE)
+
+Reads all the incoming data on a socket and returns as a scalar value.
+
+&dowrite(HANDLE, BUFFER)
+
+Writes the data on the scalar value BUFFER to the socket HANDLE.
+
+&expect(HANDLE, REGEXP)
+&expect(HANDLE, REGEXP, CODE)
+
+Reads incoming data and matches against REGEXP. If successful, returns the regular expression 
+results. If not, calls the subroutine referenced by CODE where the input packet is passed to $_
+
+
+&fileexists(FILENAME)
+
+Checks if FILENAME exists. If FILENAME is a valid URL, checks if the URL exists.
+
+&forkredirect
+&forkredirect(LOCATION)
+
+Redirects the browser to LOCATION while keeping the script running in background. Useful for batch 
+processing.
+Redirection unavailable for converted scripts executed outside htpl.cgi.
+If LCOATION is omitted, exits and returns the script output, while background copy still runs.
+
+&getcc
+
+Attempts to find the C compiler. Tries in the usual locations, unless the default has been edited in 
+htpl-config.pl.
+
+&getmailprog
+
+Attempts to find the mail program. Same mechanism as getcc.
+
+&html_format(TEXT, TAGS)
+&html_format(TEXT, TAGS, NONL, NOOUTPUT)
+
+TAGS is a cons delmited list of HTML tags to apply, with no < > chars. TEXT is formatted with the 
+TAGS, while closing tags are added automatically.
+Set NONL to true if you want all the output in one line. 
+Normally html_format yields the HTML code. Setting NOOUTPUT to true will make it only return the 
+code.
+
+&html_header(TITLE)
+
+Prints <HTML>, <HEAD> and <TITLE> tags according to the TITLE supplied.
+
+&html_hidden(FIELD)
+&html_hidden(FIELD, VALUE)
+&html_hidden(FIELD, VALUE, NOOUT)
+
+Prints a hidden <INPUT> field. Usually used to transfer parameters between pages. If VALUE is 
+omitted, the value of the scalar variable with the name of FIELD is used.
+Set NOOUT to true to get the code returned without printing it.
+
+
+&html_table_cols(ATTRIBUTES)
+&html_table_rows(ATTRIBUTES)
+
+Formats a list of values in an HTML table.
+ATTRIBUTES are given as key => value pairs.
+Attributes are case insensitive.
+For columns divided table, attribute cols should contain the column number. For rows divided table, 
+the attribute rows should be supplied.
+
+The attributes tattr, rattr and cattr are used to specify the extra code for TABLE, TR and TD tags in the 
+table, to control alignment, etc. Normally, they contain the string to include.
+
+If the attribute eval is set to true, the contents of the attributes above are evaluate. The code can use the 
+variables $x, $y, $data to inspect the cell before returning values.
+
+Individual cells can be given different values, by using a hash reference instead of a scalar value ad the 
+cell value.
+The hash should contain: 
+ ? Data - the real cell data
+ ? Header - true if the cell should be formatted with TH and not TD
+ ? cattr - alternative attributes for the cell. Ignored if not set or if null.
+
+At last, the attribute noout can be set, so the html code is returned without being printed.
+
+&include(FILENAME)
+
+Dump a text file. FILENAME can be a URL.
+
+&inputlist(ARRAYREF, ATTRIBUTES)
+
+Returns a reference to an array of HTML code entries rendering a list of checkboxes or radio buttons.
+ARRAYREF should point to an array of referenced hash tables, for each the following attributes have 
+to appear:
+ ? value - Value for the VALUE attribute of the INPUT tag
+ ? text - text to put near the input element
+ATTRBIUTES are pairs of key => value that describe the input list. The possible attributes are:
+ ? name - Name of input fields. Mandatory.
+ ? Default - Value or a reference to an array of values of input fields that will be marked as 
+CHECKED
+ ? OnCheck - Javascript code for onCheck event
+ ? Attr - Additional attributes for INPUT tag
+
+
+&isip(IP)
+
+Returns true if IP is in IP address format. Doesn’t validate contents.
+
+&isurl(STRING)
+
+Checks is STRING is composed as a URL. To check validity of the URL use &validurl.
+
+&max(LIST)
+
+Returns the highest element of LIST, numeric wise.
+
+&min(LIST)
+
+Returns the lowest element of LIST, numeric wise.
+
+&nslookup(HOSTNAME)
+
+Uses gethostbyname() to resolve HOSTNAME. Returns undef if lookup fails.
+
+&opendoc(HANDLE, FILENAME)
+
+Opens HANDLE to read FILENAME. If FILENAME is a URL, the document is fetched and then 
+opened from a local copy. Handles opened with &opendoc should be closed with &closedoc to ensure 
+erasure of temporary files.
+The filename to use is given by &tempfilename
+
+&publish(HASH)
+
+For each in HASH, the value is copied to variables in the main namespaces with names identical to the 
+key; both scalar and array values. 
+In htpl.head, this brings the CGI variables to the main namespace. 
+
+&readfile(FILENAME)
+
+Reads the file named FILENAME into a scalar value. FILENAME may be a URL.
+
+&redirect(URL)
+
+Erases the output of the script and redirects the client. Any data sent to the HTTP headers (cookies etc) 
+won’t be erased except MIME TYPE info.
+Unavailable for converted scripts executed outside htpl.cgi.
+
+&rewind
+
+Clear the output of the script.
+Unavailable when script runs outside of htpl.cgi.
+
+
+&revnslookup(IP)
+
+Attempts to find hostname for IP.
+
+&selectbox(DEFAULT, PAIRS)
+&selectbox(HASHREF, PAIRS)
+
+Prints <OPTION> tags .
+If the first argument is a scalar, &selectbox only prints <OPTION> tags and not <SELECT> tags. 
+PAIRS contains VALUE values for the tags and content information in pairs. The option with value 
+equivalent to DEFAULT is marked SELECTED. DEFAULT can be undef if no default is required. 
+(undef and not a blank string)
+DEFAULT can an array reference, to select several options as default for multiple select boxes.
+
+If the first argument is a hash reference, it should contain the following fields:
+ ? Default - default values. Can be ommited.
+ ? Name - Name of the field. <SELECT> tag will be printed
+ ? Attr - Additional attributes for SELECT tag
+ ? Noout - If set to true, HTML code will be returned but not printed
+
+
+&sendmail(TEXT, ATTRIBUTES)
+Sends a mail message by spawning a sendmail client process.
+TEXT is the message, without ARPA mail message headers. Headers will be created automatically by 
+the program.
+
+ATTRIBUTES is a list of key => value pairs, as follows:
+ ? To: Address of recipent. Can be either user@host, user@host “name” or name user@host
+ ? From: Address of sender. Same format.
+ ? Subject: Subject.
+ ? Reply-To: Reply to address. Optional.
+Any other attributes will be added as mail message headers.
+
+The location of sendmail is taken from the function &getmailprog.
+
+&setcookie(PAIRS)
+
+Adds persistent cookies. PAIRS is an array of pairs of cookie names and values.
+Unavailable when script runs outside of htpl.cgi.
+
+&setmimetype(STRING)
+
+Changes the MIME type of the document.  
+Unavailable when script runs outside of htpl.cgi.
+To write a script that returns images, use &setmimetype, then &rewind and after that 
+binmode STDOUT and send the image to STDOUT.
+
+&takelog(STRING)
+
+Write a log entry to the default log file. The default log file for a
+script is the script name with the extension log, unless the variable
+$default_log_file points to a lof file name.
+
+&tempfilename
+
+Creates a temporary filename, unified by the script name, the PID, parent PID, time, index of calls and 
+per session. That should completely suffice. The filename is preceded by ~~ to note a disposable file.
+If the environment variable TEMP is set, the directory information contained in it is preceded to the 
+filename.
+
+&trim(STRING)
+
+Cuts leading and trailing spaces, and removes double spaces. Returns the modified string.
+
+&txt2html(TEXT)
+
+Formats a string with line breaks, ampersands, > and < signs, and double quotes to HTML code.
+
+&urldecode(STRING)
+
+Decodes a string from an HTTP query.
+
+&urlencode(STRING)
+
+Encodes a string for HTTP queries.
+
+&validemail(ADDRESS)
+
+Checks if an email address is formed correctly, and if so, checks for the availability of a mail 
+exchanger for the address. Returns undef if fails, true if succeeds.
+
+&validurl(ADDRESS)
+
+Checks if a URL is formed correctly, if so, checks for its existence. Returns undef if fails, true if 
+succeeds.
+
+6.2 HTPL result set
+
+All the HTPL macros for information retrieval return their values via the HTPL result set class. This 
+class is defined in the file htpl_result.pm
+
+The information retrieval macros are implemented with packages creating an instance of htpl_result
+Interface follows.
+
+Class htpl_result {
+constructor new(String Fields[]); 	# Gets the list of columns in the result set.
+			 	# Returns a blessed reference
+void addrow(String cells[]); 		# Gets a list of values, ordered according to
+				# the field list. Adds a row to the result set.
+bool isnone();			# Returns true if there are no rows in the result set
+bool fetch();			# Populates the main namespace with scalar
+				# variables named like the result set fields
+				# with values from the current row. Then advances 1 row
+				# Returns undef if past end of result set.
+bool unfetch();			# Simillar to fetch, but moves backwards.
+bool access(int row);		# Accesses a specific row. Returns undef if row does not 
+# exist
+	bool eof();			# Returns true if cursor is past end of result set.
+	bool bof();			# Returns true if cursor is past the beginning of result set.
+I	int index();			# Returns the index of current row
+	int rows();			# Returns the number of rows
+	String cols()[];			# Returns the names of the fields
+	String getcol(int colnumber);	# Returns one value of the current row.
+					# The number of the field is zero based
+	String get(String colname);	# Returns one value, based on field name.
+	void rewind();			# Sets the cursor on the first row and retrieves it
+	htpl_result filter(bool code());	# Creates a subset of the result set for rows where
+					# the code referenced returns true
+}
+
+6.3 HTPL macros
+
+Macros are specified in HTPL source as pseudo comments.
+Lines beginning with a # and no spaces following before alphanumeric content will be matched for 
+macros. If a macro was matched, the perl output file will be commented accordingly and the macro will 
+be resolved.
+If the macro instance does not contain a > (greater-than) sign or an odd number of double quotes,
+it can be written inside a tag:
+<#
+	#MACRO
+>
+becomes
+<HTMACRO>
+
+For example:
+<HTQUERY crs tbl>
+<HTFETCH crs>
+$name
+<HTLOOP>
+
+You can define as many macros as you like. See section 6.5.
+
+The following macros are bundled with HTPL:
+
+1. SQL
+1.1 CONNECT
+#SQL CONNECT <dbi-dsn> <username> <password>
+Connects to a database.
+Specific database:
+1.2 MYSQL 
+#SQL MYSQL <database> <username> <password>
+1.3 MSQL
+#SQL MSQL <database>
+1.4 XBASE
+#SQL XBASE <directory>
+Uses the dbi::xbase module
+1.5 POSTGRESQL
+#SQL POSTGRESQL <database> <username> <password>
+1.6 EXEC / EXECUTE
+#SQL EXECUTE <dml or ddl>
+Executes the SQL statements.
+1.7 CURSOR / SEARCH
+#SQL CURSOR <result set name> <sql query>
+Runs a query, creates a result set object.
+1.8 INSERT / ADD
+#SQL INSERT <table name> <list of columns>
+Inserts a new row.  Values are taken from the corresponding scalar variables. Uses type casting 
+of new DBI modules.
+1.9 QUERY
+#SQL QUERY <result set name> <table> <list of constraint columns>
+Retrieves a table with a simple filter - each column that appears in the constraint list is 
+matched against the corresponding scalar variable in the main namespace.
+1.10 UPDATE / MODIFY
+#SQL UPDATE <table name> <list of columns> WHERE  <list of constraint columns>
+Updates the specified fields, using the specified constraints to match the record.
+2. TEXT
+All text operations can receive a URL for a filename.
+2.1 CSV
+#TEXT CSV <result set name> <source text file> <delimiter> <list of field names>
+Reads a delimited file, using the module Text::ParseWords. Tokens can be quoted, which 
+escapes the delimiter, and quotes can be escaped.
+If the list of fields is not supplied, the first line of the file is read and represents the field names.
+2.2 FLAT
+#TEXT FLAT <result set name> <source text file> <list of field names>
+Reads a flat file in which every record is terminated by a blank line. Each line in each record is 
+a field.
+2.3 CUBE
+#TEXT CUBE <result set name> <source text file> <column delimiter> <row delimiter> <list 
+of field names>
+Parses a text file with both kinds of delimiters.
+2.4 READ
+#TEXT READ <variable> <filename>
+Reads the file into the scalar variable.
+3. Result set aliases
+3.1 FETCH, LOOP
+#FETCH <result set name>
+* code *
+#LOOP
+Generates a loop over the code block for each row in the result set. The
+fields are published into the main namespace.
+3.2 FETCHIT
+#FETCHIT <result set name>
+Publishes the fields without generating a loop. Useful for queries that
+need to retrieve only one  row.
+3.3 FETCHCOLS
+#FETCHCOLS <result set name> <var name>
+The variable (notated with no $ sign) is iterated via all the column names.
+3.4 FETCHCELL
+#FETCHCELL <result set name> <field name> <var>
+Fetches one cell. Note, if the field name is stored in a variable, use a $
+to evaluate it. 
+3.5 IFNULL, IFNOTNULL, ENDIF, ELSE
+#IFNULL <result set name>
+#ENDIF
+#IFNOTNULL <result set name>
+#ELSE
+#ENDIF
+Open conditional blocks depending on whether there are any rows on the result set.
+3.6 FILTER <source result set> <target result set> <condition source code>
+Creates a subset of the result set. The condition is supplied as a string and contains a boolean 
+check.
+
+Version 2.81 is bundled with 143 nodes in the macro tree. See ./doc and
+./demos in the htpl distribution for updates.
+
+6.4 HTPL directives
+
+Several HTPL meta commands are hard coded into the source.
+
+To include HTPL source, (usually with the extension hh):
+#INCLUDE filename
+
+To embed XSUB code:
+#XSUB
+* C functions *
+#ENDXSUB
+You don't need to create module definition.
+If you include XSUB code, you will have to compile the document offline by
+accessing it and letting the system compile it on the background.
+
+Example:
+
+<#
+
+void
+hello
+CODE:
+	printf("Shalom chaver!\n");
+
+#ENDXSUB
+
+&hello;
+
+
+6.5 Writing your own macros
+
+The file htpl.subs (or macros.xpl, as of version 2.79) contain an XML tree
+of the macros.
+
+I recommend that instead of modifying this file, create a file called
+/usr/local/share/htpl-site.xpl with all your local macros. This way,
+everytime you recompile a new version of HTPL, your own macroes will be
+compiled in.
+
+As of version 2.81, stardatized XML was engaged. All the tags begin with
+__ (to keep compatible with prior versions), and the tag to define a mcaro
+is __MACRO. ALl tags and attributes are in upper case.
+Macros that are related are grouped, like the SQL and TEXT macros.
+Those will have nodes with the group names with children for the macros.
+The root tag must be HTPL.
+
+Example:
+<HTPL>
+<__MACRO NAME="HELLO">$s = "Goodbye, friend";</__MACRO>
+<__MACRO NAME="WORLD">print "$s\n";</__MACRO>
+</HTPL>
+
+This macro tree will enable us to write the code:
+#HELLO
+#WORLD
+
+And have it subsituted for:
+$s = "Goodbye, friend";
+print "$s\n";
+
+Example:
+<HTPL>
+<__MACRO ID="HELLO"><!-- ID and NAME do the same -->
+<__MACRO ID="WORLD">$s = "Goodbye, friend";</__MACRO>
+<__MACRO ID="BAMBA">$s = "Father, mother, bamba";</__MACRO>
+</__MACRO>
+</HTPL>
+
+Now we have the macros:
+#HELLO WORLD
+#HELLO BAMBA
+
+Macros with parameters:
+
+The tokens that follow the macro unification are used as indexed arguments
+at run time.
+Arguemnts are number 1 based.
+References to arguments are by numbers inside %'s.
+
+<__MACRO NAME="PRINT">print "%1%<BR>\n";</__MACRO>
+
+Now we can command:
+#PRINT Hello
+Which will be substituted for:
+print "Hello<BR>\n";
+
+We can also capture a row of arguments from a specific one until the last
+one, for example: 
+
+<__MACRO NAME="SHOW">print "%1% >> %2*%";</__MACRO>
+
+#SHOW 1 2 3
+Will be equal to: print "1 >> 2 3";
+
+<__MACRO NAME="DUMP">print join(".", %1!%);</__MACRO>
+#DUMP a b c d 
+Will be: print join(".", $a, $b, $c, $d);
+
+Instead of %1*% we could say "%1", "*%"
+In this case, the delimiter between the parameters will be ", "
+In this example, double quotes will be added before and after the string.
+
+Last, but not least, we can dereference a token in a delimited string:
+%1,3% means the first argument will be delimited by commas, take the third
+token. %2|1% means - the second argument will be delimited by pipes, take
+the first token.
+
+Some macro groups have prerequisites. For example, the SQL macros must
+have the HTML::HTPL::Db package loaded.
+
+We can define a prerequisite this way:
+
+<__MACRO NAME="LOOKUP">($%1%) = gethostbyname("%2%");
+<__PRE>use Socket;</__PRE></__MACRO>
+
+Sometimes we might want to alias a macro:
+<__MACRO ID="PRINT">die "%1*%\n" unless (fork());</__MACRO>
+<__MACRO ID="HELLO"><__ALIAS>PRINT Good bye, friend!</__ALIAS></__MACRO>
+
+#HELLO will be the same as:
+die "Good bye, friend!" unless (fork());
+
+We can also define a macro with several steps:
+<__MACRO NAME="COUNT">
+	<__DO>printf  "1";</__DO>
+	<__DO>printf  "2";</__DO>
+</__MACRO>
+
+In such a macro we can include other macros:
+
+<__MACRO NAME="COUNT">
+	<__DO>printf  "1";</__DO>
+	<__DO>printf  "2";</__DO>
+	<__INCLUDE>HELLO</__INCLUDE>
+</__MACRO>
+
+Aliasing and including are not the same!
+
+We might want some macros to be available only inside the aliasing system,
+so we can define them as private:
+
+<__MACRO NAME="PRINT" PRIVATE="1">die "%1*%";</__MACRO>
+<__MACRO NAME="HELLO"><__ALIAS>PRINT end of all</__ALIAS></__MACRO>
+
+We might want to define a non operational macro, for example just to hold
+a prerequisite: 
+
+<__MACRO NAME="INCLUDEDBI" NOOP="1"><__PRE>use DBI;</__PRE></__MACRO>
+<__MACRO NAME="ORA">
+	<__INCLUDE>INCLUDEDBI</__INCLUDE>
+	<__DO>print "D'oh!\n";</__DO>
+</__MACRO>
+
+If we want to define variables, we can use the SCOPE attribute to ease
+adding of brackets before and after the code, for scoping needs:
+<__MACRO ID="YEAR" SCOPE="1">my @t = localtime; my $y = $t[5]; 
+my $yy = $y + 1900 + ($y < 70 ? 100 : 0);
+print $yy;</__MACRO>
+
+Will resolve to:
+{
+my @t = localtime; my $y = $t[5];
+my $yy = $y + 1900 + ($y < 70 ? 100 : 0);
+print $yy;
+}
+
+When using SCOPE="1" with block macros (see just below here), brackets
+will be added upon all the area.
+
+Block macros:
+Using macros as HTML tags:
+A macro defined as
+<__MACRO ID="X"> ... perl commands ... </__MACRO>
+can be called either by writing
+#X
+in the middle of your perl code, or by embedding the psudo HTML tag
+<HTX> inside your HTML code. The disadvantage of the second option is that
+the < and > signs may not be used, as they would confuse the parser.
+Tags beginnig with HTX can be "broken" among lines.
+Closing tags can also be implementing. 
+</HTX> would be the same as #END X
+The END macro is bundled with HTPL.
+
+To make this much simpler, here is an example:
+If you want to define a tag X with both an opener and a closer, do:
+<__MACRO NAME="X" AREA="1">
+  <__FWD>print "begin tag\n";</__FWD>
+  <__REV>print "end tag\n";</__REV>
+</__MACRO>
+
+As you can see, we need to set AREA="1", then define the actions under
+__FWD and __REV sections.
+
+In order to process attributes of SGML tags, use the PARAMS attribute. For
+example:
+<__MACRO NAME="PRINT" PARAMS="1">print $TEXT;</PRINT>
+
+And use like: <HTPRINT TEXT="text here">
+In order to check for mandatory attributes, use the MANDATORY attribute.
+For example:
+<__MACRO NAME="MYIMG" PARAMS="1" MANDATORY="SRC, BORDER">
+
+Areas of HTPL code can be scoped with tags. You can capture the HTPL
+output between tags with the &begintransaction and &gettransaction
+functions.
+For example:
+<__MACRO NAME="TXT" AREA="1">
+<__FWD>&amp;begintransaction();</__FWD>
+<__REV>$txt = &amp;endtransaction; print uc($txt);</REV>
+</__MACRO>
+
+And use like:
+<TXT>This is going to be in upper case</TXT>
+
+In order to make sure tag scopes are not overlapping, you can make a tag
+demand being in a scope, using a scope stack.
+For example:
+<__MACRO NAME="TXT" AREA="1">
+<__FWD PUSH="begin end">&amp;begintransaction();</__FWD>
+<__REV POP="begin end">$txt = &amp;endtransaction; print uc($txt);</REV>
+</__MACRO>
+
+The begin tag would push a "begin end" state to the scope stack. The end
+tag would make sure we are in that state, and pop it from the stack.
+
+It can be easier if we just define a pair of <HTX> - </HTX> or #X - #END X
+<__MACRO NAME="X" BLOCK="x scope" AREA="1">
+  <__FWD>&amp;beginx;</__FWD>
+  <__REV>&amp;endx;</__REV>
+</__MACRO>
+
+In order to have a macro verify it is inside a scope but not pop it:
+
+<__MACRO NAME="inside" BROTHER="x scope">
+
+In order for a macro to change the uppermost scope:
+<__MACRO NAME="inside" BROTHER="x scope" CHANGE="y scope">
+
+You can also push and pop scopes in the middle of a macro:
+<__MACRO NAME="x">
+<__PUSH SCOPE="x scope"/>
+<__INCLUDE>END X</__INCLUDE>
+<__PUSH SCOPE="x scope"/>
+<__INCLUDE DIR="__REV">X</__INCLUDE>
+</__MACRO>
+Notice the different methods to call the closing tag of X.
+
+Conditional blocks, and macro schema:
+
+You can define a macro the demands a mimimum of 2 parameters and a maximum
+of 4:
+<__MACRO NAME="I" MIN="2" MAX="4">
+
+You can define a macro which will behave differently with one parameter or
+none:
+<__MACRO NAME="I" MAX="1">
+<__DO MAX="0">print "No param!\n";</__DO>
+<__DO MAX="1">print "Param = %1%!\n";</__DO>
+</__MACRO>
+
+You can make string checks:
+<__DO ASSERT="%1% = %2% or %1.2% > 'word'">
+
+Or check context:
+<__DO BROTHER="scope1,scope2"> .. do things if we are in scope1 or scope2
+.. </__DO>
+<__DO BROTHER="scope2,scope3"> .. do things if we are in scope2 or scope3
+.. </__DO>
+<__DO BROTHER="!scope1,scope2,scope3"> .. otherwise do .. </__DO>
+
+Reporting error:
+<__CROAK MSG="message"/>
+
+Example: Check that we are in scope inner inside scope outter:
+
+<__MACRO NAME="inside">
+<__POP SCOPE="inner"/>
+<__CROAK BROTHER="!outter" MSG="inside must be inside inner inside outter"/>
+<__PUSH SCOPE="inner"/>
+... do things
+</__MACRO>
+
+Everytime you are inside a scope, the substitution of %id% has a unique
+id. Another useful substitution is %random% in order to create unique
+names.
+You can store variables while parsing a macro and use them from other
+macros in the same scope:
+<__SET VAR="name" VALUE="value">
+For example:
+<__MACRO NAME="setit" BROTHER="scopex" MIN="1" MAX="1">
+<__SET VAR="varname" VALUE="$%1%_%id%_%random%">
+<__DO>%$varname% = time;</__DO>
+</__MACRO>
+<__MACRO NAME="getit" BROTHER="scopex">
+print "Value is %$varname%";
+</__MACRO>
+
+The variable name comes between %$ and % to be derefferenced. This
+examples stores a perl variable name in the macro variable, but the macro
+var could store a subroutine name or anything.
+
+Escaping:
+
+You should escape ampersands in the htpl.subs as &amp;, < as &lt; and > as
+&gt; as with any XML file. If you wish the % sign to appear literally in
+the expanded macro, double it, for example:
+&amp;myproc() if (power(%%hash) &gt; 0);
+
+6.6 Additional information
+
+ ? Any script initializes with the form and variables brought to the main
+namespace. 
+ ? The variables REMOTE_HOST, REMOTE_USER, HTTP_REFERER, QUERY_STRING,
+SCRIPT_NAME, SERVER_NAME and SERVER_PORT contain the corresponding CGI
+variables. 
+ ? The variable SELF_URL contains a reflextion to the script. The variable
+SELF reflects the script with the same URL parameters.
+ ? The file htpl-config.pl resides in the binary directory and contains
+miscellaneous site oriented configurations. 
+You can override its defaults per directory by creating a local file
+called htpl-site.pl with the same format.
+ ? If the directory holding the document has a plain Perl file called
+htpl-glob.pl, it will be consulted  for application based configuration.
+ ? If the directory contains an HTPL file called htpl-glob.hh, it will be
+included, to supply application based functions.
+ ? If the directory contains a file called htsource.pre, HTPL will read
+one line from this file containing a filter. All HTPL sources will be
+passed through this filter. The filter will get the source filename as an
+appended parameter. You can include the string %s to represent the source
+filename in the filter line to override it. For example: cat %s | expand
+ ? If the directory contains a filed called htout.pre, output from the
+HTPL script will be passed through it. (CGI mode only)
+ ? Incoming HTTP cookies will be stored in the %cookies hash table.
+ ? %application and %session contain the persistent objects, if enabled.
+ ? Debug information can be displayed by simply accessing the htpl.cgi binary
+ ? A binary called htpldbg is created that only converts the document to a
+perl script and dumps the  scrip to the standard output. It can be useful
+to convert your script to pure CGI if you need to  immigrate, and for
+debugging your scripts. 
+ ? When the perl script fails, htpl.cgi captures the error dump, and
+displays a page with the output  dump, temporary filenames, error dump and
+convert source, to help keep track of line numbers. After  you finished
+working on your application and are not interested in the source to appear
+with error  dumps, create a file called htpl.nodbg with no content in the
+source dir. Scripts in that dir will not have  source attached when failing. 
+Another strategy is to create a file called htpl.dbg containing the
+subnets to allow debug information to, each line in the format of:
+a.b.c.d e.f.g.h
+Subnet first and then netmask. Localhost will automatically be authorized.
+
+6.7. Compiling with dependency database.
+
+In order for htpl.cgi to create compiled perl scripts, the web server must
+have write access to the directory where they are written.
+I suggest the following:
+1) If possible, run the whole httpd with your own user-id. On a dedicated
+machine, run httpd as user www, and have the htdocs directory owned by
+this user.
+2) If not, try to run httpd with the SU_EXEC property set to your own user
+id. Ask your system administrator if you need help.
+3) On a multi user machine, you can use cgi_wrap. Edit your created
+.htaccess and replace the referrence to /cgi-bin/htpl.cgi to
+/cgi-bin/cgiwrap/you-user-name/htpl.cgi
+Request your administrator to install cgiwrap.
+4) If those are impossible, you will have to create a directory called
+htpl-cache under your html directory to hold the scripts. Have that
+directory world writable.
+Since this way anybody could edit the compiled scripts to add code,
+compile HTPL with the dependency database, by issuing:
+./configure --enable-depdb
+HTPL will maintaing a database of dependencies, in a file called
+htpl-depend.db in the htpl-cache directory. Perl files that were changed
+since created, will be recompiled.
+It's your responsibility to erase the file htpl-depend.db from time to
+time to save disk space.
+
+7. Extensions
+
+7.1 Running as mod_perl
+
+In order ro run HTPL in mod_perl mode, issue ./configure --enable-modperl
+when compiling.
+HTPL will install a module called Apache::HTPL and configure your Apache
+for it.
+You must have mod_perl already installed for it!
+Under mod_perl you can't assume the output is going to STDOUT -
+Apache::HTPL will use select() to capture the output.
+Package variables will be cleared with each execution, but variables that
+need to be initialized can be stored on other namespaces. Don't use it for
+persistent objects, as Apache uses a one client per process model.
+
+7.2 HTPL database components
+
+These components use the Tie::DBI module, available from CPAN.
+Edit a file called <class>.htpc, with <class> substituted by the class
+name for the method.
+Create the following definitions in the file:
+#DATABASE <dsn> <user> <passwd>
+#TABLE <table>
+#INDEX <index column>
+#AUTOCOMMIT <0..2, default - yes, see Tie::DBI for options>
+#CACHESIZE <cache size in records, default 100>
+#WORKSECTION <other class variables, optional>
+
+Then, one line:
+#BEGIN
+And then methods and procedures, in the HTPL notation.
+This will create a collection of objects, each containing the methods
+described in the class, that can be autoread and stored on the database.
+
+Here is an example:
+#DATABASE dbi:Oracle:workers sysdba system
+#TABLE workers
+#INDEX id
+#AUTOCOMMIT 0
+#WORKSECTION newsalary
+#BEGIN
+
+# Filename: workers.htpc
+# Table contains id as the primary key, salary as current salary
+
+#METHOD suggest n
+$newsalary = $n;
+#END METHOD
+
+#METHOD accept
+$salary = $newsalary;
+&store;
+#END METHOD
+
+# EOF
+
+<HTML>
+<#
+# edit.htpl
+#USE workers
+
+unless ($id) {
+>
+No id specified!
+<#
+}
+
+my $obj = $workers{$id};
+
+>
+Current salary: <% $obj->salary %><BR>
+Nominated salary: <% $obj->newsalary %><BR>
+
+<#
+if ($new) {
+    $obj->suggest($new);
+    $obj->accept;
+    &redirect($SELF_URL);
+}
+
+$new = $obj->salary + 1000;
+>
+<A HREF="$SELF_URL?id=$id&new=$new">Raise salary</A>
+
+The example speak for itself -
+We have an oracle database, a table called workers.
+The page increases the salary with an object interface.
+
+The fields are directly read from the database and then stored in cache.
+When using mod_perl caching will reduce databae time.
+HTPL database components can be used in both HTPL pages and HTPL
+middleware servers, see below.
+When using HTPL middleware server, members which are not database fields
+can be saved between sessions.
+

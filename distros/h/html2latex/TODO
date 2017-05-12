@@ -1,0 +1,6 @@
+* Do all of the things in the TODO for HTML::Latex first.
+* Give it a CGI interface.  I think it would be cool to go to a
+webpage, type in an html url, and get back a link to a pdf or latex
+file to download.
+
+

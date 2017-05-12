@@ -1,0 +1,66 @@
+Data sources can be SQL databases via DBI, LDAP directories, comma
+delimited files, and multiline flat files.
+
+SQL:
+
+#SQL CONNECT dbi:driver:database
+(Check the DBI pod for instructions)
+#SQL CURSOR cursorname SELECT * FROM CUSTOMERS
+$var = 10;
+#SQL CURSOR crs SELECT * FROM CUSTOMERS WHERE ID = :var
+#SQL EXEC DELETE FROM CUSTOMERS
+#SQL DECLARE myquery SELECT * FROM CUSTOMERS WHERE ID = :1 AND PRICE > :price
+Later on: 
+$price = 10;
+#LOAD myquery 24
+Will query: SELECT * FROM CUSTOMERS WHERE ID = 24 AND PRICE > 10
+Into cursor myquery.
+#SQL IMMEDIATE SELECT DISTINCT price FROM ITEMS WHERE CATEGORY = "cats"
+print $price;
+#SQL PROJECT ary SELECT ID FROM VENDORS
+print join(" ", @ary);
+$id = 1; $name = "John"; $last = "Smith";
+#SQL INSERT CUSTOMERS id name last
+Or simply:
+#SQL INSERT CUSTOMERS
+$id = 23;
+$debth = 100;
+#SQL DELETE CUSTOMERS id debth
+(And logic)
+#SQL QUERY crs CUSTOMERS id age
+Same as:
+#SQL CURSOR crs SELECT id, age FROM CUSTOMERS WHERE id = :id AND age = :age
+Or just:
+#SQL CURSOR cursor TABLENAME
+To select all fields.
+
+
+LDAP:
+#LDAP INIT ldap.enterprise.net 329 c=fo,o=university,cn=Sven password
+#LDAP SEARCH cursor SCOPE=SUB BASE=c=fo,o=university ATTRS=cn \
+    FILTER=(&(email=*)(phone=666666))
+#LDAP ADD c=fo,o=university,cn=Hans email=hans@yaoo.com cn=Hans
+#LDAP DELETE c=fo,o=university,cn=Joe
+#LDAP MODIFY c=fo,o=university,cn=Hans email=
+
+Comma delimited:
+#TEXT CSV cursor /etc/passwd : user pass uid gid name shell root
+#TEXT FLAT cursor data.txt line1 line2 line3
+data.txt looks like:
+This is line1
+This is line2
+This is line3
+
+This is also line1
+This is also line2
+This is also line3
+
+
+#TEXT READ var http://www.yahoo.com
+print $var;
+
+For all result sets:
+#FETCH cursor
+print "Field 'x' is $x\n";
+#LOOP
+

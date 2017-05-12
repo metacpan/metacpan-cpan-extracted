@@ -1,0 +1,24 @@
+Revision history for Helm
+
+0.4 (June 28, 2011)
+    + Added missing namespace::autoclean to the dependencies in Build.PL
+      [M. Peters]
+
+0.3 (May 5, 2011)
+    + Added new param() and params() methods to Helm::Task so subclasses
+      can pass information between validate(), setup(), execute() and
+      teardown() phases [M. Peters]
+    + Added a new --user option so you can switch the user (Github issue
+      #5) [xsawyerx and M. Peters]
+    + Fixed GitHub issue #4 that incorrectly identified a failure to
+      load a config dependency as a failure to load the config module
+      itself [xsawyerx and M. Peters]
+    + Fixed GitHub issue #6 - use ./.helmrc first and ~/.helmrc second
+      [xsawyerx and M. Peters]
+
+0.2 (April 27, 2011)
+    + packaging change: release is "helm" not "Helm" so that all info is pulled from the command script
+      not the helper module [M. Peters]
+
+0.1 (April 27, 2011)
+    + Initial public release

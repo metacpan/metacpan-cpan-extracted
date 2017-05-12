@@ -1,0 +1,64 @@
+======================================================================
+                             HTML::Latex
+======================================================================
+
+Summary
+=======
+
+Converts properly formatted HTML files, filehandles, or strings to
+LaTeX.  It offers several options in processing, such a the ignoring
+of tags, the configuration of the TeX, and downloading of URLs.  It is
+also much easier to extend than any other html2latex converter.
+
+License 
+======= 
+
+It is available under the GPL by default.  If you are faced with
+license compatibility issues because of Perl's dual-license
+configuration, I will _consider_ releasing it under the Artistic
+License as well.  Contact me at peterthatcher@asu.edu
+
+Requirements
+============
+
+For a convinient place for all of the following modules, look for
+ftp://html2latex.sourceforge.net/html2latex/pub/.  They won't be the
+lastest ones, but they should work.
+
+html2latex requires the following perl modules:
+	*HTML::TreeBuilder
+	*XML::Simple
+
+html2latex can use, but does not require (I hope not, anway):
+	*LWP::Simple (called libwwwperl too)
+	*URI
+	*Image::Magik
+
+These are needed if you want to use URLs instead of just files, or if
+you want to use images in your HTML that are not on your computer, but
+are on the Internet
+
+Each of the modules may require further modules installed; check their
+documentation to see.  
+
+If you want a really easy way to install both of these, try typing
+"perl -MCPAN -e shell" on the command line.  This is a voodoo magic
+interface to CPAN (Comprehensize Perl Archive Network).  You will need
+an internet connection running, and should be root to install as well.
+Once their, type "install MODULE", where MODULE is the name of the
+module you wish to install, such as HTML::TreeBuilder.  For more info,
+try "man CPAN".
+
+Documentation
+=============
+
+All Documentation is in HTML::Latex.pm itself.  The default
+configuration file (in XML) is at the bottom of it under __DATA__.
+
+
+Other
+=============
+
+If you need a good example of how to use HTML::Latex, look for
+html2latex at http://html2latex.sourceforge.net.  It's why HTML::Latex
+exists.

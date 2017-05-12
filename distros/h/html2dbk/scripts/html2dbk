@@ -1,0 +1,182 @@
+#!/usr/bin/env perl
+# vim:ts=8 sw=4 sts=4 ai
+require v5.8.7;
+use strict;
+use warnings;
+
+=head1 NAME
+
+html2dbk - convert XHTML to DocBook.
+
+=head1 VERSION
+
+This describes version B<0.03> of html2dbk.
+
+=cut
+
+our $VERSION = '0.03';
+
+=head1 SYNOPSIS
+
+html2dbk --help | --manpage | --version
+
+html2dbk [ --html ] [ --stylesheet I<filename> ] file ...
+
+=head1 DESCRIPTION
+
+This script (and module) converts an XHTML file into DocBook, using both
+XSLT and heuristics (as XSLT alone can't do everything).
+
+This script will convert "I<filename>.html" into "I<filename>.xml"
+
+By default, the input file is expected to be correct XML (there are
+other programs such as html tidy (http://tidy.sourceforge.net/) which
+can correct files for you; this does not do that).
+If you give the --html option then this will attempt to parse the file
+as HTML.
+
+Note also this is very simple; it doesn't deal with things like <div> or
+<span> which it has no way of guessing the meaning of.  This does not merge
+multiple XHTML files into a single document, so this converts each XHTML
+file into a <chapter>, with each header being a section (sect1 to sect5).
+The <title> tag is used for the chapter title.
+
+There will likely to be validity errors, depending on how good the original
+HTML was.  There may be broken links, <xref> elements that should be <link>s,
+and overuse of <emphasis> and <emphasis role="bold">.
+
+=head1 OPTIONS
+
+=over
+
+=item --help
+
+Print help message and exit.
+
+=item --html
+
+Treat the input as HTML rather than XML.  This may be necessary even
+with XHTML if the file contains entities such as &nbsp; which are not
+recognised XML-only entities.
+
+=item --manpage
+
+Print the full help documentation (manual page) and exit.
+
+=item --stylesheet I<filename>
+
+A replacement XSLT stylesheet to use instead of the built-in default.
+
+=item --verbose
+
+Print informational messages.
+
+=item --version
+
+Print version information and exit.
+
+=back
+
+=head1 REQUIRES
+
+    Getopt::Long
+    Pod::Usage
+    Getopt::ArgvFile
+    HTML::ToDocBook
+	Cwd
+	File::Basename
+	File::Spec
+	XML::LibXML
+	XML::LibXSLT
+	HTML::SimpleParse
+
+=head1 SEE ALSO
+
+perl(1)
+Getopt::Long
+Getopt::ArgvFile
+Pod::Usage
+
+=cut
+
+use Getopt::Long 2.34;
+use Getopt::ArgvFile qw(argvFile);
+use Pod::Usage;
+use HTML::ToDocBook;
+
+#========================================================
+# Subroutines
+
+sub init_data ($) {
+    my $data_ref = shift;
+
+    $data_ref->{manpage} = 0;
+    $data_ref->{verbose} = 0;
+} # init_data
+
+sub process_args ($) {
+    my $data_ref = shift;
+
+    my $ok = 1;
+
+    argvFile(home=>1,current=>1,startupFilename=>'.html2dbkrc');
+
+    pod2usage(2) unless @ARGV;
+
+    my $op = new Getopt::Long::Parser;
+    $op->configure(qw(auto_version auto_help));
+    $op->getoptions($data_ref,
+	       'verbose!',
+	       'manpage',
+	       'html!',
+	       'stylesheet=s',
+	      ) or pod2usage(2);
+
+    if ($data_ref->{'manpage'})
+    {
+	pod2usage({ -message => "$0 version $VERSION",
+		    -exitval => 0,
+		    -verbose => 2,
+	    });
+    }
+
+} # process_args
+
+#========================================================
+# Main
+
+MAIN: {
+    my %data = ();
+
+    init_data(\%data);
+    process_args(\%data);
+    my $obj = HTML::ToDocBook->new(%data);
+
+    foreach my $file (@ARGV)
+    {
+	$obj->convert(%data, infile=>$file);
+	print STDERR "Converted $file\n" if $data{verbose};
+    }
+}
+
+=head1 BUGS
+
+Please report any bugs or feature requests to the author.
+
+=head1 AUTHOR
+
+    Kathryn Andersen (RUBYKAT)
+    perlkat AT katspace dot com
+    http://www.katspace.org/tools
+
+=head1 COPYRIGHT AND LICENCE
+
+Copyright (c) 2006 by Kathryn Andersen
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+
+=cut
+
+__END__

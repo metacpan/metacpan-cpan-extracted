@@ -1,0 +1,20 @@
+Short Term:
+* Improve testing files.
+* Look into using Latex package Hyperref
+* Make section\section* an option.  Perhaps automate TOC building.
+* change 'index.html' default behavior.
+* Possibly rearrange POD documentation.
+
+Long Term:
+
+* Make it run on Windows better/also.
+* Give more TeX options, and header style, and a table of contents and such.
+* Parsing of more HTML options, esepcially meta information in the HEAD.
+* Right an automated installer. 
+
+Things left to test:
+* All options
+* Consistancy of options between objects.
+* Alternate config files
+* Good debugging info
+* Alternate stores

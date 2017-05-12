@@ -1,0 +1,16 @@
+AUTHORS				Who made this
+Changes				The history of the head-r releases
+check-lo			Check whether the local loopback is usable
+COPYING				GNU General Public License version 3
+head-r				Recurse through Web pages and issue HEAD requests
+head-r.pod			Document head-r(1)
+lib/App/HeadR.pm		head-r(1) core library
+Makefile.PL			The build system
+MANIFEST			This file
+t/10-changes.t			Check the Changes file’s compliance
+t/40-rec-lo.t			Test against local HTTP::Daemon
+t/Daemon.pm			Employ HTTP::Daemon for testing purposes
+t/Socket.pm			Choose an IO::Socket::INET* class
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)
+SIGNATURE			This distribution is OpenPGP-signed

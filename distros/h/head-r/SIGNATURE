@@ -1,0 +1,42 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.63.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 c515e8ba73e822c20a3329c5d636c46433bedcc8 AUTHORS
+SHA1 8624bcdae55baeef00cd11d5dfcfa60f68710a02 COPYING
+SHA1 b4fcffefefdd7fc5127b12298c35b83e22dc42ec Changes
+SHA1 56593a06359c215ccae00f51c118a32b790df504 MANIFEST
+SHA1 50057f3b83ada64b031099dd661210b751641bc2 META.json
+SHA1 f7917d9cad6f362c983724929295884822a788c0 META.yml
+SHA1 52b1cddc79ef3b7f03e7a3dfb8e5da1263099ea3 Makefile.PL
+SHA1 28bac30527ed90b0625380d93f30cc6e703beb24 check-lo
+SHA1 6e0718532eefc65210fd70b51cf34dca26d03944 head-r
+SHA1 2f59ddb7f388c0edb91d340612408cb2a543b15b head-r.pod
+SHA1 0aaba404f0979b29068dd3fd90e3fdfe5e78c954 lib/App/HeadR.pm
+SHA1 a1c4c45e4828d14792a4342ed66511885873e996 t/10-changes.t
+SHA1 a682c734d24454e8b0ab63710aa2f90c6279f2b6 t/40-rec-lo.t
+SHA1 cc82c6d9fb894c4bb57524fed275064a6267b8e1 t/Daemon.pm
+SHA1 6a993bcf10cda8ebee5a6fb740c643c5ad3a940e t/Socket.pm
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.10 (GNU/Linux)
+
+iQEcBAEBAgAGBQJSVuL6AAoJEBLbJrxe7aG0w4EIAI2V/FKujxDePXhg3wA4+tJa
+ezdTrJbOVZwbSFIn3gjV29WKaSztTmjl1VpYJtTNTtZRR5afxdpl7q/e+sUGoqqJ
+05Q6L2KicUrJHfEtv2v3k1gjc1qH0yyuK2Ecw4nI+dwtY7GTjHopV9isd06kQjHD
+INiaJoWMdhEQdjxyCqul4DiJtRY0iIYy2O1sfrUyNorb/+RmgkLFF5Ci9XT6Kw4B
+FTefdQFu5aNT7bJWfo37/V7C53ATNS1mXJOAc9M/TA2fH162+hC+gyofmwDJ0+BU
+qnDw+ri93eponNPZqUus3Xn7dhF9yRYGLW6/LLWqLcai4X8KRxV60cy56MC93hQ=
+=huFt
+-----END PGP SIGNATURE-----

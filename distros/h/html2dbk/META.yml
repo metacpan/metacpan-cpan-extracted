@@ -1,0 +1,33 @@
+---
+abstract: 'Converts an XHTML file into DocBook.'
+author:
+  - 'Kathryn Andersen'
+build_requires:
+  Test::More: '0'
+configure_requires:
+  Module::Build: '0.42'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4214, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: html2dbk
+provides:
+  HTML::ToDocBook:
+    file: lib/HTML/ToDocBook.pm
+    version: '0.0301'
+requires:
+  Cwd: '0'
+  File::Basename: '0'
+  File::Spec: '0'
+  Getopt::ArgvFile: '1.09'
+  Getopt::Long: '2.34'
+  HTML::SimpleParse: '0'
+  Pod::Usage: '0'
+  XML::LibXML: '0'
+  XML::LibXSLT: '0'
+resources:
+  homepage: http://github.com/rubykat/html2dbk
+  repository: git://github.com/rubykat/html2dbk.git
+version: '0.0301'

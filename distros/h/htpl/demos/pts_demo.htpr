@@ -1,0 +1,3 @@
+#PTS SET localhost system admin
+#PTS POOL obj demo 2
+print $obj->name;

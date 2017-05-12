@@ -1,0 +1,101 @@
+---
+abstract: 'helm - Easy server and cluster automation'
+author:
+  - 'Michael Peters <wonko@cpan.org>'
+build_requires: {}
+configure_requires:
+  Module::Build: 0.38
+dynamic_config: 1
+generated_by: 'Module::Build version 0.38, CPAN::Meta::Converter version 2.110930'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: helm
+provides:
+  Helm:
+    file: lib/Helm.pm
+    version: 0.4
+  Helm::Conf:
+    file: lib/Helm/Conf.pm
+    version: 0
+  Helm::Conf::Loader:
+    file: lib/Helm/Conf/Loader.pm
+    version: 0
+  Helm::Conf::Loader::helm:
+    file: lib/Helm/Conf/Loader/helm.pm
+    version: 0
+  Helm::Log:
+    file: lib/Helm/Log.pm
+    version: 0
+  Helm::Log::Channel:
+    file: lib/Helm/Log/Channel.pm
+    version: 0
+  Helm::Log::Channel::console:
+    file: lib/Helm/Log/Channel/console.pm
+    version: 0
+  Helm::Log::Channel::email:
+    file: lib/Helm/Log/Channel/email.pm
+    version: 0
+  Helm::Log::Channel::file:
+    file: lib/Helm/Log/Channel/file.pm
+    version: 0
+  Helm::Log::Channel::irc:
+    file: lib/Helm/Log/Channel/irc.pm
+    version: 0
+  Helm::Server:
+    file: lib/Helm/Server.pm
+    version: 0
+  Helm::Task:
+    file: lib/Helm/Task.pm
+    version: 0
+  Helm::Task::get:
+    file: lib/Helm/Task/get.pm
+    version: 0
+  Helm::Task::patch:
+    file: lib/Helm/Task/patch.pm
+    version: 0
+  Helm::Task::put:
+    file: lib/Helm/Task/put.pm
+    version: 0
+  Helm::Task::rsync_put:
+    file: lib/Helm/Task/rsync_put.pm
+    version: 0
+  Helm::Task::run:
+    file: lib/Helm/Task/run.pm
+    version: 0
+  Helm::Task::unlock:
+    file: lib/Helm/Task/unlock.pm
+    version: 0
+recommends:
+  AnyEvent::IRC::Client: 0
+  Config::ApacheFormat: 0
+  Email::Sender: 0
+  Email::Simple: 0
+  Email::Simple::Creator: 0
+  Email::Valid: 0
+requires:
+  AnyEvent: 0
+  Carp: 0
+  Cwd: 0
+  Data::UUID: 0
+  DateTime: 0
+  Fcntl: 0
+  File::Basename: 0
+  File::HomeDir: 0
+  File::Spec::Functions: 0
+  Getopt::Long: 0
+  IO::File: 0
+  IO::Pipe: 0
+  Moose: 1.14
+  Net::OpenSSH: 0
+  Parallel::ForkManager: 0
+  Pod::Usage: 0
+  Term::ANSIColor: 0
+  Try::Tiny: 0
+  URI: 0
+  namespace::autoclean: 0
+  perl: v5.8.0
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.4

@@ -1,0 +1,32 @@
+To run demos:
+
+1) htplrun hello.htpr
+2) htplrun tempdemo.htpr
+
+3) Copy treedemo.htpl to your web directory.
+
+4) To compile the HTPL service app:
+htplsrvc app
+
+Then add these lines to yout httpd.conf:
+
+<Location /appdemo>
+    SetHandler PerlScript
+    PerlHandler Apache::HTPL::ServApp::app
+</Location>
+
+And check http://yourhost/appdemo/page.htpl
+
+5) perl client.pl
+Check <html_directory>/htpl/server_procs for configuration.
+
+6) htpgen gen.xml
+
+7) htreporter -h report.ini
+
+8) htplp demo
+   htplrun compdemo.htplr
+
+9) htplss demo pwd
+   ./demo.pl
+   htplrun pts_demo.htpr

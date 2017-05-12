@@ -1,0 +1,68 @@
+###
+# Created by configure
+
+#$mailprog = "@SENDMAIL@";
+$ccprog = "@CCPROG@";
+$dbgbin = "@INSTALLDIR@/htpldbg";
+$pcbin = "@INSTALLDIR@/htplp";
+$temp = "@TEMP@";
+
+###
+# Uncomment to allow persistency
+
+# $htpl_persistent = 1;
+$htpl_db_file = "@HTDOCS@/htpl.db";
+$htpl_per_session_idle_time = 3600;
+$htpl_persist_cachesize = 4;
+
+###
+# Uncomment to use cookies
+
+# $htpl_use_cookies = 1;
+$htpl_cookie = "htpl-ck-id";
+
+###
+# Uncomment if your web site contains forms in hebrew
+
+# $htpl_flip_hebrew = 1;
+
+###
+# Uncomment to have logs redirected to a single file. Default is
+# Script name + ".log"
+
+# $htpl_default_log_file = "put filename here";
+
+###
+# Security and system logs.
+$htpl_system_log = "@HTLOGS@";
+
+###
+# Locale. Currently supported via the DoW and MoY arrays
+$htpl_language = "English"; # Norwegian, Austrian, English, German,
+                            # Czech, French, Italian
+
+####
+# Comment to disable persistent DB connections under mod_perl
+$htpl_db_save = 1;
+
+####
+# HTPL PTS port
+$htpl_pts_port = 4002;
+
+####
+# Uncomment to enable debugging
+# $htpl_debug = 1;
+if ($htpl_debug) {
+    my $scriptdir = $0;
+    $scriptdir =~ s/[^\/\\]*$//;
+    $scriptdir =~ s/([\/\\])htpl-cache[\/\\]$/$1/;
+    my $fn = $scriptdir . "htpl.dbg";
+    open(DBGH, $fn);
+    while (<DBGH>) {
+        chomp;
+        my @t = split(/\s+/);
+        $htpl_debug_hosts{$t[0]} = $t[1];
+    }
+    close(DBGH);
+}
+1;

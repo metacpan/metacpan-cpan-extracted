@@ -1,0 +1,6 @@
+Persistency is implemented via disk storage, not live objects.
+Edit htpl-config.pl in the HTPL install directory, and setup the
+parameters for MLDBM, and whther to use cookies or IP tracking.
+
+The hashes %application and %session can be used then to store either
+scalars or structures.

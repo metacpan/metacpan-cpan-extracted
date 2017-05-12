@@ -1,0 +1,65 @@
+Thur Sep 14 11:37:33 MST 2000 - Peter Thatcher <peterthatcher@asu.edu>
+        * Changed packaging.  Basically, 'make test' should stop failing.
+	* Added 'kill' type for tags.
+	* Made SCRIPT tag into 'kill'.  So, javascript is now completely
+	ignored.
+	
+Tues Sep 12 00:33:40 MST 2000 - Peter Thatcher <peterthatcher@asu.edu>
+	* Added support for international characters.
+	* Added quote-expansion
+	* Prints usage if no files are given.
+	* ~ doesn't expand to $ENV{HOME} unless $ENV{HOME} exists. 
+	* Due to above, I believe html2latex works perfectly in windows
+	now. (Assuming you change the config file).
+	
+Thu Aug 17 00:52:24 MST 2000 - Peter Thatcher <peterthatcher@asu.edu>
+	* Changed handler routine paramater order and got rid of $content_ref.
+	* Split html2latex.pl into 2 files.
+	* Created the library HTML::Latex with the important method html2latex.
+	* Ported the conversion of images to ImageMagick (boy was that easy; why did I ever use convert?).
+	* Changed all calls to $html_element->content to $html_element->content_list to deal with undef's (requires HTML::Tree .68).
+	* Changed get_uri and store_uri a lot.  
+	* Moved all test files in the emphamis "t" directory and named them in some coherent manner.
+	* Removed useless documentation and added more usefull documentation in the code.
+	* Improved the information printed by &texify when using $option{debug}.
+	* Tried to improve <PRE> and <CODE> behavior.  I don't know what to make it do.  It's sort of difficult.
+	* Fixed the <LI> bug.
+	* Added an HTML-style paragraph option (no indent and 1 line paragraph spacing).
+	* Altered default behavior of \[sub]section to \[sub]section*.
+	* Changed call to texify from array of parents to single parent (more efficient and also can check try attributes).
+	* Added the command-line and config-file option to ban (ignore certain tags.)
+	* Fixed "^" bug.
+	* Made relative local IMG sources work correcly.  At least, I
+	hope.  All this local/network absolute/relative crap is getting on
+	my nerves.  It never seems to work correctly.
+	* Created several testing scripts and examples.
+		
+Saturday April 22, 2000 - Peter Thatcher <peterthatcher@asu.edu>
+	* Nested tables work now.
+	* Absolute URL sources in the IMG tag work now. (bug from 0.6)
+	
+Thursday April 19, 2000 - Peter Thatcher <peterthatcher@asu.edu>
+	* You can now hand it a URL instead of a file if you have the
+          URI and LWP modules.
+	* You can now give it IMP tags with IMGs with URLs
+	  if you have the URI and LWP modules.
+	* Deleted use of Data::Dump, so it's not required anymore.
+	* Added STRONG tag.
+	* Added EM tag.
+	* Fixed all bold tags.
+	* Fixed all italisize tags.
+	* Fixed all special tex characters.
+	* Added DT,DD,and DL tags.
+	* Added &option_handler, the most flexible of all handlers.
+	* Fixed extra padding around elements.
+	* html2latex ignores comments now.
+	* when using the pdf option, the pdflatex output is put in the correct directory
+
+
+Thursday March 23, 2000 - Peter Thatcher <peterthatcher@asu.edu>
+	* Revamped documentation
+	* Packaged stuff (like this ChangeLog)
+	* Build a man page usind perlpod and pod2man.
+
+Somtime in Winter 2000 - Peter Thatcher <peterthatcher@asu.edu>
+	* Initial Version

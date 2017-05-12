@@ -1,0 +1,29 @@
+#!/usr/local/bin/perl
+# FILE .../hp200lx-db/docs/announce-0.08.txt
+#
+# written:       1999-12-05
+# latest update: 1999-12-05 14:47:08
+#
+
+This release contains again a couple of improvements and bug fixes and
+a bit better error and constraint handling.
+
+1. General DB handling, module DB.pm:
+   a. implements the password and data decryption routines from
+      Curtis Cameron's dbcheck.pas program.
+
+
+
+
+
+Acknowledgements:
+1. Curtis Cameron shared valuable results from his dbcheck program.
+   His password decoder and insight into the structure of ADB files
+   are very much appreciated.
+
+I hope the software is useful for your purposes, but use it at your own
+risk!  Feedback, e.g. bug reports, fixes and other suggestions are
+welcome.
+
+g.gonter@ieee.org
+

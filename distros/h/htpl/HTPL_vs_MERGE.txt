@@ -1,0 +1,88 @@
+HTPL as compared to Merge
+
+Since summer 2001 I have been involved in developing another embedded
+HTML/Perl/SQL product called Merge. Merge is a proprietary system
+of Raz Information Systems (http://www.raz.co.il) and is in use by
+its customers. Raz Information Systems also supports all my Perl modules upon
+demand.
+The two products have been complementing each others, and here
+is a quick comparison:
+
+Both products were inspired by Mason, EP, ASP and similar packages.
+Both have SQL support in tag level. HTPL was somewhat inspired by Cold
+Fusion and Miva (registered trademarks of the corresponding copyright owners),
+while Merge owes some inspiration to ZOPE.
+
+Both HTPL and Merge act by compiling the page to pure perl, caching the
+compiled perl script and running it. Therefore both are as fast as a CGI
+solutions. If the page is run again without being changed, the cached
+script will be executed automatically. With some modifications, cached
+scripts can run with the support libraries, separated from their sources.
+Both support mod_perl: HTPL with an Apache module, Merge via the
+Apache::Registry module. Merge pages load much faster as they require
+much less working envelope, but HTPL compiles much faster, as it is written
+in C and not Perl. Therefore, albeit HTPL is compliant with win-cgi you will
+have to compile it yourself for Windows, while Merge is pure Perl and was 
+tested to work on Windows without modifications.
+
+HTPL runs pages, while Merge runs templates. Merge is always
+refered to as the same CGI script with the template as a parameter.
+For example, a template called admin will be referred as /admin.htpl
+in HTPL or /cgi-bin/merge.pl?template=admin.html in Merge.
+
+HTPL is aimed mainly at perl programmers. The powerful macro processor
+uses XML, and you have to recompile HTPL upon adding macros. Macros
+are best used as embedded perl pragmas, but can be used as tags.
+All extensions are used machine-wide.
+Merge uses a true perl API for writing extended tags, and the tags can be
+different per applications. Extension tags are written as perl segments 
+that create strings of perl code, as opposed to the cryptic syntax of 
+XPL. (The macro processor language used by HTPL, which is based on XML and 
+variable substitution). This gives much more power in compilation time.  
+Upon adding custom tags in Merge, they can be used immediately. Merge 
+solutions are best written solely with tags and extension tags, and embedded 
+perl is only a second choice, while HTPL assumes knowledge of Perl.
+
+HTPL has a polymorphic result set class for browsing results of database
+queries and other data sources. A query returns a "cursor", that can be
+traversed with the same commands as other result sets - LDAP directories,
+file system list, textual files and more.
+Merge only separates query from its loop in SQL queries, but in one database
+connection only one query can be manipulated. Other kinds of queries just use 
+iterators - automatic loops that iterate over the data and bind variables 
+according to the definition. 
+The object that holds a query in Merge is called "engine", and various engines
+can connect to different databases. Database operations can related to any
+named database engine.
+
+HTPL infects the main namespace with the page variables, while Merge keeps
+them behind an API. This means it is less likely to run over an undocument
+system variable in Merge. HTPL, on the other hand, offers a lot of
+"magic" variables. (Lower case m in 'magic').
+
+HTPL massively uses its run-time libraries, while Merge compiles most
+of the logic into the cached script, with the main exception being the
+database operations.
+
+HTPL is authored only in source files, while Merge allows configuration
+via the web, and some web based debugging facilities. The site control
+mechanism in HTPL is still undocumented, while the site control in Merge
+is web based and database driven, hence easier to hand to customers.
+
+Merge is installed as a standard Perl package. Before using, you
+have to create an 'instance'. Normally there is one instance on the server,
+associated with the cgi-bin directory. Creating the instance is easy,
+with a user friendly script. HTPL installs as a Gnu package, and needs to be
+configured for the server before compiled.
+
+HTPL was tested in virtual hosting to work fine, but installing in
+Virtual Private Servers is not supported anymore. Merge should work fine
+with virtual hosting, but I haven't tested that feature yet.
+
+Merge will be released for public use by Winter 2002. Commercial support
+for both HTPL and Merge can be ordered from Raz Information Systems,
+raz@raz.co.il. Yet, HTPL is royalty free and open source, and is disributed
+according to the artistic licence. Merge will probably be released with a 
+similar licence. No registration, licencing or royalties are needed 
+for either product.
+

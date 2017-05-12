@@ -1,0 +1,28 @@
+#!/bin/sh
+echo This will install HTPL
+echo We will now activate a GNU configure script, please wait until
+echo tests are over and answer the questions.
+echo If you are going to run HTPL for the whole server, you have to
+echo run the script as root.
+echo
+echo If you need to install dependency database or mod perl support,
+echo or if you need to change the default options for configure,
+echo please run configure manually.
+echo
+echo Press enter to start...
+read line
+./configure
+clear
+echo Compiling
+make
+clear
+echo Installing
+make install
+clear
+echo Installing modules
+make build
+clear
+echo Fetching complementary modules, this will take a while
+make CPAN
+clear
+echo Welcome to HTPL

@@ -1,0 +1,19 @@
+---
+abstract: 'Recurse through Web pages and issue HEAD requests'
+author:
+  - 'Ivan Shmakov <oneingray@gmail.com>'
+build_requires: {}
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.120921'
+license: gpl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: head-r
+no_index:
+  directory:
+    - t
+    - inc
+resources:
+  repository: http://am-1.org/~ivan/archives/git/head-r-2013.git/
+version: 0.1

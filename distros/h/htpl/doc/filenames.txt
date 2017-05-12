@@ -1,0 +1,43 @@
+$txt = &readfile("/etc/motd");
+$txt = &readfile("http://www.yahoo.com");
+
+opendoc(I, "/etc/motd");
+closedoc(I);
+
+while (<I>) ...
+
+opendoc(I, "http://www.yahoo.com");
+closedoc(I);
+
+while (<I>) ...
+
+($text, $imgs, $links) = &readurl("http://www.yahoo.com");
+print join(" ", @$links);
+print join(" ", @$imgs);
+
+&catfile("usr", "local", "apache/bin") = "/usr/local/apache/bin"
+&mkfile("data.txt", "This is the file data.txt");
+
+$sig = &filesig("/etc/passwd");
+sleep(10);
+$sig2 = &filesig("/etc/passwd");
+die "File was changed" if ($sig ne $sig2);
+
+$cwd = &getcwd;
+
+$temporary_filename = &tempfilename;
+
+.log and .dump files per .htpl file:
+
+&takelog("Exiting");
+&takebroadlog("fatal - exiting");
+
+&core("Stack call", @stack)
+
+$counter = &increasefile("count.dat");
+
+print "Last modified at " . localtime(&lastmodified);
+
+&safemkdir("/usr/dir1/dir2/dir3/dir4/dir5/dir6");
+Creates directories until reaching end point.
+

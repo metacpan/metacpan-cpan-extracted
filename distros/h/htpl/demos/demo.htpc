@@ -1,0 +1,11 @@
+#DATABASE dbi:XBase:xbase
+#TABLE week
+#INDEX ID
+#BEGIN
+#METHOD emit
+print "Day number $ID is $NAME\n";
+#END METHOD
+#METHOD outp
+print "Calling emit:\n";
+&emit;
+#END METHOD

@@ -1,0 +1,22 @@
+Apart of using with macros, resultsets can be used with method calling.
+
+#SQL MYSQL mydb
+
+#SQL CURSOR table SELECT * FROM CUSTOMERS
+
+@ids = $table->project('ID');
+$table2 = $table->clone;
+@two_dim_ary = $table->matrix;
+@ary = $table->project(sub {"$id $debth"});
+$table2 = $table->filter(sub {$debth > 200;});
+
+@columns = $table->cols;
+$num = $table->rows;
+$table->access($row_number);
+$table->fetch;
+$row_number = $table->index;
+
+Resultsets can be queried with the memory SQL engine, if SQL::Statement is
+installed.
+
+#MEM CURSOR table2 SELECT ID, DEBTH FROM table WHERE DEBTH = DEPOSITS

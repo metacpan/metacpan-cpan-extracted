@@ -1,0 +1,905 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+use Getopt::Long;
+use Pod::Usage;
+use Helm;
+use Try::Tiny;
+use Cwd qw(abs_path);
+use File::Spec::Functions qw(catfile);
+use File::HomeDir;
+
+our $VERSION = "0.4";
+
+=head1 NAME
+
+helm - Easy server and cluster automation
+
+=head1 SYNOPSIS
+
+    helm TASK [OPTIONS]
+    helm help tasks
+    helm help [TASK]
+
+    # patch the same file on all of the machines in your cluster 
+    helm patch --file my_fix.patch --target /opt/cool_system/do_stuff.pl
+
+    # run a command on only the servers which run memcache
+    helm run "pidof memcached" --roles memcache 
+
+    # copy a file to every server in your cluster
+    helm put --local foo.tar.gz --remote /tmp/bar.tar.gz
+
+    # rsync a local folder to specific servers
+    helm rsync_put --local lib/important --remote /tmp/important_libs --servers web1,web2,web4
+
+=head1 DESCRIPTION
+
+C<helm> is command-line utility to make it easy to automate system tasks
+for individual machines, a cluster of machines or a subset of machines
+in a cluster. It has the following features:
+
+=over
+
+=item *
+
+Combine multiple commands into a single tasks and to have groups of
+related tasks gathered together.
+
+=item *
+
+Uses SSH as the transport layer for tasks and uses SSH keys for automatic
+authorization.
+
+=item *
+
+Simple optional configuration file describing your cluster, allowing
+tasks to target a single machine, multiple machines which share the
+same role, or all machines in your cluster. Can also be extended to pull
+configuration from more complicated sources like LDAP, etc.
+
+=item *
+
+Logging of each action performed to multiple channels: console, log file,
+irc, email, etc.
+
+=item *
+
+Interact with the remote processes via C<STDIN>, C<STDOUT> and C<STDERR>.
+
+=item *
+
+Convenient F<.helmrc> file to reduce the number of options you need to
+pass on every invocation of C<helm>.
+
+=item *
+
+Locking on the client and/or server so that multiple invocations
+of C<helm> aren't running at the same time.
+
+=back
+
+=cut
+
+$0 = 'helm';
+
+my $lock_type    = 'none';
+my $sudo         = '';
+my $sleep        = 0;
+my $port         = 22;
+my $timeout      = 30;
+my (
+    @servers,  @exclude_servers, @roles,   @exclude_roles, $config_uri,
+    @logs,     $log_level,       @libs,    $no_rc_file,    $quiet,
+    $man,      $help,            $version, $dump_config,   $debug,
+    $parallel, $max_parallel,    $continue_with_errors,    $user,
+);
+
+# the main task (make sure not to grab an option by mistake)
+my $task = defined $ARGV[0] && $ARGV[0] !~ /^-/ ? shift @ARGV : '';
+
+# load the .helmrc file unless we have the --no-rc-file set
+unless (grep { $_ eq '--no-rc-file' } @ARGV) {
+    my $file = $ENV{HELMRC};
+    # look for ./.helmrc
+    unless ($file && -e $file) {
+        $file = catfile(abs_path, '.helmrc');
+        undef $file unless -e $file;
+    }
+
+    # no .helmrc in the current directory, so let's checkt ~/.helmrc
+    if (!$file) {
+        $file = catfile(File::HomeDir->my_home, '.helmrc');
+        undef $file unless -e $file;
+    }
+
+    if ($file) {
+        open(my $FH, '<', $file) or die "Can't read $file: $!\n";
+        my @lines = grep { /\S/ && !/^\s*#/ } <$FH>;
+        chomp @lines;
+        unshift(@ARGV, map { split(/\s+/, $_) } @lines);
+    }
+}
+
+Getopt::Long::Configure('pass_through');
+GetOptions(
+    'user|u=s'                                        => \$user,
+    'servers|server=s'                                => \@servers,
+    'exclude|exclude_servers|exclude-servers=s'       => \@exclude_servers,
+    'roles|role=s'                                    => \@roles,
+    'exclude_roles|exclude-roles=s'                   => \@exclude_roles,
+    'configuration|config|conf=s'                     => \$config_uri,
+    'parallel'                                        => \$parallel,
+    'parallel-max|max-parallel'                       => \$max_parallel,
+    'log-level|log_level=s'                           => \$log_level,
+    'log=s'                                           => \@logs,
+    'load=s'                                          => \@libs,
+    'sudo=s'                                          => \$sudo,
+    'lock=s'                                          => \$lock_type,
+    'sleep=i'                                         => \$sleep,
+    'port=i'                                          => \$port,
+    'timeout=i'                                       => \$timeout,
+    'continue-with-errors'                            => \$continue_with_errors,
+    'no-rc-file'                                      => \$no_rc_file,
+    'quiet'                                           => \$quiet,
+    'man'                                             => \$man,
+    'h|help'                                          => \$help,
+    'v|version'                                       => \$version,
+    'dump-config|dump_config|config-dump|config_dump' => \$dump_config,
+    'debug'                                           => \$debug,
+) or pod2usage(2);
+pod2usage(-verbose => 2) if $man;
+
+if( $version ) {
+    print "$Helm::VERSION\n";
+    exit(0);
+}
+
+if(@libs) {
+    foreach my $lib (@libs) {
+        eval "require $lib";
+        die "Could not load library $lib: $@\n" if $@;
+    }
+}
+
+if(!$log_level) {
+    $log_level = 'info';
+}
+
+# split servers and roles on commas if specified together
+if(@servers) {
+    @servers = map { split(/\s*,\s*/, $_) } @servers;
+}
+if(@exclude_servers) {
+    @exclude_servers = map { split(/\s*,\s*/, $_) } @exclude_servers;
+}
+if(@roles) {
+    @roles = map { split(/\s*,\s*/, $_) } @roles;
+}
+if(@exclude_roles) {
+    @exclude_roles = map { split(/\s*,\s*/, $_) } @exclude_roles;
+}
+
+if( $debug ) {
+    # set the class variable since this isn't tied to a particular Helm object
+    $Helm::DEBUG = $debug;
+}
+
+# look through @ARGV to save any extra junk for task specific
+# things. Process according to these rules:
+# 1) If we see something that starts with a '--' then assume it's a named
+#   option. 
+#   a) If it's a "--.*=.*" then assume it's a name-value pair together joined
+#      with an equals sign.
+#   b) Else if the next thing also starts with a '--' then assume that
+#      the value of this option is "1". 
+#   c) Else assume the next thing is it's value.
+#      Stored named options and their values in %extra_options.
+# 2) If we see something that doesn't start with a '--' and isn't preceded
+#   by something with a '--' then assume it's a positional argument. Store
+#   positional arguments in @extra_args.
+my (%extra_options, @extra_args);
+for(my $i=0; $i<=$#ARGV; $i++) {
+    my $option = $ARGV[$i];
+    if( $option =~ /^-+(.*)/ ) {
+        my $val;
+        if( $option =~ /^-+(.*)=(.*)/ ) {
+            # --option=value
+            $option = $1;
+            $val = $2;
+        } else {
+            # --option value
+            $option = $1;
+            $val = $ARGV[$i+1];
+        }
+
+        # is it "--option value" or just boolean "--option"
+        if( ! defined $val || $val =~ /^-/ ) {
+            $val = 1;
+        } else {
+            $i++;
+        }
+
+        # strip off quotes
+        if( $val =~ /^'(.*)'$/ ) {
+            $val = $1;
+        } elsif( $val =~ /^"(.*)"$/ ) {
+            $val = $1;
+        } elsif( $val =~ /^`(.*)`$/ ) {
+            $val = $1;
+        }
+
+        $extra_options{$option} = $val;
+    } else {
+        # strip off quotes
+        if( $option =~ /^'(.*)'$/ ) {
+            $option = $1;
+        } elsif( $option =~ /^"(.*)"$/ ) {
+            $option = $1;
+        } elsif( $option =~ /^`(.*)`$/ ) {
+            $option = $1;
+        }
+        push(@extra_args, $option);
+    }
+}
+
+show_help() if $help || $task eq 'help';
+
+my $helm;
+unshift(@logs, 'console') unless $quiet;
+try {
+    $helm = Helm->new(
+        user                 => $user,
+        task                 => $task,
+        config_uri           => $config_uri,
+        extra_options        => \%extra_options,
+        extra_args           => \@extra_args,
+        servers              => \@servers,
+        roles                => \@roles,
+        exclude_servers      => \@exclude_servers,
+        exclude_roles        => \@exclude_roles,
+        log                  => \@logs,
+        log_level            => $log_level,
+        sudo                 => $sudo,
+        lock_type            => $lock_type,
+        sleep                => $sleep,
+        default_port         => $port,
+        timeout              => $timeout,
+        parallel             => $parallel,
+        max_parallel         => $max_parallel,
+        continue_with_errors => $continue_with_errors,
+    );
+} catch {
+    # TODO - we can do this better than just filtering the error messages
+    my $err = $_;
+    $err =~ s/at (\S)+ line \d+$//;
+    die "Error: $err";
+};
+
+if( $dump_config ) {
+    my $main_header = "=" x 70;
+    my $section_header = '-' x 50;
+    if( %extra_options ) {
+        warn "$main_header\nEXTRA OPTIONS\n$main_header\n";
+        foreach my $key (sort keys %extra_options) {
+            print "  $key -> $extra_options{$key}\n";
+        }
+    }
+        
+    die "Can't dump configuration without a --config option\n" unless $config_uri;
+    my $config = try {
+        $helm->load_configuration($config_uri);
+    } catch {
+        warn "Error: $_\n";
+        exit(1);
+    };
+    warn "$main_header\nSERVERS\n$main_header\n";
+    foreach my $server (@{$config->servers}) {
+        warn "  " . $server->name() . "\n  Roles: " . join(', ', @{$server->roles}) . "\n$section_header\n";
+    }
+
+    # don't bother with anything else if we don't have a task
+    exit(0) if !$task;
+}
+
+die "No task given\n" if !$task;
+try {
+    $helm->steer();
+} catch {
+    my $err = $_;
+    $err =~ s/at (\S)+ line \d+$//;
+    die "Error: $err";
+};
+
+sub show_help {
+    if( $extra_args[0] ) {
+        if( $extra_args[0] eq 'tasks' ) {
+            warn "Known Helm tasks:\n";
+            foreach my $task (Helm->known_tasks) {
+                warn "  $task\n";
+            }
+        } else {
+            my $help_text = Helm->task_help($extra_args[0]);
+            warn "$help_text\n";
+        }
+    } else {
+        pod2usage(1);
+    }
+    exit(0);
+}
+
+
+=head1 OPTIONS
+
+C<helm> has several options that can be specified for all commands. Any
+remaining arguments are passed to the task that was invoked. These global
+options are:
+
+=over
+
+=item --user
+
+By default, helm assumes you're running the comands as the current local.
+This works really well with SSH keys set up so that you don't have to
+try and type in your password on lots of login attempts. However, if you
+want to change the user, this option allows for that. You will however
+be prompted for a password if you don't have SSH keys properly set up.
+
+=item --servers
+
+Specifically list out the hostnames of the servers to send the task
+to. These can either be full hostnames (or an unambiguous abbreviation
+of your servers as defined in your L<CONFIGURATION>). Multiple hostnames
+must me specified in a comma separated list.
+
+If no servers (or roles) are specified, then the task will be performed
+on all servers (as defined in your L<CONFIGURATION>).
+
+    # using full hostnames 
+    --servers 192.168.0.23,192.168.0.24,web1.company.com
+
+    # using abbreviations from config file 
+    --servers web1,db2
+
+    # using abbreviations from config file and ranges
+    --servers web[1-3],db[1-2]
+
+=item --roles
+
+Instead of specifying the servers explicitly, you can instead
+specify which server roles you want to target (as defined in your
+L<CONFIGURATION>). Multiple roles must be specified in a comma separated
+list.
+
+If no roles (or servers) are specified, then the task will be performed
+on all servers (as defined in your L<CONFIGURATION>).
+
+    # single role 
+    --roles web
+
+    # multiple roles
+    --roles web,cache
+
+=item --exclude
+
+Specifically exclude servers from the list to be used. This can be combined
+with both C<--servers> and C<--roles> and even by itself to exclude certain
+servers from the list of all servers as defined in your L<CONFIGURATION>).
+
+    # combined with --servers
+    --servers web[1-10] --exclude web3
+
+    # combined with --roles, using ranges
+    --roles web --exclude web[4-5]
+
+=item --exclude-roles
+
+Specifically exclude servers with certain roles from the list to be
+used. This can be combined with both C<--servers> and C<--roles> and
+even by itself to exclude certain servers from the list of all servers
+as defined in your L<CONFIGURATION>).
+
+    # combined with --servers: any web[1-10] servers that aren't also caches
+    --servers web[1-10] --exclude-roles cache
+
+    # combined with --roles: any web servers that aren't also proxies
+    --roles web --exclude-roles proxy
+
+=item --parallel
+
+Execute tasks in parallel on the remote servers. The default is to
+execute in serial instead.
+
+=item --parallel-max
+
+The maximum number of parallel processes to be running at the same
+time if C<--parallel> is used. The default is 100.
+
+=item --config
+
+Which resource to use for pulling cluster configuration information (see
+L<CONFIGURATION>).
+
+    --config helm:///etc/helm.conf
+
+=item --log-level
+
+The log level used. Can be one of C<debug>, C<info>, C<warn>,
+and C<error>.  Defaults to C<info>.
+
+=item --log
+
+Log messages to a specific channel. Multiple channels can be
+specified by specifying this option multiple times. The value of this
+option is the URI of the channel to be used.  See L<LOG CHANNELS>
+for more details.
+
+    # send log messages to a comany tech IRC channel 
+    --log irc://helm@irc.company.com/tech
+
+    # log messages to a file and to email address
+    --log file:///var/log/helm.log --log mailto:helm@company.com?from=helm@company.com
+
+Log messages are also sent to C<STDERR> unless the L<--quiet> option
+is also passed.
+
+=item --load
+
+Allows you to load other 3rd party plugin modules to extend C<helm>
+functionality. This could be to add more log channels, different
+configuration loading, etc. The value of this option is the full Perl
+module name of the plugin. This can be specified multiple times.
+
+    # load a hypothetical Yammer log plugin 
+    --load Helm::Log::Channel::Yammer
+
+    # load hypothetical custom LDAP configuration and
+    --load Helm::Conf::Loader::CompanyLDAP
+
+See L<WRITING HELM PLUGINS> for more information.
+
+=item --sudo
+
+The user that should be used to perform the commands on the remote server.
+The actual SSH connection will be made using the current user's SSH keys,
+but then once the connection is made to the remote server, it's sometimes
+useful for the commands to be run as a different user. We also try to make
+sure that things like file permissions (on tasks like C<put> and C<patch>)
+are also handled so that the resulting files are owned by this sudo user.
+
+=item --lock
+
+This options allows you to have control over whether concurrent C<helm> processes
+can be running on either the local or remote servers. The value can be one of: C<none>,
+C<local>, C<remote>, C<both>.
+
+=item --no-rc-file
+
+Suppress the default loading of the L<".helmrc file"|THE .helmrc FILE>
+file.
+
+=item --port
+
+The port to use for SSH on all of the remote servers. Defaults to the standard (22).
+
+=item --timeout
+
+The timeout in seconds to give the ssh connections. Default is 30 seconds.
+
+=item --continue-with-errors
+
+If a command fails executing against this will normally cause execution
+to halt and not run against any other remote servers. Using this option
+will tell helm to continue on to the server(s) even if a previous one
+has errors.
+
+=item --quiet
+
+Suppress the default logging to C<STDERR>
+
+=item --man
+
+Display this documentation
+
+=item --version
+
+Display the version of Helm installed
+
+=item --dump-config
+
+Display a dump of the configuration data as understood by Helm
+
+=item --debug
+
+Tell helm to dump out verbose information about what it is doing internally
+to a log file named F<helm.debug> in the current working directory.
+This is different than the C<--log-level> since that is mainly for end user
+logging of individual task actions. This flag is meant to debug the internals
+of helm, including the logging subsystem, which is why it's a separate flag.
+
+=item --sleep
+
+Sleep a given number of seconds in between each server.
+
+=back
+
+=cut
+
+=head1 TASKS
+
+Helm comes with the following built-in tasks
+
+To get more information on how to run each task, simply
+use C<helm help>:
+
+    helm help run
+
+=head2 run
+
+This is the simplest of helm commands and will run some arbitrary command
+on the remote server.
+
+=head2 get
+
+Get a file from a remote server and put it on the local machine.
+
+=head2 put
+
+Put a local file onto a remote server.
+
+=head2 rsync_put
+
+Put a local file onto a remote server using C<rsync> rather than a full copy.
+
+=head2 patch
+
+Patch a file on a remote server with a patch on the local machine.
+
+=head2 unlock
+
+Clear out any stuck Helm locks on a remote server.
+
+=head1 CONFIGURATION
+
+By default, C<helm> doesn't use a configuration file, but certain features
+require it (using roles, server abbreviations, etc) so it's best to
+have one. You can tell C<helm> which configuration resource to use by using
+the L<--config> option. Currently, only the C<helm://> URI scheme
+is supported.  
+
+    --config helm:///etc/helm.conf
+
+A configuration file will look something like this:
+
+    <Server web[1-5].company.com>
+        Role web
+    </Server>
+
+    <Server db1.company.com>
+        Role db Role db_master
+    </Server>
+
+    <Server db2.company.com>
+        Role db Role db_slave
+    </Server>
+
+This configuration would define 7 servers (web1.company.com,
+web2.company.com, web3.company.com, web4.company.com, web5.company.com,
+db1.company.com and db2.company.com). It defines 4 different roles (web,
+db, db_master, db_slave).
+
+C<helm> currently just supports a single configuration resource format
+(C<helm://>), but the internals are flexible enough that more formats
+could be supported in the future, including other configuration methods
+like LDAP, etc.
+
+If, for instance you wanted to support a URI like:
+
+    --config ldap://ldap.company.com
+
+See L<WRITING HELM PLUGINS> for more information.
+
+If you are having problems getting your configuration right, you can pass
+the L<--dump-config> option to tell C<helm> to display what it thinks things
+are configured to be.
+
+=head1 LOG CHANNELS
+
+C<helm> can be told to send various levels of log data to different
+channels. By default we support a log file, IRC and email logs. We also
+support various log levels (see the L<--log-level> option).
+
+You can specify which channel is used by giving a URI which indicates
+what type of channel and where to send the log. The following URI schemes
+are supported:
+
+=over
+
+=item file://
+
+This is basically a log file where messages are immediately appended.
+
+    --log file:///var/log/helm.log
+
+=item irc://
+
+B<NOTE>: IRC logging is still experimental and quite
+tempermental. Improvements are welcome.
+
+This is an IRC channel where messages are immediately sent. For example
+to send messages to the C<sysadmin> IRC channel on C<irc.company.com>
+using the user C<michael> and the password C<s3cr3t> you would have:
+
+    --log irc://michael@irc.company.com/sysadmin?pass=s3cr3t
+
+=item mailto:
+
+Similar to Mail-To links in HTML documents, this just specifies an
+email address to log. Log messages aren't sent immediately, but
+are instead queued up to be sent once the command has been completed.
+
+    --log mailto:michael@company.com?from=helm@company.com
+
+=back
+
+Plugins can be written to load allow other log channels. See L<WRITING
+HELM PLUGINS> for more information on how this is done.
+
+=head1 THE .helmrc FILE
+
+The F<.helmrc> file contains command-line options that are prepended
+to the command line before processing. Multiple options may live on
+multiple lines. Lines beginning with a # are ignored. A F<.helmrc>
+might look like this:
+
+    # always log to a file 
+    --log file:///var/log/helm.log
+
+    # always load our custom plugins 
+    --load Helm::Conf::Loader::CompanyLDAP 
+    --load Helm::Log::CompanyYammer
+    --load Company::CustomHelmTasks
+
+C<helm> looks for the rc file first in the current directory and then in
+your home directory. You can specify another location with the C<HELMRC>
+environment variable.
+
+If L<--no-rc-file> is specified on the command line, the F<.helmrc> file
+is ignored.
+
+=head1 WRITING HELM PLUGINS
+
+Helm can be extended in many ways to make it more convenient for your projects.
+Helm has 3 customization points where plugins can be written and registered to
+interact: C<task>, C<log> and C<configuration>. Using the C<--load> option, you
+can tell Helm about your custom or 3rd party Perl modules that you would like to
+load. Each plugin module must register itself with Helm along with the type of events
+it will handle using the C<< Helm->register_module >> method. For example, if I were
+creating a new plugin module for a custom task named "spiffy" I might invoke
+Helm like:
+
+    helm spiffy --load MyCompany::Helm::Task::spiffy
+
+And my Perl module might look something like this:
+
+    package MyCompany::Helm::Task::spiffy;
+    use strict;
+    use warnings;
+    use Helm;
+    use Moose;
+    extends 'Helm::Task';
+    Helm->register_module('task', spiffy => 'MyCompany::Helm::Task::spiffy')
+
+    sub validate {
+        my $self = shift;
+        # custom validation
+    }
+
+    sub execute {
+        my ($self, %args) = @_;
+        # do something spiffy
+    }
+
+    1;
+
+Most likely you'd put the C<--load> statment in your F<.helmrc> file
+so you wouldn't have to worry about it again.  Now we'll get into the
+details of what is expected of each type of plugin.
+
+=head2 Task Plugins
+
+A task plugin should inherit from L<Helm::Task> and implement the following methods:
+
+=over
+
+=item validate
+
+This method would perform any custom validation needed before the task
+is executed against any servers. Normally this involves validating the
+custom options this task might use. This method only receives a single
+object, the task itself.  As an example, lets say you want a C<--nifty>
+option to your C<spiffy> plugin above:
+
+    helm spiffy --nifty foo
+
+Then your validation method might look something like this:
+
+    sub validate {
+        my $self          = shift;
+        my $helm          = $self->helm;
+        my $extra_options = $helm->extra_options;
+        my $nifty         = $extra_options->{nifty};
+        $helm->die("You need to provide a --nifty option!") unless $nifty;
+        $helm->die("--nifty option ($nifty) is not a valid value") unless $nifty =~ /^fo+/;
+    }
+
+=item execute
+
+This is the meat of your task plugin and is where the work happens. This method is called
+once for every server the task is being executed against. It receives the following named arguments:
+
+=over
+
+=item ssh
+
+A L<Net::OpenSSH> object with an already open SSH connection to the server in question.
+
+=item server
+
+A L<Helm::Server> object for the currently executing task.
+
+=back
+
+As long as your method doesn't die (or preferrably calls C<< $helm->die() >>, then we will assume
+that all was fine and dandy in the execution of the task.
+
+=back
+
+=head2 Log Plugins
+
+Log plugins can offer new channels for logging Helm output based on the URI given
+to Helm. For instance, if you wanted to send SMS logging of critical messages only, you might
+invoke helm with a logger like:
+
+    helm foo --log sms:+15105550101 --load MyCompany::Helm::Log::SMS
+
+And then your SMS module might look something like
+
+    package MyCompany::Helm::Log::SMS;
+    use strict;
+    use warnings;
+    use Helm;
+    use Moose;
+    extends 'Helm::Log::Channel';
+    Helm->register_module('log', sms => 'MyCompany::Helm::Log::SMS');
+
+    sub initialize   {}
+    sub finalize     {}
+    sub start_server {}
+    sub end_server   {}
+    sub debug        {}
+    sub info         {}
+    sub warn         {}
+    sub error        { 
+        my ($self, $msg) = @_;
+        # send SMS message
+    }
+    1;
+
+In this example, we don't care about anything except errors (since SMS messages cost money
+and would get really annoying for anything with frequency). Log plugins need to inherit
+from L<Helm::Log::Channel> and implement the following methods:
+
+=over
+
+=item intialize
+
+=item finalize
+
+=item start_server
+
+=item end_server
+
+=item debug
+
+=item info
+
+=item warn
+
+=item error
+
+=back
+
+=head3 Configuration Plugins
+
+Configuration plugins can implement new ways to load configuration data
+about your servers based on the URI given to helm. For instance, if you
+wanted to load the list of your servers and their roles from a company
+LDAP server, you might invoke Helm like:
+
+    helm foo --config ldap://ldap.company.com --load MyCompany::Helm::Conf::ldap
+
+Helm will look for the last module registered to handle the C<ldap> scheme
+of that url. That module might look like:
+
+    package MyCompany::Helm::Conf::ldap;
+    use strict;
+    use warnings;
+    use Helm;
+    use Moose;
+    extends 'Helm::Conf::Loader';
+    Helm->register_module('configuration', ldap => 'MyCompany::Helm::Conf::ldap')
+
+    sub load {
+        my ($self, %args) = @_;
+        my $uri = $args{uri};
+        # poke around in our LDAP server and create a list of Helm::Server objects
+        my @servers = ...;
+        # then return a Helm::Conf object
+        return Helm::Conf->new(servers => \@servers)
+    }
+
+    1;
+
+A configuration loading plugin should inherit from L<Helm::Conf::Loader>
+and implement the following methods:
+
+=over
+
+=item load
+
+This method is the backbone of a configuration plugin. It receives the
+following named arguments:
+
+=over
+
+=item uri
+
+A L<URI> object representing the URI passed on the command line to be
+loaded by this configuration loader.
+
+=item helm
+
+The C<Helm> object doing the loading.
+
+=back
+
+This method must create a list of L<Helm::Server> objects and use them
+to return a L<Helm::Conf> object.
+
+=back
+
+=head1 CAVEATS
+
+=over 
+
+=item Multi-Platform
+
+This has been developed and tested on Linux (with bash as the shell
+on the remote hosts) only. Dealing with multiple platforms and writing
+multi-platform tasks has been punted to the future.
+
+=item Alpha Software
+
+This software is very ALPHA, which means it's interface is likely to
+change in the future.  It's used currently and happily in production
+but please be aware if you start using it that you'll probably want to
+follow future versions carefully to make sure you aren't bitten by API
+changes as thing are flushed out.
+
+=back
+
+=head1 TODO
+
+In the not too distant future, we'd like to add the following features
+to Helm:
+
+=over
+
+=item * Add a capture option which allows stdout/stderr to be handled differently
+
+=item * Add a compare option which allows the output (stdout/stderr) to be compared between servers in an intelligent manner
+
+=item * A real exception system to avoid parsing error messages
+
+=back

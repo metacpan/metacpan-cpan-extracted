@@ -1,0 +1,22 @@
+To send a block to a process, and include it's output in the source *in
+compile time*, use the preprocessing tag.
+For example, to use the output of a Python script:
+<HTML>
+<@python>
+for x in range(0, 10):
+    print x + "\n"
+</@>
+You should see numbers 1 to 10.
+
+This will be generated in compile time, not in run time.
+
+To include TCL code in your application:
+
+<HTML>
+<#
+   $perl_var++;
+>
+<? puts $per_var ?>
+
+This uses the Tcl module which you must install.
+perl scalars and arrays can be accessed from Tcl.

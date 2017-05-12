@@ -1,0 +1,62 @@
+
+==== NAME ====
+
+html2dbk - convert XHTML to DocBook.
+
+
+==== VERSION ====
+
+This describes version ``0.03'' of html2dbk.
+
+
+==== DESCRIPTION ====
+
+This script (and module) converts an XHTML file into DocBook, using both
+XSLT and heuristics (as XSLT alone can't do everything).
+
+This script will convert "*filename*.html" into "*filename*.xml"
+
+By default, the input file is expected to be correct XML (there are other
+programs such as html tidy (http://tidy.sourceforge.net/) which can correct
+files for you; this does not do that). If you give the --html option then
+this will attempt to parse the file as HTML.
+
+Note also this is very simple; it doesn't deal with things like <div> or
+<span> which it has no way of guessing the meaning of. This does not merge
+multiple XHTML files into a single document, so this converts each XHTML
+file into a <chapter>, with each header being a section (sect1 to sect5).
+The <title> tag is used for the chapter title.
+
+There will likely to be validity errors, depending on how good the original
+HTML was. There may be broken links, <xref> elements that should be <link>s,
+and overuse of <emphasis> and <emphasis role="bold">.
+
+
+==== REQUIRES ====
+
+    Getopt::Long
+    Pod::Usage
+    Getopt::ArgvFile
+    HTML::ToDocBook
+        Cwd
+        File::Basename
+        File::Spec
+        XML::LibXML
+        XML::LibXSLT
+        HTML::SimpleParse
+
+
+==== AUTHOR ====
+
+    Kathryn Andersen (RUBYKAT)
+    perlkat AT katspace dot com
+    http://www.katspace.org/tools
+
+
+==== COPYRIGHT AND LICENCE ====
+
+Copyright (c) 2006 by Kathryn Andersen
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+

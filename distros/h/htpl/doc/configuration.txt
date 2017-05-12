@@ -1,0 +1,9 @@
+Configuring HTPL:
+
+Main configuration for HTPL is htpl-config.pl in the cgi-bin directory.
+Any directory can contain a file called htpl-site.pl to redefine constants
+found on htpl-config.pl.
+
+Configuring applications:
+Applications can assume a website.ini file (in windows INI format) in the
+application directory, which they can access by $config{$section, $key}.

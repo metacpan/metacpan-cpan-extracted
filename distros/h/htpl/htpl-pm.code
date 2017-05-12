@@ -1,0 +1,11 @@
+my $ref = eval("*" . __PACKAGE__ . "::");
+
+my $key;
+
+foreach $key (keys %$ref) {
+    my $val = $$ref{$key};
+    my $code = eval("$val\{CODE}");
+    push(@EXPORT, $key) if (ref($code) =~ /^CODE/);
+}
+
+1;

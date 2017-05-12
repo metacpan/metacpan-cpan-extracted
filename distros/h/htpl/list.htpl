@@ -1,0 +1,96 @@
+<#
+$| = 1;
+
+$root = $ENV{'DOCUMENT_ROOT'};
+
+&phase2 if ($action eq "compile");
+&html_header("Select files to compile in /$dir", $STD_BODY);
+
+
+$thedir = "$root/$dir";
+$thedir =~ s|/$||;
+
+@dirs = ();
+opendir(DIR, $thedir);
+while ($_ = readdir(DIR)) {
+    $item = "$dir/$_";
+    $item =~ s|^/||;
+    $realitem = "$thedir/$_";
+    if (-d $realitem && -x $realitem && $_ !~ /^\.\.?$/) {
+        push(@dirs, [$_, $item]);
+        next;
+    }
+    if (/.htp[lm]$/i) {
+        push(@files, [$_, $item]);
+    }
+}
+closedir(DIR);
+
+if ($dir) {
+    $up = "/$dir";
+    $up =~ s|/.*?$||;
+    $up =~ s|^/||;
+    $outup = &urlencode($up);
+    $up = "/$up";
+>
+<A HREF="$SCRIPT_NAME?dir=$outup">[Up to $up]</A><BR><BR>
+<#
+}
+
+foreach (@dirs) {
+    ($name, $path) = @$_;
+    $odir = &urlencode($path);
+>
+<A HREF="$SCRIPT_NAME?dir=$odir">[$name]</A><BR>
+<#
+}
+
+>
+<FORM ACTION="$SCRIPT_NAME" EMTHOD=POST>
+<#
+&html_hidden('dir');
+&html_hidden('action', 'compile');
+
+foreach (@files) {
+    ($name, $path) = @$_;
+
+>
+<INPUT TYPE=CHECKBOX NAME="file" VALUE="$path"> $path<BR>
+<#
+}
+
+>
+<INPUT TYPE=SUBMIT VALUE="Compile">
+</FORM>
+</BODY>
+</HTML>
+<#
+exit;
+
+sub phase2 {
+    &html_header("Compiling files in /$dir", $STD_BODY);
+    $bin = $HTML::HTPL::Config'dbgbin;
+    $i = 0;
+    $log = &tempfilename;
+    foreach (@file) {
+        $i++;
+        print "$i. $_<BR>\n";
+        @a = ("-t");
+        push(@a, '-w') if (/\.htpm$/);
+        push(@a, "$root/$_");
+        $cmd = join (" ", $bin, @a);
+        print "$cmd<BR>\n";
+#        die unless (-x $bin);
+        open(REALOUT, ">&STDOUT");
+        close(STDOUT);
+        open(STDOUT, ">$log");
+        system($bin, @a);
+        close(STDOUT);
+        open(STDOUT, ">&REALOUT");
+        close(REALOUT);
+        $t = &txt2html(&readfile($log));
+        print "<PRE>$t</PRE><BR>\n" if ($t);     
+    }
+exit;
+}
+>

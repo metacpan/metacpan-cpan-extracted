@@ -1,0 +1,17 @@
+======================================================================
+                             html2latex
+======================================================================
+
+Introduction
+------------
+
+html2latex converts a valid HTML file to (hopefully) a valid latex
+one.  There is also on option to create a pdf automatically, so this
+could be called "html2pdf".  If you just want something like that,
+look for "html2ps" at freshmeat.net.
+
+Information
+-----------
+
+For usage, try "./html2latex -h" or "perldoc html2latex.pod".  For
+installation and further information, read INSTALL.

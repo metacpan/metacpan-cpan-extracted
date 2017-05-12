@@ -1,0 +1,27 @@
+use HTML::HTPL::Lib;
+use HTML::HTPL::Sys;
+
+&HTML::HTPL::Sys::init_offline;
+
+CONFIG: {
+        &__sys_init;
+}
+
+END {
+        &__sys_deinit;
+}
+
+
+sub __sys_init {
+        my $code = *InitDoc{CODE};
+        if (UNIVERSAL::isa($code, 'CODE')) {
+                &$code;
+        }
+}
+sub __sys_deinit {
+        my $code = *CleanDoc{CODE};
+        if (UNIVERSAL::isa($code, 'CODE')) {
+                &$code;
+        }
+}
+

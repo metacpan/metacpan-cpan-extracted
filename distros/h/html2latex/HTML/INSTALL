@@ -1,0 +1,15 @@
+Make sure before you do anything else that you install requirements.
+See README for more information.  After you're done with that try the
+classic:
+
+perl Makefile.PL
+make install
+
+That should just install it.  Although, I recommend:
+
+perl Makefile.PL
+make test
+make install
+make clean
+
+It's more safe (it's tested) and more clean (it's cleaned). 

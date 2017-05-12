@@ -1,0 +1,43 @@
+#!/usr/local/bin/perl
+# FILE .../CPAN/hp200lx-db/T2D
+#
+# $VERSION= '0.09';
+#
+# written:       1998-10-29
+# latest update: 2001-03-11  2:19:53
+# $Id: $
+#
+
+To-Do List:
+
+1. Enforce GDB's inherent limits
+2. define text based dump format which could be used to check databases
+   into a revision control system such as RCS or CVS.
+   This can be used as a form of backup...
+3. Code reorganisation:
+   DBgui should be in it's own module
+
+Things left to be done for later:
+
+
+  additional UNIMPLEMENTED data manipulation methods:
+    $db->DELETE ($num)                  delete given data record
+    $db->INSERT ($num)                  insert a new object at index
+    $db2= $db1->dupDB ()                copy the database
+    $db->clearDB ()                     delete data and note elements
+    $db->delete ($num)                  delete a data record including note
+
+retrieve DB format
+$fmt->{$Fieldname}=
+{
+  'type'        => type code,
+  'min_size'    => minimum size to display, e.g. DATE == 10 as in 1998-01-11
+  'max_size'    => maximum size to display
+};
+
+formatted print list output somehow
+
+-----
+possible import/export application which are not too specific:
++ synchronization of a Phone Database with ELM/Pine/Netscape address books
++ Netscape bookmarks

@@ -1,0 +1,557 @@
+<!-- FILE .../CPAN/hp200lx-db/docs/adb-differences.html 1998-09-19 20:26:05 +gg -->
+<title>ADB: appointment book database format</title>
+<h1>ADB: appointment book database format</h1>
+
+$Id: adb-format.html,v 1.6 2001/01/01 20:13:59 gonter Exp $
+latest update: 1999-10-11 10:20:55 CET<br>
+compiled by: <a href="mailto:g.gonter@ieee.org">g.gonter@ieee.org</a>
+
+<h3>Contents</h3>
+<ul>
+<li><a href="#foreword">Foreword</a>
+<li><a href="#db_records">DB records</a>
+<li><a href="#user14">USER14</a>
+    <ul>
+    <li><a href="user14-a">USER14, first occurance</a>
+    <li><a href="user14-b">USER14, second occurance</a>
+    </ul>
+<li><a href="#data_records">format of data records</a>
+<li><a href="#data_fields">format of data fields</a>
+    <ul>
+    <li><a href="#U18">U18: Recurrence Class and States</a>
+    <li><a href="#U19">U19:</a>
+    <li><a href="#U20">U20: date due</a>
+    <li><a href="#U22">U22:</a>
+    <li><a href="#U23">U23:</a>
+    <li><a href="#U24">U24:</a>
+    </ul>
+</ul>
+
+<h3><a name="foreword">Foreword</h3>
+All information here is based on the careful examination of sample
+HP 200LX databases, especially ADB files which are used by the
+built-in appointment book application.  This examination was done
+to find a way to exchange data with other application, thus enhancing
+the usability value of HP 200LX-class devices.
+Use this at your own risk!  Comments and further examples are welcome.
+
+<h2><a name="#db_records">DB records</h2>
+The appointment book implements a number of application
+specific record types and interprets a few items differently
+than the generic database engine:
+
+<ul>
+<li>there is no card definition record
+<li>there are no viewpoint definitions
+<li>the application specific record (USER14) is present twice and
+    seems to contain some <a href="#user14-a">header information</a>
+    as well as a <a href="#user14-b">view point table</a>
+    table.
+</ul>
+
+<hr>
+<h2><a name="user14">USER14</h2>
+There are two special components of the "USER14" which contain application
+specific data.
+
+<h3><a name="user14-a">USER14, first occurance</h3>
+In all my examples sofar, the first record has a payload of
+exactly 29 bytes.
+
+<table border=1>
+<tr><th>Offset<th>Type<th>Description
+<tr><td>0x00<td rowspan=3>Date<td rowspan=3>head date
+<tr><td>0x01</tr>
+<tr><td>0x02</tr>
+<tr><td>0x03<td>flags 1<td>Raster</tr>
+<tr><td>0x04<td>flags 2<td>Last View, raster</tr>
+<tr><td>0x05<td>flags 3<td>signals</tr>
+<tr><td>0x06<td>&nbsp;<td> ??? </tr>
+<tr><td>0x07<td>flags 4<td>options for the date view</tr>
+<tr><td>0x08<td>flags 4<td>options for the to-do view</tr>
+<tr><td>0x09<td rowspan=2>INT<td rowspan=2>Raster: first date shown</tr>
+<tr><td>0x0A</tr>
+<tr><td>0x0B<td rowspan=2>INT<td rowspan=2>dates: duration in minutes</tr>
+<tr><td>0x0C</tr>
+<tr><td>0x0D<td rowspan=2>INT<td rowspan=2>dates: leadtime in minutes</tr>
+<tr><td>0x0E</tr>
+<tr><td>0x0F<td rowspan=2><a href="#U22">U22</a><td rowspan=2>To-Do: default priority</tr>
+<tr><td>0x10</tr>
+<tr><td>0x11<td rowspan=2>INT<td rowspan=2>?? index ??</tr>
+<tr><td>0x12</tr>
+<tr><td>0x13<td rowspan=2>INT<td rowspan=2>?? index ??</tr>
+<tr><td>0x14</tr>
+<tr><td>0x15<td rowspan=2>INT<td rowspan=2>always 3 ?</tr>
+<tr><td>0x16</tr>
+</table>
+
+<h4>head date</h4>
+The head date is the date that is stored as the current date.
+
+<h4>flags 1: raster</h4>
+Defines raster and defaults for new date entries
+
+<table border=1>
+<tr><th>bit<th>function
+<tr><td>0<td rowspan=4>Raster
+    <pre>    value | function
+        1 | 15 minutes
+        2 | 30 minutes
+        4 | 60 minutes
+        8 | raster off
+    </pre>
+<tr><td>1
+<tr><td>2
+<tr><td>3
+<tr><td>4<td>weeks start on Monday
+<tr><td>5<td>weeks start on Sunday
+<tr><td>6<td>new date entries set alarm (Meldung an)
+<tr><td>7<td>show date in month view
+</table></P.
+Note: The week start does not have to be explicitly set.  If it
+is not set, the application seems to use an application built-in
+default or uses the default value defined
+
+<h4>flags 2: last view</h4>
+Defines defaults for new date, event, and to-do entries
+as well as last view shown.
+
+<table border=1>
+<tr><th>bit<th>function
+<tr><td>0<td>show date in week view
+<tr><td>1<td>show event in month view
+<tr><td>2<td>show event in week view
+<tr><td>3<td>carry-over of new to-do entries
+<tr><td>4<td rowspan=3>last view shown
+    (bit field, values shifted 4 bits)
+    <pre>    value | function
+        0 | date
+        1 | to-do
+        2 | week
+        3 | month
+        4 | 6 months
+    </pre>
+<tr><td>5
+<tr><td>6
+<tr><td>7<td>&nbsp;</tr>
+</table>
+
+<h4>flags 3: signal</h4>
+<table border=1>
+<tr><th>Bit<td>function
+<tr><td>0<td rowspan=3>signal volume
+    <pre>    value | volume
+        1 | low
+        2 | middle
+        4 | loud
+    </pre></td></tr>
+<tr><td>1
+<tr><td>2
+<tr><td>3<td>signal off
+<tr><td>4<td rowspan=4>signal type
+    <pre>    value | english | german
+        1 | peep    | Piepton
+        2 | trumpet | Trompete
+        4 | bell    | Glocke
+        8 | special | Spezial
+    </pre></td></tr>
+<tr><td>5
+<tr><td>6
+<tr><td>7
+</table>
+
+<h4>flags 4: options</h4>
+The option flags define the appearance of the date and event view
+(byte offset 0x07) and of the to-do view (byte offset 0x08):
+<table border=1>
+<tr><th>Bit<td>function
+<tr><td>0<td rowspan=2>show list with
+    <pre>    value | combination
+        0 | nothing
+        1 | clock
+        2 | calendar
+        3 | (undefined)</pre>
+    </td></tr>
+<tr><td>1
+<tr><td>2<td>show next date
+<tr><td>3<td>show graphic bar
+<tr><td>4<td>&nbsp;
+<tr><td>5<td>&nbsp;
+<tr><td>6<td>&nbsp;
+<tr><td>7<td>&nbsp;
+</table>
+
+<h3><a name="user14-b">USER14, second occurance</h3>
+This is very possibly a kind of view point table for the head date
+for the to-do list view and the date and event view.<p>
+
+The view point table consists of repeating blocks of date/number
+pairs in the format:
+<table border=1>
+<tr><th>relative Offset<th>Type<th>Description
+<tr><td>0x00<td rowspan=3>Date<td rowspan=3>Date of Event or Date?
+<tr><td>0x01</tr>
+<tr><td>0x02</tr>
+<tr><td>0x03<td rowspan=2>Index<td rowspan=3>data record index???
+<tr><td>0x04</tr>
+</table>
+The dates seem to be always pointing to some date or event and not
+to to-do type entries.
+The last entry always contains <tt>date=1990-01-01 num=65535</tt>.
+
+<hr>
+<h2><a name="data_records">format of data records</h2>
+
+The format of the data records varies slightly depending
+on the entry type:
+
+<table border=1>
+<tr><th>Offset<th>Type<th>To-Do<th>Termin/Event
+<tr><td>0x00<td rowspan=2>INT<td rowspan=2 colspan=2>length of record</tr>
+<tr><td>0x01</tr>
+<tr><td>0x02<td rowspan=2>Offset<td rowspan=2 colspan=2>Category</tr>
+<tr><td>0x03</tr>
+<tr><td>0x04<td rowspan=2>Offset<td rowspan=2>(not used)<td rowspan=2>Location</tr>
+<tr><td>0x05</tr>
+<tr><td>0x06<td rowspan=2>Offset<td rowspan=2 colspan=2>Pointer
+    to <a href="#recurrence_status">recurrence status</a> descriptor block.</tr>
+<tr><td>0x07</tr>
+<tr><td>0x08<td rowspan=2>Note<td rowspan=2 colspan=2>Number of note</tr>
+<tr><td>0x09</tr>
+<tr><td>0x0A<td rowspan=2>INT<td rowspan=2 colspan=2>previous record on same day</tr>
+<tr><td>0x0B</tr>
+<tr><td>0x0C<td rowspan=2>INT<td rowspan=2 colspan=2>next record on same day</tr>
+<tr><td>0x0D</tr>
+<tr><td>0x0E<td>BYTEBOOL<td colspan=2><a href="#entry_type">Entry Type and Flags</a></tr>
+<tr><td>0x0F<td rowspan=3>Date<td rowspan=3 colspan=2>Begin Date (<a href="#U19">U19</a>)</tr>
+<tr><td>0x10</tr>
+<tr><td>0x11</tr>
+<tr><td>0x12<td rowspan=2>&nbsp;<td rowspan=2>Priority (<a href="#U22">U22</a>)
+    <td rowspan=2>Begin Time (TIME)</tr>
+<tr><td>0x13</tr>
+<tr><td>0x14<td rowspan=2>&nbsp;<td rowspan=2>Due Date (<a href="#U20">U20</a>)
+    <td rowspan=2>#Consecutive Days (<a href="#U23">U23</a>)</tr>
+<tr><td>0x15</tr>
+<tr><td>0x16<td rowspan=4>&nbsp;<td rowspan=3>End Date (DATE)
+    <td rowspan=2>End Time (TIME)</tr>
+<tr><td>0x17</tr>
+<tr><td>0x18<td rowspan=2>Leadtime (<a href="#U24">U24</a>)</tr>
+<tr><td>0x19</tr>
+<tr><td>0x1A<td><a href="#U18">U18</a>
+            <td colspan=2>recurrence class
+            (RADIO_BUTTON *and* <a href="#U18">U18</a>)</tr>
+<tr><td>0x1B<td rowspan=2>String/mod.<td colspan=2 rowspan=2>Description</tr>
+<tr><td>...</tr>
+<tr><td>var<td rowspan=2>String<td colspan=2 rowspan=2>Category</tr>
+<tr><td>...</tr>
+<tr><td>var<td rowspan=2>String<td colspan=2 rowspan=2>Location</tr>
+<tr><td>...</tr>
+<tr><td>var<td rowspan=2>Binary<td colspan=2 rowspan=2>Recurrence data</tr>
+<tr><td>...</tr>
+</table>
+
+<h2><a name="data_fields">data fields</h2>
+The usual data fields are also slightly different to regular GDB files,
+there are a number of application specific types and also
+overlapping fields which depend on the <a href="#entry_type">entry type</a>:
+<ul>
+<li>Type 2: STRING (field name=Description; Feldname=Beschreibung)<br>
+    A string is usually implemented as a pointer to the
+    real beginning of the string, however, in this case, the
+    string actually begins always at the offset position (0x1B).
+<li>Type 6: CATEGORY (field name=Category; Feldname=Kategorie)<br>
+    This looks like a perfectly normal category item, however, there
+    does not seem to by any way to use this field.  Was it defined
+    for a future upgrade of the database application?
+</ul>
+
+<h3><a name="entry_type">Entry Type and Flags</h3>
+The type of an ADB entry can be determined by examining the upper
+4 bits of the byte at offset 0x0E.  The lower 4 bits are flags
+that have different meanings for the to-do list and
+schedule and event entries, respectively.<p>
+
+<table border=1>
+<tr><th>value<th>mode<th>English<th>Deutsch</tr>
+<tr><td>0x01<td>events<td>Alarm<td>Meldung aktiv</tr>
+<tr><td rowspan=2>0x02<td>to-do<td>Completed ToDo<td>Vorhaben erledigt</tr>
+<tr><td>events<td>Shows in Month View<td>Monatsansicht</tr>
+<tr><td rowspan=2>0x04<td>to-do<td>Carry Forward<td>&Uuml;bertrag</tr>
+<tr><td>events<td>Shows in Week View<td>Wochenansicht</tr>
+<tr><td>0x10<td>sel<td>View/To-Do<td>Ansicht/Vorhaben<tr>
+<tr><td>0x20<td>sel<td>View/Event<td>Ansicht/Ereignis<tr>
+<tr><td>0x80<td>sel<td>View/Date<td>Ansicht/Termin<tr>
+</table>
+<p>
+
+Check Boxes are mapped to check box fields<p>
+<table border=1>
+<tr><th>Feldname<th>Ansichten<th>field name<th>view
+<tr><td>Zeigt Wochenplan<td>Woche<td>Shows in Week View<td>Week
+<tr><td>Zeigt Monatsplan<td>Monat<td>Shows in Month View<td>Month
+</table>
+
+<h3><a name="U18">U18: Recurrence Class (Repeat Factor, Wiederholung)</h3>
+    1 Byte, references the radio-button field which is used to hold the entry type
+
+The recurrence factor (U18) points to the same positionas as the radio button
+field so it must basically work like the group data type.
+The display shows the names for the radio buttons.
+
+<table border=1>
+<tr><th>Bit<th>Value<th>English<th>German<th>indicators</tr>
+<tr><td>0<td>0x01<td>none<td>Keine<td>none</tr>
+<tr><td>1<td>0x02<td>daily<td>Taeglich<td>cycle</tr>
+<tr><td>2<td>0x04<td>weekly<td>Woechentlich<td>cycle day</tr>
+<tr><td>3<td>0x08<td>monthly<td>Monatlich<td>cycle day</tr>
+<tr><td>4<td>0x16<td>yearly<td>Jaehrlich<td>cycle day month{1}</tr>
+<tr><td>5<td>0x32<td>special<td>Spezial<td>day month</tr>
+</table>
+
+<h3><a name="U19">U19: Begin Date (Beginndatum?)</h3>
+    Works like a DATE field
+
+<h3><a name="U20">U20: date due (Faelligkeitsdatum)</h3>
+    2 Bytes interpreted as INT; Semantics: maybe the number of days after the
+    begin?  latest possible date seems to be 2099-12-31
+<table border=1>
+<tr><th>value<th>English<th>German</tr>
+<tr><td>0<td>none<td>keine</tr>
+<tr><td>1<td>at the same day<td>am selben Tag</tr>
+<tr><td>2<td>next day<td>am naechsten Tag</tr>
+<tr><td>...<td>...<td>...</tr>
+</table>
+
+<!-- U21 does not exist -->
+
+<h3><a name="U22">U22: priority (Prioritaet)</h3>
+<ul>
+<li>This field is used by the appointment book
+    application for to-do entries.
+<li>data representation: 2 byte ASCII characters<br>
+    possible values: [ A-Z0-9]{2}
+<li>For events and dates it has the value \xFF{2}
+</ul>
+<h3><a name="U23">U23: #Consecutive Days (# aufeinanderfolgende Tage)</h3>
+<h3><a name="U24">U24: Leadtime (Vorlauf)</h3>
+
+<hr>
+<h2>defined fields</h2>
+The following fields are defined in the ADB file with field definition
+records in the same way as in other GDB files.  Due to the fact that
+they partially overlap and/or have application specific types,
+the are not all used or interpreted slightly different
+in the <tt>HP200LX::DB</tt> Perl module.
+
+<table border=1>
+<tr><th>IDX<th>To-Do<th>Events<th>Type<th>TType<th>Size<th>FID<th>Off<th>Res<th>Flg<th>English<th>Deutsch</tr>
+<tr><td align=right>0<td align=middle>X<td align=middle>X<td align=right>2<td>STRING<td align=right>2<td align=right>0<td align=right>0x1B<td align=right>0<td align=right>0x00<td>'Description'<td>'Beschreib.'</tr>
+<tr><td align=right>1<td align=middle>X<td align=middle>X<td align=right>19<td><a href="U19">U19</a><td align=right>3<td align=right>0<td align=right>0x0F<td align=right>0<td align=right>0x00<td>'Start Date '<td>'Beginndatum'</tr>
+<tr><td align=right>2<td align=middle>&nbsp;<td align=middle>X<td align=right>7<td>TIME<td align=right>2<td align=right>0<td align=right>0x12<td align=right>0<td align=right>0x00<td>'Start Time '<td>'Beginnzeit'</tr>
+<tr><td align=right>3<td align=middle>&nbsp;<td align=middle>X<td align=right>7<td>TIME<td align=right>2<td align=right>0<td align=right>0x16<td align=right>0<td align=right>0x00<td>'End Time   '<td>'Endzeit   '</tr>
+<tr><td align=right>4<td align=middle>&nbsp;<td align=middle>X<td align=right>2<td>STRING<td align=right>2<td align=right>0<td align=right>0x04<td align=right>0<td align=right>0x20<td>'Location   '<td>'Ort      '</tr>
+<tr><td align=right>5<td align=middle>&nbsp;<td align=middle>X<td align=right>23<td><a href="#U23">U23</a><td align=right>2<td align=right>0<td align=right>0x14<td align=right>0<td align=right>0x00<td>'#Consecutive Days'<td>'# aufein'folg. Tage'</tr>
+<tr><td align=right>6<td align=middle>&nbsp;<td align=middle>X<td align=right>0<td>BYTEBOOL<td align=right>1<td align=right>0<td align=right>0x0E<td align=right>1<td align=right>0x00<td>'Alarm'<td>'Meldung'</tr>
+<tr><td align=right>7<td align=middle>&nbsp;<td align=middle>X<td align=right>24<td><a href="#U24">U24</a><td align=right>2<td align=right>0<td align=right>0x18<td align=right>0<td align=right>0x00<td>'Leadtime'<td>'Vorlauf'</tr>
+<tr><td align=right>8<td align=middle>X<td align=middle>&nbsp;<td align=right>20<td><a href="#U20">U20</a><td align=right>2<td align=right>0<td align=right>0x14<td align=right>0<td align=right>0x00<td>'Due Date   '<td>'F&auml;lligkeitstermin '</tr>
+<tr><td align=right>9<td align=middle>X<td align=middle>&nbsp;<td align=right>8<td>DATE<td align=right>3<td align=right>0<td align=right>0x16<td align=right>0<td align=right>0x00<td>'Completion Date'<td>'Abschlu&szlig;datum'</tr>
+<tr><td align=right>10<td align=middle>X<td align=middle>&nbsp;<td align=right>22<td><a href="#U22">U22</a><td align=right>2<td align=right>0<td align=right>0x12<td align=right>0<td align=right>0x00<td>'Priority   '<td>'Priorit&auml;t   '</tr>
+<tr><td align=right>11<td align=middle>X<td align=middle>&nbsp;<td align=right>0<td>BYTEBOOL<td align=right>1<td align=right>0<td align=right>0x0E<td align=right>4<td align=right>0x00<td>'Carry Forward'<td>'&Uuml;bertrag'</tr>
+<tr><td align=right>12<td align=middle>X<td align=middle>X<td align=right>10<td>NOTE<td align=right>2<td align=right>0<td align=right>0x08<td align=right>0<td align=right>0x00<td>'Note'<td>'Notiz'</tr>
+<tr><td align=right>13<td align=middle>X<td align=middle>X<td align=right>18<td><a href="#U18">U18</a><td align=right>1<td align=right>0<td align=right>0x1A<td align=right>0<td align=right>0x00<td>'Repeat Status: '<td>'Wiederholung: '</tr>
+<tr><td align=right>14<td align=middle>&nbsp;<td align=middle>X<td align=right>0<td>BYTEBOOL<td align=right>1<td align=right>0<td align=right>0x0E<td align=right>4<td align=right>0x00<td>'Shows in Week View'<td>'Zeigt Wochenplan'</tr>
+<tr><td align=right>15<td align=middle>&nbsp;<td align=middle>X<td align=right>0<td>BYTEBOOL<td align=right>1<td align=right>0<td align=right>0x0E<td align=right>2<td align=right>0x00<td>'Shows in Month View'<td>'Zeigt Monatsplan'</tr>
+<tr><td align=right>16<td align=middle>&nbsp;<td align=middle>&nbsp;<td align=right>6<td>CATEGORY<td align=right>2<td align=right>0<td align=right>0x02<td align=right>0<td align=right>0x20<td>'Category'<td>'Kategorie'</tr>
+<tr><td align=right>17<td align=middle>mod.<td align=middle>mod.<td align=right>9<td>RADIO_BUTTON<td align=right>1<td align=right>0<td align=right>0x1A<td align=right>0<td align=right>0x00<td>'None   '<td>'Keine  '</tr>
+<tr><td align=right>18<td align=middle>&nbsp;<td align=middle>&nbsp;<td align=right>9<td>RADIO_BUTTON<td align=right>1<td align=right>0<td align=right>0x1A<td align=right>1<td align=right>0x00<td>'Daily  '<td>'T&auml;glich'</tr>
+<tr><td align=right>19<td align=middle>&nbsp;<td align=middle>&nbsp;<td align=right>9<td>RADIO_BUTTON<td align=right>1<td align=right>0<td align=right>0x1A<td align=right>2<td align=right>0x00<td>'Weekly '<td>'W&ouml;chentlich'</tr>
+<tr><td align=right>20<td align=middle>&nbsp;<td align=middle>&nbsp;<td align=right>9<td>RADIO_BUTTON<td align=right>1<td align=right>0<td align=right>0x1A<td align=right>3<td align=right>0x00<td>'Monthly'<td>'Monatlich'</tr>
+<tr><td align=right>21<td align=middle>&nbsp;<td align=middle>&nbsp;<td align=right>9<td>RADIO_BUTTON<td align=right>1<td align=right>0<td align=right>0x1A<td align=right>4<td align=right>0x00<td>'Yearly '<td>'J&auml;hrlich'</tr>
+<tr><td align=right>22<td align=middle>&nbsp;<td align=middle>&nbsp;<td align=right>9<td>RADIO_BUTTON<td align=right>1<td align=right>0<td align=right>0x1A<td align=right>5<td align=right>0x00<td>'Custom '<td>'Spezial '</tr>
+<tr><td align=right>23<td align=middle>&nbsp;<td align=middle>&nbsp;<td align=right>0<td>BYTEBOOL<td align=right>1<td align=right>0<td align=right>0x0E<td align=right>32<td align=right>0x00<td>'Event'<td>'Ereignis'</tr>
+<tr><td align=right>24<td align=middle>&nbsp;<td align=middle>&nbsp;<td align=right>0<td>BYTEBOOL<td align=right>1<td align=right>0<td align=right>0x0E<td align=right>128<td align=right>0x00<td>'Appointment'<td>'Termin'</tr>
+<tr><td align=right>25<td align=middle>&nbsp;<td align=middle>&nbsp;<td align=right>0<td>BYTEBOOL<td align=right>1<td align=right>0<td align=right>0x0E<td align=right>16<td align=right>0x00<td>'ToDo'<td>'Vorhaben'</tr>
+<tr><td align=right>26<td align=middle>&nbsp;<td align=middle>&nbsp;<td align=right>0<td>BYTEBOOL<td align=right>1<td align=right>0<td align=right>0x0E<td align=right>2<td align=right>0x00<td>'Completed ToDo'<td>'Erledigtes Vorhaben'</tr>
+</table>
+Note: Category is not used anywhere!
+
+<hr>
+<h2><a name="undef">undefined fields</h2>
+These fields are not described by field definition records.
+<table border=1>
+<tr><th>To-Do<th>Events<th>TType<th>Size<th>Off<th>Description</tr>
+<tr><td>X<td>X<td>INT<td>2<td>0x00<td>record length</tr>
+<tr><td>X<td>X<td>INT<td>4<td>0x06<td>recurrence data pointer</tr>
+<tr><td>X<td>X<td>INT<td>2<td>0x0A<td>previous record on same day</tr>
+<tr><td>X<td>X<td>INT<td>2<td>0x0C<td>next record on same day</tr>
+</table>
+
+<hr>
+<h2><a name="recurrence">Recurrence</h2>
+
+Recurrence is a difficult matter to explain, especially when conflicting
+terminology is used and database items are used for different things.
+Until a better solution is found, I will try to stick to the terminology
+used in the vCalendar as closely as possibly.</p>
+
+<h3>Terminology Overview</h3>
+<dl>
+<dt>Recurrence Class (HP-LX)<dd>
+    HP-LX specific definition of the recurrence rule.
+    (english "<a href="#U18">Repeat Status</a>",
+    german "<a href="#recurrence)class">Wiederholung</a>")
+<dt>Recurrence Rule (vCalendar)<dd>
+    describes patterns of recurring events
+<dt>Recurrence Status (vCalendar)<dd>
+    describes instances of recurring events, e.g. their completion
+<dt>Recurrence Exception Rule (vCalendar)<dd>
+    describes patterns of <em>exceptions</em> to recurring events
+<dt>Recurrence Exception (vCalendar)<dd>
+    singular exceptions
+</dl>
+
+The ADB uses a data field of type <a href="#U18">U18</a>
+to describe the basice recurrence class which defines the recurrence rule.
+Remaining details about the recurrence rule, status and  exceptions
+are lumped together into an variably sized binary block,
+"<a href="#recurrence_status">recurrence status</a>".
+
+<h3><a name="recurrence_status">Recurrence Status</a></h3>
+
+This block is used for two different purposes and hence has
+different structures.  In the first case, it appears in the
+main entry of a recurring entry, in the second case it appears
+in those entries which are already checked-off as completed.
+Checked-off entries appear as separate entries in the data base,
+the extension block is then used to point to the next and previous
+checked-off records and the main entry.
+Deleted entries are of course not stored as separate records
+in the ADB file.
+</p>
+The first 0x0A bytes of the recurrence status block have
+the same format in both cases:
+
+<table border=1>
+<tr><th>Offset<th>Type<th>Description
+<tr><td>0x00<td>INT<td>cycle, values 1..99
+<tr><td>0x01<td rowspan=2>INT<td rowspan=2>recurrence indicator "days"
+<tr><td>0x02
+<tr><td>0x03<td rowspan=2>INT<td rowspan=2>recurrence indicator "months"
+<tr><td>0x04
+<tr><td>0x05<td rowspan=3>Date<td rowspan=3>Duration: Begin
+<tr><td>0x06
+<tr><td>0x07
+<tr><td>0x08<td rowspan=3>Date<td rowspan=3>Duration: End
+<tr><td>0x09
+<tr><td>0x0A
+<tr><td align=right>...<td>Union<td>Recurrence Exceptions or check-off pointers
+</table>
+<p>
+Notes:
+<ul>
+<li>daily recurrence does not allow a cycle specification ????
+<li>Unexplained encoding method: boolean "Nach Datum" and "Nach
+    Tagesstellung" with detailed specification.
+<li>Also unexplained is the encoding of the "special" recurrence rule.
+</ul>
+<p>
+
+<h4>monthly recurrence</h4>
+Entries recurring every month allow specification of <tt>cycle</tt>
+and a <tt>days</tt> indicator.
+
+<h4>yearly recurrence</h4>
+Entries recurring every year allow specification of <tt>cycle</tt>,
+a <tt>days</tt> indicator, and a <tt>month</tt> idicator.
+
+<h4>recurrence day indicator</h4>
+The recurrence day indicator is encoded in a 16 bit integer.
+If bit 7 is not set, bits 0..6 represent the day number, otherwise
+the integer represents a bit field:
+<table border=1>
+<tr><th>bit<th>mask<th>represents
+<tr><td>0x01<td>0x0001<td>Monday
+<tr><td>0x02<td>0x0002<td>Tuesday
+<tr><td>0x03<td>0x0004<td>Wednesday
+<tr><td>0x04<td>0x0008<td>Thursday
+<tr><td>0x05<td>0x0010<td>Friday
+<tr><td>0x06<td>0x0020<td>Saturday
+<tr><td>0x07<td>0x0040<td>Sunday
+<tr><td>0x08<td>0x0080<td>Bitfield indicator
+<tr><td>0x09<td>0x0100<td>1st day in month
+<tr><td>0x0A<td>0x0200<td>2nd day in month
+<tr><td>0x0B<td>0x0400<td>3rd day in month
+<tr><td>0x0C<td>0x0800<td>4th day in month
+<tr><td>0x0D<td>0x1000<td>last day in month
+</table>
+</p>
+Note: Apparently, the bit for the week day is not set unless
+the recurrence is defined as "special".<br>
+Examples:
+<dl>
+<dt>0x1084<dd>last Wed in month
+</dl>
+
+<h4>recurrence month indicator</h4>
+The recurrence month indicator is encoded in a 16 bit integer bit field.
+Bit 0 represents January, bit 12 represents december.
+
+<h4>Recurrence Exception List</h4>
+The recurrence exception list is a variable size block that follows the first
+part of the recurrence status record and contain the number of
+exceptions followed by this number of 4-byte exception description blocks:<p>
+<table border=1>
+<tr><th>Offset<th>Type<th>Description
+<tr><td>0x0B<td>INT<td>Number of recurrence exception entries
+<tr><td align=right>...<td>Struct<td>Recurrence Exception, appearing 0..n times
+</table>
+
+<table border=1>
+<tr><th>relative Offset<th>Type<th>Description
+<tr><td>0x00<td rowspan=3>Date<td rowspan=3>Exception Date
+<tr><td>0x01
+<tr><td>0x02
+<tr><td>0x03<td>INT?<td>Exception Status
+</table>
+<p>
+Exception status values 0x00 and 0x01 were observed sofar.
+0x00 indicates that the item was deleted.
+0x01 indicates that an recurring to-do item was checked-off.
+Checked-off entries are kept as unique records in the database,
+their recurrence status extension block is described below.
+
+<h4>Checked-Off item pointers</h4>
+Checked-off items have a fixed size data block containing pointers
+to the main entry and other checked-off items.  The recurrence exception
+index is the number of the exception description in the main entry's
+recurrence exception list.<p>
+
+This is used to indicate that the entry at the given date
+was checked off at that day.  This is not used at the main
+entry of a recurring entry.
+<p>
+<table border=1>
+<tr><th>Offset<th>Type<th>Description
+<tr><td>0x0B<td>INT<td>recurrence exception index in the main entry
+<tr><td>0x0C<td rowspan=2>INT<td rowspan=2>record index of previous
+            checked-off item
+<tr><td>0x0D
+<tr><td>0x0E<td rowspan=2>INT<td rowspan=2>record index of next
+            checked-off item
+<tr><td>0x0F
+<tr><td>0x10<td rowspan=2>INT<td rowspan=2>record index of main entry
+<tr><td>0x11
+</table>
+
+<hr>
+<h1>References</h1>
+
+<dl>
+<dt>GDB format<dd> Description of the GDB file format, found on S.U.P.E.R.
+<dt>adbio.c<dd> C sources used for dumping and loading ADB files, found on S.U.P.E.R.
+<dt>vCalendar<dd> vCalendar - The Electronic Calendaring and Scheduling
+                  Exchange Format - Version 1.0
+<dt>RFC 2445<dd> Internet Calendaring and Scheduling Core Object Specification
+                 (iCalendar)
+</dl>
+
