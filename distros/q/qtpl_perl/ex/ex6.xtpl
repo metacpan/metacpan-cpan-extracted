@@ -1,0 +1,22 @@
+<!-- BEGIN: main -->
+<html>
+<head><title>example 6</title></head>
+<body>
+with SetNullBlock you can set the default value to put if the block doesn't get parsed.<br>
+the default is to wipe it out, but you can set it up to put a custom string.<br>
+
+<!-- BEGIN: block -->
+	<br>{INTRO_TEXT}<br>
+	<b>sub blocks begins here ==&gt; [</b>
+	<!-- BEGIN: subblock1 -->
+	<b>this is subblock1 _PARSED_</b>
+	<!-- END: subblock1 -->
+	<!-- BEGIN: subblock2 -->
+	<b>this is subblock2 _PARSED_</b>
+	<!-- END: subblock2 -->
+	<b>] &lt;== sub blocks ends here.</b><br>
+<!-- END: block -->
+<br><br>..got it? :) 
+</body>
+</html>
+<!-- END: main -->

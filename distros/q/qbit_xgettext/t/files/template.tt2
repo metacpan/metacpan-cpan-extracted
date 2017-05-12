@@ -1,0 +1,11 @@
+[% MACRO test_macro BLOCK;
+  tmp = gettext('Text in macros'); # gettext('comment')
+
+  "gettxt('Gettext in qq'):" _ tmp;
+END %]
+
+<html>
+  <body>
+    <a href="[% gettext('ref') | html %]">[% gettext('link') | html %]</a>
+  </body>
+</html>

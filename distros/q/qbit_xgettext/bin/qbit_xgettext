@@ -1,0 +1,110 @@
+#!/usr/bin/perl
+
+use FindBin qw($Bin);
+use lib "$Bin/../lib";
+
+use qbit;
+
+use Getopt::Long;
+use Pod::Usage;
+use File::Find;
+use QBit::Gettext::Extract;
+
+my %args = ();
+GetOptions(\%args, 'help|?', 'dir|d=s@', 'ofile|o=s', 'extractor=s@', 'lang|l=s', 'nplurals=i', 'plural=s');
+
+pod2usage(1) if $args{'help'};
+
+$args{'dir'}   = ['.'] unless defined($args{'dir'});
+$args{'ofile'} = '-'   unless defined($args{'ofile'});
+
+my %lang_extensions;
+
+if (defined($args{'extractor'})) {
+
+    foreach (@{ $args{'extractor'} }) {
+        if (m/(.*)=(.*)/) {
+            my $module = $1;
+            my @extensions = split /,/, $2;
+
+            $lang_extensions{$module} = \@extensions;
+        } else {
+            pod2usage(
+                -msg     => gettext("Incorrect usage of `--extractor` option.\n"),
+                -exitval => 1,
+            );
+        }
+    }
+
+}
+
+my $extractor = QBit::Gettext::Extract->new(
+    ( %lang_extensions ? (lang_extensions => \%lang_extensions) : () )
+);
+
+find({wanted => sub {$extractor->extract_from_file($File::Find::name) if -f $File::Find::name}, no_chdir => TRUE},
+    @{$args{'dir'}});
+
+if ($args{'ofile'} eq '-') {
+    print $extractor->po->as_string(%args);
+} else {
+    $extractor->po->write_to_file(%args);
+}
+
+__END__
+
+=head1 NAME
+
+qbit_xgettext
+
+=head1 SYNOPSIS
+
+qbit_xgettext [options]
+
+=head1 OPTIONS
+
+=over 8
+
+=item B<-d, --dir>
+
+Directory with source files, may be multiple.
+
+=item B<-o, --ofile>
+
+Output POT file.
+
+=item B<-l, --lang>
+
+Language code for plurals header in .po files
+
+    --lang=en
+
+=item B<--nplurals>
+
+Number of forms
+
+    --nplurals=2
+
+=item B<--plural>
+
+Format
+
+    --plural="(n != 1)"
+
+=item B<--extractor>
+
+Custom extractor and the list of extensions for that extractor. Can be
+specified several times. Example:
+
+    --extractor "Lang::FooExtractor=.fx"
+    --extractor "Lang::BarExtractor=.bx,.lbx"
+
+=item B<-h, -?, --help>
+
+Show help message and exit.
+
+=back
+
+=head1 DESCRIPTION
+
+Extract translatable strings from given input files.

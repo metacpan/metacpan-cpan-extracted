@@ -1,0 +1,17 @@
+Qtpl is template library for use in CGI applications. It's :
+	- support blocks;
+	- support simple variable and array substitutions;
+	- handle simple logic (IF, ELSE, ENDIF). More complex logic must
+		still in your program.
+
+It's first public release of library. Refer to module inline documentation.
+Some examples stored in ./ex directory. 
+
+Also check http://qtpl.sourceforge.net/
+
+HISTORY:
+	0.1. Basic syntax from XTemlate (xtpl.sourceforge.net). Porting it
+		to Perl. 
+
+	0.2. Some syntax addons, such as IF blocks, blocks saving parsing
+		order (main.row:block1).

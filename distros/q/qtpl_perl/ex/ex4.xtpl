@@ -1,0 +1,38 @@
+<!-- BEGIN: main -->
+<html>
+<head><title>example 4</title></head>
+<body>
+recursive parsing test.<br>
+you can parse entire blocks+subblocks using rparse().<br>
+<font color=red>note:</font> this will parse every subblock recursively inside the block you specified.<br><br>
+here comes the test [ rparse("main") ]: ===&gt;<br><br>	
+	<!-- BEGIN: block1 -->
+	this is block 1.<br>
+
+		<!-- BEGIN: subblock1 -->
+		this is subblock 1.1<br>
+		<!-- END: subblock1 -->
+		<!-- BEGIN: subblock2 -->
+		this is block 1.2<br>
+		<!-- END: subblock2 -->
+
+	<!-- END: block1 -->
+	
+	<!-- BEGIN: block2 -->
+	this is block 2.<br>
+		<!-- BEGIN: subblock1 -->
+		this is subblock 2.1<br>
+		<!-- END: subblock1 -->
+		<!-- BEGIN: subblock2 -->
+		this is block 2.2<br>
+		<!-- END: subblock2 -->
+
+	<!-- END: block2 -->
+
+	<!-- BEGIN: block3 -->
+		this is block 3.<br>
+	<!-- END: block3 -->
+
+</body>
+</html>
+<!-- END: main -->

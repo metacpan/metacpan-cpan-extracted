@@ -1,0 +1,5 @@
+.build/
+qbit-*/
+qbit-*.tar.gz
+.project
+/.includepath

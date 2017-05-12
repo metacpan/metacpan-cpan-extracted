@@ -1,0 +1,35 @@
+<!-- BEGIN: main -->
+<html>
+<head><title>example 2</title></head>
+<body>
+you should see a table with multiple rows:<br>
+
+<!-- BEGIN: table -->
+<table border=1>
+	<tr>
+		<th>row nr.</th>
+		<th>id</th>
+		<th>name</th>
+		<th>age</th>
+	<!-- BEGIN: row:with_age -->
+	<tr>  
+		<td>{ROW_NR}</td>
+		<td>{DATA.ID}</td>
+		<td>{DATA.NAME}</td>
+		<td>{IF DATA.AGE}AGE={DATA.AGE}{ELSE}AGE UNKNOWN{ENDIF}</td>
+	</tr>
+	<!-- END: row:with_age -->
+	<!-- BEGIN: row:without_age -->
+	<tr>  
+		<td>{ROW_NR}</td>
+		<td>{DATA.ID}</td>
+		<td colspan=2>{DATA.NAME}</td>
+	</tr>
+	<!-- END: row:without_age -->
+
+</table>
+<!-- END: table -->
+
+</body>
+</html>
+<!-- END: main -->

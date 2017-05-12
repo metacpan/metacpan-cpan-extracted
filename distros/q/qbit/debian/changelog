@@ -1,0 +1,179 @@
+libqbit-perl (2.4) raring; urgency=low
+
+  * fix warnings
+
+ -- Igor Sverdlov <igor-sverdlov@mail.ru>  Sat, 01 Apr 2017 22:41:59 +0300
+
+libqbit-perl (2.3) raring; urgency=low
+
+  * added die_handler
+
+ -- Igor Sverdlov <igor-sverdlov@mail.ru>  Thu, 01 Dec 2016 21:30:37 +0300
+
+libqbit-perl (2.2) raring; urgency=low
+
+  * delete 5.8 from travis config
+
+ -- Igor Sverdlov <igor-sverdlov@mail.ru>  Sun, 27 Mar 2016 20:58:39 +0300
+
+libqbit-perl (2.1) raring; urgency=low
+
+  * Version 2.1
+
+ -- Igor Sverdlov <igor-sverdlov@mail.ru>  Sun, 27 Mar 2016 19:54:02 +0300
+
+libqbit-perl (2.0) raring; urgency=low
+
+  * return Time::Local in require
+
+ -- Igor Sverdlov <igor-sverdlov@mail.ru>  Sun, 27 Mar 2016 19:40:29 +0300
+
+libqbit-perl (1.9) raring; urgency=low
+
+  * delete Time::Local
+
+  * new cpanfile
+
+  * added .travis.yml
+
+  * added end line
+
+  * upload to cpan
+
+ -- Igor Sverdlov <igor-sverdlov@mail.ru>  Sun, 27 Mar 2016 16:35:55 +0300
+
+libqbit-perl (1.8) raring; urgency=low
+
+  * Version 1.8
+
+ -- Igor Sverdlov <igor-sverdlov@mail.ru>  Sun, 13 Mar 2016 23:09:30 +0300
+
+libqbit-perl (1.7) raring; urgency=low
+
+  * Version 1.6
+
+  * fix catch
+
+ -- Igor Sverdlov <igor-sverdlov@mail.ru>  Wed, 18 Nov 2015 21:21:38 +0300
+
+libqbit-perl (1.6) raring; urgency=low
+
+  * fix catch
+
+ -- Igor Sverdlov <igor-sverdlov@mail.ru>  Wed, 18 Nov 2015 21:21:08 +0300
+
+libqbit-perl (1.5) raring; urgency=low
+
+  * fix trdate
+
+  * fix finally block
+
+  * fix regexp
+
+  * fix error with \n
+
+  * fix regexp for check_date
+
+ -- Igor Sverdlov <igor-sverdlov@mail.ru>  Wed, 04 Nov 2015 20:11:32 +0300
+
+libqbit-perl (1.4) raring; urgency=low
+
+  * deleted old code
+
+ -- Sergei Svistunov <sergei-svistunov@yandex.ru>  Mon, 30 Mar 2015 15:20:56 +0400
+
+libqbit-perl (1.3) raring; urgency=low
+
+  * writefile($filename => $content, append => TRUE);
+
+ -- Ivan Bessarabov <ivan@bessarabov.ru>  Tue, 30 Sep 2014 16:02:10 +0400
+
+libqbit-perl (1.2) raring; urgency=low
+
+  * lost check
+
+  * fix locale
+
+ -- Ivan Bessarabov <ivan@bessarabov.ru>  Wed, 16 Jul 2014 13:07:38 +0400
+
+libqbit-perl (1.1) raring; urgency=low
+
+  * No changes
+
+ -- Ivan Bessarabov <ivan@bessarabov.ru>  Fri, 11 Jul 2014 16:10:17 +0400
+
+libqbit-perl (1.0) raring; urgency=low
+
+  * fix sub format_number
+
+ -- Ivan Bessarabov <ivan@bessarabov.ru>  Fri, 11 Jul 2014 15:00:38 +0400
+
+libqbit-perl (0.9) raring; urgency=low
+
+  * Fix test to the code change.
+
+  * Throw simple message from from_json sub.
+
+ -- Sergei Svistunov <sergei-svistunov@yandex.ru>  Tue, 13 May 2014 15:25:43 +0400
+
+libqbit-perl (0.8) raring; urgency=low
+
+  * Fixed error messages
+
+  * Added require_class function
+
+ -- Sergei Svistunov <sergei-svistunov@yandex.ru>  Mon, 12 May 2014 21:23:16 +0400
+
+libqbit-perl (0.7) raring; urgency=low
+
+  * Added more pretty and fixed tests
+
+  *  Dist::Zilla bundle @QBbit does not use ppa upload anymore
+
+  * Added test for get_domain() that shows punycode work
+
+  * from_json() in case of error dies with usefull info
+
+ -- Sergei Svistunov <sergei-svistunov@yandex.ru>  Fri, 25 Apr 2014 16:50:32 +0400
+
+libqbit-perl (0.6) raring; urgency=low
+
+  * Changelog
+
+  * The ability to expand %qbit::Date::TR_HS
+
+ -- Sergei Svistunov <sergei-svistunov@yandex.ru>  Thu, 15 Aug 2013 10:13:26 +0400
+
+libqbit-perl (0.5) raring; urgency=low
+
+  * Merge branch 'master' of github.com:QBitFramework/qbit
+
+  * Added use gettext_pp by default
+
+  * Fixed changelog
+
+  * Removed smart mathing in qbit::Date
+
+  * Moved packages from pragmaqbit to qbit
+
+  * Added files to test project with Travis CI
+
+  * to_json() can output pretty JSON
+  * Now it is possible to write:
+  * to_json({ a => 1 }, pretty => TRUE);
+
+  * Version 0.3
+
+  * Start using @QBit Dist::Zilla bundle
+
+  * Fixed cyrillic domains in get_domain()
+  * Added some tests for get_domain()
+
+  * Fixed debian package depends
+
+  * Fixed bugs with rotation exponential notation numbers and frac zeros
+
+  * Initial commit
+
+ -- Sergei Svistunov <sergei-svistunov@yandex.ru>  Sat, 10 Aug 2013 10:13:30 +0400
+

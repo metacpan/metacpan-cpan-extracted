@@ -1,0 +1,38 @@
+qbit-xgettext (0.006) raring; urgency=low
+
+  * arguments
+
+ -- Igor Sverdlov <igor-sverdlov@mail.ru>  Sun, 22 Jan 2017 19:02:25 +0300
+
+qbit-xgettext (0.005) raring; urgency=low
+
+  * added package qbit_xgettext.pm
+
+ -- Igor Sverdlov <igor-sverdlov@mail.ru>  Sat, 21 Jan 2017 20:12:34 +0300
+
+qbit-xgettext (0.004) raring; urgency=low
+
+  * upload to cpan
+
+  * added headers
+
+ -- Igor Sverdlov <igor-sverdlov@mail.ru>  Sat, 21 Jan 2017 16:36:39 +0300
+
+qbit-xgettext (0.003) raring; urgency=low
+
+  * gettext and ngettext have the same message id
+
+ -- Sergei Svistunov <sergei-svistunov@yandex.ru>  Thu, 15 Jan 2015 16:31:55 +0400
+
+qbit-xgettext (0.002) raring; urgency=low
+
+  * Cannot find valid parameters for function
+
+ -- Sergei Svistunov <sergei-svistunov@yandex.ru>  Mon, 16 Jun 2014 19:29:33 +0400
+
+qbit-xgettext (0.001) raring; urgency=low
+
+  * Initial commit
+
+ -- Sergei Svistunov <sergei-svistunov@yandex.ru>  Sun, 15 Sep 2013 14:42:45 +0400
+

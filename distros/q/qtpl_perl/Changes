@@ -1,0 +1,13 @@
+Revision history for Perl extension qtpl.
+
+0.1  Mon May 28 12:40:54 2001
+	- original version;
+
+0.2. Mon May 28 23:13:23 2001
+	- get it worked. Added new features;
+
+0.3. Jun 01 18:30:32 2001
+	Imporoved documentation.
+
+0.4. Jun 01 15:32:52 2001
+	Fixed filename handling if template are not in current directory

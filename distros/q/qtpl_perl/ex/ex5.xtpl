@@ -1,0 +1,17 @@
+<!-- BEGIN: main -->
+<html>
+<head><title>example 5</title></head>
+<body>
+with SetNullString you can set the default value to be put when no assign is made for a variable.<br>
+the default is to wipe it out, but you can set it up to put a custom string.<br>
+<!-- BEGIN: form -->
+<br>{INTRO_TEXT}<br>
+<form>
+	full name:&nbsp;&nbsp;<input type=text size=20 name=fullname value="{FULLNAME}"><br>
+	e-mail:&nbsp;&nbsp;<input type=text size=20 name=email value="{EMAIL}"><br>
+	income:&nbsp;&nbsp;<input type=text size=20 name=income value="{INCOME}"><br>
+</form>
+<!-- END: form -->
+</body>
+</html>
+<!-- END: main -->

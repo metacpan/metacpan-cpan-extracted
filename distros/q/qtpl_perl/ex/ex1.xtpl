@@ -1,0 +1,36 @@
+<!-- BEGIN: main -->
+<html>
+<head><title>example 1</title></head>
+<body>
+this is a simple replace test. the text in bold should contain "TEST": <b>{VARIABLE}</b><br>
+now a dynamic block test:<br>
+	<!-- BEGIN: block1 -->
+	this is block 1.<br>
+	<!-- END: block1 -->
+	<!-- BEGIN: block2 -->
+	this is block 2.<br>
+	<!-- END: block2 -->
+	<!-- BEGIN: block3 -->
+	<p><table border=1>
+		<tr>
+			<td>id</td>
+			<td>{DATA.ID}</td>
+		</tr>
+		<tr>
+			<td>name</td>
+			<td>{DATA.NAME}</td>
+		</tr>
+		<tr>
+			<td>age</td>
+			<td>{DATA.AGE}</td>
+		</tr>
+	</table></p>
+	<!-- END: block3 -->
+<br><br>
+global variables can be parsed directly into the html without assigns:<br>
+$ENV{'LOGNAME'}={main::ENV.LOGNAME}<br>
+$ENV{'PATH'}={main::ENV.PATH}<br>
+etc..<br>
+</body>
+</html>
+<!-- END: main -->

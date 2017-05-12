@@ -1,0 +1,12 @@
+Source: qbit-xgettext
+Section: perl
+Priority: extra
+Maintainer: Sergei Svistunov <sergei-svistunov@yandex.ru>
+Build-Depends: debhelper (>= 8.0.0), libtest-differences-perl, perl, libqbit-perl, libqbit-class-perl
+Standards-Version: 3.9.4
+
+Package: qbit-xgettext
+Architecture: all
+Depends: ${shlibs:Depends}, ${misc:Depends}, ${perl:Depends}, perl, libqbit-perl, libqbit-class-perl
+Description: QBit gettext extractor.
+ QBit gettext extractor.

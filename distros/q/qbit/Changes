@@ -1,0 +1,49 @@
+==================================================
+Changes from 2016-04-01 00:00:00 +0000 to present.
+==================================================
+
+----------------------------------------
+version 2.4 at 2017-04-01 19:41:59 +0000
+----------------------------------------
+
+  Change: d3be470e882790904662b26e7e4296c687351c7b
+  Author: Igor <igor-sverdlov@mail.ru>
+  Date : 2017-04-01 22:39:36 +0000
+
+    Merge pull request #24 from Madskill/fix_warnings
+
+    fix warnings 
+
+  Change: 9d5248e4413f81bed954f0afdb77e90309b2ef14
+  Author: Igor Sverdlov <igor-sverdlov@mail.ru>
+  Date : 2017-04-01 22:37:47 +0000
+
+    fix warnings 
+
+----------------------------------------
+version 2.3 at 2016-12-01 18:31:03 +0000
+----------------------------------------
+
+  Change: f6408a0f69ffdaf292e7aed992f54d25795d8bb2
+  Author: Igor Sverdlov <igor-sverdlov@mail.ru>
+  Date : 2016-12-01 21:31:03 +0000
+
+    Version 2.3 
+
+  Change: 1092d69139aa76fa9be089e3e6b3723841ed5b70
+  Author: Igor <igor-sverdlov@mail.ru>
+  Date : 2016-12-01 21:29:50 +0000
+
+    Merge pull request #23 from Madskill/die_handler
+
+    added die_handler 
+
+  Change: 161e89ba8bdd591b03b2d30b4fe7e039d49590dd
+  Author: Igor Sverdlov <igor-sverdlov@mail.ru>
+  Date : 2016-11-26 20:38:09 +0000
+
+    added die_handler 
+
+=================================================
+Plus 22 releases after 2016-04-01 00:00:00 +0000.
+=================================================

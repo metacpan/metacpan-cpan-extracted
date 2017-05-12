@@ -1,0 +1,28 @@
+Source: libqbit-perl
+Section: perl
+Priority: optional
+Maintainer: Sergei Svistunov <sergei-svistunov@yandex.ru>
+Build-Depends: debhelper (>= 8),
+ libclone-perl,
+ libdate-calc-perl,
+ libhtml-parser-perl,
+ libintl-perl,
+ libjson-xs-perl,
+ libnet-libidn-perl,
+ liburi-perl
+Build-Depends-Indep: perl
+Standards-Version: 3.9.4
+Homepage: http://q-bit.ru
+
+Package: libqbit-perl
+Architecture: all
+Depends: ${misc:Depends}, ${perl:Depends},
+ libclone-perl,
+ libdate-calc-perl,
+ libhtml-parser-perl,
+ libintl-perl,
+ libjson-xs-perl,
+ libnet-libidn-perl,
+ liburi-perl
+Description: Pragma qbit
+ Pragma qbit makes WEB developers life easier.

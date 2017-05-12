@@ -1,0 +1,20 @@
+<!-- BEGIN: main -->
+<html>
+<head><title>example 7</title></head>
+<body>
+you can include template files inside another one, even recursively!<br>
+for example:<br>
+{FILE "ex7-inc.xtpl"}
+<br><br><br>
+if your include file contains blocks, you start its name it with tha original file's actual block..
+ (the FILE directive gets replaced by the file contents, and the whole thing gets parsed)<br>
+ example:<br>
+<br>
+		<!-- BEGIN: inc -->
+		included file follows: {FILE "ex7-inc2.xtpl"}
+		<!-- END: inc -->
+<br>
+
+</body>
+</html>
+<!-- END: main -->

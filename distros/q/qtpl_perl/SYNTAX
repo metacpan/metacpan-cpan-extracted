@@ -1,0 +1,113 @@
+Please refer to module inline documentation. It will be more useful than it
+document.
+
+$perldoc Qtpl.pm
+
+===============
+
+REMARK.
+It is planned to make library of patterns in the various programming languages used at creation of dynamic pages.
+However syntax of patterns should remain identical to all variations of library that you might proceed with ease from one library to another.
+As base syntax in this manual we will use Perl. 
+
+1. TERMS.
+
+Template - a file (usually containing HTML). During creation of dynamic pages it is necessary for you to substitute there the certain values to show or to not show the certain blocks etc. These tasks the given library is called to decide.
+Block - certain "piece" of a file (probably including all its contents). The block - unit with which we operate. We may show some block some times with various values, may not show at all it, may substitute variables and eventually may print it.
+Variable. Requires the explanatory? This is place in a file where it is necessary to substitute values.
+
+2. USING OF LIBRARY.
+Base pattern:
+
+1: <! - BEGIN: main - >
+2: <HTML>
+3: <HEAD> <TITLE> Qtpl Ex1 </TITLE> </HEAD>
+4: <BODY>
+5: Variable1 = {var1}
+6: </BODY>
+7: <! - END: main - ></CODE>
+
+1: use Qtpl;
+2: $q = new Qtpl ("ex1.qtpl"; 
+3. $q-> assign ('var1', 'value1');
+4: $q-> parse ("main";
+5. $q-> out ("main";
+
+What occurs here? 
+In a line 1 we connect library.
+In a line 2 we create a template: library read the specified file from a disk and split it into blocks.
+In a line 3 we substitute on a place of a variable <I>var1</I> (a line 5 in a template) value <I>value1</I>. Value is not substituted ANYWHERE at this moment, and simply kept in internal hash.
+In a line 4 we "parse" the block main. That is in it all blocks contained in it (for which the call parse on this moment is already made) are substituted, and also all variables and the received value are substituted is kept in internal structures for internal use.
+In a line 5 we print result on a standard output. 
+
+It is the most simple pattern which can be thought up.
+Let's go to more difficult things.
+
+3. BLOCKS AND A PARSE OF BLOCKS IN THE CERTAIN ORDER
+
+We want to query to a database with a conclusion of intermediate results (sum's) for everyone five records.
+
+Template:
+<! - BEGIN: main - >
+<HTML>
+<BODY>
+	 < TABLE BORER=1 >
+		 <! - BEGIN: row:record > <TR> <TD> {row.comment} </TD> <TD> {row.summa} </TD> </TR> <! - END: row:record - > 
+		 <! - BEGIN: row:sum > <TR> < TD COLSPAN=2 > <B> < Sum = {summa} </B> </TD> </TR> <! - END: row:sum - > 
+	 </TABLE>
+</BODY>
+<! - END: main - >
+
+The script:
+use Qtpl;
+$q = new Qtpl ("ex2.qtpl";
+$sth = $dbh-> prepare (" SELECT comment, summa FROM foo ");
+$sth-> execute;
+$summa = $count = 0;
+while ($row = $sth-> fetchrow_hashref) {
+	 $q-> assign ('row', $row); *if you have %row use: $q-> assign ('row', \ %row);
+	 $q-> parse ('main.row:record';
+	 $summa + = $row-> {'summa '};
+	 $count ++;
+	 if ($count > = 5) {
+		 $q-> assign ('summa', $summa);
+		 $q-> parse ('main.row:sum';
+		 $summa = $count = 0;
+	} 	
+}
+
+We will receive the table where records from the table and the sum of higher lines are calculated.
+ATTENTION! It is fair only for the blocks having ':' in the name. Other blocks always
+settle down in that order in what they are located in template irrespective of in what
+order caused parse.
+
+4. Use of IF blocks
+You can use the following pattern:
+<HTML>
+<BODY>
+ {IF image}<IMG SRC="{image}">{ELSE}<B>No image here!</B>{ENDIF}
+</BODY>
+</HTML>
+
+If you will substitute a variable image will see a picture if is not present 
+or it will be empty - will see the message.
+But blocks IF cannot be enclosed! (At least in this version)
+
+5. Inclusion of external files
+Syntax: {FILE "header.qtpl"}
+The directive simply includes contents of a file on the specified place. 
+These file also may contains the blocks, variables, etc.
+
+6. Substitution of values of empty blocks and variables.
+You can set null value which will be substituted if you obviously have not 
+set it. And you may make it both for all variables at once, and for some 
+variables chosen you.
+
+Unfortunately, the documentation on the today's moment is far 
+from perfect. Therefore, that it is better to understand work 
+of library, address to examples in a folder /ex/.
+
+The overall objective of library - to separate HTML a code from program. 
+The program with the programmer should determine logic of work of the program, 
+and HTML with the designer - as it should look. The ideal decision may not be, 
+but this library will do it well enough and the main thing, quickly!
