@@ -1,0 +1,15 @@
+<!perl:args title=text style=html >
+<html>
+  <head>
+    <title>&perl:title;</title>
+    <yatt:if &yatt:style;>
+    <style>&yatt:style;</style>
+    </yatt:if>
+  </head>
+  <body>
+    <div id=contents>
+    <h2>&perl:title;</h2>
+    <perl:body />
+    </div>
+  </body>
+</html>

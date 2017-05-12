@@ -1,0 +1,17 @@
+# -*- coding: utf-8 -*-
+FILE: doc/.htyattroot
+IN:
+ no_lineinfo: 0
+ pagevars: pagevars
+
+FILE: doc/lib/pagevars.pm
+IN: package pagevars;
+ use YATT::Util::VarExporter
+   (index => {foo => "FOO", bar => "BARRR"
+             , baz => YATT::Util::VarExporter::as_html("foo<b>bar</b>baz")});
+ 1;
+
+FILE: doc/index.html
+TITLE: pagevar, basic.
+IN: &yatt:foo; &yatt:bar; &yatt:baz;
+OUT: FOO BARRR foo<b>bar</b>baz

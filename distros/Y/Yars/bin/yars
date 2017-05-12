@@ -1,0 +1,70 @@
+#!/usr/bin/perl
+
+# PODNAME: yars
+# ABSTRACT: Yet Another RESTful-Archive Service
+our $VERSION = '1.27'; # VERSION
+
+
+use Yars;
+use Clustericious::Commands;
+
+use strict;
+use warnings;
+
+$ENV{MOJO_APP} ||= 'Yars';
+
+main();
+
+sub main {
+    my $app = Yars->new();
+    $app = Clustericious::Commands->start;
+    $app;
+}
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+yars - Yet Another RESTful-Archive Service
+
+=head1 VERSION
+
+version 1.27
+
+=head1 SYNOPSIS
+
+ % yars start
+
+=head1 DESCRIPTION
+
+This program starts and stops the Yars server.  For details on how to 
+configure and use Yars, see L<Yars>.
+
+=head1 SEE ALSO
+
+L<Yars>, L<Yars::Client>, L<yarsclient>
+
+=head1 AUTHOR
+
+Original author: Marty Brandon
+
+Current maintainer: Graham Ollis E<lt>plicease@cpan.orgE<gt>
+
+Contributors:
+
+Brian Duggan
+
+Curt Tilmes
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2013 by NASA GSFC.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

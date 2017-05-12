@@ -1,0 +1,12 @@
+[% WRAPPER page page.title = 'YAWF project setup';
+	PROCESS edit;
+	WRAPPER edit title = "Project setup login" action="./";
+	
+		WRAPPER edit_password name="setup_password" %]
+			Setup-Passwort
+		[% END;
+
+		WRAPPER edit_save value="Login"; END;
+
+	END;
+END %]

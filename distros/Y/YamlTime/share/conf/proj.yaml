@@ -1,0 +1,22 @@
+# These are all your project keywords, file under customer:
+
+acme:
+  widget:
+    name: Make New Widgets
+    rate: au1
+
+self:
+  esteem:
+    name: I love me
+    rate: us1
+  loathing:
+    name: I hate me
+    rate: us3
+
+misc:
+    fame:
+      name: Make a Name
+      rate: au2
+    fortune:
+      name: Make Bank
+      rate: au5

@@ -1,0 +1,192 @@
+# -*- coding: utf-8 -*-
+
+TITLE: min static-call only if. (no body)
+IN:
+ <!yatt:args x>
+ <yatt:hello if="&yatt:x; >= 2"/>world!
+ 
+ <!yatt:widget hello>
+ <h2>Hello</h2>
+PARAM[
+- 1
+]
+OUT:
+ world!
+
+PARAM[
+- 2
+]
+OUT:
+ <h2>Hello</h2>
+ world!
+
+TITLE: min static-call only if. (with body)
+IN:
+ <!yatt:args x>
+ <yatt:hello if="&yatt:x; >= 2">world!</yatt:hello>
+ 
+ <!yatt:widget hello>
+ <h2>Hello</h2>
+ &yatt:body();
+PARAM[
+- 1
+]
+OUT:
+ 
+
+PARAM[
+- 2
+]
+OUT:
+ <h2>Hello</h2>
+ world!
+ 
+
+TITLE: min static-call if else
+IN:
+ <!yatt:args x>
+ <yatt:hello if="&yatt:x; >= 2">
+ world!<:yatt:else/>
+ s<yatt:pace/>!</yatt:hello>
+ 
+ <!yatt:widget pace>pace<!yatt:widget hello>
+ <h2>Hello</h2>
+ &yatt:body();
+BREAK: 1
+PARAM[
+- 1
+]
+OUT:
+ <h2>Hello</h2>
+ space!
+ 
+
+PARAM[
+- 2
+]
+OUT:
+ <h2>Hello</h2>
+ world!
+ 
+
+TITLE: min static-call if elsif else
+IN:
+ <!yatt:args x>
+ <yatt:hello if="&yatt:x; >= 2">
+ world!<:yatt:else if="&yatt:x; < 0"/>
+ Zearth!<:yatt:else/>
+ space!</yatt:hello>
+ 
+ <!yatt:widget hello>
+ <h2>Hello</h2>
+ &yatt:body();
+PARAM[
+- 1
+]
+OUT:
+ <h2>Hello</h2>
+ space!
+ 
+
+PARAM[
+- -1
+]
+OUT:
+ <h2>Hello</h2>
+ Zearth!
+ 
+
+PARAM[
+- 2
+]
+OUT:
+ <h2>Hello</h2>
+ world!
+ 
+
+TITLE: dynamic-call if elsif else
+IN:
+ <!yatt:args x>
+ <yatt:hello x>
+ <:yatt:world/>
+ <h2>Hello</h2>
+ &yatt:body();</yatt:hello>
+ 
+ <!yatt:widget hello x world=[code body=code]>
+ <yatt:world if="&yatt:x; >= 2">
+ world!<:yatt:else if="&yatt:x; < 0"/>
+ Zearth!<:yatt:else/>
+ space!</yatt:world>
+PARAM[
+- 1
+]
+OUT:
+ <h2>Hello</h2>
+ space!
+ 
+
+PARAM[
+- -1
+]
+OUT:
+ <h2>Hello</h2>
+ Zearth!
+ 
+
+PARAM[
+- 2
+]
+OUT:
+ <h2>Hello</h2>
+ world!
+ 
+
+TITLE: codevar in if else
+IN:
+ <!yatt:args limit a mul offset>
+ <h2><yatt:ifte
+  limit="&yatt:limit;"
+  value='&yatt:a; + &yatt:offset;'
+  cond="&yatt:a; * &yatt:mul; > &yatt:limit;"
+ /></h2>
+ <!yatt:widget ifte cond=expr value=value limit=value>
+ <yatt:if if="&yatt:value; < &yatt:limit;">
+ &yatt:value; is under limit &yatt:limit;
+ <:yatt:else if=&yatt:cond();/>
+ cond is ok
+ <:yatt:else/>
+ otherwise
+ </yatt:if>
+PARAM[
+- 10
+- 3
+- 3
+- 5
+]
+OUT:
+ <h2>8 is under limit 10
+ 
+ </h2>
+
+PARAM[
+- 10
+- 3
+- 4
+- 8
+]
+OUT:
+ <h2>cond is ok
+ 
+ </h2>
+
+PARAM[
+- 10
+- 3
+- 3
+- 8
+]
+OUT:
+ <h2>otherwise
+ 
+ </h2>
+

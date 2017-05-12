@@ -1,0 +1,25 @@
+=head1 NAME
+
+YATT::Lite::Factory - Loader for YATT::Lite
+
+=head1 SYNOPSIS
+
+  use YATT::Lite::Factory;
+
+  my $factory = YATT::Lite::Factory->new(vfs => [dir => $dir]);
+
+  my $yatt = $factory->get_yatt('/');
+
+  print $yatt->render(index => {title => "Hello!", user => "foobar"});
+
+
+=head1 DESCRIPTION
+
+XXX:
+
+=head1 METHODS
+
+=head2 get_yatt($location)
+
+=head2 render($name, $args)
+

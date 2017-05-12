@@ -1,0 +1,72 @@
+#!/usr/bin/env perl
+# -*- mode: perl; coding: utf-8 -*-
+use strict;
+use warnings qw(FATAL all NONFATAL misc);
+use FindBin; BEGIN {do "$FindBin::RealBin/libdir.pl"}
+#----------------------------------------
+use 5.010;
+
+use base qw/YATT::Lite::Object/;
+use YATT::Lite::MFields
+  (()
+   , [cf_help => doc => "show help messages"]
+   , [cf_script_path => doc => "script search path for yatt subcommands"]
+  );
+# XXX: Should use doc strings in help message.
+
+use YATT::Lite;
+use YATT::Lite::Util::CmdLine qw/parse_opts/;
+
+{
+  my MY $self = MY->new(MY->parse_opts(\@ARGV, undef, {h => "help"}));
+
+  my $cmd = shift // 'help';
+
+  if (my $sub = $self->can("cmd_$cmd")) {
+    $sub->($self, @ARGV);
+  } elsif (-x (my $fn = $self->subcmd_path($cmd))) {
+    exec $fn, @ARGV or die "couldn't exec $fn: $!";
+  } else {
+    $self->usage("No such command: $cmd");
+  }
+}
+
+sub usage {
+  (my MY $self, my $message) = @_;
+  print STDERR "$message\n" if $message;
+  $self->cmd_help;
+}
+
+sub cmd_help {
+  my MY $self = shift;
+  print STDERR <<END;
+Usage: @{[basename $0]} [--option=value] <command> [<args>]
+
+Available commands are:
+END
+
+  print STDERR "  ", join("\n  ", $self->subcmd_list), "\n";
+  exit 1;
+}
+
+sub subcmd_list {
+  (my MY $self) = @_;
+  my $prefix = "$self->{cf_script_path}yatt.";
+  map {substr($_, length($prefix))} glob("$prefix*")
+}
+
+sub subcmd_path {
+  (my MY $self, my $subcmd) = @_;
+  "$self->{cf_script_path}yatt.$subcmd";
+}
+
+sub find_libdir {
+  shift;
+  my $pm = 'YATT/Lite.pm';
+  substr($INC{$pm}, 0, -1-length($pm));
+}
+
+sub after_new {
+  (my MY $self) = @_;
+  $self->{cf_script_path} //= $self->find_libdir . "/YATT/scripts/";
+}

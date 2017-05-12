@@ -1,0 +1,6 @@
+<!yatt:args x y>
+<h2>&yatt:x;</h2>
+<yatt:foo a=y/>
+
+<!yatt:widget foo a>
+<h3>&yatt:a;</h3>

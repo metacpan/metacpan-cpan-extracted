@@ -1,0 +1,12 @@
+www:
+  type: perl
+  approot: approot
+  requirements:
+    - Plack
+    - PSGI
+    - Locale::PO
+    - Moose
+    - Mouse
+    - Any::Moose
+    - DBIx::Class
+    - Class::Accessor

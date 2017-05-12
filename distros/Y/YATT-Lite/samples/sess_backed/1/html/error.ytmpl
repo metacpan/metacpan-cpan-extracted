@@ -1,0 +1,170 @@
+<!yatt:args err>
+<yatt:if "&yatt:is_debug_allowed_ip();">
+<yatt:error_trace err/>
+<:yatt:else/>
+<yatt:public_error err/>
+</yatt:if>
+
+<!yatt:widget public_error err>
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html>
+<html>
+<head>
+  <title>ERROR: &yatt:err:reason();</title>
+</head>
+<body>
+<div id="wrapper" style="width: 800px; margin-left: 50px;">
+<div id="topnav">
+  <h2 style="display: inline;">&yatt:err:reason();</h2>
+</div>
+<div id="body" style="text-align: left;">
+  <script><!--
+ document.write(
+'<form>'
+ + '<input type="BUTTON" onClick="history.go(-1)" value="&yatt[[;Back&yatt]];">'
+ + '</form>');
+ window.name = "ERROR";
+// --></script>
+<noscript>
+&yatt[[;Please go back to previous page&yatt]];
+</noscript>
+</div>
+</div>
+</body>
+</html>
+
+<!yatt:widget error_trace err
+	      -- This code is dumb port of Devel::StackTrace::AsHTML --
+	      >
+<yatt:envelope msg="&yatt:err:reason();">
+<h1>Error trace</h1>
+<pre class="message">&yatt:msg;</pre>
+<ol>
+<yatt:my backtrace:list="&yatt:err:cget(backtrace):frames();"
+	 top:value="shift @$backtrace"
+/>
+<li class="frame top">
+at &yatt:top:filename();
+<b>around</b> line &yatt:top:line(); <b class="note">(might not accurate, see neighbouring lines too)</b>
+<yatt:context frame=top/>
+</li>
+<yatt:foreach my=frame nth=i list=backtrace>
+  <yatt:my sub="&yatt:frame:subroutine();"/>
+  <li class="frame">
+    in &yatt:frame:subroutine();
+    at &yatt:frame:filename();
+    line &yatt:frame:line();
+    <yatt:context frame/>
+    <yatt:arguments frame id=i/>
+  </li>
+</yatt:foreach>
+</ol>
+</yatt:envelope>
+
+<!yatt:widget envelope msg style body=[code msg]>
+<!doctype html>
+<html>
+<head>
+<title>Error: &yatt:msg;</title>
+<yatt:if "&yatt:style;">
+<link rel="stylesheet" type="text/css" href="&yatt:style;"/>
+<:yatt:else/>
+<style>
+a.toggle { color: #444 }
+body { margin: 0; padding: 0; background: #fff; color: #000; }
+h1 { margin: 0 0 .5em; padding: .25em .5em .1em 1.5em; border-bottom: thick solid #002; background: #444; color: #eee; font-size: x-large; }
+pre.message { margin: .5em 1em; }
+li.frame { font-size: small; margin-top: 3em }
+li.frame:nth-child(1) { margin-top: 0 }
+pre.context { border: 1px solid #aaa; padding: 0.2em 0; background: #fff; color: #444; font-size: medium; }
+pre .match { color: #000;background-color: #f99; font-weight: bold }
+pre.vardump { margin:0 }
+pre code strong { color: #000; background: #f88; }
+
+b.note { background-color: #e4aad8; }
+
+table.lexicals, table.arguments { border-collapse: collapse }
+table.lexicals td, table.arguments td { border: 1px solid #000; margin: 0; padding: .3em }
+table.lexicals tr:nth-child(2n) { background: #DDDDFF }
+table.arguments tr:nth-child(2n) { background: #DDFFDD }
+.lexicals, .arguments { display: none }
+.variable, .value { font-family: monospace; white-space: pre }
+td.variable { vertical-align: top }
+</style>
+</yatt:if>
+<script language="JavaScript" type="text/javascript">
+function toggleThing(ref, type, hideMsg, showMsg) {
+ var css = document.getElementById(type+'-'+ref).style;
+ css.display = css.display == 'block' ? 'none' : 'block';
+
+ var hyperlink = document.getElementById('toggle-'+ref);
+ hyperlink.textContent = css.display == 'block' ? hideMsg : showMsg;
+}
+
+function toggleArguments(ref) {
+ toggleThing(ref, 'arguments', 'Hide function arguments', 'Show function arguments');
+}
+
+function toggleLexicals(ref) {
+ toggleThing(ref, 'lexicals', 'Hide lexical variables', 'Show lexical variables');
+}
+</script>
+</head>
+<body>
+<yatt:body msg/>
+</body>
+</html>
+
+<!yatt:widget context frame>
+<yatt:my file="&yatt:frame:filename();"
+	 linenum="&yatt:frame:line();"/>
+<yatt:if "-r &yatt:file;">
+<pre class="context"><code><yatt:foreach 
+my:list=ctxt list="&yatt:this:_read_file_range(:file,:linenum);"
+><yatt:if "&yatt:ctxt[0];"
+><strong class="match">&yatt:ctxt[1]; &yatt:ctxt[2]; &yatt:ctxt[3];</strong>
+<:yatt:else />&yatt:ctxt[1]; &yatt:ctxt[2]; &yatt:ctxt[3];
+</yatt:if></yatt:foreach>
+</code>
+</pre>
+</yatt:if>
+
+<!yatt:widget arguments frame id>
+<yatt:if "&yatt:frame:args();">
+<yatt:my ref="arg-&yatt:id;" args:list="&yatt:frame:args();"/>
+<p><a class="toggle" id="toggle-&yatt:ref;" href="javascript:toggleArguments('&yatt:ref;')">Show function arguments</a></p>
+<table class="arguments" id="arguments-&yatt:ref;">
+<yatt:foreach my=idx list="0 .. $#$args">
+<tr>
+  <td class="variable">&yatt:idx;</td>
+  <td class="value">&yatt:args[:idx];</td>
+</tr>
+</yatt:foreach>
+</table>
+</yatt:if>
+
+
+<!yatt:action dummy>
+
+sub _read_file_range {
+  ;#
+  my ($this, $file, $linenum, $before, $after) = @_;
+  my $start = $linenum - ($before // 3);
+  my $end   = $linenum + ($after // 3);
+
+  $start = $start < 1 ? 1 : $start;
+  open my $fh, '<', $file
+    or die "cannot open $file:$!";
+
+  my $cur_line = 0;
+  my @range;
+  while (my $line = <$fh>) {
+    ++$cur_line;
+    last if $cur_line > $end;
+    next if $cur_line < $start;
+    $line =~ s|\t|        |g;
+    $line =~ s/[\r\n]//g;
+    push @range, [$cur_line == $linenum, $cur_line, $line];
+  }
+  @range;
+}

@@ -1,0 +1,47 @@
+Revision history for Perl extension YAPE::Regex::Explain.
+
+4.01  Sep 14 2010 [GSULLIVAN]
+	- Added basic tests and tests for RT bug #14115.
+	- Tests use Test::More
+	- Added LIMITATIONS and EXAMPLES sections to POD
+	- Added 't' and 'examples' directories
+	- Added META.yml file
+4.00  Aug 31 2010 [GSULLIVAN]
+	- Gene Sullivan becomes a co-maintainer.  All previous versions by PINYAN.
+	- Fixed RT bug #4577: applied patch from CPAN author JONASBN to Makefile.PL
+	- Fixed RT bug #14115: applied my patch to explain() function
+	- Fixed RT bug #58041: added license to POD
+	- Use a more standard README file
+	- Minor POD changes
+3.011 Mon May  7 12:20:00 2001
+	- added YAPE::Regex dependency in Makefile.PL
+3.01  Fri May  4 02:30:00 2001
+	- precedence fix on line 432
+	- I'm so dumb -- left a bad 'use lib' line in explain
+3.00  Wed May  2 19:53:00 2001
+	- full 5.6 regex support!
+	- included 'explain' program
+2.00  Thu Feb  8 13:00:00 2001
+	- added (?{...}), (??{...}), and (?>...)
+	- added full (?(...)...|...) support
+	- explain() is changed to allow 'regex' or 'silent'
+	- formline() work-arounds up the wazoo
+1.05  Wed Feb  7 17:26:00 2001
+	- WARNING: formline() and formats SUCK for some evil reason
+	- added documentation for explain() method
+	- added output-as-regex for explain() method
+1.04  Tue Feb  6 17:55:00 2001
+	- fixed character class handling
+1.03  Tue Feb  6 11:45:00 2001
+	- left 'use lib' line in AGAIN (I should be shot)
+1.02  Tue Feb  6 02:06:00 2001
+	- added comments for closing parens
+	- fixed extra_info() bug
+	- fixed class::explanation() bug
+1.01  Tue Feb  6 01:26:00 2001
+	- left 'use lib' line in
+	- fixed Changes log
+	- fixed extra_info() bug
+1.00  Mon Feb  5 20:32:04 2001
+	- original version; created by h2xs 1.19
+

@@ -1,0 +1,9 @@
+<!yatt:args "/:item">
+<yatt:hello id="beta">
+&yatt:item;world line
+</yatt:hello>
+
+<!yatt:page "/edit/:uid">
+<yatt:hello id="edit">
+&yatt:uid;'s world
+</yatt:hello>

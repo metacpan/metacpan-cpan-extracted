@@ -1,0 +1,40 @@
+#!/usr/bin/perl -w
+# Currently, this doesn't work.
+
+use strict;
+use warnings qw(FATAL all NONFATAL misc);
+no warnings 'redefine';
+
+#----------------------------------------
+# Path setup.
+
+use File::Basename;
+use File::Spec;
+
+# pathname without extension.
+sub rootname {
+  my ($basename, $dirname, $suffix) = fileparse(@_);
+  join "", $dirname, $basename;
+}
+
+sub extension {
+  my ($basename, $dirname, $suffix) = fileparse($_[0], qr{(?<=\.)\w+});
+  $suffix;
+}
+
+sub follow_if_link {
+  my ($fn) = @_;
+  return $fn unless -l $fn;
+  readlink $fn;
+}
+
+use lib grep {-d $_}
+  dirname(__FILE__),
+  rootname(follow_if_link(__FILE__),
+	   qr{\.\w+}) . ".lib";
+
+#----------------------------------------
+use base qw(YATT::Toplevel::Server);
+sub MY () {__PACKAGE__}
+
+MY->run_server(@ARGV);

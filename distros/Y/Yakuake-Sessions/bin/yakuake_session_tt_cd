@@ -1,0 +1,36 @@
+#!/usr/bin/env perl
+# Called from the alias for the cd shell builtin
+# Since its called each time you cd it must be small and fast
+
+use strict;
+use warnings;
+
+our $VERSION = '0.12';
+
+use Cwd                   qw( getcwd );
+use File::Spec::Functions qw( catdir catfile );
+
+sub pathcmp {
+   my ($p1, $p2) = @_; ($p1 and $p2) or die 'Requires two input paths';
+
+   length $p2 > length $p1 and $p1 eq substr $p2, 0, length $p1 and return 1;
+  (length $p2 < length $p1  or $p1 ne $p2) and return -1;
+   return 0;
+}
+
+my $cfgd = catdir( $ENV{HOME}, '.yakuake_sessions' );
+
+my $path = catfile( $cfgd, 'project_'.$ENV{TTY} ); -f $path or exit 0;
+
+open my $fh, '<', $path or die "Path ${path} cannot open: ${!}";
+
+my $appd = readline( $fh ); close $fh; $appd or exit 0; chomp $appd;
+
+pathcmp( $appd, getcwd ) < 0 or exit 0; unlink $path;
+
+require Yakuake::Sessions;
+
+exit Yakuake::Sessions->new_with_options
+   ( method => 'set_tab_title', noask => 1 )->run;
+
+__END__

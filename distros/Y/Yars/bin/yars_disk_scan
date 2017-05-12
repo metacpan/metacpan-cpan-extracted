@@ -1,0 +1,66 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+use 5.010;
+use Yars::Command::yars_disk_scan;
+
+Yars::Command::yars_disk_scan->main(@ARGV);
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+yars_disk_scan - scan a disk for corruption and report corrupt files to stdout
+
+=head1 VERSION
+
+version 1.27
+
+=head1 SYNOPSIS
+
+ yars_disk_scan -a
+ yars_disk_scan /disk/one /disk/two
+
+=head1 DESCRIPTION
+
+Add a cron entry which does a yars_disk_scan periodically in order to 
+check the md5s of all the files on disk.
+
+=head1 OPTIONS
+
+=head2 --all | -a
+
+Scan all disks
+
+=head2 --lock filename
+
+Use the given filename as an exclusive lock to ensure that multiple 
+scans are not performed concurrently. If there is already a scan in 
+process, the scan will not commence, and instead the process will exit 
+with a 0 return value.
+
+=head1 AUTHOR
+
+Original author: Marty Brandon
+
+Current maintainer: Graham Ollis E<lt>plicease@cpan.orgE<gt>
+
+Contributors:
+
+Brian Duggan
+
+Curt Tilmes
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2013 by NASA GSFC.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

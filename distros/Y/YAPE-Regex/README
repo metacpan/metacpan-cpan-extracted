@@ -1,0 +1,188 @@
+NAME
+    YAPE::Regex - Yet Another Parser/Extractor for Regular
+    Expressions
+
+SYNOPSIS
+      use YAPE::Regex;
+      use strict;
+      
+      my $regex = qr/reg(ular\s+)?exp?(ression)?/i;
+      my $parser = YAPE::Regex->new($regex);
+      
+      # here is the tokenizing part
+      while (my $chunk = $parser->next) {
+        # ...
+      }
+
+`YAPE' MODULES
+    The `YAPE' hierarchy of modules is an attempt at a unified means
+    of parsing and extracting content. It attempts to maintain a
+    generic interface, to promote simplicity and reusability. The
+    API is powerful, yet simple. The modules do tokenization (which
+    can be intercepted) and build trees, so that extraction of
+    specific nodes is doable.
+
+DESCRIPTION
+    This module is yet another (?) parser and tree-builder for Perl
+    regular expressions. It builds a tree out of a regex, but at the
+    moment, the extent of the extraction tool for the tree is quite
+    limited (see the section on "Extracting Sections"). However, the
+    tree can be useful to extension modules.
+
+USAGE
+    In addition to the base class, `YAPE::Regex', there is the
+    auxiliary class `YAPE::Regex::Element' (common to all `YAPE'
+    base classes) that holds the individual nodes' classes. There is
+    documentation for the node classes in that module's
+    documentation.
+
+  Methods for `YAPE::Regex'
+
+    * `use YAPE::Regex;'
+    * `use YAPE::Regex qw( MyExt::Mod );'
+        If supplied no arguments, the module is loaded normally, and
+        the node classes are given the proper inheritence (from
+        `YAPE::Regex::Element'). If you supply a module (or list of
+        modules), `import' will automatically include them (if
+        needed) and set up *their* node classes with the proper
+        inheritence -- that is, it will append `YAPE::Regex' to
+        `@MyExt::Mod::ISA', and `YAPE::Regex::xxx' to each node
+        class's `@ISA' (where `xxx' is the name of the specific node
+        class).
+
+          package MyExt::Mod;
+          use YAPE::Regex 'MyExt::Mod';
+          
+          # does the work of:
+          # @MyExt::Mod::ISA = 'YAPE::Regex'
+          # @MyExt::Mod::text::ISA = 'YAPE::Regex::text'
+          # ...
+
+    * `my $p = YAPE::Regex->new($REx);'
+        Creates a `YAPE::Regex' object, using the contents of `$REx'
+        as a regular expression. The `new' method will *attempt* to
+        convert `$REx' to a compiled regex (using `qr//') if `$REx'
+        isn't already one. If there is an error in the regex, this
+        will fail, but the parser will pretend it was ok. It will
+        then report the bad token when it gets to it, in the course
+        of parsing.
+
+    * `my $text = $p->chunk($len);'
+        Returns the next `$len' characters in the input string;
+        `$len' defaults to 30 characters. This is useful for
+        figuring out why a parsing error occurs.
+
+    * `my $done = $p->done;'
+        Returns true if the parser is done with the input string,
+        and false otherwise.
+
+    * `my $errstr = $p->error;'
+        Returns the parser error message.
+
+    * `my $backref = $p->extract;'
+        Returns a code reference that returns the next back-
+        reference in the regex. For more information on enhancements
+        in upcoming versions of this module, check the section on
+        "Extracting Sections".
+
+    * `my $node = $p->display(...);'
+        Returns a string representation of the entire content. It
+        calls the `parse' method in case there is more data that has
+        not yet been parsed. This calls the `fullstring' method on
+        the root nodes. Check the `YAPE::Regex::Element' docs on the
+        arguments to `fullstring'.
+
+    * `my $node = $p->next;'
+        Returns the next token, or `undef' if there is no valid
+        token. There will be an error message (accessible with the
+        `error' method) if there was a problem in the parsing.
+
+    * `my $node = $p->parse;'
+        Calls `next' until all the data has been parsed.
+
+    * `my $node = $p->root;'
+        Returns the root node of the tree structure.
+
+    * `my $state = $p->state;'
+        Returns the current state of the parser. It is one of the
+        following values: `alt', `anchor', `any', `backref',
+        `capture(N)', `Cchar', `class', `close', `code', `comment',
+        `cond(TYPE)', `ctrl', `cut', `done', `error', `flags',
+        `group', `hex', `later', `lookahead(neg|pos)',
+        `lookbehind(neg|pos)', `macro', `named', `oct', `slash',
+        `text', and `utf8hex'.
+
+        For `capture(N)', *N* will be the number the captured
+        pattern represents.
+
+        For `cond(TYPE)', *TYPE* will either be a number
+        representing the back-reference that the conditional depends
+        on, or the string `assert'.
+
+        For `lookahead' and `lookbehind', one of `neg' and `pos'
+        will be there, depending on the type of assertion.
+
+    * `my $node = $p->top;'
+        Synonymous to `root'.
+
+  Extracting Sections
+
+    While extraction of nodes is the goal of the `YAPE' modules, the
+    author is at a loss for words as to what needs to be extracted
+    from a regex. At the current time, all the `extract' method does
+    is allow you access to the regex's set of back-references:
+
+      my $extor = $parser->extract;
+      while (my $backref = $extor->()) {
+        # ...
+      }
+
+    `japhy' is very open to suggestions as to the approach to node
+    extraction (in how the API should look, in addition to what
+    should be proffered). Preliminary ideas include extraction
+    keywords like the output of -Dr (or the `re' module's `debug'
+    option).
+
+EXTENSIONS
+    * `YAPE::Regex::Explain' 3.00
+        Presents an explanation of a regular expression, node by
+        node.
+
+    * `YAPE::Regex::Reverse' (Not released)
+        Reverses the nodes of a regular expression.
+
+TO DO
+    This is a listing of things to add to future versions of this
+    module.
+
+  API
+
+    * Create a robust `extract' method
+        Open to suggestions.
+
+BUGS
+    Following is a list of known or reported bugs.
+
+  Pending
+
+    * `use charnames ':full''
+        To understand `\N{...}' properly, you must be using 5.6.0 or
+        higher. However, the parser only knows how to resolve full
+        names (those made using `use charnames ':full''). There
+        might be an option in the future to specify a class name.
+
+SUPPORT
+    Visit `YAPE''s web site at http://www.pobox.com/~japhy/YAPE/.
+
+SEE ALSO
+    The `YAPE::Regex::Element' documentation, for information on the
+    node classes. Also, `Text::Balanced', Damian Conway's excellent
+    module, used for the matching of `(?{ ... })' and `(??{ ... })'
+    blocks.
+
+AUTHOR
+      Jeff "japhy" Pinyan
+      CPAN ID: PINYAN
+      japhy@pobox.com
+      http://www.pobox.com/~japhy/
+

@@ -1,0 +1,415 @@
+=encoding utf-8
+
+=head1 NAME (ja)
+
+YATT::Manual - YATT マニュアル 日本語版
+
+=head2 NOTE. This software is still under heavy development.
+
+このソフトは現在も開発中です。特に YATT::Registry と
+YATT::LRXML::NodeCursor の内部 API には大幅な変更が
+予定されています。これらの関数を直接呼び出すことは、
+今は避けてください。
+
+=head1 SYNOPSIS
+
+ファイル F<index.html> にて
+
+  <yatt:foo:bar:moe title="test">
+    My first YATT App! <?yatt= scalar localtime time?>
+  </yatt:foo:bar:moe>
+
+ファイル F<foo/bar.html> にて
+
+  <!yatt:widget moe title=html>
+  <h2>&yatt:title;</h2>
+  <yatt:body />
+
+変換結果は…
+
+   <h2>test</h2>
+     My first YATT App! Sun Sep  2 19:37:42 2007
+
+基本的な使い方は L</"TUTORIAL"> を、
+設計思想や特徴は L</"DESCRIPTION">, L</"FEATURES"> を
+参照して下さい。
+
+=head1 DESCRIPTION
+
+YATT (Yet Another Template Toolkit) は動的な Webサイトの構築を
+容易にするための、テンプレート・システムです。
+プログラマーの手から、サービス・コンテンツ・デザイナーの手へ、
+コントロールを移すことで、両者の関係を対立からハッピーな協調へ変化させよう、
+という意図に基づいて開発されています。
+
+Web で使われるテンプレート・システムは、その使い方から、
+プログラム主導型 (C<pipeline model>)と、
+テンプレート主導型 (C<callback model>)に分けることが出来ます。
+YATT はテンプレート主導型ながら、ロジックの括り出しを助ける枠組みも
+備えています。
+
+参考: L<http://perl.apache.org/docs/tutorials/tmpl/comparison/comparison.html#toc_Execution_Models>
+
+プログラム主導型は、メインプログラムが最初に有り、
+それが部品としてテンプレートを呼び出すタイプです。MVC (Model-View-Controler)
+を厳密に分ける設計に向きます。代表的には
+HTML::Template や Template Toolkit が挙げられます。
+
+対してテンプレート主導型は、テンプレートが最初にあり、それが各機能を
+部品として呼び出すタイプです。(Perl 以外の例ですが) PHP や
+JSP, ASP はこれに当たります。
+
+両者は一長一短が有ります。ロジック・フローを整理したい側にとっては、
+プログラム主導型の方が設計が簡単です。しかし、デザイン・コンテンツ
+・サービスを作る側の立場では、このモデルは制約が多い、窮屈なモデルです。
+
+一般的に、開発の初期の、『最終的に何になるか』が曖昧な状況では、
+(HTMLに毛が生えた程度のことしか知らない素人でも) とりあえず画面から
+作り始められる、テンプレート主導型が有利でしょう。
+(PHP の人気は、この点が大きかったと言えそうです。)
+
+ただし個々のテンプレートの中にロジックを散在させた場合、
+システムの成長・大規模化に伴い、MVC の分離、ロジックの括り出しの
+要求が高まり、プログラム主導型が有利になって来るでしょう。
+
+YATT は、この両者の長所を共存させるため、テンプレートの集まり全体と、
+そこから括り出されたロジックファイルを統一的に管理する仕組み
+(YATT::Registry) を持っています。
+
+(View と Controler を YATT の枠組みに任せ、ここにコンテンツ依存な
+汚いコードを全て閉じ込める。応用独立性を求めるのは Model 周りにとどめる)
+
+=head2 FEATURES
+
+=over 4
+
+=item * HTML との親和性の高さ
+
+YATT のテンプレートは、通常の HTML に、
+B<指定した名前空間> で始まる構文要素を埋め込んだ形式で記述します。
+(以下の説明では名前空間 C<yatt> を用います。)
+
+=over 4
+
+=item * <yatt:...> --- </yatt:...>
+
+部品(widget) の呼び出し
+
+=item * &yatt:...;
+
+変数の参照
+
+=item * <!yatt:...>
+
+宣言 (部品や use lib)
+
+=item * <!--#yatt ... -->
+
+YATT としてのコメント
+
+=item * <?yatt ... ?>
+
+その他、汚い処理
+
+=back
+
+テンプレートの構文は XML に似ていますが、XML よりも再帰性を改善した、
+よりテンプレート用途向きの独自構文 L<LRXML|YATT::LRXML> を採用しています。
+
+=item * 静的検査を重視
+
+プログラムを書き慣れない素人にとって、変数名や部品の名前をスペルミスしない
+よう、注意を払い続けることは、決して容易では有りません。
+言わば MTBF が短い状況で、素の動的言語を渡されても、
+代入による変数作成や、未知変数の空文字列化の機能が、
+かえって開発の妨げになりかねません。
+
+そこで YATT では、
+
+=over 4
+
+=item * 部品
+
+=item * 部品に渡す引数
+
+=item * 変数参照
+
+=back
+
+について、可能な限り静的にスペルミスを検査します。
+(実行しなくても、スクリプトへの変換の段階で)
+
+また、生成されるスクリプトも、C<use strict> かつ
+C<< use warnings FATAL => qw(all) >> をデフォルトとすることで、
+Perl による正当性検証機能を素人の助けとして最大限に活かすことを
+目指しています。
+
+=item * XSS への抜本対策としての、出力時エスケープと変数型宣言機能
+
+Web 用のアプリケーション開発では、
+ユーザが入力したデータを他のユーザのブラウザへと送る際に、
+セキュリティ上の問題が出ない形式へと確実に変換(エスケープ)する事が
+求められます。これを忘れると、 Cross Site Scripting (XSS)
+セキュリティーホールの問題が発生するからです。
+
+ですが、『HTML プラスα』レベルの人に、正しいエスケープを入れよと
+怒るのは、筋違いです。彼らの Speciality は、もっと別の領域に
+あるのであり、彼らに『落とし穴の多い』道具を生で押し付けた人間こそ、
+非難されるべきです。
+
+そしてこれこそ本来、Web のための DSL
+(Domain Specific Language, 特定分野に特化した、プログラミング言語)
+である、テンプレートシステムが解決すべき問題なのです。
+
+(それは、 Perl が Casual Programmer のために生まれ、進化してきた
+道のりと同じ流れだと、私は考えます)
+
+YATT ではテンプレートの中の埋め込み変数を C<&yatt:var;> のように
+『エンティティ参照』の構文で書きます。変数は予め『(escape の)型』を
+宣言する必要が有ります。埋め込み変数を書いた箇所には、型に応じた
+escape 処理が自動的に生成されます。
+
+参考: 『サニタイズ言うなキャンペーン』
+L<http://takagi-hiromitsu.jp/diary/20060115.html>
+
+また escape 済みの変数を表す型 (L<html型|html>) については、スクリプト変換時に
+C<$html_var> のように接頭辞付きの名前に改名されます。このため、
+変換されたスクリプト上で問題を探したいとき、あるいは C<< <?perl?> >> で
+強制的に出力を行いたい時も、escape の必要な変数と、不要な変数を
+一目で識別することが出来ます。
+
+参考: Joel on Software の ``Making Wrong Code Look Wrong''
+ L<http://www.joelonsoftware.com/articles/Wrong.html>
+
+=item * 部品管理の仕組み (YATT::Registry) を内蔵
+
+
+
+=item * Widget は Perl の関数へと変換される
+
+=item * Widget を好きなファイル・ディレクトリで定義できる
+
+html ファイルは各々 Perl のクラスへと変換されますが、
+クラス名は自動で生成されます。
+
+クラス同士の継承関係は自由に設定可能です。
+
+ディレクトリにも、それ固有の Perl のクラスが生成されます。
+
+ディレクトリとファイルを、どちらもタグ名前空間として統一的に扱えます。
+
+=item * <?perl?> による汚れ仕事も、可能
+
+=item * スクリプトへの変換メカニズムを容易に拡張できる。
+
+スクリプトへの変換ルールも拡張可能です。
+
+将来的には Perl 以外の言語への変換も計画しています。
+
+=back
+
+=head1 TUTORIAL
+
+=head2 widget の定義と呼び出し
+
+=head3 ファイルを部品にする
+
+widget を定義するための一番単純な方法は、ファイルを作ることです。
+ファイル名 ＝ widget 名になります。
+
+Ex. F<index.html> の中身が↓下記のようになっていたとします。
+
+   <h2> Hello <yatt:world/> </h2>
+
+同じディレクトリに F<world.html> が有ったとします。
+
+   <b>world!</b>
+
+これを YATT のフロントエンド C<yatt.render> コマンドに処理させると、
+
+   % yatt.render index.html
+   <h2> Hello <b>world!</b> </h2>
+   %
+
+となります。
+
+=head3 部品の引数
+
+XXX: body 引数も。
+
+=head3 ファイルの中に別の部品を作る
+
+=head3 別のファイルの中の部品を使う
+
+=head3 ディレクトリを名前空間にする
+
+=head3 部品を呼ぶ条件を限定する
+
+=head3 部品を継承する
+
+=head2 ロジックの括り出し
+
+=head3 .htyatt.pl と Entity 定義
+
+=head3 use YATT::Registry base => 'ディレクトリ'
+
+=head1 SYNTAX
+
+=head2 Widget宣言
+
+widget を定義するには、(a) C<< <!yatt:widget > >> 宣言を書く方法と、
+(b) ファイルを作り、C<< <!yatt:args > >> 宣言を書く方法があります。
+
+=head3 (a) C<< <!yatt:widget NAME ARG1=TYPE?DEFAULT ARG2...> >>
+
+NAME という名前の widget を定義します。widget の中で引数を参照するには
+C<< &yatt:ARG1; >> のように、entity 参照の構文を使います。
+
+  <!yatt:widget foo title>
+  <h2>&yatt:title;</h2>
+  <div>
+  </div>
+
+引数には型と、デフォルト値を指定できます(L<型の一覧|/"変数の型">)。
+型を省略した場合は L<text型|/"text"> として扱われます。
+
+定義した widget を呼び出すときには、
+
+  <yatt:NAME ARG1="..." ARG2="..." />
+
+又は
+
+  <yatt:NAME ARG1="...foo..." ARG2="...bar...">
+    ...baz...
+  </yatt:NAME>
+
+の二種類の書き方が可能です。後者の場合、...baz... の部分が
+暗黙の引数 body として渡されます。これを
+呼び出すときには C<< <yatt:body /> >> と書きます。
+
+=head3 (b) C<< <!yatt:args ARG1=TYPE?DEFAULT ARG2...> >>
+
+ファイル全体を一つの widget にします。ファイル名が widget 名に
+なります。
+
+=head2 引数宣言と変数の型
+
+引数の宣言は、詳しくは
+
+   NAME = 型名 フラグ デフォルト値
+
+の3要素からなります。型名は省略可能で、省略時は L<text型|text> になります。
+デフォルト値を指定するには、フラグが必須です。
+また、デフォルト値に空白を含めたい場合は、全体を C<"..."> で quote して
+下さい。
+
+更に後述の code 型の場合、型が更に引数の型指定を持ちます。
+
+   NAME = [code ARG1=TYPE ARG2=TYPE ...]
+
+=head3 text
+
+最も基本の型です。出力時に L<YATT::Util::escape()|YATT::Util/escape> を用いて escape されます。
+
+=head3 html
+
+出力時でなく、widget に渡す時点で escape を行う型です。
+外部ファイルからの html などにも使います。
+
+=head3 attr
+
+XXX: 仕様を変更する予定。
+
+=head4 &yatt:attrvar(str,str,...);
+
+=head3 scalar (value)
+
+計算結果や、perl のオブジェクトを渡す時に使います。
+値として、perl の正しい式を渡す必要が有ります。別名で C<value> 型
+とも書けます。
+
+=head3 list
+
+perl の配列オブジェクトを渡すときに使います。これも、perl の
+正しい式を渡す必要が有ります。
+
+=head4 :expand()
+
+list の要素を展開して、ループなどに渡したい時に使います。
+
+実は、勿論、 C<@{&yatt:listvar;}> のように perl のリスト展開の式を書けば
+ほとんど同じ事が可能です。(エラー処理が有りませんが)
+
+この関数は、将来的に JavaScript などへの対応を容易にするための機能です。
+
+=head3 code (expr)
+
+ループの中で使う条件判断や、ループの中の HTML 生成部分
+で使うための、クロージャを渡したい時に使います。
+別名で C<expr> 型とも書けます。
+
+これを呼び出すときは、HTML 部分ではタグ呼び出しの記法 C<< <yatt:var /> >>
+を、条件式の中では C<&yatt:var();> のように Entity の関数呼び出し記法を
+使って下さい。
+
+code 型の引数には、引数の型を指定することが可能です。
+
+=head2 デフォルト値と指定フラグ
+
+最もよく使うのは C<!> と C<?> です。
+
+=over 4
+
+=item * C<!>
+
+必須な引数を表します。この引数を書き忘れた場合、コンパイル時
+エラーが報告されます。(デフォルト値は有りません)
+
+=item * C</>
+
+引数が C<undef> の時に、デフォルト値と置き換えます。
+
+覚え方: perl の C<//=> と同じ
+
+=item * C<?>
+
+引数が C<undef>, C<''> の時に、デフォルト値と置き換えます。
+
+覚え方: C</> におまけ(shift) が付いた
+
+=item * C<|>
+
+引数が C<undef>, C<''>, C<0> の時に、デフォルト値と置き換えます。
+
+覚え方: perl の C<||=> と同じ
+
+=back
+
+=head2 制御構文と組込み widget
+
+=head3 C<if="...">, C<unless="..."> 引数
+
+=head3 C<< <:yatt:else if="..."/> >> 属性引数
+
+=head3 yatt:my
+
+=head3 yatt:foreach
+
+=head3 yatt:if, :yatt:else
+
+=head2 その他の宣言
+
+=head3 C<< <!yatt:base "base_template" /> >>
+
+=head1 AUTHOR
+
+"KOBAYASI, Hiroaki" (小林 弘明) hkoba at cpan.org
+
+L<http://buribullet.net/~hkoba/>
+
+=head1 LICENSE
+
+This library is free software; you may redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=cut

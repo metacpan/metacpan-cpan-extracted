@@ -1,0 +1,143 @@
+# -*- coding: utf-8 -*-
+
+TITLE: my varonly
+IN:
+ <yatt:my x y z/>
+ &yatt:x; &yatt:y; &yatt:z;
+OUT:
+   
+
+
+TITLE: my text
+IN:
+ <yatt:my x=foo y='bar' z="baz"/>
+ &yatt:x; &yatt:y; &yatt:z;
+OUT:
+ foo bar baz
+
+TITLE: my scalar/list
+IN:
+ <yatt:my x:scalar=3 y:list='(&yatt:x;) x &yatt:x;'/>
+ &yatt:x; &yatt:y[0]; &yatt:y[1]; &yatt:y[2];
+OUT:
+ 3 3 3 3
+
+TITLE: my body html
+IN:
+ <yatt:my x=foo y>
+   <h2>&yatt:x;</h2>
+ </yatt:my>
+ &yatt:y;
+OUT:
+ 
+   <h2>foo</h2>
+ 
+
+TITLE: my body html with widget invocation
+IN:
+ <yatt:my tmp>[<yatt:foo x="3" />]</yatt:my>
+ (&yatt:tmp;)
+ 
+ <!yatt:widget foo x>
+ <h2>&yatt:x;</h2>
+OUT:
+ ([<h2>3</h2>
+ ])
+
+TITLE: my body code
+IN:
+ <yatt:my x=foo y:code>
+   <h2>&yatt:x;</h2>
+ </yatt:my>
+ &yatt:y();
+OUT:
+ 
+   <h2>foo</h2>
+ 
+
+
+TITLE: my att-elem
+IN:
+ <yatt:my foo>
+ <:yatt:x:html ><h2>&yatt:foo;</h2></:yatt:x:html>
+ <b>foo</b>
+ <:yatt:y:html /><h3>&yatt:foo;</h3>
+ </yatt:my>
+ &yatt:x;
+ &yatt:y;
+OUT:
+ <h2>
+ <b>foo</b>
+ </h2>
+ <h3>
+ <b>foo</b>
+ </h3>
+ 
+
+TITLE: block my
+IN:
+ <yatt:block><yatt:my x="foo"/>
+   &yatt:x;
+ </yatt:block>
+ <yatt:block><yatt:my x="bar"/>
+   &yatt:x;
+ </yatt:block>
+OUT:
+   foo
+   bar
+ 
+
+TITLE: block my error
+IN:
+ <yatt:block><yatt:my x="foo"/>
+   &yatt:x;
+ </yatt:block>
+ &yatt:x;
+ERROR: No such variable 'x'
+
+
+TITLE: my body source and code
+IN:
+ <!yatt:args x y>
+ <yatt:my [code:code src:source]>
+   <h2>&yatt:x;</h2>
+   &yatt:y;
+ </yatt:my>
+ <pre>
+ &yatt:src;
+ </pre>
+ &yatt:code();
+PARAM[
+- foo
+- bar
+]
+OUT:
+ <pre>
+   &lt;h2&gt;&amp;yatt:x;&lt;/h2&gt;
+   &amp;yatt:y;
+ </pre>
+ 
+   <h2>foo</h2>
+   bar
+ 
+
+TITLE: Conflict detection
+IN:
+ <!yatt:args x y>
+ <yatt:my x/>
+ERROR: Conflicting variable 'x' \(previously defined at line 1\)
+
+
+FILE: otherfile.yatt
+IN:
+ <yatt:my x="foo"/>
+ &yatt:x;
+
+TITLE: Scope isolation.
+IN:
+ <yatt:my x="bar"/>
+ <yatt:otherfile/>
+ &yatt:x;
+OUT:
+ foo
+ bar

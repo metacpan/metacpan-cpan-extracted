@@ -1,0 +1,81 @@
+Yahoo-Marketing-APT
+
+A module for using Yahoo Search Marketing's APT Web Services.  See http://docs.apt.yahooapis.com
+
+SYNOPSIS
+
+This collection of modules makes interacting with Yahoo! Search Marketing's APT Web Services as easy as possible.  
+
+Sample Usage:
+
+    use Yahoo::Marketing::APT::Site;
+    use Yahoo::Marketing::APT::SiteService;
+
+    my $service = Yahoo::Marketing::APT::SiteService->new;
+
+    # setup your credentials
+
+    $service->username( 'your username' );
+    $service->password( 'your password' );
+    $service->license( 'your license' );
+    $service->account( 'your account ID' );
+    $service->endpoint( 'https://sandbox.apt.yahooapis.com/services/V6' );
+    $service->wsdl_init;
+
+    # OR
+
+    $service->parse_config( section => 'sandbox' );
+
+
+    # create a site object, and add it
+
+    my $site = Yahoo::Marketing::APT::Site->new
+                                          ->name( $site_name )
+                                          ->url( 'http://my.someurl.com' )
+                                          ->description( 'some description text' )
+                  ;
+
+    my $site_response = $service->addSite( site => $site );
+
+    # added site will have ID set 
+
+    my $added_site = $site_response->site;
+    ...
+
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Build.PL
+    ./Build
+    ./Build test
+    ./Build install
+
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the perldoc command.
+
+    perldoc Yahoo::Marketing::APT
+
+You can also look for information at:
+
+    Search CPAN
+        http://search.cpan.org/dist/Yahoo-Marketing-APT
+
+    CPAN Request Tracker:
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Yahoo-Marketing-APT
+
+    AnnoCPAN, annotated CPAN documentation:
+        http://annocpan.org/dist/Yahoo-Marketing-APT
+
+    CPAN Ratings:
+        http://cpanratings.perl.org/d/Yahoo-Marketing-APT
+
+COPYRIGHT AND LICENCE
+
+Copyright (c) 2010 Yahoo! Inc.  All rights reserved.  
+The copyrights to the contents of this file are licensed under the Perl Artistic License (ver. 15 Aug 1997) 
+

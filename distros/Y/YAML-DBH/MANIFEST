@@ -1,0 +1,15 @@
+Changes
+INSTALL
+MANIFEST
+Makefile.PL
+README
+lib/YAML/DBH.pm
+t/00.t
+t/01_find_confs_and_test.pl
+t/02_open_from_confhash.pl
+t/03-sqlite.t
+t/99_clean.pl
+t/dbh_yaml.conf
+t/dbh_yaml2.conf
+t/dbh_yaml3.conf
+META.yml                                 Module meta-data (added by MakeMaker)

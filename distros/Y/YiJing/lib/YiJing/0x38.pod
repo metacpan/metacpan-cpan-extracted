@@ -1,0 +1,103 @@
+=encoding utf8
+
+=head1 NAME
+
+YiJing::0x38 - Xun\ (Data Flow)
+
+=head1 DESCRIPTION
+
+# XXX
+
+=head2 Judgment
+
+    巽。小亨。利攸往。利見大人。
+
+Data flow brings moderate fun.  Good to move forward and meet helpful folks.
+
+=head2 Interpretation
+
+    彖曰。重巽以申命。剛巽乎中正而志行。柔皆順乎剛。
+	  是以小亨。利有攸往。利見大人。
+
+This hexagram is made of a pair of "Data Flow" trigrams.  The Data Flow
+shows a tricky relationship -- you depend on the Data Flow, your system
+is carefully adapted to it, but you can never really be sure that it
+won't all break tomorrow.  This understandably leads to worry and
+indecision.
+
+=head2 Image
+
+    象曰。隨風。巽。君子以申命行事。
+
+To follow the Wind
+is how one should handle the Data Flow.
+A wise hacker should simply do
+what the situation calls for,
+instead of worrying about what to do.
+
+=head2 Lines
+
+=over 4
+
+=item *
+
+    初六。進退。利武人之貞。
+    象曰。進退。志疑也。利武人之貞。志治也。
+
+Choose any one, and stick with it.
+
+... Pick something and sticking with it, instead of spending forever
+fretting over which choice is better.
+
+=item *
+
+    九二。巽在床下。用史巫紛若。吉無咎。
+    象曰。紛若之吉。得中也。
+
+Consult an expert.
+
+... Everything will be fine if you stop hiding under your desk
+worrying about the situation, and go see an expert about it.
+
+=item *
+
+    九三。頻巽。吝。
+    象曰。頻巽之吝。志窮也。
+
+Here we go again.
+
+... Too much of this kind of trouble over and over will burn you out.
+
+=item *
+
+    六四。悔亡。田獲三品。
+    象曰。田獲三品。有功也。
+
+Now that wasn't so bad, was it?
+
+... You'll happily solve three kinds of problems at once.
+
+=item *
+
+    九五。貞吉悔亡。無不利。無初有終。先庚三日。后庚三日。吉。
+    象曰。九五之吉。位正中也。
+
+Preview and review.
+
+... Go right ahead cheerfully.  It didn't start out well, but it will
+end up just fine.  Test it three days before, and again three days
+after.
+
+=item *
+
+    上九。巽在床下。喪其資斧。貞凶。
+    象曰。巽在床下。上窮也。喪其資斧。正乎凶也。
+
+Penny wise, pound foolish.
+
+... You spent so long on this problem that you didn't see other fatal
+problems coming.
+
+=back
+
+=cut

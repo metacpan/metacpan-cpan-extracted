@@ -1,0 +1,29 @@
+---
+abstract: 'Load (and cache) the Yahoo JavaScript YUI framework'
+author:
+  - 'Robert Krimen <robertkrimen@gmail.com>'
+build_requires:
+  Directory::Scratch: 0
+  Test::Most: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.31
+generated_by: 'Dist::Zilla version 2.101170'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: YUI-Loader
+recommends: {}
+requires:
+  Algorithm::Dependency: 0
+  Carp::Clan::Share: 0
+  File::Copy: 0
+  HTML::Declare: 0
+  JSON: 2.08
+  LWP::UserAgent: 0
+  Moose: 0
+  Path::Abstract: 0
+  Path::Class: 0
+  Scalar::Util: 0
+  URI: 0
+version: 0.071

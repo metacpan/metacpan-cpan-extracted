@@ -1,0 +1,36 @@
+0.71 Thu Jan 19 22:36:16 CET 2017
+ - Better messaging. Indicate backend. PR/4 @perlpunk++
+
+0.70 Sat Feb 20 17:37:58 UTC 2016
+ - Apply PR/4 from @perlpunk++ (use correct exit codes for errors)
+
+0.69 Sat Apr 18 13:57:42 CEST 2015
+ - Fix hashbang. eserte++
+ - https://github.com/ingydotnet/yaml-shell-pm/issues/1
+
+0.68 Sat Aug 16 16:18:20 PDT 2014
+ - Fix strict/warnings
+
+0.67 Sat Aug 16 13:04:47 PDT 2014
+ - Meta 0.0.2
+
+0.66 Fri Aug 15 21:10:49 PDT 2014
+ - Add t/000-compile-modules.t
+
+0.65 Fri Aug  8 13:00:29 PDT 2014
+ - Switch hashbang to '#!/usr/bin/env perl'
+
+0.64 Tue Aug  5 10:35:42 PDT 2014
+ - Add badges to doc
+
+0.63 Mon Aug  4 00:54:24 PDT 2014
+ - Remove (c) from Copyright
+
+0.62 Fri Jun 27 19:15:07 PDT 2014
+ - Doc fix and switch to swim.
+
+0.61 Mon Jun 23 14:43:56 PDT 2014
+ - Make distribution be modern.
+
+0.60 Sun Nov 30 13:18:00 PST 2008
+ - New module.

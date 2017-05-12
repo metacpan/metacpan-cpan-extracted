@@ -1,0 +1,26 @@
+---
+abstract: 'useful functions for Yandex daemons and programs.'
+author:
+  - 'Petya Kohts <petya@kohts.com>'
+build_requires:
+  ExtUtils::MakeMaker: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.68, CPAN::Meta::Converter version 2.112621'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Yandex-Tools
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Cwd: 0
+  IPC::Cmd: 0.84
+  Storable: 0
+  Time::HiRes: 0
+  Time::Local: 0
+version: 0.16

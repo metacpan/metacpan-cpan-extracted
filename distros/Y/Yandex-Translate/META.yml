@@ -1,0 +1,38 @@
+---
+abstract: 'a simple API for Yandex.Translate'
+author:
+  - 'James Axl E<lt>axlrose112[at]gmail.comE<gt>'
+  - 'Christian Carey'
+build_requires:
+  ExtUtils::MakeMaker: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.62, CPAN::Meta::Converter version 2.130880'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Yandex-Translate
+no_index:
+  directory:
+    - t
+    - examples
+provides:
+  Yandex::Translate:
+    file: lib/Yandex/Translate.pm
+    version: 1.000005
+recommends:
+  HTML::Entities: 3.69
+  HTTP::Tiny: 0.070
+  JSON: 2.90
+  URI::Escape: 3.31
+requires:
+  HTML::Entities: 0
+  HTTP::Tiny: 0
+  JSON: 0
+  Test::More: 0
+  URI::Escape: 0
+resources:
+  repository: https://fossil.falseking.site/dir?ci=tip&type=tree
+version: 1.000005

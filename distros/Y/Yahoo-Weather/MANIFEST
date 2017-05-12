@@ -1,0 +1,7 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Yahoo-Weather.t
+lib/Yahoo/Weather.pm
+META.yml                                 Module meta-data (added by MakeMaker)

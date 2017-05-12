@@ -1,0 +1,28 @@
+---
+abstract: ~
+author:
+  - 'Ingy döt Net <ingy@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 1.01'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+module_name: YamlTime::Extension::Git
+name: YamlTime-Extension-Git
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  YamlTime: 0.08
+  perl: 5.8.3
+resources:
+  homepage: http://github.com/ingydotnet/yamltime-extension-git-pm/tree
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/ingydotnet/yamltime-extension-git-pm.git
+version: 0.01

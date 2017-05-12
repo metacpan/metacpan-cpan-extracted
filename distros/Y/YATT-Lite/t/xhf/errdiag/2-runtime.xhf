@@ -1,0 +1,143 @@
+# -*- coding: utf-8 -*-
+
+TITLE: var in toplevel
+IN:
+ <!yatt:args x=html>
+ &yatt:x;
+PARAM[
+]
+ERROR: ^Use of uninitialized value (?:\$html_x )?in print at \S+ line 2,
+
+TITLE: var in widget
+IN:
+ <yatt:foo/>
+ <!yatt:widget foo x=html>
+ &yatt:x;
+ERROR: ^Use of uninitialized value (?:\$html_x )?in print at \S+ line 3,
+
+TITLE: var in body
+IN:
+ <yatt:foo>
+  &yatt:x;
+ </yatt:foo>
+ 
+ <!yatt:widget foo body = [code x=html]>
+ <yatt:body/>
+ERROR: ^Use of uninitialized value (?:\$html_x )?in print at \S+ line 2,
+
+TITLE: var in nested body 
+IN:
+ <yatt:foo>
+ <yatt:bar>
+ &yatt:x;
+ </yatt:bar>
+ </yatt:foo>
+ 
+ <!yatt:widget foo>
+ <yatt:body/>
+ <!yatt:widget bar body = [code x=html]>
+ <yatt:body/>
+ERROR: ^Use of uninitialized value (?:\$html_x )?in print at \S+ line 3,
+
+TITLE: pi var in body
+IN:
+ <yatt:foo>
+ <?perl===&yatt:x;?>
+ </yatt:foo>
+ 
+ <!yatt:widget foo body = [code x=html]>
+ <yatt:body/>
+ERROR: ^Use of uninitialized value (?:\$html_x )?in print at \S+ line 2,
+
+TITLE: undef after long widget call.
+IN:
+ <!yatt:args>
+ <yatt:foo a='
+ 
+ 
+ ' b="
+ 
+ 
+ " />
+ <?perl===undef?>
+ <!yatt:widget foo a b >
+ERROR: ^Use of uninitialized value (?:\$html_x )?in print at \S+ line 9,
+
+TITLE: undef after newlined widget call w/o body.
+IN:
+ <!yatt:args>
+ <yatt:foo 
+ 
+ />
+ <?perl===undef?>
+ <!yatt:widget foo a b >
+ERROR: ^Use of uninitialized value (?:\$html_x )?in print at \S+ line 5,
+
+TITLE: var after newlined widget call with body.
+IN:
+ <!yatt:args x=html>
+ <yatt:foo
+ 
+ >
+ &yatt:x;
+ </yatt:foo>
+ <!yatt:widget foo a b >
+ <yatt:body/>
+ERROR: ^Use of uninitialized value (?:\$html_x )?in print at \S+ line 5,
+SKIP: Solved in perl-5.012
+PERL_MINVER: 5.012
+
+TITLE: after element.
+IN:
+ <yatt:y>
+ foo
+ bar
+ baz
+ </yatt:y>
+ foo
+ bar
+ <?perl===undef?>
+ <!yatt:widget y>
+ <h2>y</h2>
+ <yatt:body/>
+ERROR: ^Use of uninitialized value in print at \S+ line 8,
+
+TITLE: after empty element in body
+IN:
+ <yatt:x>
+ foo
+ <yatt:y/>
+ bar
+ <?perl===undef?>
+ baz
+ </yatt:x>
+ 
+ 
+ <!yatt:widget x>
+ <yatt:body/>
+ <!yatt:widget y>
+ <h2>y</h2>
+ foo
+ bar
+ baz
+ERROR: ^Use of uninitialized value in print at \S+ line 5,
+
+TITLE: after element with body
+IN:
+ <yatt:x>
+ foo
+ <yatt:y/>
+ bar
+ baz
+ </yatt:x>
+ <?perl===undef?>
+ 
+ <!yatt:widget x>
+ <yatt:body/>
+ <!yatt:widget y>
+ <h2>y</h2>
+ foo
+ bar
+ baz
+ERROR: ^Use of uninitialized value in print at \S+ line 7,
+

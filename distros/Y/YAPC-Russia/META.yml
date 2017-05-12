@@ -1,0 +1,30 @@
+---
+abstract: 'Perl conference YAPC::Russia'
+author:
+  - 'Ivan Bessarabov <ivan@bessarabov.ru>'
+build_requires:
+  Test::Exception: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.005, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: YAPC-Russia
+requires:
+  Carp: '0'
+  Moment: v1.2.0
+  Test::Exception: '0'
+  open: '0'
+  perl: v5.8.0
+  strict: '0'
+  utf8: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/bessarabov/YAPC-Russia/issues
+  homepage: https://github.com/bessarabov/YAPC-Russia
+  repository: https://github.com/bessarabov/YAPC-Russia.git
+version: 4.0.0

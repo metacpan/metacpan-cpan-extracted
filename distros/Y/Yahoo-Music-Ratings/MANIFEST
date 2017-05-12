@@ -1,0 +1,7 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Yahoo-Music-Ratings.t
+lib/Yahoo/Music/Ratings.pm
+META.yml                                 Module meta-data (added by MakeMaker)

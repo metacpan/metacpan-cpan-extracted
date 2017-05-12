@@ -1,0 +1,3 @@
+[submodule "approot/lib/YATT"]
+	path = approot/lib/YATT
+	url = git://github.com/hkoba/yatt_lite.git

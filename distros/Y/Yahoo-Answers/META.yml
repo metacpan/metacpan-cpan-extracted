@@ -1,0 +1,29 @@
+--- #YAML:1.0
+name:               Yahoo-Answers
+version:            0.02
+abstract:           The great new Yahoo::Answers!
+author:
+    - Daniel de O. Mantovani <daniel.oliveira.mantovani@gmail.com>
+license:            perl
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+build_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    JSON:                 0
+    Moose:                0
+    Moose::Util::TypeConstraints:  0
+    MooseX::Types::Common::Numeric:  0
+    MooseX::Types::Common::String:  0
+    Test::More:           0
+    URI::QueryParam:      0
+    WWW::Mechanize:       0
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.56
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

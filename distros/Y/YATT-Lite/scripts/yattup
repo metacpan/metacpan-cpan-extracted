@@ -1,0 +1,62 @@
+#!/usr/bin/env perl
+# -*- mode: perl; coding: utf-8 -*-
+use strict;
+use warnings qw(FATAL all NONFATAL misc);
+use FindBin; BEGIN {do "$FindBin::RealBin/libdir.pl"}
+#----------------------------------------
+
+use mro qw/c3/;
+use YATT::Lite::WebMVC0::SiteApp -as_base;
+
+use Plack::App::Directory;
+use Plack::Runner;
+use Cwd;
+
+{
+  my $runner = Plack::Runner->new;
+
+  $runner->parse_options(@ARGV);
+
+  my $argv = $runner->{argv};
+
+  my $docpath = (@$argv && $argv->[0]) || cwd;
+
+  print "docpath=$docpath\n";
+
+  my $site = MY->new(doc_root => $docpath
+		     , psgi_fallback => Plack::App::Directory->new
+		     ({root => $docpath})->to_app
+		   );
+
+  $runner->run($site->to_app);
+}
+
+__END__
+
+=head1 NAME
+
+yattup - plackup alike for yatt_lite
+
+=head1 SYNOPSIS
+
+    # run local webserver using current directory as *.yatt handler
+    yattup
+
+    # Use other directory, with port.
+    yattup --port 5050 ~/public_html
+
+=head1 DESCRIPTION
+
+C<yattup> is a command line utility to run F<*.yatt> files with
+default L<PSGI App|YATT::Lite::WebMVC0::SiteApp>.
+
+It relies on L<Plack::Runner>, so you can use most of its
+L<options|Plack::Runner/OPTIONS> in yattup too
+(except C<-e>, which requires C<app.psgi> to be given as a actual file).
+
+=head1 SEE ALSO
+
+L<Plack::Runner>
+
+=cut
+

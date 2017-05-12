@@ -1,0 +1,2 @@
+<h2>[% title || 'Hinweis' %]</h2>
+[% content %]

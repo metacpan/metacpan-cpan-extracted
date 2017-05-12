@@ -1,0 +1,167 @@
+# -*- coding: utf-8 -*-
+
+IN:
+ <yatt:envelope>
+   <yatt:foo />
+ </yatt:envelope
+ <!yatt:widget foo>
+ERROR: ^Missing CLO\(>\) for: <yatt:envelope
+
+IN:
+ </yatt:envelope>
+ <!yatt:widget foo>
+ERROR: ^TAG close without open! got </yatt:envelope>
+
+TITLE: missing close tag
+IN:
+ foo
+ <yatt:my bar>
+ERROR: Missing close tag 'yatt:my' line 3
+
+
+TITLE: tag open/close mismatch
+IN:
+ foo
+ <yatt:my bar>
+ </yatt:foreach>
+ERROR: TAG Mismatch! <yatt:my> closed by </yatt:foreach> line 3,
+
+TITLE: mis-closed attribute element(name mismatch)
+IN:
+  <!yatt:widget foo x y>
+  <yatt:foo x="foo">
+    <:yatt:y>bar</:yatt:z>
+  </yatt:foo>
+  
+  <!yatt:widget bar x y>
+  barrr
+ERROR: TAG Mismatch! <:yatt:y> closed by </:yatt:z> line 3,
+
+
+TITLE: mis-closed attribute element(':' mismatch)
+IN:
+  <!yatt:widget foo x y>
+  <yatt:foo x="foo">
+    <:yatt:y>bar</yatt:y>
+  </yatt:foo>
+  
+  <!yatt:widget bar x y>
+  barrr
+ERROR: TAG Mismatch! <:yatt:y> closed by </yatt:y> line 3,
+
+
+TITLE: var in toplevel
+IN:
+ &yatt:x;
+ERROR: ^No such variable 'x' at file \S+ line 1,
+
+TITLE: var in widget
+IN:
+ <yatt:foo/>
+ <!yatt:widget foo>
+ &yatt:x;
+ERROR: ^No such variable 'x' at file \S+ line 3,
+
+TITLE: var in body
+IN:
+ <yatt:foo>
+  &yatt:y;
+ </yatt:foo>
+ 
+ <!yatt:widget foo body = [code x]>
+ <yatt:body/>
+ERROR: ^No such variable 'y' at file \S+ line 2,
+
+TITLE: var after macro
+IN:
+ <!yatt:args x=value>
+ <html>
+ <body>
+ <yatt:if if="&yatt:x; > 1">
+ foo
+ bar
+ baz
+ </yatt:if>
+ hoe
+ &yatt:z;
+ moe
+ERROR: ^No such variable 'z' at file \S+ line 10,
+
+TITLE: Unknown entity function name
+IN:
+ &yatt:unknown_entity();
+ERROR: ^No such entity in namespace "\w+::EntNS::\w+": unknown_entity
+
+TITLE: Unknown type
+IN:
+ <!yatt:args foo=bar>
+ <h2>&yatt:foo;</h2>
+ERROR: ^Unknown type 'bar' for variable 'foo' at file \S+ line 1,
+
+
+TITLE: empty element.
+# x のエラーメッセージを作るときに y の行番号が計算される
+IN:
+ <yatt:y/>
+ foo
+ bar
+ baz
+ <yatt:x/>
+ foo
+ bar
+ baz
+ <yatt:y/>
+ foo
+ bar
+ <!yatt:widget y>
+ <h2>y</h2>
+ERROR: ^No such widget <yatt:x> at file \S+ line 5,
+
+TITLE: empty element in body
+# x のエラーメッセージを作るときに y の行番号が計算される
+IN:
+ <yatt:y>
+ foo
+ bar
+ baz
+ <yatt:x/>
+ foo
+ bar
+ baz
+ </yatt:y>
+ <!yatt:widget y>
+ <h2>y</h2>
+ foo
+ <yatt:body/>
+ bar
+ baz
+ERROR: ^No such widget <yatt:x> at file \S+ line 5,
+
+TITLE: after long declaration
+IN:
+ <!yatt:args
+   x
+   y
+   z
+ >
+ &yatt:w;
+ERROR: ^No such variable 'w' at file \S+ line 6,
+
+TITLE: after long element
+IN:
+ <yatt:foo
+   x="bar"
+   y="baz"
+ />
+ &yatt:z;
+ 
+ <!yatt:widget foo x y>
+ <h2>foo</h2>
+ERROR: ^No such variable 'z' at file \S+ line 5,
+
+
+TITLE: entpath
+SKIP: Changed
+IN:
+ &yatt:array[func(x,:y)];
+ERROR: ^Can't parse entity_path group .*?, at file \S+ line 1\n$

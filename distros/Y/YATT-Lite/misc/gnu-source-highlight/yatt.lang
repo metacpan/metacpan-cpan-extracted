@@ -1,0 +1,18 @@
+state preproc delim '<\?[[:alpha:]]+' "?>" multiline begin
+	include "key_string.lang"
+end
+
+state preproc delim '<![[:alpha:]]+:[[:alpha:]]+' ">" multiline begin
+	include "key_string.lang"
+end
+
+comment delim "<!--" "-->" multiline nested
+
+# XXX: should differentiate <yatt:tag> and <:yatt:option>
+keyword = '<(/)?(:)?[[:alpha:]]([[:word:]:.-]*)(/)?>'
+
+state keyword delim '<(/)?(:)?[[:alpha:]]([[:word:]:.-]*)' '(/)?>' multiline begin
+	include "key_string.lang"
+end
+
+function = '&([[:alnum:]]+):([^;[:space:]]+|[\(,]\([^;]*\)[,\)]|\([^\(\);[:space:]]*\))+;'

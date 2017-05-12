@@ -1,0 +1,356 @@
+NAME
+    YUI::Loader - Load (and cache) the Yahoo JavaScript YUI framework
+
+VERSION
+    version 0.071
+
+SYNOPSIS
+        use YUI::Loader;
+
+        my $loader = YUI::Loader->new_from_yui_host;
+        $loader->include->yuitest->reset->fonts->base;
+        print $loader->html;
+
+        # The above will yield:
+        # <link rel="stylesheet" href="http://yui.yahooapis.com/2.5.1/build/reset/reset.css" type="text/css"/>
+        # <link rel="stylesheet" href="http://yui.yahooapis.com/2.5.1/build/fonts/fonts.css" type="text/css"/>
+        # <link rel="stylesheet" href="http://yui.yahooapis.com/2.5.1/build/base/base.css" type="text/css"/>
+        # <script src="http://yui.yahooapis.com/2.5.1/build/yahoo/yahoo.js" type="text/javascript"></script>
+        # <script src="http://yui.yahooapis.com/2.5.1/build/dom/dom.js" type="text/javascript"></script>
+        # <script src="http://yui.yahooapis.com/2.5.1/build/event/event.js" type="text/javascript"></script>
+        # <script src="http://yui.yahooapis.com/2.5.1/build/logger/logger.js" type="text/javascript"></script>
+        # <script src="http://yui.yahooapis.com/2.5.1/build/yuitest/yuitest.js" type="text/javascript"></script>
+
+    You can also cache YUI locally:
+
+        my $loader = YUI::Loader->new_from_yui_host(cache => { dir => "htdocs/assets", uri => "http://example.com/assets" });
+        $loader->include->yuitest->reset->fonts->base;
+        print $loader->html;
+
+        # The above will yield:
+        # <link rel="stylesheet" href="http://example.com/assets/reset.css" type="text/css"/>
+        # <link rel="stylesheet" href="http://example.com/assets/fonts.css" type="text/css"/>
+        # <link rel="stylesheet" href="http://example.com/assets/base.css" type="text/css"/>
+        # <script src="http://example.com/assets/yahoo.js" type="text/javascript"></script>
+        # <script src="http://example.com/assets/dom.js" type="text/javascript"></script>
+        # <script src="http://example.com/assets/event.js" type="text/javascript"></script>
+        # <script src="http://example.com/assets/logger.js" type="text/javascript"></script>
+        # <script src="http://example.com/assets/yuitest.js" type="text/javascript"></script>
+
+DESCRIPTION
+    YUI::Loader is a tool for loading YUI assets within your application.
+    Loader will either provide the URI/HTML to access
+    http://yui.yahooapis.com directly, or you can cache assets locally or
+    serve them from an exploded yui_x.x.x.zip dir.
+
+METHODS
+  YUI::Loader->new_from_yui_host([ base => <base>, version => <version> ])
+  YUI::Loader->new_from_internet([ base => <base>, version => <version> ])
+    Return a new YUI::Loader object configured to fetch and/or serve assets
+    from http://yui.yahooapis.com/<version>
+
+  YUI::Loader->new_from_yui_dir([ dir => <dir>, version => <version> ])
+    Return a new YUI::Loader object configured to fetch/serve assets from a
+    local, exploded yui_x.x.x.zip dir
+
+    As an example, for a dir of "./assets", the "reset.css" asset should be
+    available as:
+
+        ./assets/reset/reset.css
+
+  YUI::Loader->new_from_uri([ base => <base> ])
+    Return a new YUI::Loader object configured to serve assets from an
+    arbitrary uri
+
+    As an example, for a base of "http://example.com/assets", the
+    "reset.css" asset should be available as:
+
+        http://example.com/assets/reset.css
+
+  YUI::Loader->new_from_dir([ dir => <dir> ])
+    Return a new YUI::Loader object configured to serve assets from an
+    arbitrary dir
+
+    As an example, for a dir of "./assets", the "reset.css" asset should be
+    available as:
+
+        ./assets/reset.css
+
+  select( <component>, <component>, ..., <component> )
+    Include each <component> in the "manifest" for the loader.
+
+    A <component> should correspond to an entry in the "YUI component
+    catalog" (see below)
+
+  include
+    Returns a chainable component selector that will include what is called
+
+    You can use the methods of the selector to choose components to include.
+    See "YUI component catalog" below
+
+    You can return to the loader by using the special ->then method:
+
+        $loader->include->reset->yuilogger->grids->fonts->then->html;
+
+  exclude
+    Returns a chainable component selector that will exclude what is called
+
+    You can use the methods of the selector to choose components to include.
+    See "YUI component catalog" below
+
+    You can return to the loader by using the special ->then method:
+
+        $loader->exclude->yuilogger->then->html;
+
+  filter_min
+    Turn on the -min filter for all included components
+
+    For example:
+
+        connection-min.js
+        yuilogger-min.js
+        base-min.css
+        fonts-min.css
+
+  filter_debug
+    Turn on the -debug filter for all included components
+
+    For example:
+
+        connection-debug.js
+        yuilogger-debug.js
+        base-debug.css
+        fonts-debug.css
+
+  no_filter
+    Disable filtering of included components
+
+    For example:
+
+        connection.js
+        yuilogger.js
+        base.css
+        fonts.css
+
+  uri( <component> )
+    Attempt to fetch a URI for <component> using the current filter setting
+    of the loader (-min, -debug, etc.)
+
+    If the loader has a cache, then this method will try to fetch from the
+    cache. Otherwise it will use the source.
+
+  file( <component> )
+    Attempt to fetch a Path::Class::File for <component> using the current
+    filter setting of the loader (-min, -debug, etc.)
+
+    If the loader has a cache, then this method will try to fetch from the
+    cache. Otherwise it will use the source.
+
+  cache_uri( <component> )
+    Attempt to fetch a URI for <component> using the current filter setting
+    of the loader (-min, -debug, etc.) from the cache
+
+  cache_file( <component> )
+    Attempt to fetch a Path::Class::File for <component> using the current
+    filter setting of the loader (-min, -debug, etc.) from the cache
+
+  source_uri( <component> )
+    Attempt to fetch a URI for <component> using the current filter setting
+    of the loader (-min, -debug, etc.) from the source
+
+  source_file( <component> )
+    Attempt to fetch a Path::Class::File for <component> using the current
+    filter setting of the loader (-min, -debug, etc.) from the source
+
+  item( <component> )
+    Return a YUI::Loader::Item for <component> using the current filter
+    setting of the loader (-min, -debug, etc.)
+
+  item_path( <component> )
+    Return the item path for <component> using the current filter setting of
+    the loader (-min, -debug, etc.)
+
+  item_file( <component> )
+    Return the item file for <component> using the current filter setting of
+    the loader (-min, -debug, etc.)
+
+  html
+    Generate and return a string containing HTML describing how to include
+    components. For example, you can use this in the <head> section of a web
+    page.
+
+    If the loader has a cache, then it will attempt to generate URIs from
+    the cache, otherwise it will use the source.
+
+    Here is an example:
+
+        <link rel="stylesheet" href="http://example.com/assets/reset.css" type="text/css"/>
+        <link rel="stylesheet" href="http://example.com/assets/fonts.css" type="text/css"/>
+        <link rel="stylesheet" href="http://example.com/assets/base.css" type="text/css"/>
+        <script src="http://example.com/assets/yahoo.js" type="text/javascript"></script>
+        <script src="http://example.com/assets/dom.js" type="text/javascript"></script>
+        <script src="http://example.com/assets/event.js" type="text/javascript"></script>
+        <script src="http://example.com/assets/logger.js" type="text/javascript"></script>
+        <script src="http://example.com/assets/yuitest.js" type="text/javascript"></script>
+
+  source_html
+    Generate and return a string containing HTML describing how to include
+    components. For example, you can use this in the <head> section of a web
+    page.
+
+    Here is an example:
+
+        <link rel="stylesheet" href="http://example.com/assets/reset.css" type="text/css"/>
+        <link rel="stylesheet" href="http://example.com/assets/fonts.css" type="text/css"/>
+        <link rel="stylesheet" href="http://example.com/assets/base.css" type="text/css"/>
+        <script src="http://example.com/assets/yahoo.js" type="text/javascript"></script>
+        <script src="http://example.com/assets/dom.js" type="text/javascript"></script>
+        <script src="http://example.com/assets/event.js" type="text/javascript"></script>
+        <script src="http://example.com/assets/logger.js" type="text/javascript"></script>
+        <script src="http://example.com/assets/yuitest.js" type="text/javascript"></script>
+
+YUI component catalog
+  animation
+    Animation Utility (utility)
+
+  autocomplete
+    AutoComplete Control (widget)
+
+  base
+    Base CSS Package (css)
+
+  button
+    Button Control (widget)
+
+  calendar
+    Calendar Control (widget)
+
+  charts
+    Charts Control (widget)
+
+  colorpicker
+    Color Picker Control (widget)
+
+  connection
+    Connection Manager (utility)
+
+  container
+    Container Family (widget)
+
+  containercore
+    Container Core (Module, Overlay) (widget)
+
+  cookie
+    Cookie Utility (utility)
+
+  datasource
+    DataSource Utility (utility)
+
+  datatable
+    DataTable Control (widget)
+
+  dom
+    Dom Collection (core)
+
+  dragdrop
+    Drag &amp; Drop Utility (utility)
+
+  editor
+    Rich Text Editor (widget)
+
+  element
+    Element Utility (utility)
+
+  event
+    Event Utility (core)
+
+  fonts
+    Fonts CSS Package (css)
+
+  get
+    Get Utility (utility)
+
+  grids
+    Grids CSS Package (css)
+
+  history
+    Browser History Manager (utility)
+
+  imagecropper
+    ImageCropper Control (widget)
+
+  imageloader
+    ImageLoader Utility (utility)
+
+  json
+    JSON Utility (utility)
+
+  layout
+    Layout Manager (widget)
+
+  logger
+    Logger Control (tool)
+
+  menu
+    Menu Control (widget)
+
+  profiler
+    Profiler (tool)
+
+  profilerviewer
+    ProfilerViewer Control (tool)
+
+  reset
+    Reset CSS Package (css)
+
+  reset_fonts
+  reset_fonts_grids
+  resize
+    Resize Utility (utility)
+
+  selector
+    Selector Utility (utility)
+
+  simpleeditor
+    Simple Editor (widget)
+
+  slider
+    Slider Control (widget)
+
+  tabview
+    TabView Control (widget)
+
+  treeview
+    TreeView Control (widget)
+
+  uploader
+    Uploader (widget)
+
+  utilities
+  yahoo
+    Yahoo Global Object (core)
+
+  yahoo_dom_event
+  yuiloader
+    Loader Utility (utility)
+
+  yuiloader_dom_event
+  yuitest
+    YUI Test Utility (tool)
+
+SEE ALSO
+    <http://developer.yahoo.com/yui/>
+
+    <http://developer.yahoo.com/yui/yuiloader/>
+
+    JS::jQuery::Loader
+
+AUTHOR
+      Robert Krimen <robertkrimen@gmail.com>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2010 by Robert Krimen.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

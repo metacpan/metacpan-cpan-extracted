@@ -1,0 +1,4 @@
+name = "Yandex-OAuth"
+# badges = ["travis"]
+module_maker="ModuleBuildTiny"
+

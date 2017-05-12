@@ -1,0 +1,61 @@
+---
+abstract: 'Session Manager for the Yakuake Terminal Emulator'
+author:
+  - 'Peter Flanigan, C<< <pjfl@cpan.org> >>'
+build_requires:
+  Module::Build: '0.4004'
+  Test::Requires: '0.06'
+  version: '0.88'
+configure_requires:
+  Module::Build: '0.4004'
+  version: '0.88'
+dynamic_config: 1
+generated_by: 'Dist::Zilla version 5.020, CPAN::Meta::Converter version 2.142060'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Yakuake-Sessions
+no_index:
+  directory:
+    - examples
+    - inc
+    - share
+    - t
+provides:
+  Yakuake::Sessions:
+    file: lib/Yakuake/Sessions.pm
+    version: v0.15.1
+  Yakuake::Sessions::Base:
+    file: lib/Yakuake/Sessions/Base.pm
+    version: v0.15.1
+  Yakuake::Sessions::Config:
+    file: lib/Yakuake/Sessions/Config.pm
+    version: v0.15.1
+  Yakuake::Sessions::TraitFor::DBus:
+    file: lib/Yakuake/Sessions/TraitFor/DBus.pm
+    version: v0.15.1
+  Yakuake::Sessions::TraitFor::FileData:
+    file: lib/Yakuake/Sessions/TraitFor/FileData.pm
+    version: v0.15.1
+  Yakuake::Sessions::TraitFor::Management:
+    file: lib/Yakuake/Sessions/TraitFor/Management.pm
+    version: v0.15.1
+  Yakuake::Sessions::TraitFor::TabTitles:
+    file: lib/Yakuake/Sessions/TraitFor/TabTitles.pm
+    version: v0.15.1
+requires:
+  Class::Usul: v0.41.0
+  File::DataClass: v0.35.0
+  Moo: '1.004002'
+  Net::DBus: v1.0.0
+  Try::Tiny: '0.22'
+  Unexpected: v0.22.1
+  namespace::autoclean: '0.19'
+  perl: '5.010001'
+resources:
+  bugtracker: http://rt.cpan.org/NoAuth/Bugs.html?Dist=Yakuake-Sessions
+  homepage: https://metacpan.org/author/PJFL
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/pjfl/p5-yakuake-sessions.git
+version: 0.15.1

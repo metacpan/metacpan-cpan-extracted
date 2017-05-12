@@ -1,0 +1,59 @@
+---
+abstract: 'Template with "use strict"'
+author:
+  - '"KOBAYASI, Hiroaki" <hkoba@cpan.org>'
+build_requires:
+  CGI::Session: '0'
+  DBD::SQLite: '0'
+  DBD::mysql: '0'
+  DBIx::Class: '0'
+  Email::Sender: '0'
+  Email::Simple: '0'
+  FCGI: '0'
+  FCGI::Client: '0'
+  File::Temp: '0'
+  File::stat: '0'
+  HTML::Entities: '0'
+  HTTP::Cookies: '0'
+  HTTP::Headers: '0'
+  Plack::Test: '0'
+  Pod::Simple::SimpleTree: '0'
+  Test::Differences: '0'
+  Test::Kantan: '0'
+  Test::More: '0'
+  Test::WWW::Mechanize::PSGI: '0'
+  Time::HiRes: '0'
+configure_requires:
+  Module::Build: '0'
+  Module::CPANfile: '0'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4214, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: YATT-Lite
+recommends:
+  B::Utils: '!= 0.26'
+  Devel::StackTrace::WithLexicals: '0.08'
+  Sub::Inspector: '0'
+  YAML::Tiny: '0'
+requires:
+  CGI: '0'
+  Devel::StackTrace: '0'
+  File::Path: '0'
+  HTML::Entities: '0'
+  Hash::MultiValue: '0'
+  List::MoreUtils: '0'
+  List::Util: '0'
+  Locale::PO: '0'
+  Plack: '0'
+  Tie::IxHash: '0'
+  URI::Escape: '0'
+  autodie: '0'
+  parent: '0'
+  perl: '>= v5.10.1, != 5.17, != v5.19.3'
+  version: '0.77'
+resources:
+  license: http://dev.perl.org/licenses/
+version: '0.101'

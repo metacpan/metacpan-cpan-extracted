@@ -1,0 +1,8 @@
+Revision history for YVDHOVE::System
+************************************
+
+YVDHOVE::System v1.02
+	* Added IO::CaptureOutput to PREREQ_PM
+
+YVDHOVE::System v1.01
+	* original version; created by h2xs 1.23 with options '-AXc -n YVDHOVE::System'

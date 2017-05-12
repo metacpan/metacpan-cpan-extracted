@@ -1,0 +1,78 @@
+# -*- coding: utf-8 -*-
+
+ACTION[
+remove: ../data/.ht_*
+]
+
+FILE: save.ydo
+METHOD: POST
+PARAM{
+title: 漢字の投稿
+body:
+ 中身
+}
+HEADER[
+Location: ^\./
+]
+
+
+FILE: index.yatt
+HEADER[
+Content-type: ^text/html; charset="?utf-8"?
+]
+BODY:
+ <!DOCTYPE html>
+ <html>
+ <head>
+   <title>Toy file editor, (without auth!;-)</title>
+ 
+ </head>
+ <body>
+ <div id="wrapper" style="width: 800px; margin: 0 auto;">
+ <div id="topnav">
+   <h2 style="display: inline;"><a href="./">Toy file editor, (without auth!;-)</a></h2>
+ </div>
+ <center style="text-align: center;">
+ <div id="body" style="text-align: left;">
+   
+ <h3>Add new file:</h3>
+ <form method="POST" action="save.ydo">
+ <table cellspacing=0 cellpadding=0>
+   <tr>
+     <th>TITLE</th>
+     <td><input type="text" name="title" size="70" value=""><br></td>
+   </tr>
+   <tr>
+     <th>BODY</th>
+     <td><textarea name="body" rows=10 cols="70"></textarea></td>
+   </tr>
+   <tr>
+     <td colspan=2><input type="submit" name="!save" value="Save">
+       
+     </td>
+   </tr>
+ </table>
+ 
+ 
+ </form>
+ 
+ <h3>List of current files:</h3>
+ <ul>
+ 
+   <li>
+     <a href="edit.yatt?fnum=1">
+       (1)
+       漢字の投稿
+     </a>
+   </li></ul>
+ 
+ <h4>Template age: 1</h4></div>
+ </center>
+ </div>
+ </div>
+ </body>
+ </html>
+
+ACTION[
+remove: ../data/.ht_*
+]

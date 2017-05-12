@@ -1,0 +1,769 @@
+#!/usr/bin/perl 
+
+BEGIN {
+  use Cwd;
+  use FindBin;
+
+  chroot('/');
+
+  $ENV{'YM_BIN'}  = "$FindBin::RealBin";
+  $ENV{'YM_LIB'}  = Cwd::abs_path("$ENV{'YM_BIN'}/../lib");
+}
+
+use warnings;
+use strict;
+#use diagnostics;
+
+use vars qw($VERSION);
+$VERSION = '0.02';
+
+use lib $ENV{'YM_LIB'};
+use lib "$ENV{'YM_LIB'}/Ym";
+use Ym;
+
+use Getopt::Long;
+
+sub Usage {
+  my $cmd = shift;
+
+  my %cu = (
+    'add-host' => 'Add one or more hosts.
+	-o hostname|READ_FILE=file [-o object2 -o object3]                                                                                                    
+	-p use=default-host -p contact_groups=some-admins
+',
+    'delete-host' => 'Delete one or more hosts.
+        Possible arguments (may be multiple) are:
+	  -o <hostname>
+          -g <hostgroupname>
+        Arg values may be comma|space|semicolon separated names; 
+          /regex/ or READ_FILE=filename macros.
+',
+    'modify-host' => 'Modify attributes of one or more hosts.
+        Possible arguments (may be multiple) are:
+	  -o <hostname>
+          -g <hostgroupname>
+	  -p <key>=<value> (example: -p use=default-host -p contact_groups=some-admins)
+	  -r|--remove <attribute>
+        Arg values may be comma|space|semicolon separated names;
+          /regex/ or READ_FILE=filename macros.
+',
+    'copy-host' => 'Make a clone(s) of a host with all its services.
+	--host source_host
+	-d|--dest hostname|READ_FILE=file [-d dest2 -d dest3]
+',
+    'add-service' => 'Add service(s) to host(s)
+	Possible arguments (may be multiple) are:
+     	  -o <servicename>
+	  -d|--dest <hostname>
+	  -g <hostgroupname>
+	  -p <key>=<value> (example: -p use=default-service -p contact_groups=some-admins)
+	Arg values may be comma|space|semicolon separated names;
+	  /regex/ or READ_FILE=filename macros.
+',
+    'delete-service' => 'Delete service(s) from host(s)
+	Possible arguments (may be multiple) are:      
+	  -o <servicename>
+	  -d|--dest <hostname>
+          -g|--group <hostgroupname>
+        Arg values may be comma|space|semicolon separated names;
+          /regex/ or READ_FILE=filename macros.
+',
+    'modify-service' => 'Modify service(s) attributes on host(s)
+	Possible arguments (may be multiple) are:
+	  -o <servicename>
+	  -d|--dest <hostname>
+ 	  -g|--group <hostgroupname>
+	  -p <key>=<value> (example: -p use=default-service -p contact_groups=some-admins)
+	  -r|--remove <attribute>
+        Arg values may be comma|space|semicolon separated names;
+          /regex/ or READ_FILE=filename macros.
+',
+    'copy-service' => 'Make a clone(s) of a service on one host.
+	--service source_service
+	-d|--dest service|READ_FILE=file [-d dest2 -d dest3]
+	--host source_host
+',
+    'add-command' => 'Define a new command(s).
+	-o command|READ_FILE=file [-o object2 -o object3]
+	-p command_line="$USER1$/local/tryumount $SERVICESTATE$"
+',
+    'delete-command' => 'Delete command(s).
+	-o command|/REGEX/|READ_FILE=file [-o object2 -o object3]
+',
+    'modify-command' => 'Modify attributes of one or more cpmmands.
+	-o command|/REGEX/|READ_FILE=file [-o object2 -o object3]
+	-p command_line="$USER1$/local/tryumount $SERVICESTATE$"
+',
+    'add-hostgroup'  => 'Add new hostgroup(s).
+	-o hostgroup_name|READ_FILE=file [-o object2 -o object3]
+        -p property=value (example: -p alias=\'Web Servers\')
+',
+    'delete-hostgroup'  => 'Delete hostgroup(s).
+	-o hostgroup_name|/REGEX/|READ_FILE=file [-o object2 -o object3]
+',
+    'modify-hostgroup'  => 'Modify attributes of one or more hostgroups.
+	-o hostgroup_name|/REGEX/|READ_FILE=file [-o object2 -o object3]
+	-p property=value (example: -p alias=\'Web Servers\')
+	-r|--remove attribute|/REGEX/|READ_FILE=file [-r|--remove attribute2 -r|--remove attribute3]
+',
+    'modify-item' => 'Add|Delete counting values to an attribute. Like members in hostgroup.
+	(--name object_name 
+	--type  host_templates|hostgroups|service_templates|
+		commands|contact_templates|contactgroups|
+		contacts|timeperiods|service_dependencies|
+		host_dependencies
+	) or
+	(--type hosts --host hostname [--service])
+	--action add|delete
+	--attr name (for example: members)
+
+	-o object_name|/REGEX/|READ_FILE=file [-o object2 -o object3]
+',
+    'show-hostgroup-members' => 'Print a list of hostgroup members.
+	-o <hostgroup>
+	Arg values may be comma|space|semicolon separated names;
+	  /regex/ or READ_FILE=filename macros.
+',
+    'show-contactroup-members' => 'Print a list of contactgroup members.
+	-o <contactgroup>
+	Arg values may be comma|space|semicolon separated names;
+	  /regex/ or READ_FILE=filename macros.
+',
+
+    'list' => 'List object\'s names of specified type.
+	(--type host_templates|hostgroups|service_templates|
+		commands|contact_templates|contactgroups|contacts|
+		timeperiods|service_dependencies|host_dependencies
+	) or
+	(--type services --host source_host)
+
+	-o object_name|/REGEX/|READ_FILE=file [-o object2 -o object3]
+',
+    'dump' => 'Dump all attributes for specified objects name and type.
+	(--type host_templates|hostgroups|service_templates|
+		commands|contact_templates|contactgroups|contacts|
+		timeperiods|service_dependencies|host_dependencies
+	) or
+	(--type services --host source_host)
+
+	-o object_name|/REGEX/|READ_FILE=file [-o object2 -o object3]
+',
+    'show-membership' => 'Show group names where hosts or contacts are members.
+	-o object_name|/REGEX/|READ_FILE=file [-o object2 -o object3]
+	--type hosts|contacts
+',
+    'make-cfg'   => 'Generate nagios configuration files.
+',
+    'verify-cfg' => 'Generate nagios configuration files in workspace for verification.
+',
+    'flush-cache' => 'Delete objects cache from disk. Use this command after manual change of Nagios configs.
+',
+    'renew-cache' => 'Delete objects cache from disk, parse Nagios configs and make a new cache
+',
+    'cleanup'     => 'Remove unused elements from config.
+	(--type host_templates|service_templates|contacts|
+		contact_templates|timeperiods
+	)      - cleanup for a particular type of object
+	Another possible keys:
+	--ask  - Ask before delete any element
+	--diff - Be verbose
+	--dump - Dump unused object
+',
+  );
+  print "Usage: ./ym -c COMMAND\n";
+  if (defined($cu{$cmd})) {
+    my $mess = $cu{$cmd};
+    print "$cmd - $mess\n";
+  }
+  else {
+    print "\tValid commands are:\n";
+    foreach my $c (sort keys %cu) {
+      my $mess = $cu{$c};
+      print "$c - $mess\n";
+    }
+  }
+  exit;
+}
+
+##############################
+# Dance with Getopt
+
+my $cmd = '';    # Variable to store command name.
+my @objects;     # Array to store object names, regexps and macroses.
+my %p;           # Hash for storing object parameters.
+my @dest;        # Array for storing destination objects.
+my $name    = '';    # Variable to store object name.
+my $diff    = 0;     # Option to show diff of made changes or not.
+my $type    = '';
+my $host    = '';
+my $service = '';
+my $action  = '';
+my $help    = '';
+my $attr    = '';
+my $ask;
+my $dump;
+my @remove;
+my @groups;
+
+my $res = GetOptions(   'c=s' => \$cmd,         'command=s'     => \$cmd,
+                        'o=s' => \@objects,     'objects=s'     => \@objects,
+                        'd=s' => \@dest,        'dest=s'        => \@dest,
+                        'g=s' => \@groups,      'group'         => \@groups,
+                        'p=s' => \%p,
+                                                'name=s'        => \$name,
+                                                'diff'          => \$diff,
+                        't=s' => \$type,        'type=s'        => \$type,
+                                                'host=s'        => \$host,
+                                                'service=s'     => \$service,
+                                                'action=s'      => \$action,
+                        'h' => \$help,          'help'          => \$help,
+                                                'attr=s'        => \$attr,
+                        'r=s' => \@remove,      'remove=s'      => \@remove,
+                                                'ask'           => \$ask,
+                                                'dump'          => \$dump,
+);
+
+($help && !$cmd) && Usage("ALL");
+
+# Verify and execute
+if (!$cmd) {
+  die "No command specified. Use --help or -h for help.\n";
+}
+
+$diff = 1 if ($Ym::SHOW_DIFF_BY_DEFAULT);
+
+my $tree = Ym::GetStruct($Ym::STRUCT_FILE, $Ym::NAGIOS_MAIN_CFG);
+my $copy = Ym::CloneStruct($tree);
+(-s $Ym::STRUCT_FILE) || Ym::SaveStruct($tree, $Ym::STRUCT_FILE);
+
+if ($cmd eq "add-host") {
+  ($help) && Usage($cmd);
+  if (scalar(@objects) == 0) {
+    print "Error: object list is empty.\n";
+    Usage($cmd);
+  }
+
+  # objects = host names, READ_FILE macros
+  Ym::AddHost($tree, \@objects, \%p);
+
+}
+elsif ($cmd eq "delete-host") {
+  ($help) && Usage($cmd);
+  if (scalar(@objects) == 0 && scalar(@groups) == 0) {
+    print "Error: object list is empty.\n";
+    Usage($cmd);
+  }
+
+  # objects = host names, READ_FILE macros, regexp
+  Ym::DeleteHost($tree, \@objects, \@groups);
+
+}
+elsif ($cmd eq "modify-host") {
+  ($help) && Usage($cmd);
+  if (scalar(@objects) == 0 && scalar(@groups) == 0) {
+    print "Error: object list is empty.\n";
+    Usage($cmd);
+  }
+  Ym::ModifyHost($tree, \@objects, \@groups, \%p, \@remove);
+
+}
+elsif ($cmd eq "copy-host") {
+  ($help) && Usage($cmd);
+  if (!$host) {
+    print "Error: hostname is missing\n";
+    Usage($cmd);
+  }
+  if (scalar(@dest) == 0) {
+    print "Error: destination host list is empty.\n";
+    Usage($cmd);
+  }
+  Ym::CopyHost($tree, $host, \@dest);
+
+}
+elsif ($cmd eq "add-service") {
+  ($help) && Usage($cmd);
+  if (scalar(@objects) == 0) {
+    print "Error: object and group list is empty.\n";
+    Usage($cmd);
+  }
+  if (scalar(@dest) == 0 && scalar(@groups) == 0) {
+    print "Error: destination host list is empty.\n";
+    Usage($cmd);
+  }
+  Ym::AddService($tree, \@objects, \@dest, \@groups, \%p);
+
+}
+elsif ($cmd eq "delete-service") {
+  ($help) && Usage($cmd);
+  if (scalar(@objects) == 0) {
+    print "Error: object list is empty.\n";
+    Usage($cmd);
+  }
+  if (scalar(@dest) == 0 && scalar(@groups) == 0) {
+    print "Error: destination host list is empty.\n";
+    Usage($cmd);
+  }
+  Ym::DeleteService($tree, \@objects, \@dest, \@groups);
+
+}
+elsif ($cmd eq "modify-service") {
+  ($help) && Usage($cmd);
+  if (scalar(@objects) == 0) {
+    print "Error: object list is empty.\n";
+    Usage($cmd);
+  }
+  if (scalar(@dest) == 0 && scalar(@groups) == 0) {
+    print "Error: destination host list is empty.\n";
+    Usage($cmd);
+  }
+  Ym::ModifyService($tree, \@objects, \@dest, \@groups, \%p, \@remove);
+
+}
+elsif ($cmd eq "copy-service") {
+  ($help) && Usage($cmd);
+  if (!$host) {
+    print "Error: hostname is missing\n";
+    Usage($cmd);
+  }
+  if (!$service) {
+    print "Error: servive name is missing\n";
+    Usage($cmd);
+  }
+  if (scalar(@dest) == 0) {
+    print "Error: destination service list is empty.\n";
+    Usage($cmd);
+  }
+  Ym::CopyService($tree, $service, \@dest, $host);
+
+}
+elsif ($cmd eq "add-command") {
+  ($help) && Usage($cmd);
+  if (scalar(@objects) == 0) {
+    print "Error: object list is empty.\n";
+    Usage($cmd);
+  }
+  Ym::AddCommand($tree, \@objects, \%p);
+
+}
+elsif ($cmd eq "delete-command") {
+  ($help) && Usage($cmd);
+  if (scalar(@objects) == 0) {
+    print "Error: object list is empty.\n";
+    Usage($cmd);
+  }
+  Ym::DeleteCommand($tree, \@objects);
+
+}
+elsif ($cmd eq "modify-command") {
+  ($help) && Usage($cmd);
+  if (scalar(@objects) == 0) {
+    print "Error: object list is empty.\n";
+    Usage($cmd);
+  }
+  Ym::ModifyCommand($tree, \@objects, \%p);
+
+}
+elsif ($cmd eq "add-hostgroup") {
+  ($help) && Usage($cmd);
+  if (scalar(@objects) == 0) {
+    print "Error: object list is empty.\n";
+    Usage($cmd);
+  }
+  Ym::AddHostgroup($tree, \@objects, \%p);
+
+}
+elsif ($cmd eq "delete-hostgroup") {
+  ($help) && Usage($cmd);
+  if (scalar(@objects) == 0) {
+    print "Error: object list is empty.\n";
+    Usage($cmd);
+  }
+  Ym::DeleteHostgroup($tree, \@objects);
+
+}
+elsif ($cmd eq "modify-hostgroup") {
+  ($help) && Usage($cmd);
+  if (scalar(@objects) == 0) {
+    print "Error: object list is empty.\n";
+    Usage($cmd);
+  }
+  Ym::ModifyHostgroup($tree, \@objects, \%p);
+
+}
+elsif ($cmd eq 'show-hostgroup-members' 
+    || $cmd eq 'show-contactgroup-members')
+{
+  ($help) && Usage($cmd);
+  if (scalar(@objects) == 0) {
+    print "Error: object list is empty.\n";
+    Usage($cmd);
+  }
+  my $t = ($cmd eq 'show-hostgroup-members') ?
+    'hostgroups' : 'contactgroups';
+
+  Ym::ShowMembers($tree, \@objects, {'type' => $t});
+}
+elsif ($cmd eq "modify-item") {
+  ($help) && Usage($cmd);
+  if (!$action) {
+    print "Error: action is missing\n";
+    Usage($cmd);
+  }
+  if (!$attr) {
+    print "Error: attribute is missing\n";
+    Usage($cmd);
+  }
+  if (!$type) {
+    print "Error: 'type' is missing\n";
+    Usage($cmd);
+  }
+  if (!$name && $type ne "hosts") {
+    print "Error: object name is missing\n";
+    Usage($cmd);
+  }
+  if (scalar(@objects) == 0) {
+    print "Error: object list is empty.\n";
+    Usage($cmd);
+  }
+
+  my $ref;
+  if ($type eq "hosts") {
+    if (!$host) {
+      print "Error: host name is missing\n";
+      Usage($cmd);
+    }
+    if (!defined($tree->{'hosts'}{$host})) {
+      die "Error: host $host if not defined.\n";
+    }
+    if ($service) {
+      my $href = $tree->{'hosts'}{$host};
+      if ( !defined($href->{'services'})
+        || !defined($href->{'services'}{$service}))
+      {
+        die "Error: service $service is not defined for host $host\n";
+      }
+      $ref = $href->{'services'}{$service};
+    }
+    else {
+      $ref = $tree->{$type}{$host};
+    }
+  }
+  elsif ($type eq "contactgroups") {
+    if (!defined($tree->{$type}{$name})) {
+      die "Error: contactgroup $name is not defined\n";
+    }
+    $ref = $tree->{$type}{$name};
+
+  }
+  elsif ($type eq "hostgroups") {
+    if (!defined($tree->{$type}{$name})) {
+      die "Error: hostgroup $name is not defined\n";
+    }
+    $ref = $tree->{$type}{$name};
+  }
+  else {
+    print "Achtung! This command can't handle such path yet.\n";
+    exit;
+  }
+  if ($action eq "add") {
+    Ym::AddItem($tree, $ref, \@objects, $attr);
+  }
+  else {
+    Ym::DeleteItem($tree, $ref, \@objects, $attr);
+  }
+}
+elsif ($cmd eq "list" || $cmd eq "dump") {
+  ($help) && Usage($cmd);
+  if (!$type) {
+    print "Error: 'type' is missing\n";
+    Usage($cmd);
+  }
+  if (!defined($tree->{$type}) && $type ne "services") {
+    print "Error: unknown object type - $type\n";
+    Usage($cmd);
+  }
+  if (scalar(@objects) == 0) {
+    print "Error: object list is empty.\n";
+    Usage($cmd);
+  }
+  my $ref;
+  if ($type eq "services") {
+    if (!$host) {
+      print "Error: host name is missing.\n";
+      Usage($cmd);
+    }
+    if (!defined($tree->{'hosts'}{$host})) {
+      die "Error: host $host if not defined.\n";
+    }
+    my $href = $tree->{'hosts'}{$host};
+    if (!defined($href->{'services'})) {
+      die "Error: no services are defined for host $host\n";
+    }
+    $ref = $href->{'services'};
+  }
+  else {
+    $ref = $tree->{$type};
+  }
+  if ($cmd eq "list") {
+    Ym::List($ref, \@objects);
+  }
+  else {
+    Ym::Dump($ref, \@objects);
+  }
+  ($diff) && Ym::ShowDiff($copy, $tree);
+  exit;
+}
+elsif ($cmd eq "show-membership") {
+  ($help) && Usage($cmd);
+  if (!$type) {
+    print "Error: 'type' is missing\n";
+    Usage($cmd);
+  }
+  if (scalar(@objects) == 0) {
+    print "Error: object list is empty.\n";
+    Usage($cmd);
+  }
+  my $membership = Ym::ShowMembership($tree, \@objects, $type);
+  if (@$membership) {
+    print join "\n", @$membership;
+  }
+  print "\n";
+  exit;
+
+}
+elsif ($cmd eq "flush-cache" || $cmd eq "renew-cache") {
+  ($help) && Usage($cmd);
+  (-e $Ym::STRUCT_FILE) && unlink($Ym::STRUCT_FILE);
+  if ($cmd eq "renew-cache") {
+    my $temp_tree = Ym::GetStruct($Ym::STRUCT_FILE, $Ym::NAGIOS_MAIN_CFG);
+    Ym::SaveStruct($temp_tree, $Ym::STRUCT_FILE);
+  }
+  exit;
+
+}
+elsif ($cmd eq "make-cfg" || $cmd eq "verify-cfg") {
+  ($help) && Usage($cmd);
+  my $dest_dir = ($cmd eq "make-cfg") ? $Ym::NAGIOS_CFG_DIR : $Ym::WORKPLACE;
+
+  Ym::GenerateSpecific($tree, $Ym::HOSTNAME) if ($Ym::ENABLE_YM_SPECIFIC);
+
+  Ym::VerifyDataStructure($tree);
+  ($diff) && Ym::ShowDiff($copy, $tree);
+
+  if ($cmd eq "make-cfg") {
+    Ym::TouchConfigs($tree);
+  }
+
+  Ym::SaveStruct($tree, $Ym::STRUCT_FILE);
+  if ($cmd eq "make-cfg") {
+
+    if($Ym::BACKUP_CONFIG_FILES) {
+      print "Backuping old configuration...";
+      my $bd = Ym::Backup();
+      print "Backup saved in $bd\n";
+    }
+  }
+  Ym::GenerateCfg($tree, $dest_dir);
+
+  exit;
+}
+elsif ($cmd eq 'cleanup') {
+  ($help) && Usage($cmd);
+  if ($type) {
+    unless ($type =~ /^(host_templates|service_templates|contacts|contact_templates|timeperiods)$/o) {
+      warn "Cleanup: wrong type of object in '--type' directive.\n";
+      Usage($cmd);
+      die;
+    }
+  }
+  Ym::Cleanup(
+    $tree,
+    {
+      'ask'  => $ask,
+      'diff' => $diff,
+      'dump' => $dump,
+      'type' => $type
+    }
+  );
+}
+else {
+  die "Error: unrecognized command - $cmd\n";
+}
+
+($diff) && Ym::ShowDiff($copy, $tree);
+Ym::SaveStruct($tree, $Ym::STRUCT_FILE);
+
+__END__
+
+=head1 NAME
+
+Ym - a command line tool for manipulating Nagios configuration.
+
+=head1 SYNOPSIS
+
+    Usage: ./ym -c COMMAND
+            Valid commands are:
+    add-command - Define a new command(s).
+            -o command|READ_FILE=file [-o object2 -o object3]
+            -p command_line="$USER1$/local/tryumount $SERVICESTATE$"
+    
+    add-host - Add one or more hosts.
+            -o hostname|READ_FILE=file [-o object2 -o object3]                                                                                                    
+            -p use=default-host -p contact_groups=some-admins
+    
+    add-hostgroup - Add new hostgroup(s).
+            -o hostgroup_name|READ_FILE=file [-o object2 -o object3]
+            -p property=value (example: -p alias='Web Servers')
+    
+    add-service - Add service(s) to host(s)
+            Possible arguments (may be multiple) are:
+              -o <servicename>
+              -d|--dest <hostname>
+              -g <hostgroupname>
+              -p <key>=<value> (example: -p use=default-service -p contact_groups=some-admins)
+            Arg values may be comma|space|semicolon separated names;
+              /regex/ or READ_FILE=filename macros.
+    
+    cleanup - Remove unused elements from config.
+            (--type host_templates|service_templates|contacts|
+                    contact_templates|timeperiods
+            )      - cleanup for a particular type of object
+            Another possible keys:
+            --ask  - Ask before delete any element
+            --diff - Be verbose
+            --dump - Dump unused object
+    
+    copy-host - Make a clone(s) of a host with all its services.
+            --host source_host
+            -d|--dest hostname|READ_FILE=file [-d dest2 -d dest3]
+    
+    copy-service - Make a clone(s) of a service on one host.
+            --service source_service
+            -d|--dest service|READ_FILE=file [-d dest2 -d dest3]
+            --host source_host
+    
+    delete-command - Delete command(s).
+            -o command|/REGEX/|READ_FILE=file [-o object2 -o object3]
+    
+    delete-host - Delete one or more hosts.
+            Possible arguments (may be multiple) are:
+              -o <hostname>
+              -g <hostgroupname>
+            Arg values may be comma|space|semicolon separated names; 
+              /regex/ or READ_FILE=filename macros.
+    
+    delete-hostgroup - Delete hostgroup(s).
+            -o hostgroup_name|/REGEX/|READ_FILE=file [-o object2 -o object3]
+    
+    delete-service - Delete service(s) from host(s)
+            Possible arguments (may be multiple) are:      
+              -o <servicename>
+              -d|--dest <hostname>
+              -g|--group <hostgroupname>
+            Arg values may be comma|space|semicolon separated names;
+              /regex/ or READ_FILE=filename macros.
+    
+    dump - Dump all attributes for specified objects name and type.
+            (--type host_templates|hostgroups|service_templates|
+                    commands|contact_templates|contactgroups|contacts|
+                    timeperiods|service_dependencies|host_dependencies
+            ) or
+            (--type services --host source_host)
+    
+            -o object_name|/REGEX/|READ_FILE=file [-o object2 -o object3]
+    
+    flush-cache - Delete objects cache from disk. Use this command after manual change of Nagios configs.
+    
+    list - List object's names of specified type.
+            (--type host_templates|hostgroups|service_templates|
+                    commands|contact_templates|contactgroups|contacts|
+                    timeperiods|service_dependencies|host_dependencies
+            ) or
+            (--type services --host source_host)
+    
+            -o object_name|/REGEX/|READ_FILE=file [-o object2 -o object3]
+    
+    make-cfg - Generate nagios configuration files.
+    
+    modify-command - Modify attributes of one or more cpmmands.
+            -o command|/REGEX/|READ_FILE=file [-o object2 -o object3]
+            -p command_line="$USER1$/local/tryumount $SERVICESTATE$"
+    
+    modify-host - Modify attributes of one or more hosts.
+            Possible arguments (may be multiple) are:
+              -o <hostname>
+              -g <hostgroupname>
+              -p <key>=<value> (example: -p use=default-host -p contact_groups=some-admins)
+              -r|--remove <attribute>
+            Arg values may be comma|space|semicolon separated names;
+              /regex/ or READ_FILE=filename macros.
+    
+    modify-hostgroup - Modify attributes of one or more hostgroups.
+            -o hostgroup_name|/REGEX/|READ_FILE=file [-o object2 -o object3]
+            -p property=value (example: -p alias='Web Servers')
+            -r|--remove attribute|/REGEX/|READ_FILE=file [-r|--remove attribute2 -r|--remove attribute3]
+    
+    modify-item - Add|Delete counting values to an attribute. Like members in hostgroup.
+            (--name object_name 
+            --type  host_templates|hostgroups|service_templates|
+                    commands|contact_templates|contactgroups|
+                    contacts|timeperiods|service_dependencies|
+                    host_dependencies
+            ) or
+            (--type hosts --host hostname [--service])
+            --action add|delete
+            --attr name (for example: members)
+    
+            -o object_name|/REGEX/|READ_FILE=file [-o object2 -o object3]
+    
+    modify-service - Modify service(s) attributes on host(s)
+            Possible arguments (may be multiple) are:
+              -o <servicename>
+              -d|--dest <hostname>
+              -g|--group <hostgroupname>
+              -p <key>=<value> (example: -p use=default-service -p contact_groups=some-admins)
+              -r|--remove <attribute>
+            Arg values may be comma|space|semicolon separated names;
+              /regex/ or READ_FILE=filename macros.
+    
+    renew-cache - Delete objects cache from disk, parse Nagios configs and make a new cache
+    
+    show-contactroup-members - Print a list of contactgroup members.
+            -o <contactgroup>
+            Arg values may be comma|space|semicolon separated names;
+              /regex/ or READ_FILE=filename macros.
+    
+    show-hostgroup-members - Print a list of hostgroup members.
+            -o <hostgroup>
+            Arg values may be comma|space|semicolon separated names;
+              /regex/ or READ_FILE=filename macros.
+    
+    show-membership - Show group names where hosts or contacts are members.
+            -o object_name|/REGEX/|READ_FILE=file [-o object2 -o object3]
+            --type hosts|contacts
+    
+    verify-cfg - Generate nagios configuration files in workspace for verification.
+
+
+=head1 CREDITS
+
+Thank you to Yandex team:
+
+  Petya Kohts
+  Dmitry Parfenov
+
+for their bug reports, suggestions and contributions.
+
+=head1 AUTHORS
+
+Andrey Grunau E<lt>andrey-grunau@yandex.ruE<gt>
+
+=head1 COPYRIGHT
+
+Copyright 2008 - 2010 Andrey Grunau.
+
+This program is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
+
+=cut
+

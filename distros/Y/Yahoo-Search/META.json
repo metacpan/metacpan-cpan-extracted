@@ -1,0 +1,41 @@
+{
+   "abstract" : "Interface to the Yahoo! Search public API",
+   "author" : [
+      "Tim Bunce <Tim.Bunce@pobox.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.101612, CPAN::Meta::Converter version 2.101610",
+   "license" : [
+      "unrestricted"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Yahoo-Search",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.31"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Encode" : 0,
+            "LWP" : "5.835",
+            "Test::More" : "0.86",
+            "URI" : "1.54"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/timbunce/Yahoo-Search.git",
+         "web" : "http://github.com/timbunce/Yahoo-Search"
+      }
+   },
+   "version" : "1.11.3"
+}
+

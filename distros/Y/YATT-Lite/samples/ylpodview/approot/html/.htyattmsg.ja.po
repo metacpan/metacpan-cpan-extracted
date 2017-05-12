@@ -1,0 +1,23 @@
+#, fuzzy
+msgid ""
+msgstr "Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2012-10-08 12:09+0900\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: /home/hkoba/db/bz/ssri/html/devtest/pmap/lib/YATT/samples/ylpodview/approot/html/index.yatt:32
+#, perl-format
+msgid "Let's search Perl document."
+msgstr "Perlのモジュール名を入力してみて下さい"
+
+#: /home/hkoba/db/bz/ssri/html/devtest/pmap/lib/YATT/samples/ylpodview/approot/html/index.yatt:39
+#, perl-format
+msgid "...or you can see local pods listed below:"
+msgstr "以下のリンクから直接解説に飛ぶことも出来ます"
+

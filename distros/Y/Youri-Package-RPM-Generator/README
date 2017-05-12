@@ -1,0 +1,27 @@
+Youri::Package::RPM::Generator
+------------------------------
+
+Template-based RPM generator.
+
+Description
+-----------
+This module generates rpm packages from a spec file template, for testing
+purposes.
+
+Installation
+------------
+To install, just use:
+perl Makefile.PL
+make
+make test
+
+Copyright and License
+---------------------
+Copyright (c) 2006-2007 YOURI project
+
+This program is free software; you can redistribute it and/or modify it under
+the same terms as Perl itself.
+
+Authors
+-------
+Guillaume Rousse <guillomovitch@zarb.org>

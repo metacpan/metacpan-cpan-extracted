@@ -1,0 +1,83 @@
+{
+   "abstract" : "Serve up marshaled perl objects in javascript",
+   "author" : [
+      "Eric Wolf (coyocanid@gmail.com)"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4216",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Yote-Server",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Module::Build" : "0.4",
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.42"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "IO::Socket::SSL" : "2.024",
+            "JSON" : "0",
+            "Lock::Server" : "1.73",
+            "Test::More" : "0",
+            "URI::Escape" : "0",
+            "UUID::Tiny" : "0",
+            "Yote" : "1.31",
+            "perl" : "v5.12.0"
+         }
+      }
+   },
+   "provides" : {
+      "Yote::Server" : {
+         "file" : "lib/Yote/Server.pm",
+         "version" : "1.26"
+      },
+      "Yote::Server::Acct" : {
+         "file" : "lib/Yote/Server/Acct.pm"
+      },
+      "Yote::Server::App" : {
+         "file" : "lib/Yote/Server/App.pm"
+      },
+      "Yote::Server::ListContainer" : {
+         "file" : "lib/Yote/Server/ListContainer.pm",
+         "version" : "1.0"
+      },
+      "Yote::Server::ModperlOperator" : {
+         "file" : "lib/Yote/Server/ModperlOperator.pm"
+      },
+      "Yote::Server::ModperlOperatorStateManager" : {
+         "file" : "lib/Yote/Server/ModperlOperator.pm"
+      },
+      "Yote::ServerObj" : {
+         "file" : "lib/Yote/Server.pm"
+      },
+      "Yote::ServerRoot" : {
+         "file" : "lib/Yote/Server.pm"
+      },
+      "Yote::ServerSession" : {
+         "file" : "lib/Yote/Server.pm"
+      },
+      "Yote::ServerStore" : {
+         "file" : "lib/Yote/Server.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "1.26",
+   "x_serialization_backend" : "JSON::PP version 2.27300"
+}

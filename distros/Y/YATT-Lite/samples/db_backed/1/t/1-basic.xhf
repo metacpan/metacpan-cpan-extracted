@@ -1,0 +1,12 @@
+# -*- coding: utf-8 -*-
+REQUIRE[
+- DBIx::Class::Schema
+- DBD::SQLite
+- CGI::Session
+- Email::Simple
+- Email::Sender
+]
+USE_COOKIE: 1
+
+# Include real test vectors.
+INCLUDE: basic.inc.xhf

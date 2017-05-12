@@ -1,0 +1,25 @@
+# YamlTime commands will not run until you remove this line.
+unconfigured: 1
+
+
+
+#                           READ THIS NOW!!!
+#
+# You should really go over all the config files now. It will help you
+# understand YamlTime much more.
+#
+# First you need to remove the 'unconfigured: 1' line above, and you really
+# should set your timezone below.
+#
+# When YamlTime prompts you for certain information like customer, project and
+# tags, it will only accept values that you have added to your configs.
+#
+# Now you have been educated on YamlTime. Get to work!
+
+
+
+# Your current timezone.
+timezone: America/Los_Angeles
+
+# Don't try to be funny.
+be_serious: 0

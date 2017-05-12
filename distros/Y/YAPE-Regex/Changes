@@ -1,0 +1,32 @@
+Revision history for Perl extension YAPE::Regex.
+
+4.00  Feb 2 2011 [GSULLIVAN]
+	- Gene Sullivan becomes a co-maintainer.  All previous versions by PINYAN.
+	- Fixed RT bug #58040: added license to POD
+	- Attempt to fix RT bug #65042: adapt to qr stringification for 5.13.6
+	- Minor POD changes
+3.04  Mon Nov 30 13:41:40 2009
+	- fixed error in 'slash' regex (Regex.pm line 59)
+3.03  Thu Jan 11 08:50:00 2007
+	- fixed quantifier bug when /x is on ('ab+' was improperly parsed)
+3.01  Mon May  7 13:00:00 2001
+	- fixed test.pl 1..6 to 1..13
+        - removed Text::Balanced from distro (but you still need it!)
+3.00  Wed May  2 19:54:00 2001
+	- full 5.6 regex support!
+2.00  Wed Feb  7 13:00:00 2001
+	- Text::Balanced used -- (?{...}) and (??{...}) supported
+	- (?(...)...|...) is now fully supported
+	- added (?>...) support (it accidentally wasn't there)
+1.03  Tue Feb  6 17:54:00 2001
+	- fixed character class handling
+1.02  Tue Feb  6 10:56:00 2001
+	- Perl 5.6 bug fix regarding qr//
+	- doc patch
+1.01  Tue Feb  6 01:08:00 2001
+	- minor $pat{reg} fix
+	- inheritance fix
+	- added README
+1.00  Mon Feb  5 16:50:00 2001
+	- first version
+

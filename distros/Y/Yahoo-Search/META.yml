@@ -1,0 +1,22 @@
+---
+abstract: 'Interface to the Yahoo! Search public API'
+author:
+  - 'Tim Bunce <Tim.Bunce@pobox.com>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: 6.31
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.101612, CPAN::Meta::Converter version 2.101610'
+license: unrestricted
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Yahoo-Search
+requires:
+  Encode: 0
+  LWP: 5.835
+  Test::More: 0.86
+  URI: 1.54
+resources:
+  repository: git://github.com/timbunce/Yahoo-Search.git
+version: 1.11.3

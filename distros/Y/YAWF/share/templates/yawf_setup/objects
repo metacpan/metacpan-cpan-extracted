@@ -1,0 +1,50 @@
+<h2>Objekte:</h2>
+[% IF error %]<h3 style="color:red;">[% error %]</h3>[% END %]
+
+<table border=0>
+<tr><td>Projekt/Prefix:</td><td>[% project_name %]</td></tr>
+<tr><td>DB-Objekte:</td><td>[% dbo_dir %]</td></tr>
+<tr><td>Web-Objekte:</td><td>[% web_dir %]</td></tr>
+<tr><td>Templates:</td><td>[% yawf.config.template_dir %]</td></tr>
+</table><p>
+
+<form name=f action="objects.create" method=GET>
+<input type=hidden name=SID value="[% yawf.session.id %]">
+
+<table border=0>
+
+<tr><th>Tabelle</th>
+<th>Objekt</th>
+<th>Web-Objekt</th>
+<th>Templates</th>
+</tr>
+
+<tr><td>[% yawf.config.database.class %]::Result</td><td colspan=3></td><tr>
+[% FOR object IN objects %]
+	<tr><td>&nbsp;&middot;&nbsp;[% object.name %]</td>
+	<td align=center style="min-width:60px;">
+		[% IF object.can_module %]
+			<input type=checkbox name="module:[% object.name %]" value=1>
+		[% ELSE %]
+		-
+		[% END %]
+	</td>
+	<td align=center style="min-width:60px;">
+		[% IF object.can_web %]
+			<input type=checkbox name="web:[% object.name %]" value=1>
+		[% ELSE %]
+		-
+		[% END %]
+	</td>
+	<td align=center style="min-width:60px;">
+		[% IF object.can_template %]
+			<input type=checkbox name="template:[% object.name %]" value=1>
+		[% ELSE %]
+		-
+		[% END %]
+	</td>
+	</tr>
+[% END %]
+</table><p>
+<input type=submit value="erstellen...">
+</form>

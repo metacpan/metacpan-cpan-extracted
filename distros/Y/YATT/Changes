@@ -1,0 +1,42 @@
+Revision history for YATT
+
+0.0.10  2015-11-09
+    * Maintainance release. (0.0.9 was failed to be indexed correctly)
+    * Fixes
+         - [GH #5] [RT #108540] Specify CGI.pm as a prerequisite (or skip tests) 
+         - [GH #3] [RT #95311] sub () {$const}
+         - [GH #2] CGI->multi_param
+         - [GH #1] avoid "Redundant argument in sprintf" warning
+
+0.0.8  2013-05-18
+
+- Just to reduce test failures.
+- Fixed: https://rt.cpan.org/Public/Bug/Display.html?id=82756
+
+0.0.5  2010-10-20
+
+- More characters are allowed in entity like: &yatt:list(|,@,$,-,+,*,/,<,>,!);
+- scalar argtype has another alias: 'flag'
+- 'valueless arg => 1' is now restricted to 'flag(=scalar)' type.
+- foo=[delegate] should not have argument 'foo'
+- fix for misuse of Test::More::skip
+- fcgi-memleak verification. In real sense, this is test of platform.
+
+0.0.4  2010-04-08
+
+- To skip rlimit test if BSD::Resource is missing.
+- VarExporter behavior is changed.
+
+0.0.3  2010-04-07
+
+- Stable release. (Just before minor change)
+
+0.0.2  2008-05-15
+
+- Basically usable. Internal change is still in progress.
+
+- Massive directory restructuring.
+
+0.0.1  2007-12-15
+
+- Initial release.

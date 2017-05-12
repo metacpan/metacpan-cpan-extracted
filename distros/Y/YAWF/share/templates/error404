@@ -1,0 +1,5 @@
+[% WRAPPER page page.title = "Error: YAWF - domain $yawf.request.hostname not found";
+	[% WRAPPER msg title="URI: $yawf.request.uri" %]
+		The requested page or domain could not be found!
+	[% END %]
+END %]

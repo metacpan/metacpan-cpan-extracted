@@ -1,0 +1,29 @@
+==================================================
+Changes from 1740-06-07 00:00:00 +0000 to present.
+==================================================
+
+------------------------------------------
+version 0.100 at 2014-03-22 23:05:32 +0000
+------------------------------------------
+
+  Change: 1f36a9e8d64e049dd2ae932eed8357a58781d045
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2014-03-22 23:42:56 +0000
+
+    Added travis config 
+
+  Change: 91fb9031c4a3fb627a67c5c327a8b48111df3811
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2014-03-22 23:42:06 +0000
+
+    First release, moving over from main yeb repo 
+
+  Change: 4704ea5c8e6d2ec2075795f4d08153451ad94bbb
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2014-03-22 22:36:55 +0000
+
+    initial commit 
+
+================
+End of releases.
+================

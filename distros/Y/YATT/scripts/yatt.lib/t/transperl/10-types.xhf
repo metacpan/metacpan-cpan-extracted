@@ -1,0 +1,153 @@
+# -*- coding: utf-8 -*-
+TITLE: print. unspecified = type text.
+IN:
+ <!yatt:args x>
+ <h2>&yatt:x;</h2>
+PARAM[
+- <b>foo</b>
+]
+OUT:
+ <h2>&lt;b&gt;foo&lt;/b&gt;</h2>
+
+TITLE: assign -> print. type text
+IN:
+ <!yatt:args x=text y=text>
+ <yatt:foo x="&yatt:x;bar&yatt:y;"/>
+ <!yatt:widget foo x=text>
+ <h2>&yatt:x;</h2>
+PARAM[
+- <b>
+- </b>
+]
+OUT:
+ <h2>&lt;b&gt;bar&lt;/b&gt;</h2>
+ 
+
+TITLE: $var in text is just an text.
+IN:
+ <!yatt:args x=text y>
+ <yatt:foo x="x=$x,y=@{[$y*8]},z=\U,w=%s"/>
+ <!yatt:widget foo x=text>
+ <h2>&yatt:x;</h2>
+PARAM[
+- foo
+- bar
+]
+OUT:
+ <h2>x=$x,y=@{[$y*8]},z=\U,w=%s</h2>
+ 
+
+TITLE: print. type html
+IN:
+ <!yatt:args x=html>
+ <h2>&yatt:x;</h2>
+PARAM[
+- <b>foo</b>
+]
+OUT:
+ <h2><b>foo</b></h2>
+
+
+TITLE: type list, expand & size
+IN:
+ <!yatt:args x=list>
+ (&yatt:x:expand();) &yatt:x:size();
+PARAM[
+[
+- a
+- b
+- c
+]
+]
+OUT:
+ (abc) 3
+
+TITLE: type list, expand & size for undef
+IN:
+ <!yatt:args x=list>
+ (&yatt:x:expand();) &yatt:x:size();
+PARAM[
+]
+OUT:
+ () 0
+
+TITLE: type html, bare pass thru.
+IN:
+ <!yatt:args x=value>
+ <h2><yatt:foo y=&yatt:x;/></h2>
+ <!yatt:widget foo y=html>
+ &yatt:y;
+PARAM[
+- <b>foo</b>
+]
+OUT:
+ <h2><b>foo</b>
+ </h2>
+
+
+TITLE: assign -> print. type scalar
+IN:
+ <!yatt:args x=scalar y=scalar>
+ <yatt:foo x="(&yatt:x; + &yatt:y;) * 2"/>
+ <!yatt:widget foo x=scalar>
+ <h2>&yatt:x;</h2>
+PARAM[
+- 3
+- 8
+]
+OUT:
+ <h2>22</h2>
+ 
+
+TITLE: assign -> print. type list
+IN:
+ <!yatt:args x=list y=list>
+ <yatt:foo x='join(",", &yatt:x:expand();, &yatt:y:expand();)'/>
+ <!yatt:widget foo x=list>
+ <h2>&yatt:x[0];</h2>
+PARAM[
+[
+- 1
+- 2
+]
+[
+- 3
+- 4
+]
+]
+OUT:
+ <h2>1,2,3,4</h2>
+ 
+
+TITLE: attr (default)
+IN:
+ <!yatt:args class=attr>
+ <div&yatt:class;></div>
+PARAM[
+- foo
+]
+OUT:
+ <div class="foo"></div>
+
+PARAM[
+- 
+]
+OUT:
+ <div></div>
+
+
+TITLE: attr(other,value)
+IN:
+ <!yatt:args color=attr:class>
+ <div&yatt:color(bar,baz);></div>
+PARAM[
+- foo
+]
+OUT:
+ <div class="foo bar baz"></div>
+
+PARAM[
+]
+OUT:
+ <div class="bar baz"></div>
+# In case of missing value

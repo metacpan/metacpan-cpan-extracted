@@ -1,0 +1,31 @@
+Youri::Package::RPM::Updater
+----------------------------
+
+Update RPM packages
+
+Description
+-----------
+This module updates rpm packages. When given an explicit new version, it
+updates the spec file, and downloads new sources automatically. When not given
+a new version, it just updates the spec file.
+
+Installation
+------------
+To install, just use:
+perl Makefile.PL
+make
+make test
+
+Copyright and License
+---------------------
+Copyright (c) 2003-2006 Mandriva
+Copyright (c) 2007 YOURI project
+
+This program is free software; you can redistribute it and/or modify it under
+the same terms as Perl itself.
+
+Authors
+-------
+Julien Danjou <danjou@mandriva.com>
+Michael Scherer <misc@zarb.org>
+Guillaume Rousse <guillomovitch@zarb.org>,

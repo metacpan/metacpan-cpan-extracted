@@ -1,0 +1,144 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+use 5.010;
+use Yars::Command::yars_exercise;
+
+Yars::Command::yars_exercise->main(@ARGV);
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+yars_exercise - Exercise a Yars server from the client side
+
+=head1 VERSION
+
+version 0.07
+
+=head1 SYNOPSIS
+
+ % yars_exercise [log options] [options]
+
+=head1 DESCRIPTION
+
+This command provides performance testing for L<Yars>.  Forks a number
+of processes and sends requests to the Yars server, using randomly
+generated files.  Produces a report with the average C<PUT>, C<GET>
+and C<DELETE> times.
+
+All actions are performed through L<Yars::Client>.  It uses the
+L<upload|Yars::Client#upload>, L<download|Yars::Client#download>
+and L<remove|Yars::Client#remove> methods.
+
+For each client, it randomly shuffles the order of uploads, downloads, and
+removes.  The only guarantee is that for each individual file, the first
+action is an upload and the last is a remove.  With multiple processes,
+this can cause the various operations to intermingle.
+
+Uses L<Log::Log4perl> and L<Clustericious::Log::CommandLine>, so you can specify
+any logging options they support, e.g. C<--debug root> will log a note
+with the elapsed time for each action, C<--trace Yars::Client> will log
+detailed trace log messages from the client, etc.
+
+=head1 OPTIONS
+
+This command also recognizes all options supported by
+L<Clustericious::Log::CommandLine>.
+
+=head2 --numclients I<n>
+
+The number of processes to fork.
+
+=head2 --files I<n>
+
+The number of random files to produce.
+
+=head2 --size I<size>
+
+The size of the files.  You can use any suffix supported by
+L<Number::Bytes::Human>.
+
+=head2 --gets I<n>
+
+The number of GETs to perform for each client.
+
+=head2 --runs I<filename>
+
+Put your config options in a YAML file and specify it
+with "--runs" or "-r":
+
+ % cat runs_desc.yml
+ ---
+ clients: [2,4]
+ files: [5,10]
+ gets: [10,20,40,80]
+ size: [256,256K,8M]
+
+If you list more than one option, it iterates through various
+parameters listed.
+
+C<--runs> also outputs CSV of stats from each run.
+
+=head2 --chunksize I<size>
+
+Chunksize is only used for creating the temp files, changing it won't
+affect the Yars actions.  You can use any suffix supported by
+L<NumbeR::Bytes::Human>
+
+=head2 --help
+
+Display help for this command.
+
+=head2 --version
+
+Prints the L<Yars> version.
+
+=head1 EXAMPLES
+
+ $ yars_exercise --version -h|--help -m|--man
+
+ $ yars_exercise -v|--verbose -q|--quiet [...other log options]
+
+ $ yars_exercise --numclients 4 --files 20 --size 8KiB --gets 10
+                 --temppath /tmp
+
+ $ yars_exercise -n 4 -f 20 -s 8KiB -g 10 -t /tmp
+
+ $ yars_exercise [with no options, uses the defaults above]
+
+ $ yars_exercise -runs runs_desc.txt
+
+=head1 SEE ALSO
+
+=over 4
+
+=item L<Yars>
+
+=item L<yarsclient>
+
+=item L<Yars::Client>
+
+=item L<Clustericious>
+
+=back
+
+=head1 AUTHOR
+
+Original author: Curt Tilmes
+
+Current maintainer: Graham Ollis E<lt>plicease@cpan.orgE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2015 by NASA GSFC.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

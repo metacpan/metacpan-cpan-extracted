@@ -1,0 +1,12 @@
+# -*- perl -*-
+use YATT::Registry;
+
+Entity xhf => sub {
+  my ($this, $file) = @_;
+  my $reader = YATT::XHF->new(filename => $file);
+  my @result;
+  while (my $rec = $reader->read_as_hash) {
+    push @result, $rec;
+  }
+  wantarray ? @result : \@result;
+};

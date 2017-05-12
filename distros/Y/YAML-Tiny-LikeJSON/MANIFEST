@@ -1,0 +1,7 @@
+Changes
+MANIFEST
+META.yml
+Makefile.PL
+README
+lib/YAML/Tiny/LikeJSON.pm
+t/01-basic.t

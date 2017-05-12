@@ -1,0 +1,29 @@
+YVDHOVE::System version 1.01
+============================
+
+This Perl module provides "System" functions for the YVDHOVE framework
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  IO::CaptureOutput
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2007 by Yves Van den Hove <yvdhove@users.sourceforge.net>
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.x or,
+at your option, any later version of Perl 5 you may have available.
+
+

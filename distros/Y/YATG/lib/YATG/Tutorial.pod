@@ -1,0 +1,122 @@
+=head1 NAME
+
+YATG::Tutorial - A simple YATG tutorial
+
+=head1 DESCRIPTION
+
+This tutorial will teach you how to set up L<YATG> using a very simple
+configuration.
+
+=head1 CREATING A SIMPLE CONFIGURATION
+
+Although we could use "any" configuration format, let's start with a
+simple L<YAML> configuration file:
+
+    ---
+    yatg:
+        oids:
+            "sysUpTime":            [disk]
+            "ifHCInOctets":         [ifindex, disk]
+            "ifHCOutOctets":        [ifindex, disk]
+        communities: [public]
+        disk_root: '.' 
+        dbi_connect:
+            - "dbi:SQLite:database.db"
+        dbi_ip_query: 'select ip from device;'
+
+=head2 oids
+
+This configuration file lists a few oids (C<sysUpTime>, C<ifHCInOctets>,
+C<ifHCOutOctets>), and describes how to store each one (C<disk>).
+
+It's important to note that some oids represent scalar values (for
+instance, C<sysUpTime>), while others represent arrays. For instance,
+C<ifHCInOctets> may refer to several interfaces in the same machine:
+C<ifHCInOctets.0>, C<ifHCInOctets.1>, and so on.
+
+You should hint L<YATG> about these indexed interfaces, with the keyword
+C<ifindex>.
+
+=head2 communities
+
+This is a list of community strings recognized by the monitored networks.
+In our case we'll use the default "public" community string.
+
+=head2 disk_root
+
+This configuration item specifies the root of the "disk" storage. By
+default it is C</var/lib/yatg>, but we'll use the current directory
+('C<.>') instead.
+
+=head2 dbi_connect and dbi_ip_query
+
+YATG uses an external database to store a list of IPs. By default it uses
+NetDisco schema; but NetDisco requires additional setup and configuration,
+so we'll use a simpler SQLite database, consisting of a single table.
+
+=head1 CREATING A SOURCE DATABASE USING SQLITE
+
+L<YATG> uses a database to store the list of IPs it will monitor. We'll use
+the following script to create such a database, using SQLite:
+
+ CREATE TABLE device (
+     id INTEGER AUTO_INCREMENT PRIMARY KEY,
+     ip VARCHAR(15)
+ );
+ 
+ INSERT INTO device (id, ip) VALUES (1, '127.0.0.1');
+
+Save this file as "database.sql" and create the database with the command:
+
+ sqlite3 database.db < database.sql
+
+If no problems occur, you can start YATG.
+
+=head1 STARTING YATG
+
+By now, you should have the following files in your working directory:
+
+ config.yaml  # configuration file
+ database.sql # sql schema
+ database.db  # database file
+
+Just execute yatg_updater, using the configuration file as parameter:
+
+ yatg_updater config.yaml
+
+YATG will store the information gathered via SNMP in a sub-directory called
+C<127.0.0.1>.
+
+=head1 TROUBLESHOOTING
+
+The "disk" storage requires L<Tie::File::FixedRecLen>. Make sure you have
+this module installed.
+
+=head1 SEE ALSO
+
+=over 4
+
+=item L<YATG>
+
+=item L<YATG::Config>
+
+=item L<http://www.sqlite.org/>
+
+=back
+
+=head1 AUTHOR
+
+Nelson Ferraz C<< <nferraz@gmail.com> >>
+
+=head1 ACKNOWLEDGMENTS
+
+Thanks to Oliver Gorwits who created L<YATG>.
+
+=head1 COPYRIGHT & LICENSE
+
+Copyright (c) 2007 Nelson Ferraz. All Rights Reserved.
+
+This documentation is free; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+=cut

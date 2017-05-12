@@ -1,0 +1,375 @@
+==================================================
+Changes from 1742-05-07 00:00:00 +0000 to present.
+==================================================
+
+------------------------------------------
+version 0.104 at 2016-02-19 00:41:09 +0000
+------------------------------------------
+
+  Change: f7456d6663a91b448011681e185d12938009a4a6
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2016-02-19 01:40:59 +0000
+
+    Updated .travis.yml 
+
+  Change: 543a2f31bf1a06664935dd9b7d50b41bc63d6049
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2016-02-19 01:40:19 +0000
+
+    Replaced Class::Load with Module::Runtime 
+
+------------------------------------------
+version 0.103 at 2014-07-05 19:55:10 +0000
+------------------------------------------
+
+  Change: cd6c9cedc48c4ac170bba3dcc7358db43f3868c6
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2014-07-05 21:55:10 +0000
+
+    Fixed rights 
+
+  Change: 1e5256153746f636db64b394113144db1655503a
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2014-07-05 21:54:54 +0000
+
+    Added abstract to yeb executable 
+
+  Change: 508aa7cf0aad52f01d9ec7c6ed5c39b58221c9ab
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2014-07-05 21:53:59 +0000
+
+    Fixed a little bug 
+
+  Change: 9a70f37497ce7c7441e7324cb68c3c55716f37c4
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2014-07-05 21:50:02 +0000
+
+    Changed warning, changed support channel 
+
+  Change: 22c3cc53c0379a4644cf0b5b3a1b5160aeb5e03d
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2014-07-05 21:47:21 +0000
+
+    Added load test 
+
+  Change: a0419ef3ef017e150ca97eb6c2905857718b39ad
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2014-07-05 21:44:58 +0000
+
+    Merge branch 'master' of github.com:Getty/p5-yeb 
+
+  Change: 6005350ebb470edd32e6c4960847e0262252e5fa
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2014-07-05 21:44:16 +0000
+
+    Changes for new version of pluginbundle in use 
+
+  Change: 8bc9299a3f3efa7794b7f8e74bf7cd266719a8d0
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2014-03-25 09:58:44 +0000
+
+    Better redirect implementation 
+
+  Change: 838be6f84cf62be5529dcd68c96397812d3fd84d
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2014-03-25 11:07:49 +0000
+
+    Fixed rights 
+
+  Change: 96b75614141dbcbe8cf06f3b95a4c2dc9b39fde5
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2014-03-25 11:07:25 +0000
+
+    Added plugin loading via import 
+
+------------------------------------------
+version 0.101 at 2014-03-22 23:02:57 +0000
+------------------------------------------
+
+  Change: 8442e105823eca0efdbe0cd3c84a2b7d4cfe1560
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2014-03-23 00:02:57 +0000
+
+    Removed tests that involve now removed plugins 
+
+------------------------------------------
+version 0.100 at 2014-03-22 22:26:00 +0000
+------------------------------------------
+
+  Change: 91367eb3daac3a7a4b5de2fb37e7c795ee4930e1
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2014-03-22 23:26:00 +0000
+
+    Excluding the plugins, several bugfixes, redirect function 
+
+------------------------------------------
+version 0.012 at 2013-08-17 23:37:46 +0000
+------------------------------------------
+
+  Change: ecabb88f0b76420f0f3ed5cd4c1aad810e8f811c
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2013-08-18 01:37:46 +0000
+
+    Added hostname function, added "nop" function which is made for
+    getting subs which definitly return nothing (like a chain step who is
+    not meant to be an end) 
+
+------------------------------------------
+version 0.011 at 2013-08-17 07:48:15 +0000
+------------------------------------------
+
+  Change: d4ab8af19175f22cabacc3ac0fe5df45a8536db7
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2013-08-17 09:48:15 +0000
+
+    Added access to the actual app class itself (oh dear, that was stupid
+    to miss haha) 
+
+------------------------------------------
+version 0.010 at 2013-08-16 02:06:32 +0000
+------------------------------------------
+
+  Change: 86e40e73f09d823a600b12b7c25db5b150120ada
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2013-08-16 04:06:32 +0000
+
+    Hups 
+
+  Change: 71d15ad5a67c8a8583e3962939762f05bc49c920
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2013-08-15 20:44:01 +0000
+
+    Better name ;) 
+
+  Change: aa8163fc821e173a3848e3b100ffcfd40ade0714
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2013-07-29 14:31:24 +0000
+
+    WIP 
+
+  Change: 3e11185868cc890530b1db0e20d55b75850b407e
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2013-07-28 07:06:48 +0000
+
+    "destabilized" version requirements 
+
+  Change: 170d999f535d0d610dc5d2da673b9c2c4fa60951
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2013-07-27 09:14:41 +0000
+
+    Added URL making helper 
+
+------------------------------------------
+version 0.009 at 2013-07-26 16:19:48 +0000
+------------------------------------------
+
+  Change: 189d9868f31e4b778b998e2357022c00038c1bef
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2013-07-26 12:19:48 +0000
+
+    Added pr feature 
+
+  Change: c754282b748b0c3b38bf0cfbe2725b7b14401d32
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2013-07-26 10:18:05 +0000
+
+    Yeah same to html 
+
+  Change: cdcba76c11d549828d7f649fb4f2664bbdad048f
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2013-07-26 10:16:06 +0000
+
+    Extended text function 
+
+  Change: 45559debeee13ff6c3fba59bdc5d53c04db934c6
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2013-07-26 09:12:18 +0000
+
+    Fixed wrong call to request 
+
+------------------------------------------
+version 0.008 at 2013-07-08 01:20:37 +0000
+------------------------------------------
+
+  Change: 4f7dd30693cff23ffdd1586018c78b3046ca84fa
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2013-07-08 03:20:37 +0000
+
+    Nicer example code 
+
+  Change: 46779b1ff88a731b12e7f5c4072b099f8af282cb
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2013-07-06 20:20:14 +0000
+
+    Bugfix 
+
+  Change: 97039efd52daab98a4ce3f482584c505e7740089
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2013-07-06 17:57:31 +0000
+
+    Added more proper README, added call function for plugins to call
+    framework functions 
+
+  Change: 239026746d59641fd584aa474956546b7b02737e
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2013-07-06 08:55:27 +0000
+
+    Merge pull request #1 from chankeypathak/master
+
+    Have a README file getty! 
+
+  Change: 2518e0810e058bdbd2394e04ef83ab9df31b1e79
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2013-07-06 04:09:02 +0000
+
+    Doc tuning 
+
+  Change: 2e0ef97100962660c9a4eedab42291d6b2e7c347
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2013-07-06 03:32:55 +0000
+
+    More tuning on the test cases in combination with other yeb app 
+
+  Change: d3cfc66083f1ce23290db3f0f785f92b0ecaf9a3
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2013-07-06 03:19:26 +0000
+
+    Removed load test... 
+
+  Change: 19801d1de7db1b312445f407bddedac41cd2c96d
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2013-07-06 01:49:32 +0000
+
+    Removed some old debugging, added predicate for response values 
+
+  Change: e756a932b95b06e0ed57cac5d6964fbc8fd486f9
+  Author: Chankey Pathak <chankey007@gmail.com>
+  Date : 2013-07-05 10:01:48 +0000
+
+    Update README.pod 
+
+  Change: 112973833fda431f9215a755ecf876e4ebfca93c
+  Author: Chankey Pathak <chankey007@gmail.com>
+  Date : 2013-07-05 10:00:35 +0000
+
+    Create README.pod
+
+    Add a README getty 
+
+------------------------------------------
+version 0.007 at 2013-07-05 23:12:52 +0000
+------------------------------------------
+
+  Change: 3a8335feaa730f502a3434dcd6c25b7405938a64
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2013-07-06 01:12:52 +0000
+
+    Learned interesting things about Perl... ;) Now functionality for
+    adding "other yeb apps" clearly works! Still no debug, tho... 
+
+  Change: 6058721ac0c1c6a7d032cc13eb7e8c1a8109a612
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2013-07-06 00:18:23 +0000
+
+    WIP - adding option to include complete different apps via Chain 
+
+------------------------------------------
+version 0.006 at 2013-07-05 20:34:50 +0000
+------------------------------------------
+
+  Change: 4efc5bc22e61302791451cf6694920fd4565fd99
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2013-07-05 22:34:50 +0000
+
+    More dos2unix, more documentation, more more more!!! 
+
+------------------------------------------
+version 0.005 at 2013-07-05 20:04:21 +0000
+------------------------------------------
+
+  Change: 36e48ceaadebfaa40e1422511242d28ed97a407d
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2013-07-05 22:04:21 +0000
+
+    Added export, normalized functions, more proper hash merge and access 
+
+------------------------------------------
+version 0.004 at 2013-07-05 04:00:28 +0000
+------------------------------------------
+
+  Change: 00deb809722bb346e3e5e4889ba824d8fb250528
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2013-07-05 06:00:28 +0000
+
+    Added static tests for base, moved over to better test form, added
+    load() command for loading chainless controller 
+
+  Change: 23d6ff567343180b781b153ba4afaf9354e0947a
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2013-07-05 05:50:08 +0000
+
+    Added Yeb::Plugin::Static, fixed EOL 
+
+------------------------------------------
+version 0.003 at 2013-07-05 02:15:11 +0000
+------------------------------------------
+
+  Change: 8c8419a8052513fa0ae525b45fcabb73b2380196
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2013-07-05 04:15:11 +0000
+
+    Little helper 
+
+  Change: c034ddbea8b5e71f2d3dc124ea0cea651572ffb2
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2013-07-05 04:04:37 +0000
+
+    Cleaning cleaning cleaning.... 
+
+  Change: 4fe6f4b675cb0eed3715e888f8e6096b9483d821
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2013-07-05 02:57:06 +0000
+
+    Xslate plugin and tests for this, all just recommends 
+
+------------------------------------------
+version 0.002 at 2013-07-04 20:36:00 +0000
+------------------------------------------
+
+  Change: 02f2426d94edd950aa18430b83db5cca5f11d52c
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2013-07-04 22:36:00 +0000
+
+    Very relevant doc patch 
+
+------------------------------------------
+version 0.001 at 2013-07-04 20:31:08 +0000
+------------------------------------------
+
+  Change: 5613f89ca437edaf5d303dc19e55bfdd0774eca9
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2013-07-04 22:31:08 +0000
+
+    Function registration, first plugins 
+
+  Change: dad6fa20023e488847e71104fe48b98be6866f7b
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2013-07-04 05:17:01 +0000
+
+    Middleware support 
+
+  Change: 6659fd5fa53ebd1c3cbe75be77c87f1d42373e31
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2013-07-04 04:26:33 +0000
+
+    First version.. 
+
+  Change: 75077a3c2165387418a3470eaeea473b2a33c46d
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2013-07-03 20:28:31 +0000
+
+    initial commit 
+
+================
+End of releases.
+================

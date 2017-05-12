@@ -1,0 +1,25 @@
+0.16
+
+  - using IPC::Cmd run_forked and helper functions
+    (install_layered_signal, kill_gently, open3_run)
+  
+  - t/01-compile.t: by Alexandr Ciornii
+    from https://github.com/kohts/Yandex--Tools/pull/1
+
+  - get_process_by_pid: populate start_time (seconds since epoch)
+    on Linux, by Nikita Makeev (Iponweb)
+
+0.06
+  - try to read /proc even on FreeBSD (use Proc::ProcessTable as last effort)
+
+0.04
+  - more accurate with regexps
+
+0.03
+  - disable_all_signals
+
+0.02
+  - preparing for pingerd
+
+0.01
+  - first release to CPAN

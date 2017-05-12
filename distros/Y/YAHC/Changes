@@ -1,0 +1,134 @@
+Revision history for Perl module YAHC
+
+0.033 2017-04-22 IKRUGLOV
+    - yahc_conn_socket_cache_id(): return undef if conn is undef
+    - when considering droping a socket take into account response protocol
+    - socket_cache as callback
+    - fix bug in yahc_terminal_error()
+    - don't set backoff time when backoff callback returned 0
+    - support of HEAD method
+    - can pass headers in ->new()
+    - do not overwrite Host header when set by user
+    - implement yahc_conn_user_data()
+    - improved tests
+
+0.032 2017-02-27 IKRUGLOV
+    - socket cache support multiple file handles per destination
+    - uniq connections ids
+
+0.031 2017-01-17 IKRUGLOV
+    - clarification of docs
+    - yahc_retry_conn() can accept backoff_delay arg
+    - fix double setting args in ->new() and ->request()
+    - optimize internal timer creation
+
+0.030 2016-10-13 IKRUGLOV
+    - report sent body (cut to 1024 bytes) in timeline
+    - more fare scheduling of retries
+    - enrich error messages with numeric representation of $! or IO::Socket::SSL::SSL_ERROR
+    - stop leaking connections once completed
+    - drop() can force socket to be closed
+    - new tests
+
+0.029 2016-09-06 IKRUGLOV
+    - fix problem with empty head param when building http request body
+    - improved docs
+    - lots of improvments in tests
+
+0.028 2016-07-23 IKRUGLOV
+    - new yahc_conn_register_error()
+    - new yahc_conn_attempt()
+    - *change in behaivor* - timeout errors are marked with new
+      YAHC::Error::TIMEOUT() bit. So, direct comparation like $err ==
+      YAHC::Error::CONNECT_TIMEOUT() won't work anymore and should be done as
+      bitmask check $err & YAHC::Error::CONNECT_TIMEOUT.
+    - bugfix in backoff_delay logic
+    - bugfix in user_callback calls, update EV internal time to avoid deviation.
+    - added t/account_for_signal.t into MANIFEST
+    - beter docs
+    - more tests
+
+0.027 2016-07-16 IKRUGLOV
+    - new backoff_delay feature
+    - new lifetime_timeout feature
+    - *change in behaivor* - in case of internal error, exception in
+      callback or expiration of lifetime_timeout callback is called with
+      TERMINAL_ERROR bit set in $error. In this case all further attempt to
+      retry or reinit connection are ignored and the connection goes to
+      COMPLETED state unconditionally. Previous behaivor was that a connection
+      silently terminates.
+    - *change in behaivor* - give all timeouts the highest priorities in event
+      loop. This provides stonger timeout guarantee but can cause timeouts in
+      border cases which didn't happen before.
+    - *change in behaivor* - when connection failed all retry attempts report
+      error condition with new error YAHC::Error::RETRY_LIMIT instead of
+      YAHC::Error::CONNECT_ERROR
+    - rename YAHC::State::WAIT_SYNACK to YAHC::State::CONNECTING
+    - improved tests
+    - improved docs
+
+0.026 2016-07-14 IKRUGLOV
+    - improved docs
+    - account_for_signals
+    - experimental support of socket_cache
+    - expose break() method
+    - warn if UTF8 flagged payload detected
+    - tests improvments
+
+0.025 2015-12-04 IKRUGLOV
+    - yahc_retry_conn()
+    - move t/requests.t to live tests
+
+0.024 2015-11-13 IKRUGLOV
+    - fix failing tests
+
+0.023 2015-11-12 IKRUGLOV
+    - bug fix
+
+0.022 2015-11-11 IKRUGLOV
+    - new tests
+    - minor performance optimizations
+
+0.021 2015-11-06 IKRUGLOV
+    - passing host to YAHC->new didn't work
+    - ignore extention when parsing chunked encoding
+    - minor improvments
+
+0.019 2015-09-28 IKRUGLOV
+    - chunked encoding support
+    - $ENV{YAHC_DEBUG} and $ENV{YAHC_TIMELINE}
+
+0.018 2015-07-03 IKRUGLOV
+    - SSL support
+    - update EV's time before setting a timer
+    - compatibility fixes
+    - other minor changes
+
+0.017 2015-05-25 IKRUGLOV
+    - registering a error includes a record in timeline
+    - check stop condition after going into CONNECTED state
+    - improve test
+    - add test into build
+    - remove active_connections()
+
+0.016 2015-05-19 IKRUGLOV
+    - add active_connections()
+    - minor fixes
+    - tests and benchmarks
+
+0.015 2015-05-12 IKRUGLOV
+    - yahc_conn_attempts_left
+    - set the lowest priority to timers
+    - compatibility fixes
+
+0.014 2015-05-11 IKRUGLOV
+    - move benchmark files into 'benchmark' directory
+    - handle case where body is 0 (int)
+    - change response interface to use same fields as Hijk uses (headers => head, status_code => status)
+    - change format of error messages
+    - new tests
+
+0.013 2015-05-?? IKRUGLOV
+    - Added github repo to the dist metadata and the doc
+    - Added this Changes file
+

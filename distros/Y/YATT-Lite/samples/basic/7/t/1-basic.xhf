@@ -1,0 +1,119 @@
+# -*- coding: utf-8 -*-
+
+FILE: index.yatt
+BODY:
+ <h2>request sigil mapping</h2>
+ <form method="POST">
+ <input type="text" name="foo" size="10" value="">
+ <input type="submit" name="~" value="show this">
+ <input type="submit" name="~bar" value="show bar">
+ <input type="submit" name="!baz" value="do baz">
+ </form>
+
+
+FILE: index.yatt
+TITLE: ~=any -> default page
+PARAM[
+~: show this
+]
+BODY:
+ <h2>request sigil mapping</h2>
+ <form method="POST">
+ <input type="text" name="foo" size="10" value="">
+ <input type="submit" name="~" value="show this">
+ <input type="submit" name="~bar" value="show bar">
+ <input type="submit" name="!baz" value="do baz">
+ </form>
+
+FILE: index.yatt
+TITLE: ~=any -> default page, with foo=FOO
+PARAM[
+~: show this
+foo: FOO
+]
+BODY:
+ <h2>request sigil mapping</h2>
+ <form method="POST">
+ <input type="text" name="foo" size="10" value="FOO">
+ <input type="submit" name="~" value="show this">
+ <input type="submit" name="~bar" value="show bar">
+ <input type="submit" name="!baz" value="do baz">
+ </form>
+
+
+FILE: index.yatt
+TITLE: ~page=any
+PARAM[
+~bar: show bar
+]
+BODY:
+ <h2>page bar</h2>
+ foo=
+
+FILE: index.yatt
+TITLE: ~page=any, with foo=BAR
+PARAM[
+~bar: show bar
+foo: BAR
+]
+BODY:
+ <h2>page bar</h2>
+ foo=BAR
+
+
+FILE: index.yatt
+TITLE: ~~=page
+PARAM[
+~~: bar
+]
+BODY:
+ <h2>page bar</h2>
+ foo=
+
+FILE: index.yatt
+METHOD: POST
+TITLE: !baz=any
+PARAM[
+!baz: any
+]
+BODY: OK. foo=(NULL)
+
+FILE: index.yatt
+METHOD: POST
+TITLE: !baz=any, with foo=BAZ
+PARAM[
+!baz: any
+foo: BAZ
+]
+BODY: OK. foo=BAZ
+
+
+
+FILE: index.yatt
+METHOD: POST
+TITLE: !!=baz
+PARAM[
+!!: baz
+]
+BODY: OK. foo=(NULL)
+
+
+FILE: index.yatt
+TITLE: arg=list auto mapping
+SITE_CONFIG[
+no_nested_query: 1
+]
+PARAM[
+~testlistarg: show checked list
+chklst[
+- 1
+- 2
+- 5
+]
+]
+BODY:
+ checked=
+ 1
+ 2
+ 5
+ .

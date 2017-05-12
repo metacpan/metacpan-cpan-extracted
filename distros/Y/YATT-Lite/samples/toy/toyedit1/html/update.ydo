@@ -1,0 +1,27 @@
+# -*- perl -*-
+use strict; use warnings FATAL => qw/FATAL all NONFATAL misc/;
+
+sub {
+  my ($this, $con) = @_;
+  my MY $yatt = $this->YATT;
+
+  my $title = $con->param('title')
+    or die "Title is empty\n";
+  my $body = $con->param('body')
+    or die "Body is empty\n";
+
+  my $fnum = $con->param_type(fnum => integer => "fnum should be integer!");
+
+  unless (defined $yatt->{cf_datadir}) {
+    die "datadir is undef!\n";
+  }
+
+  # XXX: This can loose old content!
+  open my $fh, '>', "$yatt->{cf_datadir}/.ht_$fnum"
+    or die "Can't open $fnum: $!";
+
+  print $fh "TITLE: ", $yatt->escape_nl($title), "\n";
+  print $fh "BODY: ", $yatt->escape_nl($body), "\n";
+
+  $con->redirect('./');
+};

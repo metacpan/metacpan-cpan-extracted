@@ -1,0 +1,669 @@
+---
+name: Yahoo-Marketing-APT
+version: 6.01
+author:
+  - 'Johnny Shen <nycperl@yahoo.com>'
+abstract: an interface for Yahoo! Search Marketing's APT Web Services.
+license: artistic
+requires:
+  Cache::Cache: 1.01
+  Class::Accessor::Chained: 0.01
+  Crypt::SSLeay: 0.40
+  DateTime::Format::ISO8601: 0
+  DateTime::Format::W3CDTF: 0
+  MIME::Base64: 3.05
+  Module::Build: 0.26
+  SOAP::Lite: 0.66
+  Scalar::Util: 1.01
+  Test::Class: 0.10
+  Test::More: 0
+  Test::Simple: 0.60
+  XML::XPath: 1.10
+  YAML: 0.01
+  Yahoo::Marketing: 5.21
+  perl: 5.6.1
+build_requires:
+  Module::Build: 0.26
+  Test::More: 0
+  YAML: 0.01
+provides:
+  Yahoo::Marketing::APT:
+    file: lib/Yahoo/Marketing/APT.pm
+    version: 6.01
+  Yahoo::Marketing::APT::Account:
+    file: lib/Yahoo/Marketing/APT/Account.pm
+  Yahoo::Marketing::APT::AccountDescriptor:
+    file: lib/Yahoo/Marketing/APT/AccountDescriptor.pm
+  Yahoo::Marketing::APT::AccountResponse:
+    file: lib/Yahoo/Marketing/APT/AccountResponse.pm
+  Yahoo::Marketing::APT::AccountService:
+    file: lib/Yahoo/Marketing/APT/AccountService.pm
+  Yahoo::Marketing::APT::Ad:
+    file: lib/Yahoo/Marketing/APT/Ad.pm
+  Yahoo::Marketing::APT::AdAttributes:
+    file: lib/Yahoo/Marketing/APT/AdAttributes.pm
+  Yahoo::Marketing::APT::AdCopyResponse:
+    file: lib/Yahoo/Marketing/APT/AdCopyResponse.pm
+  Yahoo::Marketing::APT::AdDeliveryMode:
+    file: lib/Yahoo/Marketing/APT/AdDeliveryMode.pm
+  Yahoo::Marketing::APT::AdDeliveryModeDescriptor:
+    file: lib/Yahoo/Marketing/APT/AdDeliveryModeDescriptor.pm
+  Yahoo::Marketing::APT::AdDeliveryModeResponse:
+    file: lib/Yahoo/Marketing/APT/AdDeliveryModeResponse.pm
+  Yahoo::Marketing::APT::AdDeliveryModeService:
+    file: lib/Yahoo/Marketing/APT/AdDeliveryModeService.pm
+  Yahoo::Marketing::APT::AdGroup:
+    file: lib/Yahoo/Marketing/APT/AdGroup.pm
+  Yahoo::Marketing::APT::AdGroupNonGuaranteedSettings:
+    file: lib/Yahoo/Marketing/APT/AdGroupNonGuaranteedSettings.pm
+  Yahoo::Marketing::APT::AdGroupResponse:
+    file: lib/Yahoo/Marketing/APT/AdGroupResponse.pm
+  Yahoo::Marketing::APT::AdLinkingSettings:
+    file: lib/Yahoo/Marketing/APT/AdLinkingSettings.pm
+  Yahoo::Marketing::APT::AdMarker:
+    file: lib/Yahoo/Marketing/APT/AdMarker.pm
+  Yahoo::Marketing::APT::AdMarkerResponse:
+    file: lib/Yahoo/Marketing/APT/AdMarkerResponse.pm
+  Yahoo::Marketing::APT::AdMarkerService:
+    file: lib/Yahoo/Marketing/APT/AdMarkerService.pm
+  Yahoo::Marketing::APT::AdMarkerSettings:
+    file: lib/Yahoo/Marketing/APT/AdMarkerSettings.pm
+  Yahoo::Marketing::APT::AdOperationsTeamMember:
+    file: lib/Yahoo/Marketing/APT/AdOperationsTeamMember.pm
+  Yahoo::Marketing::APT::AdResponse:
+    file: lib/Yahoo/Marketing/APT/AdResponse.pm
+  Yahoo::Marketing::APT::AdService:
+    file: lib/Yahoo/Marketing/APT/AdService.pm
+  Yahoo::Marketing::APT::AdTagParameters:
+    file: lib/Yahoo/Marketing/APT/AdTagParameters.pm
+  Yahoo::Marketing::APT::AdTagService:
+    file: lib/Yahoo/Marketing/APT/AdTagService.pm
+  Yahoo::Marketing::APT::Address:
+    file: lib/Yahoo/Marketing/APT/Address.pm
+  Yahoo::Marketing::APT::AdjustmentCertifiedFeed:
+    file: lib/Yahoo/Marketing/APT/AdjustmentCertifiedFeed.pm
+  Yahoo::Marketing::APT::AdjustmentInboundFeed:
+    file: lib/Yahoo/Marketing/APT/AdjustmentInboundFeed.pm
+  Yahoo::Marketing::APT::AdjustmentInboundFeedAddRequest:
+    file: lib/Yahoo/Marketing/APT/AdjustmentInboundFeedAddRequest.pm
+  Yahoo::Marketing::APT::AdjustmentInboundFeedAddResponse:
+    file: lib/Yahoo/Marketing/APT/AdjustmentInboundFeedAddResponse.pm
+  Yahoo::Marketing::APT::AdjustmentOrder:
+    file: lib/Yahoo/Marketing/APT/AdjustmentOrder.pm
+  Yahoo::Marketing::APT::AdjustmentOrderRequest:
+    file: lib/Yahoo/Marketing/APT/AdjustmentOrderRequest.pm
+  Yahoo::Marketing::APT::AdjustmentPlacement:
+    file: lib/Yahoo/Marketing/APT/AdjustmentPlacement.pm
+  Yahoo::Marketing::APT::AdjustmentPlacementRequest:
+    file: lib/Yahoo/Marketing/APT/AdjustmentPlacementRequest.pm
+  Yahoo::Marketing::APT::AdjustmentService:
+    file: lib/Yahoo/Marketing/APT/AdjustmentService.pm
+  Yahoo::Marketing::APT::AgencyContract:
+    file: lib/Yahoo/Marketing/APT/AgencyContract.pm
+  Yahoo::Marketing::APT::AlternateImage:
+    file: lib/Yahoo/Marketing/APT/AlternateImage.pm
+  Yahoo::Marketing::APT::ApiFault:
+    file: lib/Yahoo/Marketing/APT/ApiFault.pm
+  Yahoo::Marketing::APT::Approval:
+    file: lib/Yahoo/Marketing/APT/Approval.pm
+  Yahoo::Marketing::APT::ApprovalAction:
+    file: lib/Yahoo/Marketing/APT/ApprovalAction.pm
+  Yahoo::Marketing::APT::ApprovalDetail:
+    file: lib/Yahoo/Marketing/APT/ApprovalDetail.pm
+  Yahoo::Marketing::APT::ApprovalObject:
+    file: lib/Yahoo/Marketing/APT/ApprovalObject.pm
+  Yahoo::Marketing::APT::ApprovalService:
+    file: lib/Yahoo/Marketing/APT/ApprovalService.pm
+  Yahoo::Marketing::APT::ApprovalTask:
+    file: lib/Yahoo/Marketing/APT/ApprovalTask.pm
+  Yahoo::Marketing::APT::ApprovalTaskComment:
+    file: lib/Yahoo/Marketing/APT/ApprovalTaskComment.pm
+  Yahoo::Marketing::APT::ApprovalTaskService:
+    file: lib/Yahoo/Marketing/APT/ApprovalTaskService.pm
+  Yahoo::Marketing::APT::ApprovalWorkflow:
+    file: lib/Yahoo/Marketing/APT/ApprovalWorkflow.pm
+  Yahoo::Marketing::APT::ApprovalWorkflowResponse:
+    file: lib/Yahoo/Marketing/APT/ApprovalWorkflowResponse.pm
+  Yahoo::Marketing::APT::ApprovalWorkflowService:
+    file: lib/Yahoo/Marketing/APT/ApprovalWorkflowService.pm
+  Yahoo::Marketing::APT::Approver:
+    file: lib/Yahoo/Marketing/APT/Approver.pm
+  Yahoo::Marketing::APT::AttributeSetting:
+    file: lib/Yahoo/Marketing/APT/AttributeSetting.pm
+  Yahoo::Marketing::APT::AudienceSegmentCategory:
+    file: lib/Yahoo/Marketing/APT/AudienceSegmentCategory.pm
+  Yahoo::Marketing::APT::AudienceSegmentCategoryResponse:
+    file: lib/Yahoo/Marketing/APT/AudienceSegmentCategoryResponse.pm
+  Yahoo::Marketing::APT::AudienceSegmentCategoryService:
+    file: lib/Yahoo/Marketing/APT/AudienceSegmentCategoryService.pm
+  Yahoo::Marketing::APT::AudienceSegmentDescriptor:
+    file: lib/Yahoo/Marketing/APT/AudienceSegmentDescriptor.pm
+  Yahoo::Marketing::APT::AudienceSharingRule:
+    file: lib/Yahoo/Marketing/APT/AudienceSharingRule.pm
+  Yahoo::Marketing::APT::AudienceSharingRuleResponse:
+    file: lib/Yahoo/Marketing/APT/AudienceSharingRuleResponse.pm
+  Yahoo::Marketing::APT::AudienceSharingRulesService:
+    file: lib/Yahoo/Marketing/APT/AudienceSharingRulesService.pm
+  Yahoo::Marketing::APT::BaseRate:
+    file: lib/Yahoo/Marketing/APT/BaseRate.pm
+  Yahoo::Marketing::APT::BaseRateResponse:
+    file: lib/Yahoo/Marketing/APT/BaseRateResponse.pm
+  Yahoo::Marketing::APT::BasicResponse:
+    file: lib/Yahoo/Marketing/APT/BasicResponse.pm
+  Yahoo::Marketing::APT::BidDescriptor:
+    file: lib/Yahoo/Marketing/APT/BidDescriptor.pm
+  Yahoo::Marketing::APT::BillingProfile:
+    file: lib/Yahoo/Marketing/APT/BillingProfile.pm
+  Yahoo::Marketing::APT::BillingTermsValue:
+    file: lib/Yahoo/Marketing/APT/BillingTermsValue.pm
+  Yahoo::Marketing::APT::BlockingImpact:
+    file: lib/Yahoo/Marketing/APT/BlockingImpact.pm
+  Yahoo::Marketing::APT::BookingLimit:
+    file: lib/Yahoo/Marketing/APT/BookingLimit.pm
+  Yahoo::Marketing::APT::BookingLimitResponse:
+    file: lib/Yahoo/Marketing/APT/BookingLimitResponse.pm
+  Yahoo::Marketing::APT::BumperVideoActOne:
+    file: lib/Yahoo/Marketing/APT/BumperVideoActOne.pm
+  Yahoo::Marketing::APT::BusinessProfile:
+    file: lib/Yahoo/Marketing/APT/BusinessProfile.pm
+  Yahoo::Marketing::APT::BuyerProfile:
+    file: lib/Yahoo/Marketing/APT/BuyerProfile.pm
+  Yahoo::Marketing::APT::Capability:
+    file: lib/Yahoo/Marketing/APT/Capability.pm
+  Yahoo::Marketing::APT::ClickThroughURLSettings:
+    file: lib/Yahoo/Marketing/APT/ClickThroughURLSettings.pm
+  Yahoo::Marketing::APT::ClickableVideoActOne:
+    file: lib/Yahoo/Marketing/APT/ClickableVideoActOne.pm
+  Yahoo::Marketing::APT::ClickableVideoActTwo:
+    file: lib/Yahoo/Marketing/APT/ClickableVideoActTwo.pm
+  Yahoo::Marketing::APT::CommonTargetingService:
+    file: lib/Yahoo/Marketing/APT/CommonTargetingService.pm
+  Yahoo::Marketing::APT::CompanionAdSetting:
+    file: lib/Yahoo/Marketing/APT/CompanionAdSetting.pm
+  Yahoo::Marketing::APT::CompanyLink:
+    file: lib/Yahoo/Marketing/APT/CompanyLink.pm
+  Yahoo::Marketing::APT::Complaint:
+    file: lib/Yahoo/Marketing/APT/Complaint.pm
+  Yahoo::Marketing::APT::ComplaintReason:
+    file: lib/Yahoo/Marketing/APT/ComplaintReason.pm
+  Yahoo::Marketing::APT::ComplaintResolution:
+    file: lib/Yahoo/Marketing/APT/ComplaintResolution.pm
+  Yahoo::Marketing::APT::ComplaintResponse:
+    file: lib/Yahoo/Marketing/APT/ComplaintResponse.pm
+  Yahoo::Marketing::APT::CompositeURL:
+    file: lib/Yahoo/Marketing/APT/CompositeURL.pm
+  Yahoo::Marketing::APT::ConditionalFilter:
+    file: lib/Yahoo/Marketing/APT/ConditionalFilter.pm
+  Yahoo::Marketing::APT::ConditionalFilterResponse:
+    file: lib/Yahoo/Marketing/APT/ConditionalFilterResponse.pm
+  Yahoo::Marketing::APT::Contact:
+    file: lib/Yahoo/Marketing/APT/Contact.pm
+  Yahoo::Marketing::APT::ContactResponse:
+    file: lib/Yahoo/Marketing/APT/ContactResponse.pm
+  Yahoo::Marketing::APT::ContactService:
+    file: lib/Yahoo/Marketing/APT/ContactService.pm
+  Yahoo::Marketing::APT::ContentTargetingAttributes:
+    file: lib/Yahoo/Marketing/APT/ContentTargetingAttributes.pm
+  Yahoo::Marketing::APT::ContentTopic:
+    file: lib/Yahoo/Marketing/APT/ContentTopic.pm
+  Yahoo::Marketing::APT::CopyAdGroupRequest:
+    file: lib/Yahoo/Marketing/APT/CopyAdGroupRequest.pm
+  Yahoo::Marketing::APT::CostFeed:
+    file: lib/Yahoo/Marketing/APT/CostFeed.pm
+  Yahoo::Marketing::APT::CostFeedService:
+    file: lib/Yahoo/Marketing/APT/CostFeedService.pm
+  Yahoo::Marketing::APT::CustomContentCategory:
+    file: lib/Yahoo/Marketing/APT/CustomContentCategory.pm
+  Yahoo::Marketing::APT::CustomContentCategoryDescriptor:
+    file: lib/Yahoo/Marketing/APT/CustomContentCategoryDescriptor.pm
+  Yahoo::Marketing::APT::CustomContentCategoryResponse:
+    file: lib/Yahoo/Marketing/APT/CustomContentCategoryResponse.pm
+  Yahoo::Marketing::APT::CustomGeoArea:
+    file: lib/Yahoo/Marketing/APT/CustomGeoArea.pm
+  Yahoo::Marketing::APT::CustomGeoAreaDescriptor:
+    file: lib/Yahoo/Marketing/APT/CustomGeoAreaDescriptor.pm
+  Yahoo::Marketing::APT::CustomGeoAreaResponse:
+    file: lib/Yahoo/Marketing/APT/CustomGeoAreaResponse.pm
+  Yahoo::Marketing::APT::CustomGeoAreaService:
+    file: lib/Yahoo/Marketing/APT/CustomGeoAreaService.pm
+  Yahoo::Marketing::APT::CustomSection:
+    file: lib/Yahoo/Marketing/APT/CustomSection.pm
+  Yahoo::Marketing::APT::CustomSectionDescriptor:
+    file: lib/Yahoo/Marketing/APT/CustomSectionDescriptor.pm
+  Yahoo::Marketing::APT::CustomSectionResponse:
+    file: lib/Yahoo/Marketing/APT/CustomSectionResponse.pm
+  Yahoo::Marketing::APT::CustomSegment:
+    file: lib/Yahoo/Marketing/APT/CustomSegment.pm
+  Yahoo::Marketing::APT::CustomSegmentResponse:
+    file: lib/Yahoo/Marketing/APT/CustomSegmentResponse.pm
+  Yahoo::Marketing::APT::CustomSegmentService:
+    file: lib/Yahoo/Marketing/APT/CustomSegmentService.pm
+  Yahoo::Marketing::APT::CustomizableFlashCreative:
+    file: lib/Yahoo/Marketing/APT/CustomizableFlashCreative.pm
+  Yahoo::Marketing::APT::CustomizableFlashCreativeResponse:
+    file: lib/Yahoo/Marketing/APT/CustomizableFlashCreativeResponse.pm
+  Yahoo::Marketing::APT::CustomizableFlashCreativeService:
+    file: lib/Yahoo/Marketing/APT/CustomizableFlashCreativeService.pm
+  Yahoo::Marketing::APT::CustomizableFlashTemplate:
+    file: lib/Yahoo/Marketing/APT/CustomizableFlashTemplate.pm
+  Yahoo::Marketing::APT::CustomizableFlashTemplateResponse:
+    file: lib/Yahoo/Marketing/APT/CustomizableFlashTemplateResponse.pm
+  Yahoo::Marketing::APT::CustomizableFlashTemplateService:
+    file: lib/Yahoo/Marketing/APT/CustomizableFlashTemplateService.pm
+  Yahoo::Marketing::APT::DateRange:
+    file: lib/Yahoo/Marketing/APT/DateRange.pm
+  Yahoo::Marketing::APT::DayPartingTargeting:
+    file: lib/Yahoo/Marketing/APT/DayPartingTargeting.pm
+  Yahoo::Marketing::APT::DealParticipantDetails:
+    file: lib/Yahoo/Marketing/APT/DealParticipantDetails.pm
+  Yahoo::Marketing::APT::DefaultBaseRate:
+    file: lib/Yahoo/Marketing/APT/DefaultBaseRate.pm
+  Yahoo::Marketing::APT::DefaultBaseRateResponse:
+    file: lib/Yahoo/Marketing/APT/DefaultBaseRateResponse.pm
+  Yahoo::Marketing::APT::DeliveryFormat:
+    file: lib/Yahoo/Marketing/APT/DeliveryFormat.pm
+  Yahoo::Marketing::APT::DeliveryGoal:
+    file: lib/Yahoo/Marketing/APT/DeliveryGoal.pm
+  Yahoo::Marketing::APT::DeliveryStats:
+    file: lib/Yahoo/Marketing/APT/DeliveryStats.pm
+  Yahoo::Marketing::APT::Discount:
+    file: lib/Yahoo/Marketing/APT/Discount.pm
+  Yahoo::Marketing::APT::EditorialService:
+    file: lib/Yahoo/Marketing/APT/EditorialService.pm
+  Yahoo::Marketing::APT::EnhancedBasicResponse:
+    file: lib/Yahoo/Marketing/APT/EnhancedBasicResponse.pm
+  Yahoo::Marketing::APT::Error:
+    file: lib/Yahoo/Marketing/APT/Error.pm
+  Yahoo::Marketing::APT::FilterService:
+    file: lib/Yahoo/Marketing/APT/FilterService.pm
+  Yahoo::Marketing::APT::FlashCreative:
+    file: lib/Yahoo/Marketing/APT/FlashCreative.pm
+  Yahoo::Marketing::APT::FlashCreativeResponse:
+    file: lib/Yahoo/Marketing/APT/FlashCreativeResponse.pm
+  Yahoo::Marketing::APT::FlashCreativeService:
+    file: lib/Yahoo/Marketing/APT/FlashCreativeService.pm
+  Yahoo::Marketing::APT::Folder:
+    file: lib/Yahoo/Marketing/APT/Folder.pm
+  Yahoo::Marketing::APT::FolderItem:
+    file: lib/Yahoo/Marketing/APT/FolderItem.pm
+  Yahoo::Marketing::APT::FolderResponse:
+    file: lib/Yahoo/Marketing/APT/FolderResponse.pm
+  Yahoo::Marketing::APT::FolderService:
+    file: lib/Yahoo/Marketing/APT/FolderService.pm
+  Yahoo::Marketing::APT::GeographicalTargetingService:
+    file: lib/Yahoo/Marketing/APT/GeographicalTargetingService.pm
+  Yahoo::Marketing::APT::GuaranteedDeal:
+    file: lib/Yahoo/Marketing/APT/GuaranteedDeal.pm
+  Yahoo::Marketing::APT::GuaranteedDealApproval:
+    file: lib/Yahoo/Marketing/APT/GuaranteedDealApproval.pm
+  Yahoo::Marketing::APT::ImageCreative:
+    file: lib/Yahoo/Marketing/APT/ImageCreative.pm
+  Yahoo::Marketing::APT::ImageCreativeResponse:
+    file: lib/Yahoo/Marketing/APT/ImageCreativeResponse.pm
+  Yahoo::Marketing::APT::ImageCreativeService:
+    file: lib/Yahoo/Marketing/APT/ImageCreativeService.pm
+  Yahoo::Marketing::APT::ImageFlashVariable:
+    file: lib/Yahoo/Marketing/APT/ImageFlashVariable.pm
+  Yahoo::Marketing::APT::ImageFlashVariableConstraints:
+    file: lib/Yahoo/Marketing/APT/ImageFlashVariableConstraints.pm
+  Yahoo::Marketing::APT::ImageFlashVariableValue:
+    file: lib/Yahoo/Marketing/APT/ImageFlashVariableValue.pm
+  Yahoo::Marketing::APT::InteractivePharmaceuticalVideoActFour:
+    file: lib/Yahoo/Marketing/APT/InteractivePharmaceuticalVideoActFour.pm
+  Yahoo::Marketing::APT::InteractivePharmaceuticalVideoActOne:
+    file: lib/Yahoo/Marketing/APT/InteractivePharmaceuticalVideoActOne.pm
+  Yahoo::Marketing::APT::InteractivePharmaceuticalVideoActThree:
+    file: lib/Yahoo/Marketing/APT/InteractivePharmaceuticalVideoActThree.pm
+  Yahoo::Marketing::APT::InteractivePharmaceuticalVideoActTwo:
+    file: lib/Yahoo/Marketing/APT/InteractivePharmaceuticalVideoActTwo.pm
+  Yahoo::Marketing::APT::Inventory:
+    file: lib/Yahoo/Marketing/APT/Inventory.pm
+  Yahoo::Marketing::APT::InventoryIdentifier:
+    file: lib/Yahoo/Marketing/APT/InventoryIdentifier.pm
+  Yahoo::Marketing::APT::InventoryIdentifierResponse:
+    file: lib/Yahoo/Marketing/APT/InventoryIdentifierResponse.pm
+  Yahoo::Marketing::APT::InventoryIdentifierService:
+    file: lib/Yahoo/Marketing/APT/InventoryIdentifierService.pm
+  Yahoo::Marketing::APT::InventoryOptIn:
+    file: lib/Yahoo/Marketing/APT/InventoryOptIn.pm
+  Yahoo::Marketing::APT::InventoryOptInResponse:
+    file: lib/Yahoo/Marketing/APT/InventoryOptInResponse.pm
+  Yahoo::Marketing::APT::InventorySearchFilter:
+    file: lib/Yahoo/Marketing/APT/InventorySearchFilter.pm
+  Yahoo::Marketing::APT::InventorySearchService:
+    file: lib/Yahoo/Marketing/APT/InventorySearchService.pm
+  Yahoo::Marketing::APT::LibraryAdComment:
+    file: lib/Yahoo/Marketing/APT/LibraryAdComment.pm
+  Yahoo::Marketing::APT::LibraryAdCommentResponse:
+    file: lib/Yahoo/Marketing/APT/LibraryAdCommentResponse.pm
+  Yahoo::Marketing::APT::LibraryAdInformationService:
+    file: lib/Yahoo/Marketing/APT/LibraryAdInformationService.pm
+  Yahoo::Marketing::APT::LibraryBumperVideoAd:
+    file: lib/Yahoo/Marketing/APT/LibraryBumperVideoAd.pm
+  Yahoo::Marketing::APT::LibraryBumperVideoAdResponse:
+    file: lib/Yahoo/Marketing/APT/LibraryBumperVideoAdResponse.pm
+  Yahoo::Marketing::APT::LibraryBumperVideoAdService:
+    file: lib/Yahoo/Marketing/APT/LibraryBumperVideoAdService.pm
+  Yahoo::Marketing::APT::LibraryClickToSiteOverlayVideoAd:
+    file: lib/Yahoo/Marketing/APT/LibraryClickToSiteOverlayVideoAd.pm
+  Yahoo::Marketing::APT::LibraryClickToSiteOverlayVideoAdResponse:
+    file: lib/Yahoo/Marketing/APT/LibraryClickToSiteOverlayVideoAdResponse.pm
+  Yahoo::Marketing::APT::LibraryClickToSiteOverlayVideoAdService:
+    file: lib/Yahoo/Marketing/APT/LibraryClickToSiteOverlayVideoAdService.pm
+  Yahoo::Marketing::APT::LibraryClickToVideoOverlayVideoAd:
+    file: lib/Yahoo/Marketing/APT/LibraryClickToVideoOverlayVideoAd.pm
+  Yahoo::Marketing::APT::LibraryClickToVideoOverlayVideoAdResponse:
+    file: lib/Yahoo/Marketing/APT/LibraryClickToVideoOverlayVideoAdResponse.pm
+  Yahoo::Marketing::APT::LibraryClickToVideoOverlayVideoAdService:
+    file: lib/Yahoo/Marketing/APT/LibraryClickToVideoOverlayVideoAdService.pm
+  Yahoo::Marketing::APT::LibraryClickableVideoAd:
+    file: lib/Yahoo/Marketing/APT/LibraryClickableVideoAd.pm
+  Yahoo::Marketing::APT::LibraryClickableVideoAdResponse:
+    file: lib/Yahoo/Marketing/APT/LibraryClickableVideoAdResponse.pm
+  Yahoo::Marketing::APT::LibraryClickableVideoAdService:
+    file: lib/Yahoo/Marketing/APT/LibraryClickableVideoAdService.pm
+  Yahoo::Marketing::APT::LibraryCustomHTMLAd:
+    file: lib/Yahoo/Marketing/APT/LibraryCustomHTMLAd.pm
+  Yahoo::Marketing::APT::LibraryCustomHTMLAdResponse:
+    file: lib/Yahoo/Marketing/APT/LibraryCustomHTMLAdResponse.pm
+  Yahoo::Marketing::APT::LibraryCustomHTMLAdService:
+    file: lib/Yahoo/Marketing/APT/LibraryCustomHTMLAdService.pm
+  Yahoo::Marketing::APT::LibraryCustomizableFlashAd:
+    file: lib/Yahoo/Marketing/APT/LibraryCustomizableFlashAd.pm
+  Yahoo::Marketing::APT::LibraryCustomizableFlashAdResponse:
+    file: lib/Yahoo/Marketing/APT/LibraryCustomizableFlashAdResponse.pm
+  Yahoo::Marketing::APT::LibraryCustomizableFlashAdService:
+    file: lib/Yahoo/Marketing/APT/LibraryCustomizableFlashAdService.pm
+  Yahoo::Marketing::APT::LibraryFlashAd:
+    file: lib/Yahoo/Marketing/APT/LibraryFlashAd.pm
+  Yahoo::Marketing::APT::LibraryFlashAdResponse:
+    file: lib/Yahoo/Marketing/APT/LibraryFlashAdResponse.pm
+  Yahoo::Marketing::APT::LibraryFlashAdService:
+    file: lib/Yahoo/Marketing/APT/LibraryFlashAdService.pm
+  Yahoo::Marketing::APT::LibraryImageAd:
+    file: lib/Yahoo/Marketing/APT/LibraryImageAd.pm
+  Yahoo::Marketing::APT::LibraryImageAdResponse:
+    file: lib/Yahoo/Marketing/APT/LibraryImageAdResponse.pm
+  Yahoo::Marketing::APT::LibraryImageAdService:
+    file: lib/Yahoo/Marketing/APT/LibraryImageAdService.pm
+  Yahoo::Marketing::APT::LibraryInteractivePharmaceuticalVideoAd:
+    file: lib/Yahoo/Marketing/APT/LibraryInteractivePharmaceuticalVideoAd.pm
+  Yahoo::Marketing::APT::LibraryInteractivePharmaceuticalVideoAdResponse:
+    file: lib/Yahoo/Marketing/APT/LibraryInteractivePharmaceuticalVideoAdResponse.pm
+  Yahoo::Marketing::APT::LibraryInteractivePharmaceuticalVideoAdService:
+    file: lib/Yahoo/Marketing/APT/LibraryInteractivePharmaceuticalVideoAdService.pm
+  Yahoo::Marketing::APT::LibraryThirdPartyAd:
+    file: lib/Yahoo/Marketing/APT/LibraryThirdPartyAd.pm
+  Yahoo::Marketing::APT::LibraryThirdPartyAdResponse:
+    file: lib/Yahoo/Marketing/APT/LibraryThirdPartyAdResponse.pm
+  Yahoo::Marketing::APT::LibraryThirdPartyAdService:
+    file: lib/Yahoo/Marketing/APT/LibraryThirdPartyAdService.pm
+  Yahoo::Marketing::APT::Link:
+    file: lib/Yahoo/Marketing/APT/Link.pm
+  Yahoo::Marketing::APT::LinkApproval:
+    file: lib/Yahoo/Marketing/APT/LinkApproval.pm
+  Yahoo::Marketing::APT::LinkContact:
+    file: lib/Yahoo/Marketing/APT/LinkContact.pm
+  Yahoo::Marketing::APT::LinkParticipantDetails:
+    file: lib/Yahoo/Marketing/APT/LinkParticipantDetails.pm
+  Yahoo::Marketing::APT::LinkResponse:
+    file: lib/Yahoo/Marketing/APT/LinkResponse.pm
+  Yahoo::Marketing::APT::LinkingProfileService:
+    file: lib/Yahoo/Marketing/APT/LinkingProfileService.pm
+  Yahoo::Marketing::APT::LinkingService:
+    file: lib/Yahoo/Marketing/APT/LinkingService.pm
+  Yahoo::Marketing::APT::LinkingSettings:
+    file: lib/Yahoo/Marketing/APT/LinkingSettings.pm
+  Yahoo::Marketing::APT::LocationService:
+    file: lib/Yahoo/Marketing/APT/LocationService.pm
+  Yahoo::Marketing::APT::MakeGoodOrderCredit:
+    file: lib/Yahoo/Marketing/APT/MakeGoodOrderCredit.pm
+  Yahoo::Marketing::APT::MakeGoodOrderCreditResponse:
+    file: lib/Yahoo/Marketing/APT/MakeGoodOrderCreditResponse.pm
+  Yahoo::Marketing::APT::MonthOfYear:
+    file: lib/Yahoo/Marketing/APT/MonthOfYear.pm
+  Yahoo::Marketing::APT::NonGuaranteedDeal:
+    file: lib/Yahoo/Marketing/APT/NonGuaranteedDeal.pm
+  Yahoo::Marketing::APT::NonGuaranteedDealApproval:
+    file: lib/Yahoo/Marketing/APT/NonGuaranteedDealApproval.pm
+  Yahoo::Marketing::APT::Order:
+    file: lib/Yahoo/Marketing/APT/Order.pm
+  Yahoo::Marketing::APT::OrderAgency:
+    file: lib/Yahoo/Marketing/APT/OrderAgency.pm
+  Yahoo::Marketing::APT::OrderContact:
+    file: lib/Yahoo/Marketing/APT/OrderContact.pm
+  Yahoo::Marketing::APT::OrderCredit:
+    file: lib/Yahoo/Marketing/APT/OrderCredit.pm
+  Yahoo::Marketing::APT::OrderCreditResponse:
+    file: lib/Yahoo/Marketing/APT/OrderCreditResponse.pm
+  Yahoo::Marketing::APT::OrderDiscount:
+    file: lib/Yahoo/Marketing/APT/OrderDiscount.pm
+  Yahoo::Marketing::APT::OrderFee:
+    file: lib/Yahoo/Marketing/APT/OrderFee.pm
+  Yahoo::Marketing::APT::OrderFeeResponse:
+    file: lib/Yahoo/Marketing/APT/OrderFeeResponse.pm
+  Yahoo::Marketing::APT::OrderResponse:
+    file: lib/Yahoo/Marketing/APT/OrderResponse.pm
+  Yahoo::Marketing::APT::OrderService:
+    file: lib/Yahoo/Marketing/APT/OrderService.pm
+  Yahoo::Marketing::APT::OverlayVideoActOne:
+    file: lib/Yahoo/Marketing/APT/OverlayVideoActOne.pm
+  Yahoo::Marketing::APT::OverlayVideoActTwo:
+    file: lib/Yahoo/Marketing/APT/OverlayVideoActTwo.pm
+  Yahoo::Marketing::APT::Palette:
+    file: lib/Yahoo/Marketing/APT/Palette.pm
+  Yahoo::Marketing::APT::PaletteResponse:
+    file: lib/Yahoo/Marketing/APT/PaletteResponse.pm
+  Yahoo::Marketing::APT::PaletteService:
+    file: lib/Yahoo/Marketing/APT/PaletteService.pm
+  Yahoo::Marketing::APT::PiggybackPixel:
+    file: lib/Yahoo/Marketing/APT/PiggybackPixel.pm
+  Yahoo::Marketing::APT::Pixel:
+    file: lib/Yahoo/Marketing/APT/Pixel.pm
+  Yahoo::Marketing::APT::PixelFrequency:
+    file: lib/Yahoo/Marketing/APT/PixelFrequency.pm
+  Yahoo::Marketing::APT::PixelResponse:
+    file: lib/Yahoo/Marketing/APT/PixelResponse.pm
+  Yahoo::Marketing::APT::PixelService:
+    file: lib/Yahoo/Marketing/APT/PixelService.pm
+  Yahoo::Marketing::APT::Placement:
+    file: lib/Yahoo/Marketing/APT/Placement.pm
+  Yahoo::Marketing::APT::PlacementAdAttributes:
+    file: lib/Yahoo/Marketing/APT/PlacementAdAttributes.pm
+  Yahoo::Marketing::APT::PlacementAudienceTargetingAttributes:
+    file: lib/Yahoo/Marketing/APT/PlacementAudienceTargetingAttributes.pm
+  Yahoo::Marketing::APT::PlacementContentTargetingAttributes:
+    file: lib/Yahoo/Marketing/APT/PlacementContentTargetingAttributes.pm
+  Yahoo::Marketing::APT::PlacementDetail:
+    file: lib/Yahoo/Marketing/APT/PlacementDetail.pm
+  Yahoo::Marketing::APT::PlacementEditEndDate:
+    file: lib/Yahoo/Marketing/APT/PlacementEditEndDate.pm
+  Yahoo::Marketing::APT::PlacementEditImpression:
+    file: lib/Yahoo/Marketing/APT/PlacementEditImpression.pm
+  Yahoo::Marketing::APT::PlacementEditPrice:
+    file: lib/Yahoo/Marketing/APT/PlacementEditPrice.pm
+  Yahoo::Marketing::APT::PlacementEditSettings:
+    file: lib/Yahoo/Marketing/APT/PlacementEditSettings.pm
+  Yahoo::Marketing::APT::PlacementFrequencyTargetingAttributes:
+    file: lib/Yahoo/Marketing/APT/PlacementFrequencyTargetingAttributes.pm
+  Yahoo::Marketing::APT::PlacementGuaranteedPriceSettings:
+    file: lib/Yahoo/Marketing/APT/PlacementGuaranteedPriceSettings.pm
+  Yahoo::Marketing::APT::PlacementGuaranteedSettings:
+    file: lib/Yahoo/Marketing/APT/PlacementGuaranteedSettings.pm
+  Yahoo::Marketing::APT::PlacementNonGuaranteedPriceSettings:
+    file: lib/Yahoo/Marketing/APT/PlacementNonGuaranteedPriceSettings.pm
+  Yahoo::Marketing::APT::PlacementNonGuaranteedSettings:
+    file: lib/Yahoo/Marketing/APT/PlacementNonGuaranteedSettings.pm
+  Yahoo::Marketing::APT::PlacementResponse:
+    file: lib/Yahoo/Marketing/APT/PlacementResponse.pm
+  Yahoo::Marketing::APT::PlacementService:
+    file: lib/Yahoo/Marketing/APT/PlacementService.pm
+  Yahoo::Marketing::APT::PlacementTarget:
+    file: lib/Yahoo/Marketing/APT/PlacementTarget.pm
+  Yahoo::Marketing::APT::PlacementTargetDescriptor:
+    file: lib/Yahoo/Marketing/APT/PlacementTargetDescriptor.pm
+  Yahoo::Marketing::APT::PlacementTargetingDetails:
+    file: lib/Yahoo/Marketing/APT/PlacementTargetingDetails.pm
+  Yahoo::Marketing::APT::PlacementTransferResponse:
+    file: lib/Yahoo/Marketing/APT/PlacementTransferResponse.pm
+  Yahoo::Marketing::APT::Privilege:
+    file: lib/Yahoo/Marketing/APT/Privilege.pm
+  Yahoo::Marketing::APT::ProfileContact:
+    file: lib/Yahoo/Marketing/APT/ProfileContact.pm
+  Yahoo::Marketing::APT::PublisherSelector:
+    file: lib/Yahoo/Marketing/APT/PublisherSelector.pm
+  Yahoo::Marketing::APT::ROITarget:
+    file: lib/Yahoo/Marketing/APT/ROITarget.pm
+  Yahoo::Marketing::APT::RateAdjustment:
+    file: lib/Yahoo/Marketing/APT/RateAdjustment.pm
+  Yahoo::Marketing::APT::RateAdjustmentResponse:
+    file: lib/Yahoo/Marketing/APT/RateAdjustmentResponse.pm
+  Yahoo::Marketing::APT::RateCard:
+    file: lib/Yahoo/Marketing/APT/RateCard.pm
+  Yahoo::Marketing::APT::RateCardResponse:
+    file: lib/Yahoo/Marketing/APT/RateCardResponse.pm
+  Yahoo::Marketing::APT::RateCardService:
+    file: lib/Yahoo/Marketing/APT/RateCardService.pm
+  Yahoo::Marketing::APT::ReconciliationComment:
+    file: lib/Yahoo/Marketing/APT/ReconciliationComment.pm
+  Yahoo::Marketing::APT::ReconciliationRule:
+    file: lib/Yahoo/Marketing/APT/ReconciliationRule.pm
+  Yahoo::Marketing::APT::ReferralSegment:
+    file: lib/Yahoo/Marketing/APT/ReferralSegment.pm
+  Yahoo::Marketing::APT::ReferralSegmentResponse:
+    file: lib/Yahoo/Marketing/APT/ReferralSegmentResponse.pm
+  Yahoo::Marketing::APT::ReferralSegmentService:
+    file: lib/Yahoo/Marketing/APT/ReferralSegmentService.pm
+  Yahoo::Marketing::APT::Region:
+    file: lib/Yahoo/Marketing/APT/Region.pm
+  Yahoo::Marketing::APT::RegionLevel:
+    file: lib/Yahoo/Marketing/APT/RegionLevel.pm
+  Yahoo::Marketing::APT::RegionProbability:
+    file: lib/Yahoo/Marketing/APT/RegionProbability.pm
+  Yahoo::Marketing::APT::Report:
+    file: lib/Yahoo/Marketing/APT/Report.pm
+  Yahoo::Marketing::APT::ReportColumn:
+    file: lib/Yahoo/Marketing/APT/ReportColumn.pm
+  Yahoo::Marketing::APT::ReportInfo:
+    file: lib/Yahoo/Marketing/APT/ReportInfo.pm
+  Yahoo::Marketing::APT::ReportRequest:
+    file: lib/Yahoo/Marketing/APT/ReportRequest.pm
+  Yahoo::Marketing::APT::ReportService:
+    file: lib/Yahoo/Marketing/APT/ReportService.pm
+  Yahoo::Marketing::APT::ReportStatus:
+    file: lib/Yahoo/Marketing/APT/ReportStatus.pm
+  Yahoo::Marketing::APT::ReportingTag:
+    file: lib/Yahoo/Marketing/APT/ReportingTag.pm
+  Yahoo::Marketing::APT::ReportingTagResponse:
+    file: lib/Yahoo/Marketing/APT/ReportingTagResponse.pm
+  Yahoo::Marketing::APT::ReportingTagService:
+    file: lib/Yahoo/Marketing/APT/ReportingTagService.pm
+  Yahoo::Marketing::APT::Role:
+    file: lib/Yahoo/Marketing/APT/Role.pm
+  Yahoo::Marketing::APT::RoleResponse:
+    file: lib/Yahoo/Marketing/APT/RoleResponse.pm
+  Yahoo::Marketing::APT::RoleService:
+    file: lib/Yahoo/Marketing/APT/RoleService.pm
+  Yahoo::Marketing::APT::SalesTeamMember:
+    file: lib/Yahoo/Marketing/APT/SalesTeamMember.pm
+  Yahoo::Marketing::APT::ScheduledReport:
+    file: lib/Yahoo/Marketing/APT/ScheduledReport.pm
+  Yahoo::Marketing::APT::ScheduledReportResponse:
+    file: lib/Yahoo/Marketing/APT/ScheduledReportResponse.pm
+  Yahoo::Marketing::APT::SellerProfile:
+    file: lib/Yahoo/Marketing/APT/SellerProfile.pm
+  Yahoo::Marketing::APT::SellingRule:
+    file: lib/Yahoo/Marketing/APT/SellingRule.pm
+  Yahoo::Marketing::APT::SellingRuleResponse:
+    file: lib/Yahoo/Marketing/APT/SellingRuleResponse.pm
+  Yahoo::Marketing::APT::SellingRulesService:
+    file: lib/Yahoo/Marketing/APT/SellingRulesService.pm
+  Yahoo::Marketing::APT::Service:
+    file: lib/Yahoo/Marketing/APT/Service.pm
+  Yahoo::Marketing::APT::Site:
+    file: lib/Yahoo/Marketing/APT/Site.pm
+  Yahoo::Marketing::APT::SiteAccess:
+    file: lib/Yahoo/Marketing/APT/SiteAccess.pm
+  Yahoo::Marketing::APT::SiteAccessResponse:
+    file: lib/Yahoo/Marketing/APT/SiteAccessResponse.pm
+  Yahoo::Marketing::APT::SiteClassificationService:
+    file: lib/Yahoo/Marketing/APT/SiteClassificationService.pm
+  Yahoo::Marketing::APT::SiteDescriptor:
+    file: lib/Yahoo/Marketing/APT/SiteDescriptor.pm
+  Yahoo::Marketing::APT::SiteResponse:
+    file: lib/Yahoo/Marketing/APT/SiteResponse.pm
+  Yahoo::Marketing::APT::SiteService:
+    file: lib/Yahoo/Marketing/APT/SiteService.pm
+  Yahoo::Marketing::APT::SiteStructure:
+    file: lib/Yahoo/Marketing/APT/SiteStructure.pm
+  Yahoo::Marketing::APT::SiteStructureSettings:
+    file: lib/Yahoo/Marketing/APT/SiteStructureSettings.pm
+  Yahoo::Marketing::APT::SourceOwner:
+    file: lib/Yahoo/Marketing/APT/SourceOwner.pm
+  Yahoo::Marketing::APT::Tag:
+    file: lib/Yahoo/Marketing/APT/Tag.pm
+  Yahoo::Marketing::APT::TargetingAttribute:
+    file: lib/Yahoo/Marketing/APT/TargetingAttribute.pm
+  Yahoo::Marketing::APT::TargetingAttributeDescriptor:
+    file: lib/Yahoo/Marketing/APT/TargetingAttributeDescriptor.pm
+  Yahoo::Marketing::APT::TargetingAttributeDescriptorWithAny:
+    file: lib/Yahoo/Marketing/APT/TargetingAttributeDescriptorWithAny.pm
+  Yahoo::Marketing::APT::TargetingAttributeDetails:
+    file: lib/Yahoo/Marketing/APT/TargetingAttributeDetails.pm
+  Yahoo::Marketing::APT::TargetingAttributeValue:
+    file: lib/Yahoo/Marketing/APT/TargetingAttributeValue.pm
+  Yahoo::Marketing::APT::TargetingAttributeValueRequest:
+    file: lib/Yahoo/Marketing/APT/TargetingAttributeValueRequest.pm
+  Yahoo::Marketing::APT::TargetingDictionaryService:
+    file: lib/Yahoo/Marketing/APT/TargetingDictionaryService.pm
+  Yahoo::Marketing::APT::TargetingProfile:
+    file: lib/Yahoo/Marketing/APT/TargetingProfile.pm
+  Yahoo::Marketing::APT::TargetingProfileResponse:
+    file: lib/Yahoo/Marketing/APT/TargetingProfileResponse.pm
+  Yahoo::Marketing::APT::TargetingProfileService:
+    file: lib/Yahoo/Marketing/APT/TargetingProfileService.pm
+  Yahoo::Marketing::APT::TargetingRule:
+    file: lib/Yahoo/Marketing/APT/TargetingRule.pm
+  Yahoo::Marketing::APT::TextFlashVariable:
+    file: lib/Yahoo/Marketing/APT/TextFlashVariable.pm
+  Yahoo::Marketing::APT::TextFlashVariableConstraints:
+    file: lib/Yahoo/Marketing/APT/TextFlashVariableConstraints.pm
+  Yahoo::Marketing::APT::TextFlashVariableValue:
+    file: lib/Yahoo/Marketing/APT/TextFlashVariableValue.pm
+  Yahoo::Marketing::APT::TimePeriod:
+    file: lib/Yahoo/Marketing/APT/TimePeriod.pm
+  Yahoo::Marketing::APT::TimeRange:
+    file: lib/Yahoo/Marketing/APT/TimeRange.pm
+  Yahoo::Marketing::APT::UniversalFilter:
+    file: lib/Yahoo/Marketing/APT/UniversalFilter.pm
+  Yahoo::Marketing::APT::UniversalFilterResponse:
+    file: lib/Yahoo/Marketing/APT/UniversalFilterResponse.pm
+  Yahoo::Marketing::APT::UpdatePlacementResponse:
+    file: lib/Yahoo/Marketing/APT/UpdatePlacementResponse.pm
+  Yahoo::Marketing::APT::UploadService:
+    file: lib/Yahoo/Marketing/APT/UploadService.pm
+  Yahoo::Marketing::APT::Url:
+    file: lib/Yahoo/Marketing/APT/Url.pm
+  Yahoo::Marketing::APT::User:
+    file: lib/Yahoo/Marketing/APT/User.pm
+  Yahoo::Marketing::APT::UserResponse:
+    file: lib/Yahoo/Marketing/APT/UserResponse.pm
+  Yahoo::Marketing::APT::UserService:
+    file: lib/Yahoo/Marketing/APT/UserService.pm
+  Yahoo::Marketing::APT::VideoCreative:
+    file: lib/Yahoo/Marketing/APT/VideoCreative.pm
+  Yahoo::Marketing::APT::VideoCreativeAddRequest:
+    file: lib/Yahoo/Marketing/APT/VideoCreativeAddRequest.pm
+  Yahoo::Marketing::APT::VideoCreativeAddResponse:
+    file: lib/Yahoo/Marketing/APT/VideoCreativeAddResponse.pm
+  Yahoo::Marketing::APT::VideoCreativeResponse:
+    file: lib/Yahoo/Marketing/APT/VideoCreativeResponse.pm
+  Yahoo::Marketing::APT::VideoCreativeService:
+    file: lib/Yahoo/Marketing/APT/VideoCreativeService.pm
+  Yahoo::Marketing::APT::Visit:
+    file: lib/Yahoo/Marketing/APT/Visit.pm
+  Yahoo::Marketing::APT::YahooPremiumBehavioralSegmentTargeting:
+    file: lib/Yahoo/Marketing/APT/YahooPremiumBehavioralSegmentTargeting.pm
+  Yahoo::Marketing::APT::ZippedCreativesResponse:
+    file: lib/Yahoo/Marketing/APT/ZippedCreativesResponse.pm
+generated_by: Module::Build version 0.261

@@ -1,0 +1,101 @@
+#!/usr/bin/env perl
+# -*- coding: utf-8 -*-
+#----------------------------------------
+use strict;
+use warnings qw(FATAL all NONFATAL misc);
+use FindBin; BEGIN {do "$FindBin::RealBin/libdir.pl"}
+#----------------------------------------
+
+use mro 'c3'; # XXX: Not fully compatible.
+use parent qw/YATT::Lite::Object/;
+use YATT::Lite::MFields qw/dispatcher
+			   cf_linear/;
+
+use YATT::Lite::Util qw/globref look_for_globref/;
+use YATT::Lite::Util::CmdLine qw/run/;
+
+
+use YATT::Lite::Factory;
+
+{
+  my $disp = YATT::Lite::Factory->load_factory_offline
+    or die "Can't find YATT app script!\n";
+
+  my MY $cmd = MY->new;
+  $cmd->{dispatcher} = $disp;
+
+  $cmd->run(\@ARGV);
+}
+
+sub cmd_isa {
+  (my MY $self, my ($path)) = @_;
+
+  my $disp = $self->{dispatcher};
+
+  unless (defined $path) {
+    $self->show_isa(dispatcher => ref $disp);
+  } else {
+    my ($dir, $file) = do {
+      if (-d $path) {
+	($path)
+      } else {
+	(dirname($path), basename($path));
+      }
+    };
+    my $dh = $disp->get_dirhandler($dir);
+
+    if (defined $file) {
+      my ($part, $sub, $pkg) = $dh->open_trans->find_part_handler($file);
+      $self->show_isa(File => $pkg);
+#      my ($tmpl) = $dh->open_trans->find_file($file);
+#      $self->show_isa(File => $tmpl->cget('entns'));
+    } else {
+      $self->show_isa(DirApp => ref $dh);
+    }
+  }
+}
+
+sub show_isa {
+  (my MY $self, my ($title, $class)) = @_;
+  if ($self->{cf_linear}) {
+    print "$title=$class\n";
+    foreach my $super (@{mro::get_linear_isa($class)}) {
+      print "  $super\n";
+    }
+  } else {
+    print $class;
+    if (my $fn = $self->get_class_filename($class)) {
+      print "\t[$fn]";
+    }
+    print "\n";
+    $self->show_isa_tree(0, {}, *{globref($class, 'ISA')}{ARRAY});
+  }
+}
+
+sub show_isa_tree {
+  (my MY $self, my ($depth, $seen, $supers)) = @_;
+  $depth++;
+  foreach my $super (@$supers) {
+    my $cnt = $seen->{$super}++;
+    print "  " x $depth, $cnt ? "*" : " ", $super;
+    if (my $fn = $self->get_class_filename($super)) {
+      print "\t[$fn]";
+    }
+    print "\n";
+    next if $cnt;
+    my $sym = look_for_globref($super, 'ISA')
+      or next;
+    my $isa = *{$sym}{ARRAY}
+      or next;
+    $self->show_isa_tree($depth, $seen, $isa);
+  }
+}
+
+sub get_class_filename {
+  (my MY $self, my ($cls, $default)) = @_;
+  my $fnsym = look_for_globref($cls, 'filename')
+    or return $default;
+  my $sub = *{$fnsym}{CODE}
+    or return $default;
+  $sub->() // $default;
+}

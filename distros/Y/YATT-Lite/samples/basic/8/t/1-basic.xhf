@@ -1,0 +1,5 @@
+# -*- coding: utf-8 -*-
+
+FILE: index.yatt
+ERROR: ^Use of uninitialized value in concatenation \(\.\) or string at (?:(?:/[^/]+)*/)?t_undef_error.pm line 10.
+

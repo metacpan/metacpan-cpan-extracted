@@ -1,0 +1,45 @@
+---
+abstract: 'Yet another HTTP client'
+author:
+  - 'Ivan Kruglov <ivan.kruglov@yahoo.com>'
+build_requires:
+  Data::Dumper: 0
+  ExtUtils::MakeMaker: 6.36
+  FindBin: 0
+  HTTP::Tiny: 0
+  IO::Socket::INET: 0
+  JSON: 0
+  List::Util: 0
+  Net::Ping: '2.41'
+  Plack: 0
+  Plack::Handler::Starman: 0
+  Test::Exception: 0
+  Test::Memory::Cycle: 0
+  Test::More: '0.88'
+  Time::HiRes: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.36
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.16'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: YAHC
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  EV: 0
+  Fcntl: 0
+  IO::Socket::SSL: 0
+  POSIX: 0
+  Scalar::Util: 0
+  Socket: 0
+  Time::HiRes: 0
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/ikruglov/YAHC
+version: '0.033'

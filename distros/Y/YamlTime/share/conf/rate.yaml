@@ -1,0 +1,19 @@
+# These are keywords for rates used in your proj.yaml file.
+
+us1:
+  amt: 20
+  cur: USD
+  note: Regular Work
+us2:
+  amt: 10
+  cur: USD
+  note: Open Source Discount
+
+au1:
+  amt: 30
+  cur: AUD
+  note: Regular Work
+au2:
+  amt: 15
+  cur: AUD
+  note: Open Source Discount

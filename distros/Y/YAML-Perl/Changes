@@ -1,0 +1,30 @@
+---
+version: 0.02
+date:    Sun Mar  8 17:21:05 PDT 2009
+changes:
+- Parser port is done
+- Most basic functionality is working.
+- Updated doc a little bit to detail current status.
+---
+version: 0.01_03
+date:    Mon Jan 26 16:14:16 PST 2009
+changes:
+- Added use_test_base to Makefile.PL per ribasushi
+- 16:12 < ribasushi> expects Test::Base which is not in the makefile
+---
+version: 0.01_02
+date:    Wed Dec 31 02:26:41 PST 2008
+changes:
+- Entire dumper stack working top to bottom, but not fully ported.
+---
+version: 0.01_01
+date:    Sat Dec 27 00:54:36 PST 2008
+changes:
+- Entire loader stack working top to bottom, but not fully ported.
+---
+version: 0.01
+date:    Mon Dec 15 01:43:57 PST 2008
+changes:
+- Initial version.
+- Not nearly complete.
+- Parser and Emitter passing initial tests.

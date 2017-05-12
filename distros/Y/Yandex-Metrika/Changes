@@ -1,0 +1,7 @@
+Revision history for Perl extension Yandex-Metrika
+
+0.01 2015-05-01T09:48:19Z
+    - add POD
+    - add base methods for stats Yandex.Metrika
+    - original version
+

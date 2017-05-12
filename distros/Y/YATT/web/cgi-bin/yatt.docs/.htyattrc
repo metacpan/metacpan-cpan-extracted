@@ -1,0 +1,2 @@
+# -*- mode: perl; coding: utf-8 -*-
+use YATT::Registry base => '/normal';

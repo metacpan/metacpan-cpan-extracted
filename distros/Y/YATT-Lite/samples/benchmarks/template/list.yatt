@@ -1,0 +1,7 @@
+<!yatt:args list=list>
+List:
+<yatt:foreach my=item list=list>
+    * &yatt:item{title};
+    * &yatt:item{title};
+    * &yatt:item{title};
+</yatt:foreach>

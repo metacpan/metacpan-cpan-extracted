@@ -1,0 +1,92 @@
+#!/usr/bin/env perl
+use 5.12.1;
+
+use Yukki;
+
+use File::Path;
+use IO::Prompter;
+use Path::Class;
+use YAML qw( DumpFile );
+
+my $app = Yukki->new;
+my $digest = $app->hasher;
+
+my @user_fields = (
+    login_name => [ 'Login name:', 
+        -must => { 
+            'be only letters, numbers, and underscores' =>  
+                qr{^[a-zA-Z0-9_]+$}
+        },
+    ],
+    password   => [ 'Password:', -echo => '' ],
+    name       => [ 'Name:' ],
+    email      => [ 'Email:' ],
+);
+
+my %user;
+while (my ($name, $label) = splice @user_fields, 0, 2) {
+    $user{$name} = prompt @$label, -v;
+}
+
+$digest->add($user{password});
+$user{password} = $digest->generate;
+
+while (my $group = prompt 'Group name [enter a blank line to end]:', -v) {
+    last unless $group =~ /\S/;
+    push @{ $user{groups} }, $group;
+}
+
+my $user_file = $app->locate('user_path', $user{login_name});
+
+# Do not overwrite existing users.
+if (-f "$user_file") {
+    die "User $user{login_name} already exists. Try editing $user_file instead.\n";
+}
+
+mkpath(''.$user_file->dir);
+
+DumpFile("$user_file", \%user);
+chmod 0400, "$user_file";
+
+# ABSTRACT: add users to a Yukki installation
+# PODNAME: yukki-add-user
+
+__END__
+
+=pod
+
+=head1 NAME
+
+yukki-add-user - add users to a Yukki installation
+
+=head1 VERSION
+
+version 0.140290
+
+=head1 SYNOPSIS
+
+  yukki-add-user
+
+=head1 DESCRIPTION
+
+Interactively adds a user to a Yukki installation. There are no command-line
+options.
+
+=head1 ENVIRONMENT
+
+Normally, this script tries to find F<etc/yukki.conf> from the current working
+directory. If no configuraiton file is found, it checks C<YUKKI_CONFIG> for the
+path to this file.
+
+=head1 AUTHOR
+
+Andrew Sterling Hanenkamp <hanenkamp@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2014 by Qubling Software LLC.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

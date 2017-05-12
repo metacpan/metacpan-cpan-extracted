@@ -1,0 +1,72 @@
+# -*- coding: utf-8 -*-
+
+=encoding utf-8
+
+=head1 NAME
+
+prog_guide -- programmer's guide for YATT
+
+=head1 DESCRIPTION
+
+YATT consists of two layers. General purpose template engine L</YATT::Lite>,
+and sample Web Application Framework L</WebMVC0>.
+
+=for image yatt_lite.svg
+
+Note: In this document, I choose simplicity of explanation over
+accuracy. Some methods/configs are described in subclass section
+as-if it is defined there (but actually not).
+
+=head1 YATT::Lite -- General Purpose Template Engine
+X<YATT::Lite>
+
+When requested,
+yatt converts a template into a set of perl functions and compile them.
+After successful compilation, yatt calls corresponding function.
+For example, assume we have a variable C<$template_1> which contains
+a template like following:
+
+=for testing
+% perl -Mlib=lib -Mstrict -w =(cat)
+
+=for code yatt
+
+  <!yatt:args x y>
+  <h2>&yatt:x;</h2>
+  <yatt:hello who=y />
+
+  <!yatt:widget hello who>
+  Hello &yatt:who;!
+
+And our program is like following:
+
+=for code perl
+
+  use YATT::Lite;
+  my $yatt = new YATT::Lite(vfs => [data => $template_1]);
+  print $yatt->render('', {x => "foo", y => "bar"});
+  # ..Or..
+  $yatt->render_into(\*STDOUT, "" => {x => "baz", y => "qux"});
+
+Then, when C<< $yatt->render >> is called, yatt generates
+following perl script (package) and invoke it as
+C<< MyApp::EntNS->render_(...) >>.
+
+  package MyApp::EntNS;
+  sub render_ {
+    my ($this, $CON, $x, $y, $body) = @_;
+    print $CON (q|<h2>|, YATT::Lite::Util::escape($x), q|</h2>|, "\n");
+    $this->render_hello($CON, (undef, $y)[1, 0]); print $CON ("\n");}
+  
+  sub render_hello {
+    my ($this, $CON, $who, $body) = @_;
+    print $CON (q|Hello |, YATT::Lite::Util::escape($who), q|!|, "\n");}
+
+=for author cgen
+perl  -MYATT::Lite -Mstrict -wle '
+  my $template_1 = do {local $/; <>};
+  my $yl = new YATT::Lite(vfs => [data => $template_1], debug_cgen => 1);
+  $yl->render_into(\*STDOUT, "" => {x => "foo", y => "bar"})'
+
+Note: if you specify template as a file,
+it is cached until the file is modified.

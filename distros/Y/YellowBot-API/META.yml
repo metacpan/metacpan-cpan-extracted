@@ -1,0 +1,30 @@
+---
+abstract: 'The great new YellowBot::API!'
+author:
+  - 'Ask Bjørn Hansen <ask@develooper.com>'
+build_requires:
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '6.30'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.012, CPAN::Meta::Converter version 2.132830'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: YellowBot-API
+requires:
+  Digest::SHA: '0'
+  JSON: '2.12'
+  LWP::UserAgent: '0'
+  Moose: '0'
+  UNIVERSAL::require: '0.10'
+  URI: '1.36'
+  namespace::clean: '0'
+resources:
+  homepage: http://search.cpan.org/dist/YellowBot-API/
+  repository: git://github.com/solfo/YellowBot-API-perl.git
+version: '0.97'

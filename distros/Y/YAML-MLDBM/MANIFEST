@@ -1,0 +1,10 @@
+Changes
+MANIFEST
+MLDBM.pm
+Makefile.PL
+README
+lib/MLDBM/Serializer/YAML.pm
+t/test.t
+
+
+CPAN/MakeMaker.pm

@@ -1,0 +1,33 @@
+YAML/LoadFileCached version 0.21
+================================
+
+This module provides a way to gain speed improvements when you have
+to repeatedly read a file in YAML format (eg. configuration files)
+under mod_perl or in a long running process, although at the cost
+of memory expense.
+
+Please see the documentation in pod format in the module for more
+information.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  YAML 0.30
+
+COPYRIGHT AND LICENCE
+
+This program is free software; you can redistribute it
+and/or modify it under the same terms as Perl itself.
+
+Copyright (C) 2002 - 2003 Florian Helmberger <fh@laudatio.com>
+

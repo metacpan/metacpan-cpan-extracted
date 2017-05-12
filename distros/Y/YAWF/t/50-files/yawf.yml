@@ -1,0 +1,11 @@
+---
+foo.bar:
+    domain: www.foo.bar
+    database:
+        dbi: dbi:SQLite:dbname=t/50-files/db
+        username: none
+        password: none
+        database: t/50-files/db
+        class: Test50::DB
+    handlerprefix: Test50
+    template_dir: t/50-files/templates

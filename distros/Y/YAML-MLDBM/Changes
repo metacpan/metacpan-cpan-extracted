@@ -1,0 +1,5 @@
+---
+version: 0.10
+date:    Sat Feb  1 15:56:38 PST 2003
+changes:
+  - original version; created without any help from h2xs

@@ -1,0 +1,55 @@
+#!/usr/bin/env perl
+#----------------------------------------
+use strict;
+use warnings qw(FATAL all NONFATAL misc);
+use sigtrap die => qw(normal-signals);
+use FindBin; BEGIN {do "$FindBin::RealBin/libdir.pl"}
+#----------------------------------------
+use YATT::Lite::Util::FindMethods;
+
+use YATT::Lite::Factory;
+use YATT::Lite qw(*YATT *CON);
+use YATT::Lite::Util qw(rootname);
+use YATT::Lite::Breakpoint;
+
+use YATT::Lite::Util::CmdLine qw/parse_opts process_result/;
+
+# Getopt::Long was bit too greed.
+my %opts = parse_opts(undef, \@ARGV);
+
+my $if_can = delete $opts{if_can};
+
+my $dispatcher = YATT::Lite::Factory->load_factory_offline
+  or die "Can't find YATT app script!\n";
+
+# to_app is already done.
+
+unless (@ARGV) {
+  die <<END, join("\n", map {"  $_"} FindMethods($dispatcher, sub {s/^cmd_//}))."\n";
+Usage: @{[basename($0)]} COMMAND args...
+
+Available commands are:
+END
+
+}
+
+my $command = $ARGV[0];
+if ($dispatcher->can("cmd_$command") || $dispatcher->can($command)) {
+  my $cmd = shift @ARGV || 'help';
+  my @opts = (%opts, parse_opts(undef, \@ARGV));
+  local $CON = $dispatcher->make_connection(\*STDOUT, noheader => 1);
+  if ($dispatcher->can(my $method = "cmd_$command")) {
+    $dispatcher->cf_let(\@opts, $method, $CON, @ARGV);
+  } elsif ($dispatcher->can($command)) {
+    process_result($dispatcher->cf_let(\@opts, $command, $CON, @ARGV));
+  } else {
+    die "Should not reached here!";
+  }
+  #print "at last,transdepth=", $con->backend->storage->transaction_depth, "\n";
+  # $con->txn_commit;
+} elsif ($if_can) {
+  exit
+} else {
+  die "No such command: $command\n";
+}
+

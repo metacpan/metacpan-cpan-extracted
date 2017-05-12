@@ -1,0 +1,6 @@
+<yapc:hello>
+  <b>W</b>orld
+</yapc:hello>
+
+<!yapc:widget hello>
+Hello <yapc:body/>!

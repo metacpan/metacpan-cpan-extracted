@@ -1,0 +1,81 @@
+# -*- coding: utf-8 -*-
+encoding: utf8
+ONLY_UTF8: 1
+YATT_CONFIG[
+namespace[
+- yatt
+- perl
+- 漢字
+]
+]
+
+
+TITLE: Japanese tag
+IN:
+ <!yatt:args x y>
+ <yatt:こんにちは x y/>world!
+ 
+ <!yatt:widget こんにちは x y>
+ <h2>Hello</h2>
+ &perl:x; x &perl:y; = <?perl= $x * $y?>
+PARAM[
+- 3
+- 8
+]
+OUT:
+ <h2>Hello</h2>
+ 3 x 8 = 24
+ world!
+
+TITLE: Japanese ns
+IN:
+ <!漢字:args x y>
+ <漢字:こんにちは x y/>world~~
+ 
+ <!漢字:widget こんにちは x y>
+ <h2>Hello</h2>
+ &漢字:x; x &漢字:y; = <?漢字= $x * $y?>
+PARAM[
+- 3
+- 8
+]
+OUT:
+ <h2>Hello</h2>
+ 3 x 8 = 24
+ world~~
+
+TITLE: Japanese ns plus Japanese output
+IN:
+ <!漢字:args x y>
+ <漢字:こんにちは x y/>世界！
+ 
+ <!漢字:widget こんにちは x y>
+ <h2>Hello</h2>
+ &漢字:x; x &漢字:y; = <?漢字= $x * $y?>
+PARAM[
+- 3
+- 8
+]
+OUT:
+ <h2>Hello</h2>
+ 3 x 8 = 24
+ 世界！
+
+
+TITLE: Japanese entity
+IN:
+ <!yatt:args x y>
+ <yatt:hello 甲=x 乙=y/>world!
+ 
+ <!yatt:widget hello 甲 乙>
+ <h2>Hello</h2>
+ &perl:甲; x &perl:乙; = <?perl= $甲 * $乙?>
+PARAM[
+- 3
+- 8
+]
+OUT:
+ <h2>Hello</h2>
+ 3 x 8 = 24
+ world!
+

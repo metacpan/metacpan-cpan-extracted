@@ -1,0 +1,44 @@
+---
+abstract: 'Yet Another RESTful-Archive Service'
+author:
+  - 'Graham Ollis <plicease@cpan.org>'
+build_requires:
+  Capture::Tiny: '0'
+  Data::Hexdumper: '0'
+  Module::Build: '0.28'
+  Monkey::Patch: '0'
+  Test::Clustericious::Cluster: '0.28'
+  Test::More: '0.94'
+  perl: '5.010001'
+configure_requires:
+  Module::Build: '0.28'
+  perl: '5.010001'
+dynamic_config: '1'
+generated_by: 'Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Yars
+recommends:
+  Cpanel::JSON::XS: '0'
+  EV: '0'
+requires:
+  Clustericious: '1.20'
+  File::Find::Rule: '0'
+  File::HomeDir: '0.91'
+  Hash::MoreUtils: '0'
+  IO::Uncompress::Gunzip: '0'
+  JSON::MaybeXS: '0'
+  List::MoreUtils: '0'
+  Log::Log4perl: '0'
+  Number::Bytes::Human: '0.09'
+  Path::Class: '0.26'
+  YAML::XS: '0'
+  perl: '5.010001'
+resources:
+  bugtracker: https://github.com/clustericious/Yars/issues
+  homepage: https://metacpan.org/pod/Yars
+  repository: git://github.com/clustericious/Yars.git
+version: '1.27'
+x_serialization_backend: 'YAML::Tiny version 1.70'

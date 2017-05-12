@@ -1,0 +1,31 @@
+NAME
+    YAML::Full - Full Stack YAML Processor.
+
+STATUS
+    This project is just beginning. Not useful yet. Stay tuned.
+
+SYNOPSIS
+        use YAML::Full;
+    
+        my $node = YAML::Full->construct($yaml);
+    
+        # Process in original key order:
+        for my ($key, $value) (@{$node->each}) {
+            ...
+        }
+
+DESCRIPTION
+    YAML::Full is a full stack framework for processing YAML. It gives you
+    control at every level.
+
+AUTHOR
+    Ingy döt Net <ingy@cpan.org>
+
+COPYRIGHT AND LICENSE
+    Copyright (c) 2014. Ingy döt Net.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+    See <http://www.perl.com/perl/misc/Artistic.html>
+

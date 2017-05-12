@@ -1,0 +1,35 @@
+# -*- coding: utf-8 -*-
+
+FILE: index.yatt
+HEADER[
+Content-type: ^text/html; charset="?utf-8"?
+]
+BODY:
+ 
+ 
+ Oh no!
+
+
+FILE: index.yatt
+PARAM{
+foo: 10
+}
+BODY:
+ 
+ Other(10).
+
+FILE: index.yatt
+PARAM{
+foo: 3
+}
+BODY:
+ 
+ Single(3).
+
+FILE: index.yatt
+PARAM{
+foo: 1
+}
+BODY:
+ 
+ One!

@@ -1,0 +1,153 @@
+#!/usr/bin/env perl
+#----------------------------------------
+use strict;
+use warnings qw(FATAL all NONFATAL misc);
+use FindBin; my $libdir; BEGIN {($libdir) = do "$FindBin::RealBin/libdir.pl"}
+#----------------------------------------
+use 5.010;
+use Cwd qw(realpath);
+
+use Test::More;
+use Test::Differences;
+use List::Util qw(sum);
+
+use YATT::Lite::Breakpoint;
+use YATT::Lite::XHF;
+use YATT::Lite::Util qw(ostream);
+
+{
+  package TestSection;
+  use base qw(YATT::Lite::Object);
+  use fields qw(cf_file items);
+  sub ntests {
+    my TestSection $self = shift;
+    scalar @{$self->{items}};
+  }
+
+  package TestItem;
+  use base qw(YATT::Lite::Object);
+  use fields qw(cf_TITLE cf_FILE cf_METHOD
+		cf_PARAM
+		cf_HEADER cf_BODY);
+}
+
+use Getopt::Long;
+GetOptions("m|mode=s", \ my $mode)
+  or die "Usage: [--mode=...] [t/*.xhf]";
+
+my @section = map {
+  my TestSection $section = new TestSection(file => $_);
+  my $parser = new YATT::Lite::XHF(file => $_);
+  if (my @global = $parser->read) {
+    $section->configure(@global);
+  }
+  while (my @config = $parser->read) {
+    push @{$section->{items}}, new TestItem(@config);
+  }
+  # XXX: . とか渡したときに、全然ダメじゃん。
+  $section;
+} @ARGV ? @ARGV : <t/*.xhf>;
+# XXX: dict_sort
+
+unless (@section) {
+  plan skip_all => "No testfile (t/*.xhf) found";
+  exit;
+}
+
+my $sub = MY->can(join '', mode_ => ($mode // "http_localhost"))
+  or die "No such test mode: $mode\n";
+$sub->(MY, @section);
+
+sub mode_http_localhost {
+  my ($pack, @section) = @_;
+  plan tests => sum(map {$_->ntests} @section);
+  require WWW::Mechanize;
+  my $mech = new WWW::Mechanize;
+  foreach my TestSection $sect (@section) {
+    # 正しく設定されていれば、 .htaccess の x-yatt-handler 行には url が書かれている。
+    # ここから base_url を取り出す。
+    my $dir = dirname(realpath($sect->{cf_file}));
+    $dir =~ s{/t$}{}; # $sect->{cf_file} is assumed t/*.xhf
+    my $sect_name = basename($dir).';'.basename($sect->{cf_file});
+    my $cgi_url = $pack->find_yatt_handler
+      (realpath(dirname($sect->{cf_file}) . "/../.htaccess"));
+    (my $base_url = $cgi_url) =~ s|/cgi-bin/\w+\.f?cgi$|/|;
+
+    foreach my TestItem $item (@{$sect->{items}}) {
+      my $url = join '', 'http://localhost', $base_url, $item->{cf_FILE};
+      $item->{cf_METHOD} //= 'GET';
+      given ($item->{cf_METHOD}) {
+	when ('GET') {
+	  my $res = $mech->get($url);
+	  eq_or_diff trimlast(nocr($mech->content)), $item->{cf_BODY}
+	    , "[$sect_name] $_ $item->{cf_FILE}";
+	}
+	when ('POST') {
+	  my $res = $mech->post($url, $item->{cf_PARAM});
+	  my $pat = join("|", @{$item->{cf_HEADER}});
+	  like $res->previous->as_string, qr{$pat}sm
+	    , "[$sect_name] $_ $item->{cf_FILE}";
+	}
+	default {
+	  die "Unknown test method: $_\n";
+	}
+      }
+    }
+  }
+}
+
+sub mode_internal {
+  my ($pack, @section) = @_;
+  plan tests => sum(map {$_->ntests} @section);
+
+  # do で runyatt.cgi を load し、 $dispatcher を取り出す！
+  (my $cgi = $libdir) =~ s/\.\w+$/.cgi/;
+  my $dispatcher = YATT::Lite::Factory->load_factory_offline || do {
+    require YATT::Lite::WebMVC0::SiteApp;
+    YATT::Lite::WebMVC0::SiteApp->new
+	(app_ns => 'MyApp'
+	 , namespace => ['yatt', 'perl', 'js']
+	 , header_charset => 'utf-8'
+	 , debug_cgen => $ENV{DEBUG}
+	 , debug_cgi  => $ENV{DEBUG_CGI}
+	 # , is_gateway => $ENV{GATEWAY_INTERFACE} # Too early for FastCGI.
+	 # , tmpl_encoding => 'utf-8'
+	);
+  };
+
+  foreach my TestSection $sect (@section) {
+    my $dir = dirname(realpath($sect->{cf_file}));
+    $dir =~ s{/t$}{}; # $sect->{cf_file} is assumed t/*.xhf
+    my $sect_name = basename($dir).';'.basename($sect->{cf_file});
+    foreach my TestItem $item (@{$sect->{items}}) {
+      $dispatcher->run_dirhandler
+	(ostream(my $buffer)
+	 , $dispatcher->make_cgi("$dir/$item->{cf_FILE}", $item->{cf_PARAM}));
+      eq_or_diff trimlast(nocr($buffer)), $item->{cf_BODY}
+	, "[$sect_name] GET $item->{cf_FILE}";
+    }
+  }
+}
+
+sub find_yatt_handler {
+  my $pack = shift;
+  local $_;
+  foreach my $fn (@_) {
+    open my $fh, '<', $fn or do { warn "$fn: $!"; next };
+    while (<$fh>) {
+      next unless m/^Action\s+x-yatt-handler\s+(\S+)/;
+      return $1;
+    }
+  }
+  die "Can't find x-yatt-handler in any of: @_";
+}
+
+sub trimlast {
+  $_[0] =~ s/\s+$/\n/g;
+  $_[0];
+}
+
+sub nocr {
+  $_[0] =~ s|\r||g;
+  $_[0];
+}

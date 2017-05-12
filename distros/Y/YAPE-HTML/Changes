@@ -1,0 +1,11 @@
+Revision history for Perl extension YAPE::HTML.
+
+1.11  Tue Feb  6 01:11:00 2001
+	- another inheritence fix
+1.10  Fri Feb  2 11:40:00 2001
+	- fixed auto-inheritence
+	- added SSI, DTD, and PI support
+1.01  Wed Jan 31 16:14:00 2001
+	- fixed directory structure
+1.00  Tue Jan 30 15:06:17 2001
+	- the first released version

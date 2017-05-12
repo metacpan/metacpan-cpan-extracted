@@ -1,0 +1,17 @@
+examples/build_menu.pl
+examples/build_menu_html.pl
+examples/menu_yaml.yaml
+inc/Module/Install.pm
+inc/Module/Install/Base.pm
+inc/Module/Install/Can.pm
+inc/Module/Install/Fetch.pm
+inc/Module/Install/Makefile.pm
+inc/Module/Install/Metadata.pm
+inc/Module/Install/Win32.pm
+inc/Module/Install/WriteAll.pm
+lib/YUI/MenuBar/Markup.pm
+lib/YUI/MenuBar/Markup/YAML.pm
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+README

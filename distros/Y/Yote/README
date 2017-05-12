@@ -1,0 +1,21 @@
+Name
+    YOTE
+
+Summary
+
+
+Requirements
+    *   perl version 5.10
+
+Install Yote
+	$ export INSTALL_BASE=/usr/local/yote #optional. default is /usr/local/yote
+
+    $ cpan Yote
+
+	$ # ---  OR ---
+		
+    $ perl Build.PL 
+    $ ./Build
+    $ ./Build test
+    $ ./Build install
+      

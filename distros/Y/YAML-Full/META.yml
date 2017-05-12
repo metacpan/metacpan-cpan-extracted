@@ -1,0 +1,28 @@
+---
+abstract: 'Full Stack YAML Processing Framework'
+author:
+  - 'Ingy döt Net <ingy@cpan.org>'
+build_requires:
+  TestML: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '6.30'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.019, CPAN::Meta::Converter version 2.132830'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: YAML-Full
+no_index:
+  directory:
+    - inc
+    - t
+    - xt
+requires:
+  Pegex: '0'
+  perl: v5.8.1
+resources:
+  bugtracker: https://github.com/ingydotnet/yaml-full-pm/issues
+  homepage: https://github.com/ingydotnet/yaml-full-pm
+  repository: https://github.com/ingydotnet/yaml-full-pm.git
+version: 0.0.1

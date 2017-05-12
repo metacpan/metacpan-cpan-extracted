@@ -1,0 +1,679 @@
+# -*- coding: utf-8 -*-
+USE_COOKIE: 1
+
+ACTION[
+remove: ../var/data/.ht_*
+]
+
+TITLE: 1st index
+FILE: index.yatt
+BODY:
+ <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+ <html>
+ <head>
+   <title>Submission form (Example of session based input restoration)</title>
+   <link rel="stylesheet" type="text/css" href="main.css">
+ </head>
+ <body>
+ <div id="wrapper">
+   <div id="header">
+     <h2>Submission form <span class="theme">(Example of session based input restoration)</span></h2>
+   </div>
+ 
+   <div id="body">
+   <div style="float: left; width: 65%;">
+ <form method="POST">
+ <div>
+   <div class="item">
+ <label for="name">
+     Your Name
+   </label><input type="text" id="name" name="name"  size="35" value="">
+ 
+ </div>
+ 
+   <div class="item">
+ <label for="email">
+     E-Mail
+   </label><input type="text" id="email" name="email"  size="35" value="">
+ 
+ </div>
+ 
+   <div class="item">
+     <label>Gender</label>
+     <select name="gender">
+       <option value="0">-</option>
+       <option value="1">Female</option>
+       <option value="2">Male</option>
+     </select>
+   
+ 
+ </div>
+ 
+   <div class="item">
+     <label>Favorite Fruits</label>
+     <table>
+       <tr>
+ 	<td>&nbsp;</td>
+ 	<th class="top">Choose all you like</th>
+ 	<th class="top">Most Favorite</th>
+       </tr>
+       
+       <tr>
+ 	<th class="left">Apple</th>
+ 	<td class="center"><input type="checkbox" name="fruits[1]" /></td>
+ 	<td class="center"><input type="radio" name="fond_fruits" value="1" /></td>
+       </tr>
+       
+       <tr>
+ 	<th class="left">Banana</th>
+ 	<td class="center"><input type="checkbox" name="fruits[2]" /></td>
+ 	<td class="center"><input type="radio" name="fond_fruits" value="2" /></td>
+       </tr>
+       
+       <tr>
+ 	<th class="left">Grape</th>
+ 	<td class="center"><input type="checkbox" name="fruits[3]" /></td>
+ 	<td class="center"><input type="radio" name="fond_fruits" value="3" /></td>
+       </tr>
+       
+       <tr>
+ 	<th class="left">Grapefruit</th>
+ 	<td class="center"><input type="checkbox" name="fruits[4]" /></td>
+ 	<td class="center"><input type="radio" name="fond_fruits" value="4" /></td>
+       </tr>
+       
+       <tr>
+ 	<th class="left">Kiwifruit</th>
+ 	<td class="center"><input type="checkbox" name="fruits[5]" /></td>
+ 	<td class="center"><input type="radio" name="fond_fruits" value="5" /></td>
+       </tr>
+       
+       <tr>
+ 	<th class="left">Lemon</th>
+ 	<td class="center"><input type="checkbox" name="fruits[6]" /></td>
+ 	<td class="center"><input type="radio" name="fond_fruits" value="6" /></td>
+       </tr>
+       
+       <tr>
+ 	<th class="left">Mango</th>
+ 	<td class="center"><input type="checkbox" name="fruits[7]" /></td>
+ 	<td class="center"><input type="radio" name="fond_fruits" value="7" /></td>
+       </tr>
+       
+       <tr>
+ 	<th class="left">Orange</th>
+ 	<td class="center"><input type="checkbox" name="fruits[8]" /></td>
+ 	<td class="center"><input type="radio" name="fond_fruits" value="8" /></td>
+       </tr>
+       
+       <tr>
+ 	<th class="left">Pineapple</th>
+ 	<td class="center"><input type="checkbox" name="fruits[9]" /></td>
+ 	<td class="center"><input type="radio" name="fond_fruits" value="9" /></td>
+       </tr>
+       
+       <tr>
+ 	<th class="left">Strawberry</th>
+ 	<td class="center"><input type="checkbox" name="fruits[10]" /></td>
+ 	<td class="center"><input type="radio" name="fond_fruits" value="10" /></td>
+       </tr>
+           </table>
+   
+ 
+ </div>
+ 
+   <div class="item">
+ <label for="message">
+     Message
+   </label><textarea name="message" id="message"  rows="5"  cols="70"></textarea>
+ 
+ </div>
+ 
+   <div class="submit">
+           <input type="submit" name="~confirm" value="Confirm"/>
+     
+   </div>
+ </div>
+ </form>
+ </div>
+ 
+ <div class="sidenote">
+   <iframe src="00readme.html"></iframe>
+ </div>
+ 
+   </div>
+ 
+   <div style="clear: both;">
+     <pre>
+ 
+     </pre>
+   </div>
+ 
+   <div id="footer">
+     Powered by YATT::Lite.
+   </div>
+ 
+ </div>
+ </div>
+ </body>
+ </html>
+
+TITLE: Confirm
+FILE: index.yatt
+METHOD: POST
+PARAM[
+~confirm: Confirm
+name: foo
+email: bar
+gender: 2
+fruits[1]: on
+fruits[2]: on
+fruits[5]: on
+fruits[6]: on
+fruits[7]: on
+fond_fruits: 7
+message:
+ This is <b>test</b>
+]
+BODY:
+ <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+ <html>
+ <head>
+   <title>Confirm (Example of session based input restoration)</title>
+   <link rel="stylesheet" type="text/css" href="main.css">
+ </head>
+ <body>
+ <div id="wrapper">
+   <div id="header">
+     <h2>Confirm <span class="theme">(Example of session based input restoration)</span></h2>
+   </div>
+ 
+   <div id="body">
+   
+ 
+ <h2>Is this ok?</h2>
+ <form method="POST">
+ <div>
+   <div class="item">
+ <label for="name">
+     Your Name
+   </label><div class="input">
+ foo
+ </div>
+ 
+ </div>
+ 
+   <div class="item">
+ <label for="email">
+     E-Mail
+   </label><div class="input">
+ bar
+ </div>
+ 
+ </div>
+ 
+   <div class="item">
+     <label>Gender</label>
+     <select name="gender">
+       <option value="0">-</option>
+       <option value="1">Female</option>
+       <option value="2" selected>Male</option>
+     </select>
+   
+ 
+ </div>
+ 
+   <div class="item">
+     <label>Favorite Fruits</label>
+     <table>
+       <tr>
+ 	<td>&nbsp;</td>
+ 	<th class="top">Choose all you like</th>
+ 	<th class="top">Most Favorite</th>
+       </tr>
+       
+       <tr>
+ 	<th class="left">Apple</th>
+ 	<td class="center"><input type="checkbox" name="fruits[1]" checked /></td>
+ 	<td class="center"><input type="radio" name="fond_fruits" value="1" /></td>
+       </tr>
+       
+       <tr>
+ 	<th class="left">Banana</th>
+ 	<td class="center"><input type="checkbox" name="fruits[2]" checked /></td>
+ 	<td class="center"><input type="radio" name="fond_fruits" value="2" /></td>
+       </tr>
+       
+       <tr>
+ 	<th class="left">Grape</th>
+ 	<td class="center"><input type="checkbox" name="fruits[3]" /></td>
+ 	<td class="center"><input type="radio" name="fond_fruits" value="3" /></td>
+       </tr>
+       
+       <tr>
+ 	<th class="left">Grapefruit</th>
+ 	<td class="center"><input type="checkbox" name="fruits[4]" /></td>
+ 	<td class="center"><input type="radio" name="fond_fruits" value="4" /></td>
+       </tr>
+       
+       <tr>
+ 	<th class="left">Kiwifruit</th>
+ 	<td class="center"><input type="checkbox" name="fruits[5]" checked /></td>
+ 	<td class="center"><input type="radio" name="fond_fruits" value="5" /></td>
+       </tr>
+       
+       <tr>
+ 	<th class="left">Lemon</th>
+ 	<td class="center"><input type="checkbox" name="fruits[6]" checked /></td>
+ 	<td class="center"><input type="radio" name="fond_fruits" value="6" /></td>
+       </tr>
+       
+       <tr>
+ 	<th class="left">Mango</th>
+ 	<td class="center"><input type="checkbox" name="fruits[7]" checked /></td>
+ 	<td class="center"><input type="radio" name="fond_fruits" value="7" checked /></td>
+       </tr>
+       
+       <tr>
+ 	<th class="left">Orange</th>
+ 	<td class="center"><input type="checkbox" name="fruits[8]" /></td>
+ 	<td class="center"><input type="radio" name="fond_fruits" value="8" /></td>
+       </tr>
+       
+       <tr>
+ 	<th class="left">Pineapple</th>
+ 	<td class="center"><input type="checkbox" name="fruits[9]" /></td>
+ 	<td class="center"><input type="radio" name="fond_fruits" value="9" /></td>
+       </tr>
+       
+       <tr>
+ 	<th class="left">Strawberry</th>
+ 	<td class="center"><input type="checkbox" name="fruits[10]" /></td>
+ 	<td class="center"><input type="radio" name="fond_fruits" value="10" /></td>
+       </tr>
+           </table>
+   
+ 
+ </div>
+ 
+   <div class="item">
+ <label for="message">
+     Message
+   </label><div class="input">
+ This is &lt;b&gt;test&lt;/b&gt;
+ 
+ </div>
+ 
+ </div>
+ 
+   <div class="submit">
+           <input type="submit" name="~" value="Back"/>
+       <input type="submit" name="!register" value="Proceed"/>
+       
+   </div>
+ </div>
+ </form>
+   </div>
+ 
+   <div style="clear: both;">
+     <pre>
+ 
+     </pre>
+   </div>
+ 
+   <div id="footer">
+     Powered by YATT::Lite.
+   </div>
+ 
+ </div>
+ </div>
+ </body>
+ </html>
+
+
+TITLE: Back
+FILE: index.yatt
+METHOD: POST
+PARAM[
+~: Back
+]
+BODY:
+ <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+ <html>
+ <head>
+   <title>Submission form (Example of session based input restoration)</title>
+   <link rel="stylesheet" type="text/css" href="main.css">
+ </head>
+ <body>
+ <div id="wrapper">
+   <div id="header">
+     <h2>Submission form <span class="theme">(Example of session based input restoration)</span></h2>
+   </div>
+ 
+   <div id="body">
+   <div style="float: left; width: 65%;">
+ <form method="POST">
+ <div>
+   <div class="item">
+ <label for="name">
+     Your Name
+   </label><input type="text" id="name" name="name"  size="35" value="foo">
+ 
+ </div>
+ 
+   <div class="item">
+ <label for="email">
+     E-Mail
+   </label><input type="text" id="email" name="email"  size="35" value="bar">
+ 
+ </div>
+ 
+   <div class="item">
+     <label>Gender</label>
+     <select name="gender">
+       <option value="0">-</option>
+       <option value="1">Female</option>
+       <option value="2" selected>Male</option>
+     </select>
+   
+ 
+ </div>
+ 
+   <div class="item">
+     <label>Favorite Fruits</label>
+     <table>
+       <tr>
+ 	<td>&nbsp;</td>
+ 	<th class="top">Choose all you like</th>
+ 	<th class="top">Most Favorite</th>
+       </tr>
+       
+       <tr>
+ 	<th class="left">Apple</th>
+ 	<td class="center"><input type="checkbox" name="fruits[1]" checked /></td>
+ 	<td class="center"><input type="radio" name="fond_fruits" value="1" /></td>
+       </tr>
+       
+       <tr>
+ 	<th class="left">Banana</th>
+ 	<td class="center"><input type="checkbox" name="fruits[2]" checked /></td>
+ 	<td class="center"><input type="radio" name="fond_fruits" value="2" /></td>
+       </tr>
+       
+       <tr>
+ 	<th class="left">Grape</th>
+ 	<td class="center"><input type="checkbox" name="fruits[3]" /></td>
+ 	<td class="center"><input type="radio" name="fond_fruits" value="3" /></td>
+       </tr>
+       
+       <tr>
+ 	<th class="left">Grapefruit</th>
+ 	<td class="center"><input type="checkbox" name="fruits[4]" /></td>
+ 	<td class="center"><input type="radio" name="fond_fruits" value="4" /></td>
+       </tr>
+       
+       <tr>
+ 	<th class="left">Kiwifruit</th>
+ 	<td class="center"><input type="checkbox" name="fruits[5]" checked /></td>
+ 	<td class="center"><input type="radio" name="fond_fruits" value="5" /></td>
+       </tr>
+       
+       <tr>
+ 	<th class="left">Lemon</th>
+ 	<td class="center"><input type="checkbox" name="fruits[6]" checked /></td>
+ 	<td class="center"><input type="radio" name="fond_fruits" value="6" /></td>
+       </tr>
+       
+       <tr>
+ 	<th class="left">Mango</th>
+ 	<td class="center"><input type="checkbox" name="fruits[7]" checked /></td>
+ 	<td class="center"><input type="radio" name="fond_fruits" value="7" checked /></td>
+       </tr>
+       
+       <tr>
+ 	<th class="left">Orange</th>
+ 	<td class="center"><input type="checkbox" name="fruits[8]" /></td>
+ 	<td class="center"><input type="radio" name="fond_fruits" value="8" /></td>
+       </tr>
+       
+       <tr>
+ 	<th class="left">Pineapple</th>
+ 	<td class="center"><input type="checkbox" name="fruits[9]" /></td>
+ 	<td class="center"><input type="radio" name="fond_fruits" value="9" /></td>
+       </tr>
+       
+       <tr>
+ 	<th class="left">Strawberry</th>
+ 	<td class="center"><input type="checkbox" name="fruits[10]" /></td>
+ 	<td class="center"><input type="radio" name="fond_fruits" value="10" /></td>
+       </tr>
+           </table>
+   
+ 
+ </div>
+ 
+   <div class="item">
+ <label for="message">
+     Message
+   </label><textarea name="message" id="message"  rows="5"  cols="70">This is &lt;b&gt;test&lt;/b&gt;
+ </textarea>
+ 
+ </div>
+ 
+   <div class="submit">
+           <input type="submit" name="~confirm" value="Confirm"/>
+     
+   </div>
+ </div>
+ </form>
+ </div>
+ 
+ <div class="sidenote">
+   <iframe src="00readme.html"></iframe>
+ </div>
+ 
+   </div>
+ 
+   <div style="clear: both;">
+     <pre>
+ 
+     </pre>
+   </div>
+ 
+   <div id="footer">
+     Powered by YATT::Lite.
+   </div>
+ 
+ </div>
+ </div>
+ </body>
+ </html>
+
+
+TITLE: 2nd Confirm
+FILE: index.yatt
+METHOD: POST
+PARAM[
+~confirm: Confirm
+name: foo
+email: bar
+gender: 2
+fruits[1]: on
+fruits[2]: on
+fruits[5]: on
+fruits[6]: on
+fruits[7]: on
+fond_fruits: 7
+message:
+ This is <b>test</b>
+]
+BODY:
+ <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+ <html>
+ <head>
+   <title>Confirm (Example of session based input restoration)</title>
+   <link rel="stylesheet" type="text/css" href="main.css">
+ </head>
+ <body>
+ <div id="wrapper">
+   <div id="header">
+     <h2>Confirm <span class="theme">(Example of session based input restoration)</span></h2>
+   </div>
+ 
+   <div id="body">
+   
+ 
+ <h2>Is this ok?</h2>
+ <form method="POST">
+ <div>
+   <div class="item">
+ <label for="name">
+     Your Name
+   </label><div class="input">
+ foo
+ </div>
+ 
+ </div>
+ 
+   <div class="item">
+ <label for="email">
+     E-Mail
+   </label><div class="input">
+ bar
+ </div>
+ 
+ </div>
+ 
+   <div class="item">
+     <label>Gender</label>
+     <select name="gender">
+       <option value="0">-</option>
+       <option value="1">Female</option>
+       <option value="2" selected>Male</option>
+     </select>
+   
+ 
+ </div>
+ 
+   <div class="item">
+     <label>Favorite Fruits</label>
+     <table>
+       <tr>
+ 	<td>&nbsp;</td>
+ 	<th class="top">Choose all you like</th>
+ 	<th class="top">Most Favorite</th>
+       </tr>
+       
+       <tr>
+ 	<th class="left">Apple</th>
+ 	<td class="center"><input type="checkbox" name="fruits[1]" checked /></td>
+ 	<td class="center"><input type="radio" name="fond_fruits" value="1" /></td>
+       </tr>
+       
+       <tr>
+ 	<th class="left">Banana</th>
+ 	<td class="center"><input type="checkbox" name="fruits[2]" checked /></td>
+ 	<td class="center"><input type="radio" name="fond_fruits" value="2" /></td>
+       </tr>
+       
+       <tr>
+ 	<th class="left">Grape</th>
+ 	<td class="center"><input type="checkbox" name="fruits[3]" /></td>
+ 	<td class="center"><input type="radio" name="fond_fruits" value="3" /></td>
+       </tr>
+       
+       <tr>
+ 	<th class="left">Grapefruit</th>
+ 	<td class="center"><input type="checkbox" name="fruits[4]" /></td>
+ 	<td class="center"><input type="radio" name="fond_fruits" value="4" /></td>
+       </tr>
+       
+       <tr>
+ 	<th class="left">Kiwifruit</th>
+ 	<td class="center"><input type="checkbox" name="fruits[5]" checked /></td>
+ 	<td class="center"><input type="radio" name="fond_fruits" value="5" /></td>
+       </tr>
+       
+       <tr>
+ 	<th class="left">Lemon</th>
+ 	<td class="center"><input type="checkbox" name="fruits[6]" checked /></td>
+ 	<td class="center"><input type="radio" name="fond_fruits" value="6" /></td>
+       </tr>
+       
+       <tr>
+ 	<th class="left">Mango</th>
+ 	<td class="center"><input type="checkbox" name="fruits[7]" checked /></td>
+ 	<td class="center"><input type="radio" name="fond_fruits" value="7" checked /></td>
+       </tr>
+       
+       <tr>
+ 	<th class="left">Orange</th>
+ 	<td class="center"><input type="checkbox" name="fruits[8]" /></td>
+ 	<td class="center"><input type="radio" name="fond_fruits" value="8" /></td>
+       </tr>
+       
+       <tr>
+ 	<th class="left">Pineapple</th>
+ 	<td class="center"><input type="checkbox" name="fruits[9]" /></td>
+ 	<td class="center"><input type="radio" name="fond_fruits" value="9" /></td>
+       </tr>
+       
+       <tr>
+ 	<th class="left">Strawberry</th>
+ 	<td class="center"><input type="checkbox" name="fruits[10]" /></td>
+ 	<td class="center"><input type="radio" name="fond_fruits" value="10" /></td>
+       </tr>
+           </table>
+   
+ 
+ </div>
+ 
+   <div class="item">
+ <label for="message">
+     Message
+   </label><div class="input">
+ This is &lt;b&gt;test&lt;/b&gt;
+ 
+ </div>
+ 
+ </div>
+ 
+   <div class="submit">
+           <input type="submit" name="~" value="Back"/>
+       <input type="submit" name="!register" value="Proceed"/>
+       
+   </div>
+ </div>
+ </form>
+   </div>
+ 
+   <div style="clear: both;">
+     <pre>
+ 
+     </pre>
+   </div>
+ 
+   <div id="footer">
+     Powered by YATT::Lite.
+   </div>
+ 
+ </div>
+ </div>
+ </body>
+ </html>
+
+
+TITLE: Proceed
+FILE: index.yatt
+METHOD: POST
+PARAM[
+!register: Proceed
+]
+BODY[
+- <title>Thank you! \(Example of session based input restoration\)</title>
+- saved as:<br>\n<b>(?:/[^/]+)*/samples/sess_backed/1/\S*?data/.ht_1</b>,<br>
+]
+
+ACTION[
+remove: ../var/data/.ht_*
+]

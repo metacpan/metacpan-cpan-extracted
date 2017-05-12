@@ -1,0 +1,25 @@
+Revision history for Yars-Command-yars_exercise
+
+0.07      2017-01-07 09:08:23 -0500
+
+0.06      2016-11-28 14:37:51 -0500
+  - remove dependency on Log::Log4perl::CommandLine
+
+0.05      2016-06-20 13:56:34 -0400
+  - Minor documentation nit
+
+0.04      2016-01-20 18:30:29 -0500
+  - Fix for AnyEvent::Open3::Simple in test
+
+0.03      2015-12-01 11:16:05 -0500
+  - Clean up documentation
+  - Moved repository to clustericious org on github
+    (updated meta appropriately)
+
+0.02      2015-11-05 08:06:09 -0500
+  - Added itration capability to specify
+    testing with different sizes; otput
+    will dump a .csv
+
+0.01      2015-11-03 07:36:55 -0500
+  - initial version

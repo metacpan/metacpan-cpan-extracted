@@ -1,0 +1,8 @@
+extra/YAPE.pm
+Changes
+HTML.pm
+HTML/Element.pm
+MANIFEST
+Makefile.PL
+README
+test.pl

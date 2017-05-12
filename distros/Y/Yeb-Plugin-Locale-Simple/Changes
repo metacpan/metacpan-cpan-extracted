@@ -1,0 +1,35 @@
+==================================================
+Changes from 1740-06-10 00:00:00 +0000 to present.
+==================================================
+
+------------------------------------------
+version 0.002 at 2014-03-25 00:50:44 +0000
+------------------------------------------
+
+  Change: a59499cc38db47088fa7d4bdf82a4cf4ef04b9f5
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2014-03-25 01:50:31 +0000
+
+    Added ability to define locales directory on plugin configuration 
+
+  Change: 97d46d5436b2fbc6df5c41f860800c0f9218a578
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2014-03-25 00:35:23 +0000
+
+    Added travis config 
+
+  Change: 2f42119c051266c1012d4d7323e535084b220c8a
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2014-03-25 00:34:13 +0000
+
+    First release, functions available, not more yet 
+
+  Change: 5a2587f0a5dd43e6f23f0abe6af8781e5d76da91
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2014-03-25 00:24:01 +0000
+
+    initial commit 
+
+================
+End of releases.
+================

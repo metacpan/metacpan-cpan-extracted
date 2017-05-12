@@ -1,0 +1,7 @@
+# These are keywords for the customers you track time for.
+acme:
+  name: ACME Inc
+self:
+  name: Your Name
+misc:
+  name: Miscellaneous

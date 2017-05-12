@@ -1,0 +1,52 @@
+=head1 NAME
+
+YATT::Lite::WebMVC0::Connection - output buffer with request properties
+
+=head1 SYNOPSIS
+
+  # If $env is like followings:
+  # $env->{PATH_INFO}       = '/mysite/user/hkoba'
+  # $env->{PATH_TRANSLATED} = '/var/www/webapps/mysite/html/user.yatt/hkoba'
+
+  # $con should be created like this:
+  my $con = YATT::Lite::WebMVC0::Connection->create(
+               $parent_fh,
+               env => $env,
+
+               site_prefix => "/mysite",
+
+               dir         => "/var/www/webapps/mysite/html",
+               location    => "/",
+               file        => "user.yatt",
+               subpath     => "/hkoba",
+
+               # cgi => Plack::Request->new($env),
+               # no_nested_query => 1
+            );
+
+  # or
+
+  $con = $siteapp->make_connection($parent_fh, @config);
+
+  # Connection is just a blessed glob handle
+
+  print $con "foo", "bar";
+  my $result = $con->buffer; # "foobar";
+
+  # Connection can carry request specific values such as parameters.
+  my $val = $con->param('x') + $con->param('y');
+  $con->stash->{'foo'} = 3;
+
+
+  # Connection implements YATT::Lite::Object like configure/cget methods.
+  print $con->cget('env');
+  $con->configure(dir => $foo, file => $bar);
+
+
+  $con->redirect($url, $params);
+
+  $con->error("Found error in %s!", $path);
+  # $con->raise(error => "Found error in %s!", $path);
+
+=head1 DESCRIPTION
+

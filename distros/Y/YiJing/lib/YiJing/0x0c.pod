@@ -1,0 +1,110 @@
+=encoding utf8
+
+=head1 NAME
+
+YiJing::0x0c - Tong/ Ren/ (Listserv)
+
+=head1 DESCRIPTION
+
+"So you're all interested in the same thing.  See if you can all get
+along!"
+
+=head2 Judgment
+
+    同人：同人于野，亨。利涉大川，利君子貞。
+
+Getting to know other people in the world.  Fun.  Sifting through large
+volume of discussions is good for diligent hackers.
+
+=head2 Interpretation
+
+    彖曰：同人，柔得位得中，而應乎乾，曰同人。
+	  同人曰，同人于野，亨。利涉大川，乾行也。
+	  文明以健，中正而應，君子正也。唯君子為能通天下之志。
+
+When the empathetic nature of human interaction is applied to hacking,
+mailing lists and forums are formed.
+
+"Getting to know other people in the world" is a noble motivation to
+hacking; it is what keeps great projects going.  A wise hacker should
+correspond with character and honesty -- it is the only way to
+communicate your ideas with people around the world.
+
+=head2 Image
+
+    象曰：天與火，同人﹔君子以類族辨物。
+
+Hackers discussing their works
+forms the Image of a Listserv.
+People with similiar minds are bound together
+to explore their common interests.
+
+=head2 Lines
+
+=over 4
+
+=item *
+
+    初九。同人于門。無咎。象曰。出門同人。又誰咎也。
+
+Common interest, no trouble.
+
+... People on the list share your interests; nobody will cause you
+troubles.
+
+=item *
+
+    六二。同人于宗。吝。
+    象曰。同人于宗。吝道也。
+
+Infighting among the same camp.  Tough.
+
+... Taking noncompromising positions on your kinfolks is the sure path
+to infighting.
+
+=item *
+
+    九三：伏戎于莽，升其高陵，三歲不興。
+    象曰：伏戎于莽，敵剛也。三歲不興，安行也。
+
+Trolls everywhere with their holier-than-thou attitudes.  The list is
+ruined for three years.
+
+... The signal-to-noise ratio dropped significantly.  Find some other
+place for people to calm down and talk again.
+
+=item *
+
+    九四：乘其墉，弗克攻，吉。
+    象曰：乘其墉，義弗克也，其吉，則困而反則也。
+
+Stick to the point, don't flame others.  Good fortune.
+
+... Don't be provoked and stick to the point, so you can discuss
+constructively; otherwise, the thread will stuck and get nowhere.
+
+=item *
+
+    九五：同人，先號啕而后笑。大師克相遇。
+    象曰：同人之先，以中直也。大師相遇，言相克也。
+
+Shouting and whining at first, now laughing together: Two camps are
+clashed against each other.
+
+... Before you make friends with others, don't reject their honest
+criticisms.  When two camps meet, strong opinions are unavoidable.
+
+=item *
+
+    上九：同人于郊，無悔。
+    象曰：同人于郊，志未得也。
+
+The enthusiasm is getting thin, but there are no regrets.
+
+... Although you did not complete the work you set out to do, the
+members are still associated together.
+
+=back
+
+=cut
+

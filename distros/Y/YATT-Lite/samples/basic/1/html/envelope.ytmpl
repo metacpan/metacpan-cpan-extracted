@@ -1,0 +1,20 @@
+<!yatt:args title="html?">
+<!DOCTYPE html>
+<html>
+<head>
+  <title>&yatt:title;</title>
+</head>
+<body>
+<div id="wrapper" style="width: 800px; margin-left: 50px;">
+<div id="topnav">
+  <h2 style="display: inline;"><a href="./">&yatt:title;</a></h2>
+</div>
+<center>
+<div id="body" style="text-align: left;">
+  <yatt:body/>
+</div>
+</center>
+</div>
+</div>
+</body>
+</html>

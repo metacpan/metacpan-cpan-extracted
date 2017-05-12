@@ -1,0 +1,9 @@
+Revision history for Perl Extention Yahoo::BBAuth
+
+0.5 Mon Mar 19 21:34:59 UTC 2007
+	Fixed by co-author, Jason Levitt
+	Added Mail API with JSON-RPC
+	Added sample scripts for MAIL and PHOTOS
+
+0.01 Mon Oct 11 06:13:44 JST 2006
+	original version

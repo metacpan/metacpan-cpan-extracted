@@ -1,0 +1,4 @@
+<!yatt:args vars=value>
+Include:
+<yatt:list list="@{&yatt:vars{data};}"/>
+

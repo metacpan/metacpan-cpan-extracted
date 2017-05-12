@@ -1,0 +1,38 @@
+0.018     2017-02-27 07:14:15+00:00 UTC
+
+0.018  2015-07-02 15:37:58 CAT
+    - Remove FreshenCache from the general LoadFile flow
+
+0.017  2015-03-02 11:55:51 MYT
+    - Expand caching time to just over one hour from just under ten minutes
+
+0.016  2015-01-31 12:35:48 CAT
+
+    - Properly call YAML::XS
+
+0.015  2015-01-31 10:58:53 CAT
+
+    - Switch to less generic YAML::XS
+
+0.014  2015-01-27 07:57:43 CAT
+
+    - Fix Test::RedisServer dependency loading issue.
+
+0.013  2015-01-21 14:35:46 CAT
+
+    - Allow file list to FreshenCache
+    - Use FreshenCache in the general LoadFile flow
+
+0.012  2015-01-20 12:11:12 CAT
+
+    - Require Cache::RedisDB 0.07
+    - Improve FreshenCache with new 'ttl' command from Cache.
+
+0.011  2015-01-18 16:27:42 CAT
+
+    - Improve POD style, perhaps.
+    - Require Cache::RedisDB 0.06
+    - Add FreshenCache which tries to get the cache in line with disk
+
+0.010  2015-01-07 11:31:04 EST
+    - Move to Milla for distribution management

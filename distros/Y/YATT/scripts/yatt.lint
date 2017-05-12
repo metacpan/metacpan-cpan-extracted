@@ -1,0 +1,80 @@
+#!/usr/bin/perl -w
+use strict;
+use warnings qw(FATAL all NONFATAL misc);
+
+use FindBin;
+use lib grep(-d
+	     , "$FindBin::Script.lib", "$FindBin::RealScript.lib"
+	     , "$FindBin::Bin/yatt.lib", "$FindBin::Bin/lib"
+	     , grep {defined} $ENV{YATT_LIB});
+
+use File::Basename;
+use YATT::Util;
+use YATT::Exception qw(Exception);
+use base qw(YATT::Toplevel::CGI);
+sub MY () { __PACKAGE__ }
+
+MY->parse_opts(\@ARGV, \ my %opts);
+MY->parse_params(\@ARGV, \ my %common);
+
+my $config = MY->new_config(%opts);
+
+my ($rootdir, $top) = do {
+  my $file = $ARGV[0]; # Keep original.
+
+  unless (defined $file) {
+    die "Usage: $0 file ?name=value ...?\n"
+  }
+  unless (-r $file) {
+    die "$0: No such file! $file\n";
+  }
+
+  my $dir = dirname(MY->rel2abs($file));
+  $config->try_load_config($ENV{YATT_ROOTDIR} || $dir);
+
+  # XXX: テンプレートディレクトリの指定も。
+  ($dir
+   , MY->new_translator([DIR => $dir], $config->translator_param
+			, mode => 'render'
+			, debug_translator => $ENV{DEBUG}));
+};
+
+{
+  my $count;
+  foreach my $file (@ARGV) {
+    my Exception $error;
+    if (catch {
+      my $widget = $top->get_widget(MY->widget_path_in
+				    ($rootdir, MY->rel2abs($file)));
+      $top->ensure_widget_is_generated($widget) if $widget;
+    } \ $error or do {
+      if (my $script = $top->emit) {
+	eval join(";"
+		  , 'use strict'
+		  , 'use warnings FATAL => qw(all)'
+		  , $script);
+	$error = $@ if $@;
+      }
+    }) {
+      my ($file, $line, $simple, $node);
+      if (ref $error) {
+	($file, $line, $simple, $node)
+	  = ($error->{cf_file}, $error->{cf_line}
+	     , $error->simple, $error->error_node);
+      } elsif ($error =~ s{ at (\S+) line (\d+)(?=\.$|, at EOF|, near )}{}) {
+	($file, $line, $simple, $node) = ($1, $2, $error, '');
+      } else {
+	($file, $line, $simple, $node) = (undef, 0, $error, '');
+      }
+      printf qq{line %d file %s\n %s\n %s\n}
+	, $line, defined $file ? MY->abs2rel($file) : "<unknown>", map {
+	  my $str = $_;
+	  $str =~ s/\n/\n /g;
+	  $str
+	} $simple, $node;
+
+      exit 1
+    }
+
+  }
+}

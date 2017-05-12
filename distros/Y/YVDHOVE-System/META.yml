@@ -1,0 +1,14 @@
+--- #YAML:1.0
+name:                YVDHOVE-System
+version:             1.02
+abstract:            This Perl module provides "System" functions for the YVDHOVE framework
+license:             ~
+generated_by:        ExtUtils::MakeMaker version 6.32
+distribution_type:   module
+requires:     
+    IO::CaptureOutput:             0
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.2.html
+    version: 1.2
+author:
+    - Yves Van den Hove <yvdhove@users.sourceforge.net>

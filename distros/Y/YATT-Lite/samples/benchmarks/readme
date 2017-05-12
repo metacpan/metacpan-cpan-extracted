@@ -1,0 +1,5 @@
+This directory contains comparative benchmarks to major template engines.
+
+All of those are stolen (with many thanks) from Text::Xslate:
+
+https://github.com/xslate/p5-Text-Xslate

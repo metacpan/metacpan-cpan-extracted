@@ -1,0 +1,30 @@
+<div>
+    <form method="GET" action="/page/diff/repository/page">
+        <table>
+            <thead>
+                <tr>
+                    <th class="first-revision"></th>
+                    <th class="second-revision"></th>
+                    <th class="date">Date</th>
+                    <th class="author">Author</th>
+                    <th class="diffstat">Changes</th>
+                    <th class="comment">Comment</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr class="revision">
+                    <td class="first-revision"><input type="radio" name="r1" value="OBJECT-ID"/></td>
+                    <td class="second-revision"><input type="radio" name="r2" value="OBJECT-ID"/></td>
+                    <td class="date">just now</td>
+                    <td class="author">Big Bird</td>
+                    <td class="diffstat">+1/-19</td>
+                    <td class="comment">A comment goes here...</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div class="buttons">
+            <button type="submit">Compare Selected</button>
+        <div>
+    </form>
+</div>

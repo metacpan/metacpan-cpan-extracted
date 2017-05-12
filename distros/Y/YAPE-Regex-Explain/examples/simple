@@ -1,0 +1,25 @@
+#!/usr/bin/env perl
+
+=pod
+
+Simple examples.
+
+=cut
+
+use warnings;
+use strict;
+use YAPE::Regex::Explain;
+
+# Print the full explanation for the regex "\Q[abc]\E\d+", compiling it first:
+print YAPE::Regex::Explain->new(qr/\Q[abc]\E\d+/i)->explain();
+
+# Print the explanation for the regex "\w[a-f]*", without comments:
+print YAPE::Regex::Explain->new('\w[a-f]*')->explain('silent');
+
+# Print the explanation for a multi-line regex:
+my $re = qr{
+            (foo|bar)   # just a comment
+            \d+
+            /
+}ix;
+print YAPE::Regex::Explain->new($re)->explain();

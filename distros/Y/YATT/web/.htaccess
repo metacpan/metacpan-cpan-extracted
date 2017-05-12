@@ -1,0 +1,6 @@
+<Files ".ht*">
+ deny from all
+</Files>
+
+Action x-yatt-handler /yatt/cgi-bin/yatt.cgi
+AddHandler x-yatt-handler .html

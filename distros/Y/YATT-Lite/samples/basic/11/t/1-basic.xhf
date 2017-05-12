@@ -1,0 +1,11 @@
+# -*- coding: utf-8 -*-
+
+FILE: t1.yatt
+BODY:
+ <h2>foo: bar</h2>
+ baz
+
+FILE: t2.yatt
+BODY:
+ <h2>bar: qux</h2>
+ quux

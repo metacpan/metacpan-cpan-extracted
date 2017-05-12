@@ -1,0 +1,90 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+use 5.010;
+use Yars::Command::yars_generate_diskmap;
+
+Yars::Command::yars_generate_diskmap->main(@ARGV);
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+yars_generate_diskmap - generate a mapping from servers + hosts to buckets for yars.
+
+=head1 VERSION
+
+version 1.27
+
+=head1 SYNOPSIS
+
+given hostdisk.txt:
+
+ host1 /disk1
+ host2 /disk2
+ host2 /disk3
+
+generate a yars disk map:
+
+ % yars_generate_diskmap 2 hostdisk.txt > ~/etc/yars_disk_map.conf
+
+then include from your Yars.conf file:
+
+ ---
+ % extend_config 'yars_disk_map.conf';
+
+=head1 DESCRIPTION
+
+This script generates a disk map for use with the Yars service.  The 
+first argument is the number of hex digits to use in prefixes, 
+subsequent arguments are files where each line contains a hostname and a 
+path to use for disk storage separated by a space.  Given this list of 
+hosts and disks, distribute 16^n buckets onto the disks.
+
+=head1 OPTIONS
+
+=head2 --port | -p I<port_number>
+
+The port number to use for each server, defaults to 9001. You can also 
+specify a port for each host by adding a colon and port number, for 
+example:
+
+ host1:1234 /disk1
+
+=head2 --protocol http|https
+
+The protocol to use, either http or https.
+
+=head1 EXAMPLES
+
+ % clad -a testarch df -kh|grep archive | awk '{print $1 " " $7}' |  ./yars_generate_diskmap 2
+
+=head1 SEE ALSO
+
+L<Yars>, L<Yars::Client>
+
+=head1 AUTHOR
+
+Original author: Marty Brandon
+
+Current maintainer: Graham Ollis E<lt>plicease@cpan.orgE<gt>
+
+Contributors:
+
+Brian Duggan
+
+Curt Tilmes
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2013 by NASA GSFC.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

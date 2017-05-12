@@ -1,0 +1,91 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+use YellowBot::API;
+use Getopt::Long;
+use JSON;
+ 
+GetOptions(
+    'api-key=s'    => \(my $opt_api_key),
+    'api-secret=s' => \(my $opt_api_secret),
+    'api-server=s' => \(my $opt_api_server),
+    'method=s'     => \(my $opt_method),
+    'debug!'       => \(my $opt_debug),
+);
+
+die "--api-key, --api-secret and --method parameters are required\n"
+  unless $opt_api_key and $opt_api_secret and $opt_method;
+
+
+my $api = YellowBot::API->new(
+    api_key    => $opt_api_key,
+    api_secret => $opt_api_secret,
+    api_server => $opt_api_server
+);
+
+my %args;
+for my $arg (@ARGV) {
+    my ($key,$value) = split m/=/, $arg, 2;
+    die "invalid key=value pair: $arg" unless defined $value;
+    $args{$key} = $value;
+}
+
+if ($opt_debug) {
+    $ENV{API_DEBUG} = 1;
+}
+my $response = $api->call($opt_method, %args);
+for my $err_type (qw(system_error error)) {
+    if ($response->{$err_type}) {
+        print uc($err_type), " ", $response->{$err_type}, "\n";
+        exit 2;
+    }
+}
+
+my $json = JSON->new->pretty(1)->utf8(1);
+print $json->encode($response);
+
+__END__
+
+=pod
+
+=encoding utf8
+
+=head1 NAME 
+
+ybapi - YellowBot API Test Utility
+
+=head1 SYNOPSIS
+
+   ybapi --api-key abc123 --api-secret def \
+      --method 'search/locations' \
+      q=sushi place=90069 get_ratings=1 get_media=1
+
+   
+=head1 OPTIONS
+
+=over 4
+
+=item api-key
+
+API Key (required)
+
+=item api-secret
+
+API secret (required)
+
+=item method
+
+API method to call, for example C<search/locations>. (required).
+
+=item api-server
+
+Optional parameter to specify a different API server (see L<YellowBot::API>).
+
+=item debug
+
+Specify C<--debug>) to get the full request parameters printed to STDERR.
+
+=back     
+
+After the options, specify each parameter to the API call in key=value pairs.
+

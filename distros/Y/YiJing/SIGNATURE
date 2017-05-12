@@ -1,0 +1,45 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.66.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 87898016a743c205b9fa504955f3e190a3906841 MANIFEST
+SHA1 76ea939943dd60e065e2e34d926c86d9c1e5b7fc META.yml
+SHA1 a0f3bdcc02e4ea37fb41420b014753ccec5990c3 Makefile.PL
+SHA1 9f5a1ad364f8af6ee2cf208006cf692dfad1d2b1 README
+SHA1 7305dbe2904416e28decb05396988a5d51d578be inc/Module/Install.pm
+SHA1 129960509127732258570c122042bc48615222e1 inc/Module/Install/Base.pm
+SHA1 cf3356ed9a5bd2f732527ef9e7bc5ef4458c8a93 inc/Module/Install/Can.pm
+SHA1 a17a3743f8dd277d970dcfd09a909e99b497d8fb inc/Module/Install/DSL.pm
+SHA1 bf0a3e1977effc2832d7a813a76dce3f31b437b6 inc/Module/Install/Fetch.pm
+SHA1 b721c93ca5bc9a6aa863b49af15f1b1de6125935 inc/Module/Install/Makefile.pm
+SHA1 026cc0551a0ad399d195e395b46bdf842e115192 inc/Module/Install/Metadata.pm
+SHA1 a615bb050ca0b2d79bfa0224addcb83019a53b09 inc/Module/Install/ReadmeFromPod.pm
+SHA1 5457015ea5a50e93465bf2dafa29feebd547f85b inc/Module/Install/Win32.pm
+SHA1 051e7fa8063908befa3440508d0584a2497b97db inc/Module/Install/WriteAll.pm
+SHA1 10c756db7babb2905bd414b927f0b45503adcf2e lib/YiJing.pm
+SHA1 3383b3741a24c93f256eb62fb19258b01e3d3962 lib/YiJing/0x0c.pod
+SHA1 ab0964d14dfefa0d1be554d3c761e2c2f48dfbe1 lib/YiJing/0x11.pod
+SHA1 27f2074822ff1696b8af5dd739f9ccf4be3da33d lib/YiJing/0x29.pod
+SHA1 e04dd5d54069a6c98f4a3517fc0ba699969b27bd lib/YiJing/0x38.pod
+SHA1 cedd1f9c7efb31e4ad49c1dd5cf23a85cc1819c1 lib/YiJing/0x3b.pod
+SHA1 a70da2c10d13b5e87e81b92e0f262b3dc5c94d2a lib/YiJing/0x3f.pod
+SHA1 5efa0c77ef45cbf440857efd251ccdc8c6bb1b2b t/YiJing.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.10 (Darwin)
+
+iEYEARECAAYFAk0E4HoACgkQtLPdNzw1AaDitwCgiMTmkiMyRR6dS+rxwB5i1Uzp
+EfUAnj+J1tYRfoJL4iV34chFOkXTt6AD
+=wAGz
+-----END PGP SIGNATURE-----

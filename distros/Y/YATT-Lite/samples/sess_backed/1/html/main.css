@@ -1,0 +1,80 @@
+body {
+    background-color: #f4fffe;
+}
+
+#wrapper {
+    width: 800px;
+    margin-left: auto;
+    margin-right: auto;
+    background-color: #fff;
+}
+
+#header h2 {
+    border-left: solid #de9 5px;
+    border-bottom: solid #de9 1px;
+    text-align: left;
+}
+
+#header .theme {
+    font-size: small;
+    font-weight: normal;
+    color: #333;;
+}
+
+#footer {
+    font-size: xx-small;
+    color: #bbb;
+    border-top: solid 1px #bbb;
+    text-align: center;
+}
+
+.login {
+    float: right;
+    text-align: right;
+}
+
+div#body {
+    text-align: left;
+}
+
+th {
+    background-color: #e3ccd3;
+}
+th.top { text-align: center; width: 18em; }
+th.left { text-align: left; }
+
+td.center {
+    text-align: center;
+}
+
+div.item {
+    margin: 1.5em 1em;
+}
+
+div.item label {
+    display: block;
+    border: solid #858;
+    border-width: 0px 0px 1px 2px;
+    padding: 0px 0px 1px 3px;
+}
+
+div.item ul { padding-left: 0; }
+div.item ul li {
+    list-style-type: none;
+}
+
+div.submit {
+    text-align: center;
+}
+
+div.sidenote {
+    float: right;
+    width: 30%;
+    border: solid 1px #007;
+    font-size: smaller;
+}
+
+div.sidenote iframe {
+    width: 100%;
+    height: 300px;
+}

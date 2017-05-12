@@ -1,0 +1,29 @@
+---
+abstract: 'Like XXX but dump arguments in a stack'
+author:
+  - 'Michael G Schwern <schwern@pobox.com>'
+build_requires:
+  Test::More: 0.88
+configure_requires:
+  Module::Build: 0.2808
+generated_by: 'Module::Build version 0.3607'
+keywords:
+  - Rush
+  - XXX
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: YYZ
+provides:
+  YYZ:
+    file: lib/YYZ.pm
+    version: 2112.1001001
+requires:
+  XXX: 0.17
+  perl: v5.8.1
+resources:
+  bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=YYZ
+  license: http://dev.perl.org/licenses/
+  repository: http://github.com/schwern/YYZ/tree/master
+version: 2112.1001001

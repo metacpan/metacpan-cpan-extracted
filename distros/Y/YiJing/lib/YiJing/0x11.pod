@@ -1,0 +1,116 @@
+=encoding utf8
+
+=head1 NAME
+
+YiJing::0x11 - Gu\/ (Web Crawler)
+
+=head1 DESCRIPTION
+
+"Beware: There is only a thin line between a crawler and a worm!"
+
+=head2 Judgment
+
+    蠱。元。亨。利涉大川。先甲三日。后甲三日。
+
+Web crawler: Nice and fun.  Suitable to sift in the great Data Flow.
+Test run for three days before sending it out; analyze the data for
+three days before sending it out again.
+
+=head2 Interpretation
+
+    彖曰。蠱。剛上而柔下。巽而止。
+	  蠱。元亨。而天下治也。利涉大川。往有事也。
+	  先甲三日。后甲三日。終則有始。天行也。
+
+This hexagram is emblematic of the trouble that you would face in
+writing or managing a web crawler: the program has to strike out on its
+own and unobtrusively sift great gobs of data in any number of messy
+formats.
+
+It needs testing and retesting, planning and monitoring. It has to
+follow old standards and accept new ones, and tolerate sites that don't
+follow standards at all. To do its work, the web crawler has to get as
+much data from as many sites as it can, without bothering any webmasters
+in the process.
+
+It has to be efficient, but deliberate. It is a matter of contradictory
+goals -- a situation that comes up in all sorts of systems besides web
+crawlers.
+
+=head2 Image
+
+    象曰。山下有風。蠱。君子以振民育德。
+
+Gathering Data under Standards,
+is the Image of a Web Crawler.
+A wise hacker makes careful use of it
+to provide people with interesting information
+while maintaining the proper ethics.
+
+=head2 Lines
+
+=over 4
+
+=item *
+
+    初六。干父之蠱。有子。考無咎。厲終吉。
+    象曰。干父之蠱。意承考也。
+
+Crawling and the Data.
+
+... The web crawler will harvest some bad data.  Make sure it can
+recover well and move on correctly.
+
+=item *
+
+    九二。干母之蠱。不可貞。
+    象曰。干母之蠱。得中道也。
+
+Crawling and the Network.
+
+... The web crawler should back off from network trouble, wait,
+compromise, and improvise.
+
+=item *
+
+    九三。干父小有晦。無大咎。
+    象曰。干父之蠱。終無咎也。
+
+Fine tuning.
+
+... You'll have to fix some mistakes that shouldn't have been made, but
+it's no big deal.
+
+=item *
+
+    六四。裕父之蠱。往見吝。
+    象曰。裕父之蠱。往未得也。
+
+Obvious and oblivious.
+
+... The implementation is nice and simple, and dangerously wrong.  Watch
+it upset everyone!
+
+=item *
+
+    六五。干父之蠱。用譽。
+    象曰。干父之蠱。承以德也。
+
+Public attention.
+
+... Make it clear that you're listening to what people say.  The web
+crawler depends on the kindness of strangers.
+
+=item *
+
+    上九。不事王侯。高尚其事。
+    象曰。不事王侯。志可則也。
+
+Stepping back.
+
+... You should act on principle depite the authority's demands, so that
+you can serve a higher goal.
+
+=back
+
+=cut

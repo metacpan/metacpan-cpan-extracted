@@ -1,0 +1,99 @@
+{
+   "abstract" : "Session Manager for the Yakuake Terminal Emulator",
+   "author" : [
+      "Peter Flanigan, C<< <pjfl@cpan.org> >>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Dist::Zilla version 5.020, CPAN::Meta::Converter version 2.142060",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Yakuake-Sessions",
+   "no_index" : {
+      "directory" : [
+         "examples",
+         "inc",
+         "share",
+         "t"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Module::Build" : "0.4004",
+            "Test::Requires" : "0.06",
+            "version" : "0.88"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.4004",
+            "version" : "0.88"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Class::Usul" : "v0.41.0",
+            "File::DataClass" : "v0.35.0",
+            "Moo" : "1.004002",
+            "Net::DBus" : "v1.0.0",
+            "Try::Tiny" : "0.22",
+            "Unexpected" : "v0.22.1",
+            "namespace::autoclean" : "0.19",
+            "perl" : "5.010001"
+         }
+      }
+   },
+   "provides" : {
+      "Yakuake::Sessions" : {
+         "file" : "lib/Yakuake/Sessions.pm",
+         "version" : "v0.15.1"
+      },
+      "Yakuake::Sessions::Base" : {
+         "file" : "lib/Yakuake/Sessions/Base.pm",
+         "version" : "v0.15.1"
+      },
+      "Yakuake::Sessions::Config" : {
+         "file" : "lib/Yakuake/Sessions/Config.pm",
+         "version" : "v0.15.1"
+      },
+      "Yakuake::Sessions::TraitFor::DBus" : {
+         "file" : "lib/Yakuake/Sessions/TraitFor/DBus.pm",
+         "version" : "v0.15.1"
+      },
+      "Yakuake::Sessions::TraitFor::FileData" : {
+         "file" : "lib/Yakuake/Sessions/TraitFor/FileData.pm",
+         "version" : "v0.15.1"
+      },
+      "Yakuake::Sessions::TraitFor::Management" : {
+         "file" : "lib/Yakuake/Sessions/TraitFor/Management.pm",
+         "version" : "v0.15.1"
+      },
+      "Yakuake::Sessions::TraitFor::TabTitles" : {
+         "file" : "lib/Yakuake/Sessions/TraitFor/TabTitles.pm",
+         "version" : "v0.15.1"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-Yakuake-Sessions@rt.cpan.org",
+         "web" : "http://rt.cpan.org/NoAuth/Bugs.html?Dist=Yakuake-Sessions"
+      },
+      "homepage" : "https://metacpan.org/author/PJFL",
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/pjfl/p5-yakuake-sessions.git",
+         "web" : "http://github.com/pjfl/p5-yakuake-sessions"
+      }
+   },
+   "version" : "0.15.1"
+}
+

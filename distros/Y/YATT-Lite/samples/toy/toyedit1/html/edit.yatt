@@ -1,0 +1,12 @@
+<!yatt:args fnum>
+<yatt:std:envelope title="Editing file # &yatt:fnum;">
+
+<yatt:my file:value="&yatt:mh_load(:fnum);"/>
+
+<yatt:index:theform action="update.ydo" fnum
+		    title="&yatt:file{TITLE};" BODY="&yatt:file{BODY};">
+<:yatt:buttons/>
+  <a href="delete.yatt?fnum=&yatt:fnum;">DEL</a>
+</yatt:index:theform>
+
+</yatt:std:envelope>

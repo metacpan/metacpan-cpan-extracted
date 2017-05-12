@@ -1,0 +1,4 @@
+dir_config{
+appname: ylpodview
+}
+mod_overlay: YATT::Lite::docs

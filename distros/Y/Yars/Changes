@@ -1,0 +1,307 @@
+Revision history for Yars
+
+1.27      2017-03-14 11:00:06 -0400
+  - More mojolicious deprecations
+
+1.26      2016-11-28 14:36:20 -0500
+  - Remove dependency on Log::Log4perl::CommandLine
+
+1.25      2016-10-31 15:50:18 -0400
+  - Tweak on the new yars_balance command.  All bucket maps
+    are verified to match the local copy, not just the default
+    node.
+
+1.24      2016-10-31 14:28:18 -0400
+  - Added yars_balance command.  Intended as a replacement
+    for yars_fast_balance, which will likely be removed in
+    a future version.
+
+1.23      2016-10-10 11:09:34 -0400
+  - Fix bug related to rendering exceptions
+
+1.22      2016-04-22 13:52:41 -0400
+  - Compatability for Mojolicious 6.58
+  - Compatability for Clustericious 1.14
+
+1.21      2015-12-08 04:40:01 -0500
+  - Remove english specific test
+
+1.20      2015-12-07 19:52:12 -0500
+  - use render(autodata => ...) instead of render_json(...)
+    this was deprecated and removed from Mojolicious a long
+    time ago, and is being deprecated in Clustericious as well
+
+1.19      2015-12-07 13:20:24 -0500
+  - Reduce connect timeout in tests to keep test suite
+    from being insanely slow on windows (gh#29)
+  - Fixed bugs manifest on windows in the test suite.
+
+1.18      2015-12-04 20:33:27 -0500
+  - Test fixes in preperation for Clustericious 1.08
+    URLs needed to be normalized in several places
+    in the test suite.
+
+1.17      2015-12-01 10:28:44 -0500
+  - Compatability fixes for Clustericious::Log 1.06
+  - Moved repository to clustericious org on github
+    (updated meta appropriately)
+
+1.16      2015-11-20 09:04:15 -0500
+  - Migrate from JSON::XS to JSON::MaybeXS
+
+1.15      2015-11-17 10:56:50 -0500
+  - Fixed bug where failover_urls wasn't getting
+    a default value in some cases in Yars::Client.
+
+1.14      2015-11-13 12:39:42 -0500
+  - Files can be downloaded to a scalar with
+    Yars::Client#download, by passing a scalar reference
+    as the last argument.
+  - Error mssages are decoded correctly by the
+    client (bug was introduced by incompatible changes
+    in Mojolicious).
+  - Yars::Client and yarsclient now have a persistent
+    bucket cache (previously an in-memory only cache
+    was used).  The cache is invalidated when the
+    server detects the client has asked the wrong
+    server to either upload or download a file.
+  - Yars::Client#upload and "yarsclient upload" now
+    take an optional pre-computed md5, which allows
+    the client code to skip the computation.
+  - The bundled examples have been cleaned up and
+    verified to work with most recent versions of
+    Yars and Clustericious.
+  - Additional documentation improvements
+
+1.12      2015-11-05 07:49:04 -0500
+  - Added support for nginx X-Accel-Redirect
+    by using the X-Yars-Use-X-Accel header
+    (see Yars#EXAMPLES for example usage)
+  - yars_fast_banace now accepts --help
+    and --version like the other yars_*
+    scripts
+  - You can disable MD5 checks server side
+    for download when using Yars::Client or
+    yarsclient (which do a MD5 check client
+    side after download) by using the 
+    download_md5_verify server side
+    configuration (see Yars#EXAMPLES for
+    example usage).
+  - Removed documentation for a "countent"
+    subcommand for yarsclient which was 
+    never implmeneted
+  - Added a number of additional sanity
+    checks for the 'yars configtest' command.
+  - Fixed a Yars::Client / yarsclient bug
+    where files stashed on a non-primary,
+    non-failover host would not download
+    correctly due to the client not correctly
+    following redirects.
+  - Much improved documentation.
+
+1.11      2015-10-27 13:20:19 -0400
+  - Yars::Client no longer overides @INC
+
+1.10      2015-10-27 12:51:51 -0400
+  - Compatability for Mojolicious changes
+
+1.09      2015-07-07 13:59:15 -0400
+  - Added some tests for file removals
+    and fixed bugs revealed by those tests
+
+1.08      2015-03-13 03:59:13 -0400
+  - Mojo 6.x compatability
+
+1.07      2015-02-18 21:49:06 -0500
+  - Fix test for current version of Test::Mojo
+
+1.06      2015-01-31 11:25:31 -0500
+  - Bump Clustericious requirement up to 0.9942
+
+1.05      2015-01-29 13:14:57 -0500
+  - Mojo compat: replace render_not_found with reply->not_found
+
+1.04      2014-12-21 01:07:35 -0500
+  - remove bogus dep on Yars::Client
+
+1.03      2014-12-19 12:05:50 -0500
+  - merge Yars::Client into this distro
+  - More mojo 5.x compat changes
+
+1.02      2014-12-09 10:05:54 America/New_York
+  - use Mojo::JSON's new API
+    the older OO API was deprecated
+
+1.01      2014-10-06 12:29:38 America/New_York
+  - added --lock option for yars_disk_scan
+
+1.00      2014-04-19 08:18:09 America/New_York
+  - more robust checking for t/40_hostfail.t
+
+0.99      2014-04-17 03:55:54 America/New_York
+  - arguments to Yars::Tools->remote_stashed_server has changed
+  - turn off IPv6 and SSL for t/40_hostfail.t
+    see https://github.com/plicease/Test-Clustericious-Cluster/issues/3
+    for details
+  - make the content type be application/octet-stream 
+    instead of text/plain for files with unrecognized or
+    missing extensions
+
+0.98      2014-04-16 03:19:23 America/New_York
+  - rm dep on Smart::Comments
+  - bump required Mojolicious to 4.31
+  - Mojolicious 4.93 compatability
+
+0.97_01   2014-04-08 11:16:00 America/New_York
+  - add additional diagnostics for testing
+
+0.97      2014-04-07 14:54:58 America/New_York
+  - Fixed dynamic configuration bug introduced in
+    version 0.96
+
+0.96      2014-04-07 12:59:27 America/New_York
+  - more portability fixes
+
+0.95      2014-04-07 11:04:22 America/New_York
+  - fix test failure on Solaris (GH#10)
+
+0.94      2014-04-01 12:21:16 America/New_York
+  - fix missing dependency (File::Find::Rule)
+  - remove dependency on Try::Tiny
+
+0.93      2014-03-28 13:47:55 America/New_York
+  - yars_generate_diskmap: ignore blank lines and allow # style comments in input
+
+0.92      2013-11-18 11:41:52 America/New_York
+  - fix sloness of t/60_mark_down.t introduced in mojo 4.50
+
+0.91_02   2013-11-07 07:10:44 America/New_York
+  - fix yars_fast_balance.pm so that perl -c works whithout config
+
+0.91_01   2013-11-06 11:50:32 America/New_York
+  - /servers/status does more checking to see that each disk really is "up"
+    This includes writing to the disks tmp directory and checking that the
+    file is non zero size.  While this makes it slower, this route is usually
+    used by Yars::Client manually by a human to check the health of the Yars
+    cluster.
+
+0.91      2013-10-06 10:55:59 America/New_York
+  - more robust testing on platforms that don't support
+    read only folders (cygwin)
+
+0.90      2013-09-27 15:15:01 America/New_York
+  - fixed false failure in test suite
+
+0.89      2013-08-31 20:46:18 America/New_York
+  - added generate_config for 'yars configure' command
+
+0.88      2013-07-19 22:59:00 America/New_York
+  - require Test::Clustericious::Cluster 0.08 for MSWin32 fixes
+
+0.87      2013-07-18 09:23:59 America/New_York
+  - promote to production
+
+0.86_02   2013-07-13 12:58:27 America/New_York
+  - basic use test for yars_fast_balance
+
+0.86_01   2013-07-10 22:15:35 America/New_York
+  - yars_generate_diskmap: dash character is legal for hostnames
+  - yars_generate_diskmap: ports other than 9001
+  - added test for yars_disk_scan
+  - add a sanity check: our url has to be in the server list somewhere.
+
+0.86      2013-07-10 17:01:59 America/New_York
+  - added a test case for yars_generate_diskmap
+  - documentation
+  - fix $tools->_ua bug
+
+0.85      2013-07-08 09:08:02 America/New_York
+  - promote to production
+
+0.84_02   2013-07-06 09:05:53 America/New_York
+  - require Clustericious::Config 0.22
+
+0.84_01   2013-07-05 22:33:00 America/New_York
+  - Make OO interface to Yars::Tools
+
+0.84      2013-07-02 17:23:54 America/New_York
+  - Make Yars::Client 0.87 a prereq since it has fixes for Mojo 4.x
+
+0.83_11   2013-07-01 19:02:52 America/New_York
+  - improved Mojo 4.x detection and recovery
+
+0.83_10   2013-07-01 07:26:15 America/New_York
+  - remove dep on YAML (use YAML::XS instead which is already a prereq of Clustericious)
+
+0.83_09   2013-06-30 18:15:57 America/New_York
+  - retire problematic 071_tempdir test (replacement is 073_tempdir)
+
+0.83_08   2013-06-28 11:35:40 America/New_York
+  - fixed testing diagnostic
+
+0.83_07   2013-06-26 21:38:13 America/New_York
+  - added testing diagnostic
+
+0.83_06   2013-06-26 15:22:36 America/New_York
+  - added testing diagnostic
+
+0.83_05   2013-06-22 22:59:29 America/New_York
+  - use fewer resources during testing
+
+0.83_04   2013-06-22 20:06:51 America/New_York
+  - don't hardcode /tmp anymore
+
+0.83      2013-05-25 22:04:54 America/New_York
+  - Require Clustericious 0.9920 for Mojolicious 4.0 compatability
+
+0.82      2013-05-24 04:47:14 America/New_York
+  - Mojolicious 4.0 compatability
+
+0.81      2013-05-06 08:31:53 EST5EDT
+  - promote to production
+
+0.80_06   2013-05-04 22:13:33 EST5EDT
+  - Minor timing fixes
+
+0.80_05   2013-05-04 18:26:46 EST5EDT
+  - properly cleanup processes after test
+
+0.80_04   2013-05-04 17:08:25 EST5EDT
+  - fixed prereq
+  - tests can now be run in parallel
+  - tests should pass even if the perl in path != the build perl
+
+0.80_03   2013-05-04 07:27:05 EST5EDT
+  - Jump through some hoops so the right perl is executed in tests
+
+0.80_02   2013-05-03 17:05:52 EST5EDT
+  - Additional diagnostics
+
+0.80_01   2013-05-03 16:34:52 EST5EDT
+  - Less sleepy tests
+  - use ephermeral ports for 020_dual.t to see if that plays nice
+    with cpan testers
+  - Portability: use File::HomeDir instead of $ENV{HOME}
+
+0.80      2013-05-02 06:17:18 EST5EDT
+  - move integration tests into the xt directory
+
+0.79      2013-04-30 12:57:02 EST5EDT
+     Remove extranious dep
+
+0.78      2013-04-30 12:40:26 EST5EDT
+     Compatability, bug check Mojolicious 3.84 (require 3.86)
+
+0.77 2012-12-05
+     Use /usr/bin/perl instead of /usr/bin/env perl
+     for system tests to work.
+
+0.76 2012-12-05
+     More fixes to tests.
+
+0.75 2012-11-29
+     Improved portability of tests
+
+0.74 2012-11-25
+     First public release
+

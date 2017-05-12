@@ -1,0 +1,25 @@
+--- #YAML:1.0
+name:               Youri-Package-RPM-Builder
+version:            0.3.0
+abstract:           ~
+author:
+    - Youri project <youri@zarb.org>
+license:            unknown
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+build_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    String::ShellQuote:  0
+    Test::Exception:     0
+    version:             0
+    Youri::Package:      0.002
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.56
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

@@ -1,0 +1,16 @@
+<!yatt:args
+   script_name="scalar?$ENV{SCRIPT_NAME}"
+   handler="text?x-yatt-handler"
+   class=attr
+   style=attr
+   body=[code yatt=text]
+   >
+<yatt:if &yatt:script_name;>
+<yatt:body yatt=&yatt:script_name;/>
+<pre&yatt:class;&yatt:style;>Action &yatt:handler; &yatt:script_name;
+AddHandler &yatt:handler; .html
+</pre>
+<:yatt:else />
+Cannot generate .htaccess sample! 
+(Your HTTP_SCRIPT_NAME is empty)
+</yatt:if>

@@ -1,0 +1,104 @@
+2011-01-22 Guillaume Rousse <guillomovitch@zarb.org> 0.6.0
+	* compatibility with either RPM or RPM4 perl bindings
+
+2009-12-02 Guillaume Rousse <guillomovitch@zarb.org> 0.5.2
+	* add application/x-tar as a valid mime-type for all compressed 
+	  tar archives
+
+2009-11-22 Guillaume Rousse <guillomovitch@zarb.org> 0.5.1
+	* fix fallback to other compression format when a .tar.bz2 archive
+	  is not found
+
+2009-11-21 Guillaume Rousse <guillomovitch@zarb.org> 0.5.0
+	* allow usage of YAML-format configuration files
+	* check content-types according to file extension
+	* force archive extension to .tgz for PEAR packages download
+
+2009-07-03 Guillaume Rousse <guillomovitch@zarb.org> 0.4.7
+	* make version check before updating optional, for special situations 
+	  where comparaison is not reliable, such as mandriva perl packages
+	  where one version is mangled and the other not
+	* fix a warning during tests
+
+2009-06-02 Guillaume Rousse <guillomovitch@zarb.org> 0.4.6
+	* recognize %upstream_version macro
+	* recognize %{mkrel X} macro syntax
+
+2009-05-18 Guillaume Rousse <guillomovitch@zarb.org> 0.4.5
+	* make accepted content types configurable
+	* add application/empty as valid content type
+
+2009-05-07 Guillaume Rousse <guillomovitch@zarb.org> 0.4.4
+	* accept application/x-download content-type for archives
+	* make user-agent configurable, with a different default
+	  value from libwww, to be able to download content from
+	  berlios.de (spotted by Götz)
+
+2009-01-06 Guillaume Rousse <guillomovitch@zarb.org> 0.4.3
+	* only check content-type when downloading tarballs
+	  (spotted by Buchan Milne)
+
+2008-04-22 Guillaume Rousse <guillomovitch@zarb.org> 0.4.2
+	* ensure the module returns a true value when loaded
+	  (spotted by Jérôme Quelin)
+	* rewrite Changes file top-down
+
+2008-02-15 Guillaume Rousse <guillomovitch@zarb.org> 0.4.1
+	* allow to redefine url rewrite rules, sourceforge mirrors
+	  and alternate extensions in constructor
+
+2007-11-17 Guillaume Rousse <guillomovitch@zarb.org> 0.4.0
+	* strip away everything related to building, in favor of new
+	  Youri::Package::RPM::Builder class
+	* consequently rename public methods from 'build' to 'update'
+	* make most options previously handled by constructor local
+	  to update methods
+	* no more reference to mandriva in default packager value
+	* enhanced test suite
+	* rename ChangeLog file to Changes
+
+2007-11-01 Guillaume Rousse <guillomovitch@zarb.org> 0.3.4
+	* only invoke dependencies callback on missing ones, if any
+
+2007-08-11 Guillaume Rousse <guillomovitch@zarb.org> 0.3.3
+	* re-add forgotten x-gzip as a valid content type
+	* allow %rel as release macro too
+	* segregate parsing code in methods, to make testing easier
+
+2007-07-28 Guillaume Rousse <guillomovitch@zarb.org> 0.3.2
+	* add application/octet-stream as a valid content type
+	* fix source filename change with CPAN optimization
+
+2007-07-26 Guillaume Rousse <guillomovitch@zarb.org> 0.3.1
+	* configurable timeout
+	* CPAN specific download optimizations
+	* abort immediatly if already up to date
+
+2007-07-25 Guillaume Rousse <guillomovitch@zarb.org> 0.3.0
+	* large code cleanup
+	* use LWP instead of File::Fetch to retrieve file, so as to have
+	better control on returned file mime types
+	* download files after spec file edition, allowing to use
+	arbitrary perl expressions to handle source URL, especially
+	for mismatch between software and package version
+	* allow local perl file expression/callback, in addition to global
+	ones
+
+2007-07-01 Guillaume Rousse <guillomovitch@zarb.org> 0.2.1
+	* quote arguments of external commands
+
+2007-07-01 Guillaume Rousse <guillomovitch@zarb.org> 0.2.0
+	* allow to pass external commands instead of callbacks for pre and
+	post building stage, and perl expressions instead of callback for spec
+	file parsing
+	* fix usage with rpm 4.4.8, which doesn't allow to parse spec without
+	checking source file presence
+	* fix identifying release when release number exceed one digit
+	* rewrite the svn extraction part in real perl
+
+2007-04-25 Guillaume Rousse <guillomovitch@zarb.org> 0.1.1
+	* fix a wrong invocation of build_from_source as a function, instead
+	  of a method
+
+2007-04-22 Guillaume Rousse <guillomovitch@zarb.org> 0.1.0
+	* initial release

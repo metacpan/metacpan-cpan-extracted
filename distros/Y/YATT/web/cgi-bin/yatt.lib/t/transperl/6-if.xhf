@@ -1,0 +1,67 @@
+# -*- coding: utf-8 -*-
+
+TITLE: ifonly, nameless
+IN:
+ <!yatt:args x>
+ <yatt:if "&yatt:x; >= 2">
+ <h2>Hello</h2>
+ </yatt:if>world!
+PARAM[
+- 1
+]
+OUT:
+ world!
+
+PARAM[
+- 2
+]
+OUT:
+ <h2>Hello</h2>
+ world!
+
+TITLE: ifonly, if=
+IN:
+ <!yatt:args x>
+ <yatt:if if="&yatt:x; >= 2">
+ <h2>Hello</h2>
+ </yatt:if>world!
+PARAM[
+- 1
+]
+OUT:
+ world!
+
+PARAM[
+- 2
+]
+OUT:
+ <h2>Hello</h2>
+ world!
+
+
+TITLE: if else
+BREAK: 1
+IN:
+ <!yatt:args x>
+ <h2>Hello</h2>
+ <yatt:if "&yatt:x; >= 2">
+ world!
+ <:yatt:else/>
+ space!
+ </yatt:if>
+PARAM[
+- 1
+]
+OUT:
+ <h2>Hello</h2>
+ space!
+ 
+
+PARAM[
+- 2
+]
+OUT:
+ <h2>Hello</h2>
+ world!
+ 
+

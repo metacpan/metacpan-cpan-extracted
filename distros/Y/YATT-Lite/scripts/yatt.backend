@@ -1,0 +1,44 @@
+#!/usr/bin/env perl
+#----------------------------------------
+use strict;
+use warnings qw(FATAL all NONFATAL misc);
+use FindBin; BEGIN {do "$FindBin::RealBin/libdir.pl"}
+#----------------------------------------
+use YATT::Lite::Util::FindMethods;
+
+use YATT::Lite::Factory;
+use YATT::Lite qw(*YATT);
+use YATT::Lite::Util qw(rootname);
+use YATT::Lite::Breakpoint;
+
+require YATT::Lite::Util::CmdLine;
+
+use Getopt::Long;
+
+GetOptions("if_can" => \ my $if_can)
+  or exit 1;
+
+my $dispatcher = YATT::Lite::Factory->load_factory_offline
+  or die "Can't find YATT app script!\n";
+
+# to_app is already done.
+
+my $backend = $dispatcher->cget('backend')
+  or die "Can't find backend from in YATT app script!\n";
+
+unless (@ARGV) {
+  die <<END, join("\n", map {"  $_"} FindMethods($backend, sub {s/^cmd_//}))."\n";
+Usage: @{[basename($0)]} COMMAND args...
+
+Available commands are:
+END
+}
+
+my $command = $ARGV[0];
+if ($backend->can("cmd_$command") || $backend->can($command)) {
+  YATT::Lite::Util::CmdLine::run($backend, \@ARGV);
+} elsif ($if_can) {
+  exit
+} else {
+  die "No such command: $command\n";
+}

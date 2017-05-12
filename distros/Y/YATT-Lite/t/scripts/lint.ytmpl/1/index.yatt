@@ -1,0 +1,5 @@
+<!yatt:action foo>
+my ($this, $con) = @_;
+
+$foo * $bar;
+

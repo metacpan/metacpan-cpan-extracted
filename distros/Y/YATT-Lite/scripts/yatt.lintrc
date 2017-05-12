@@ -1,0 +1,54 @@
+#!/usr/bin/env perl
+#----------------------------------------
+use strict;
+use warnings qw(FATAL all NONFATAL misc);
+use FindBin; BEGIN {do "$FindBin::RealBin/libdir.pl"}
+#----------------------------------------
+sub fgrep (&@);
+
+use Carp;
+
+use YATT::Lite::Factory;
+use YATT::Lite::Breakpoint;
+use YATT::Lite::Util qw(rootname);
+# XXX: 各ディレクトリに .htyattcf.xhf が有ったら？ rc が有ったら?
+# XXX: それらが無い状態で、 Web::* 環境での動作検証をしたいときは？
+
+# library の追加は？ <= .htyattrc で？違うよね?
+
+my $dispatcher = YATT::Lite::Factory->load_factory_offline || do {
+  require YATT::Lite::WebMVC0::SiteApp;
+  YATT::Lite::WebMVC0::SiteApp->new
+      (app_ns => 'MyApp'
+       , namespace => ['yatt', 'perl', 'js']
+       , header_charset => 'utf-8'
+       , debug_cgen => $ENV{DEBUG}
+       , debug_cgi  => $ENV{DEBUG_CGI}
+       # , is_gateway => $ENV{GATEWAY_INTERFACE} # Too early for FastCGI.
+       # , tmpl_encoding => 'utf-8'
+      );
+};
+
+foreach my $path (@ARGV) {
+  my $fn = basename($path);
+  if ($fn eq '.htyattrc.pl') {
+    unless (fgrep {/^\s*use strict\s*;/} $path) {
+      die "[use strict] is missing! in $fn\n";
+    }
+  } elsif ($fn eq '.htyattconfig.xhf') {
+    # XXX:
+  } else {
+    croak "Not for yatt: $fn";
+  }
+  my $dir = dirname($path);
+  my $dirhandler = $dispatcher->get_dirhandler($dir);
+}
+
+sub fgrep (&@) {
+  my ($sub, $fn) = @_;
+  open my $fh, '<', $fn or die "Can't open '$fn': $!";
+  local $_;
+  while (<$fh>) {
+    return 1 if $sub->();
+  }
+}

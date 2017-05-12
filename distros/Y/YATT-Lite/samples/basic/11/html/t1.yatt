@@ -1,0 +1,2 @@
+<!yatt:base "base1.ytmpl">
+<yatt:foo xa="bar" xb="baz"/>

@@ -1,0 +1,26 @@
+<!yatt:args "/:rest">
+<yatt:envelope>
+  <title>Inline url pattern test: &yatt:rest;</title>
+  root
+</yatt:envelope>
+
+<!yatt:page foo="/foo/:ymd">
+<yatt:envelope>
+  <title>foo: &yatt:ymd;</title>
+<h2>This is foo</h2>
+</yatt:envelope>
+
+<!yatt:widget envelope>
+<!doctype html>
+<html>
+<yatt:body/>
+</html>
+
+<!yatt:page bar="/bar/:nid">
+<yatt:envelope>
+  <title>bar: &yatt:nid;</title>
+<h2>This is bar</h2>
+xx: &yatt:test((select *
+from	node where nid = ?,:nid));<br>
+yy: &yatt:test(node,{uid,foobar,nid,{<,2}});
+</yatt:envelope>

@@ -1,0 +1,30 @@
+---
+abstract: "YAML Ain't Markup Language™"
+author:
+  - 'Ingy döt Net <ingy@cpan.org>'
+build_requires:
+  Test::More: '0.88'
+  Test::YAML: '1.05'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: YAML
+no_index:
+  directory:
+    - example
+    - inc
+    - t
+    - xt
+requires:
+  perl: v5.8.1
+resources:
+  bugtracker: https://github.com/ingydotnet/yaml-pm/issues
+  homepage: https://github.com/ingydotnet/yaml-pm
+  repository: https://github.com/ingydotnet/yaml-pm.git
+version: '1.23'
+x_serialization_backend: 'YAML::Tiny version 1.69'

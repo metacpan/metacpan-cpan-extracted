@@ -1,0 +1,12 @@
+bin/yote_exporer
+Build.PL
+ChangeLog
+lib/Yote.pm
+LICENSE
+MANIFEST			This list of files
+README
+t/yotedb.t
+VERSIONS
+Makefile.PL
+META.yml
+META.json

@@ -1,0 +1,23 @@
+Revision history for Yahoo-Marketing-APT
+
+1.01    3 October 2008
+        First version for Yahoo! APT Web Services V1.0.
+1.02    5 October 2008
+        Update perldoc with Yahoo! APT online doc links.
+1.03    23 February 2008
+        Add two missing parameters (networkID and siteID) in PlacementGuaranteedSettings data obj.
+        Make Yahoo::Marketing-4.31 as the dependency.
+2.01    30 April 2009
+        Upgrade for Yahoo! APT V2.0.
+2.02    14 May 2009
+        Follow changes in Yahoo::Marketing-5.04, making simple_type_exceptions a method.
+        Remove unnecessary methods.
+3.01    2 July 2009
+        Upgrade for Yahoo! APT V3.0.
+4.01    12 October 2009
+        Upgrade for Yahoo! APT V4.0.
+4.11    2 December 2009
+        Upgrade for Yahoo! APT V4.1.0.
+        Override some parsing related methods in Service.pm due to APT web services wsdl changed structure since V4.0.
+6.01    26 July 2010
+        Upgrade for Yahoo! APT V6.0.0.

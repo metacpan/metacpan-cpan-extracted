@@ -1,0 +1,25 @@
+---
+abstract: ~
+author:
+  - 'Sean M. Burke C<sburke@cpan.org>,'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 1.00'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: YiJing
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  perl: 5.005
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: http://github.com/audreyt/YiJing
+version: 0.10

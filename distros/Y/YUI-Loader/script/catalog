@@ -1,0 +1,17 @@
+#!/usr/bin/perl
+# vim: set filetype=perl:
+
+use strict;
+use warnings;
+
+use JS::YUI::Loader::Catalog;
+my $catalog = JS::YUI::Loader::Catalog->new;
+
+my @entry = sort { $a->name cmp $b->name } $catalog->entry_list;
+for my $entry (@entry) {
+    my $method = $entry->name;
+    $method =~ s/-/_/g;
+    my $description = "";
+    $description = join "", $entry->description, " (", $entry->kind, ")", "\n\n" unless $entry->description =~ m/\.css|\.js/; 
+    print "=head2 $method\n\n", $description;
+}

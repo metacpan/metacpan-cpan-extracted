@@ -1,0 +1,8 @@
+AnswersRevision history for Yahoo-Ansewers
+
+0.01    Date/time
+        First version, released on an unsuspecting world.
+
+0.02	The attribute "query" is not more required to instance.
+
+0.03	Error tratament now working fine.

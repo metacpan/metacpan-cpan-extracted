@@ -1,0 +1,92 @@
+# -*- coding: utf-8 -*-
+
+TITLE: form roundtrip
+IN:
+ <form>
+ <input type=text name='q1' value="foobar">
+ </form>
+OUT:
+ <form>
+ <input type=text name='q1' value="foobar" />
+ </form>
+
+TITLE: form attribute with entity
+IN:
+ <!yatt:args action name value>
+ <form action="&yatt:action;">
+ <input type=text name='&yatt:name;' value=&yatt:value; >
+ </form>
+PARAM[
+- post.html
+- q1
+- test
+]
+OUT:
+ <form action="post.html">
+ <input type=text name='q1' value=test />
+ </form>
+
+PARAM[
+- <post&html>
+- 'q1'
+- "test"
+]
+OUT:
+ <form action="&lt;post&amp;html&gt;">
+ <input type=text name='&#39;q1&#39;' value=&quot;test&quot; />
+ </form>
+
+TITLE: form attribute with entity in middle.
+IN:
+ <!yatt:args num value>
+ <input type=text name='q&yatt:num;' value=x&yatt:value;z >
+PARAM[
+- 1
+- y
+]
+OUT:
+ <input type=text name='q1' value=xyz />
+
+
+
+TITLE: form attlist entity
+IN:
+ <!yatt:args attlist=html>
+ <input &yatt:attlist;>
+PARAM[
+- type=text name='q1' value="test"
+]
+OUT:
+ <input type=text name='q1' value="test" />
+
+TITLE: form attlist escaping.
+IN:
+ <!yatt:args attlist=html>
+ <input ()$\ >
+OUT:
+ <input ()$\ />
+
+TITLE: form attlist with onlyone space
+IN:
+ <!yatt:args type=attr name=attr value=attr>
+ <input &yatt:type;&yatt:name;&yatt:value;>
+PARAM[
+- radio
+- q
+- 1
+]
+OUT:
+ <input  type="radio" name="q" value="1" />
+
+TITLE: form attlist without space
+SKIP: still buggy.
+IN:
+ <!yatt:args type=attr name=attr value=attr>
+ <input&yatt:type;&yatt:name;&yatt:value;>
+PARAM[
+- radio
+- q
+- 1
+]
+OUT:
+ <input type="radio" name="q" value="1" />

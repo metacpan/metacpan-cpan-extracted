@@ -1,0 +1,98 @@
+#!/usr/bin/env perl
+# -*- coding: utf-8 -*-
+#----------------------------------------
+use strict;
+use warnings qw(FATAL all NONFATAL misc);
+use FindBin; BEGIN {do "$FindBin::RealBin/libdir.pl"}
+#----------------------------------------
+
+use CGI;
+use YATT::Lite::Factory;
+use YATT::Lite::Entities qw(*YATT *CON *SYS);
+use YATT::Lite::Util::CmdLine qw(parse_opts parse_params);
+use YATT::Lite::Util qw(rootname
+			catch try_invoke);
+use YATT::Lite::CGen::Perl; # Just for debugging aid.
+use YATT::Lite::Breakpoint;
+
+use YATT::Lite::Util::FindMethods; # For debugging aid.
+# Try x FindMethods($this, qr/^entity_/)
+
+
+MY->parse_opts(\@ARGV, \ my %opts);
+MY->parse_params(\@ARGV, \ my %common);
+
+my $direct_mode = delete $opts{direct};
+
+$SYS = my $dispatcher = YATT::Lite::Factory->load_factory_offline || do {
+  require YATT::Lite::WebMVC0::SiteApp;
+  YATT::Lite::WebMVC0::SiteApp->new
+      (app_ns => 'MyApp'
+       , namespace => ['yatt', 'perl', 'js']
+       , header_charset => 'utf-8'
+       , debug_cgen => $ENV{DEBUG}
+       , debug_cgi  => $ENV{DEBUG_CGI}
+       # , is_gateway => $ENV{GATEWAY_INTERFACE} # Too early for FastCGI.
+       # , tmpl_encoding => 'utf-8'
+      );
+};
+
+# [1] Compile all.
+my @command;
+{
+  while (@ARGV) {
+    my $file = shift @ARGV;
+    my %param = %common;
+    MY->parse_params(\@ARGV, \%param);
+
+    my $dir = dirname($dispatcher->rel2abs($file));
+    $dir =~ s,/*$,/,;
+    my $dirhandler = $dispatcher->get_dirhandler($dir)
+      or die "Can't find dirhandler for $dir";
+    # XXX: そもそも、ここでの DONE に疑問が.
+    local $dirhandler->{cf_at_done} = sub {
+      # ここで at_done が呼ばれるのは error_handler からだけ。
+      exit;
+    };
+
+    my $trans = $dirhandler->open_trans;
+
+    my ($part, $sub, $pkg) = $trans->find_part_handler(basename($file));
+    # XXX: cgi mode.
+    push @command, [$dirhandler, $file, $sub, $pkg
+		    , $part->reorder_hash_params(\%param)];
+  }
+}
+
+# [2] Execute all.
+
+my $nerror;
+foreach my $cmd (@command) {
+  my ($dirhandler, $file, $sub, $this, @args) = @$cmd;
+  local $YATT = $dirhandler;
+  local $dirhandler->{cf_at_done} = sub {};
+  # $dirhandler->fconfigure_encoding(\*STDOUT, \*STDERR);
+  local $CON = $dispatcher->make_connection
+    (\*STDOUT, cgi => CGI->new({}), file => $file, noheader => 1
+     , system => $SYS, yatt => $YATT);
+  my $err = catch {
+    $sub->($this, $CON, @args);
+  };
+
+  try_invoke($CON, 'flush_headers');
+
+  if (not $err or YATT::Lite::WebMVC0::SiteApp::is_done($err)) {
+  } elsif (ref $err eq 'ARRAY') {
+    my ($status, $header, $body) = @$err;
+    if ($status == 200) {
+      print $body
+    } else {
+      print STDERR join(" ", $status, @$body), "\n";
+      $nerror++;
+    }
+  } else {
+    die $err;
+  }
+}
+
+exit 1 if $nerror;

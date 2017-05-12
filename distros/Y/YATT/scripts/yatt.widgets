@@ -1,0 +1,111 @@
+#!/usr/bin/perl -w
+use strict;
+use warnings qw(FATAL all NONFATAL misc);
+
+use FindBin;
+use lib grep(-d
+	     , "$FindBin::Script.lib", "$FindBin::RealScript.lib"
+	     , "$FindBin::Bin/yatt.lib", "$FindBin::Bin/lib"
+	     , grep {defined} $ENV{YATT_LIB});
+
+use File::Basename;
+
+use YATT::Util;
+use YATT::Util::CmdLine;
+
+use YATT::Translator::Perl;
+use YATT::Registry::NS;
+# use base qw(YATT::Translator::Perl File::Spec);
+
+use YATT::LRXML::Node qw(DECLARATOR_TYPE);
+use YATT::Widget;
+
+use YATT::Exception qw(Exception);
+
+use base qw(YATT::Toplevel::CGI);
+sub MY () { __PACKAGE__ }
+
+MY->parse_opts(\@ARGV, \ my %opts);
+MY->parse_params(\@ARGV, \ my %common);
+
+my ($o_all, $o_args, $o_decl) = map {delete $opts{$_}} qw(all args decl);
+$o_args = $o_decl = 1 if $o_all;
+
+my $config = MY->new_config(%opts);
+
+my $path = shift || '.';
+
+my ($instpkg, $rootdir, $top) = do {
+
+  unless (defined $path) {
+    die "Usage: $0 path\n"
+  }
+  unless (-r $path) {
+    die "$0: No such file! $path\n";
+  }
+  unless (-d $path) {
+    die "$0: Not a directory! $path\n";
+  }
+
+  my $dir = MY->rel2abs($path);
+  $config->try_load_config($dir);
+
+  my $instpkg = MY->prepare_export($config);
+
+  # XXX: テンプレートディレクトリの指定も。
+  ($instpkg
+   , $dir
+   , $instpkg->new_translator([DIR => $dir], $config->translator_param
+			      , debug_translator => $ENV{DEBUG}
+			      , no_lineinfo => YATT::Util::no_lineinfo()));
+};
+
+show_widgets_in_dir($top, $top, {});
+
+sub show_widgets_in_dir {
+  (my Root $root, my Dir $dir, my $uniq) = @_;
+
+  if (catch {$root->refresh($dir)} \ my $error) {
+    print STDERR "ERROR: $error\n";
+    return;
+  }
+
+  my $primary_ns = $root->{cf_namespace}[-1];
+
+  foreach my $fn (sort keys %{$dir->{Template}}) {
+    my Template $tmpl = $root->nsobj($dir->{Template}{$fn});
+    $root->refresh($tmpl);
+    foreach my $wn (sort keys %{$tmpl->{Widget}}) {
+      my Widget $widget = $tmpl->{Widget}{$wn};
+      next unless $widget->declared;
+      my @wpath = grep {$_ && $_ ne $primary_ns} $fn, $wn;
+      next unless @wpath;
+      my $winfo = sprintf "<%s:%s />", $primary_ns, join(":", @wpath);
+      (my $path = $tmpl->{cf_loadkey}) =~ s{^\Q$root->{cf_loadkey}/}{};
+      next if $uniq->{$winfo}++;
+      print "=" x 60, "\n" if $o_decl;
+      print "$winfo\t# file $path line $widget->{cf_decl_start}\n";
+      if ($o_args) {
+	foreach my $arg (list($widget->{arg_order})) {
+	  print qq(\t$arg="), $widget->{arg_dict}{$arg}->as_argspec, qq("\n);
+	}
+      }
+      if ($o_decl) {
+	print "-" x 60, "\n";
+	# my $cursor = $widget->cursor;
+	print YATT::LRXML::Node::stringify_node($widget->{cf_root}), "\n";
+      }
+    }
+  }
+
+  foreach my $dn (sort keys %{$dir->{Dir}}) {
+    my Dir $d = $root->nsobj($dir->{Dir}{$dn});
+    show_widgets_in_dir($root, $d, $uniq, $d->{cf_loadkey});
+  }
+}
+
+sub list {
+  my ($list) = @_;
+  return unless defined $list;
+  @$list;
+}

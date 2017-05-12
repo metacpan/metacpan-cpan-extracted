@@ -1,0 +1,176 @@
+FILE: doc/test1/.htyattrc
+IN:
+ use YATT::ArgMacro test1 => in => [qw(pair)], out => [qw(x y)];
+ use YATT::LRXML::Node;
+ 
+ test1->define(handle => sub {
+   (my test1 $macro, my ($trans, $scope, $node)) = @_;
+   my ($x, $y) = split /,/, node_body($macro->{cf_pair});
+   $node->add_attribute(x => $x);
+   $node->add_attribute(y => $y);
+   $node;
+ });
+
+TITLE: hello pair => x, y
+FILE: doc/test1/index.html
+IN:
+ <!yatt:args>
+ <yatt:hello pair='3,8'>world!</yatt:hello>
+ 
+ <!yatt:widget hello %test1; >
+ <h2>Hello <yatt:body/></h2>
+ &perl:x; x &perl:y; = <?perl= $x * $y?>
+OUT:
+ <h2>Hello world!</h2>
+ 3 x 8 = 24
+ 
+
+TITLE: hello => real => x, y
+FILE: doc/test1/t%d.html
+IN:
+ <!yatt:args>
+ <yatt:hello pair='3,8'/>
+ 
+ <!yatt:widget hello %test1;  %yatt:no_last_newline;>
+ <yatt:real x y />
+ 
+ <!yatt:widget real %test1;  %yatt:no_last_newline;>
+ &perl:x; x &perl:y; = <?perl= $x * $y?>
+OUT:
+ 3 x 8 = 24
+# eol.
+
+TITLE: hello => real => x, y
+FILE: doc/test1/t%d.html
+IN:
+ <!yatt:args>
+ <yatt:hello pair='3,8'/>
+ 
+ <!yatt:widget hello %test1; %yatt:no_last_newline;>
+ <yatt:deep x y />
+ 
+ <!yatt:widget deep %test1;  %yatt:no_last_newline;>
+ <yatt:real x y />
+ 
+ <!yatt:widget real %test1;  %yatt:no_last_newline;>
+ &perl:x; x &perl:y; = <?perl= $x * $y?>
+OUT:
+ 3 x 8 = 24
+# eol.
+
+TITLE: hello => optional argmacro
+FILE: doc/test1/t%d.html
+IN:
+ <!yatt:args>
+ <yatt:hello arg="world"/>
+ 
+ <!yatt:widget hello arg %test1;  %yatt:no_last_newline;>
+ Hello &yatt:arg;
+OUT:
+ Hello world
+# eol.
+
+FILE: doc/test2/.htyattrc
+IN:
+ use YATT::ArgMacro range => out => ['list=list'], in => [qw(from to)];
+ use YATT::LRXML::Node;
+ 
+ range->define(handle => sub {
+   (my range $macro, my ($trans, $scope, $node)) = @_;
+   $macro->accept($trans, $scope, $node);
+   $node->add_node($macro->{out_list}) if $macro->{out_list};
+   $node;
+ });
+ 
+ range->define(accept => sub {
+   (my range $macro, my ($trans, $scope, $node)) = @_;
+   $macro->{out_list} = $node->create_attribute($macro->output_name('list') =>
+        node_body($macro->{cf_from}), '..', node_body($macro->{cf_to}));
+ });
+
+TITLE: %range;
+FILE: doc/test2/t%d.html
+IN:
+ <!yatt:args>
+ <yatt:hello from=3 to=8/>
+ 
+ <!yatt:widget hello %range;  %yatt:no_last_newline;>
+ &yatt:list:expand();
+OUT:
+ 345678
+# eol.
+
+TITLE: %range; - output overriding
+FILE: doc/test2/t%d.html
+IN:
+ <!yatt:args>
+ <yatt:hello list="2..4"/>
+ 
+ <!yatt:widget hello %range;  %yatt:no_last_newline;>
+ &yatt:list:expand();
+OUT:
+ 234
+# eol.
+
+
+TITLE: %range; input and output overriding
+FILE: doc/test2/t%d.html
+IN:
+ <!yatt:args>
+ <yatt:hello list=3 to=8/>
+ 
+ <!yatt:widget hello to=! %range;  %yatt:no_last_newline;>
+ &yatt:to;
+OUT:
+ 8
+# eol.
+
+
+TITLE: %range(num=from);
+FILE: doc/test2/t%d.html
+IN:
+ <!yatt:args>
+ <yatt:hello num=3 num_to=5/>
+ 
+ <!yatt:widget hello %range(num=from); %yatt:no_last_newline;>
+ &yatt:num:expand();
+OUT:
+ 345
+# eol.
+
+TITLE: %range(num=from); overriding
+FILE: doc/test2/t%d.html
+IN:
+ <!yatt:args>
+ <yatt:hello num_list="2,3"/>
+ 
+ <!yatt:widget hello %range(num=from); %yatt:no_last_newline;>
+ &yatt:num:expand();
+OUT:
+ 23
+# eol.
+
+
+TITLE: %range(row=from); %range(col=from);
+FILE: doc/test2/t%d.html
+IN:
+ <!yatt:args>
+ <yatt:hello row=2 row_to=4 col=6 col_to=8/>
+ 
+ <!yatt:widget hello %range(row=from); %range(col=from); %yatt:no_last_newline;>
+ &yatt:row:expand(); &yatt:col:expand();
+OUT:
+ 234 678
+# eol.
+
+TITLE: %range(row=from); %range(col=from); overriding
+FILE: doc/test2/t%d.html
+IN:
+ <!yatt:args>
+ <yatt:hello row_list="2,3" col_list="7,8"/>
+ 
+ <!yatt:widget hello %range(row=from); %range(col=from); %yatt:no_last_newline;>
+ &yatt:row:expand(); &yatt:col:expand();
+OUT:
+ 23 78
+# eol.

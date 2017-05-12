@@ -1,0 +1,6 @@
+List:
+<tmpl_loop name="data">
+    * <tmpl_var name="title" escape="html">
+    * <tmpl_var name="title" escape="html">
+    * <tmpl_var name="title" escape="html">
+</tmpl_loop>

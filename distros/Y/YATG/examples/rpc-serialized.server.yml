@@ -1,0 +1,10 @@
+---
+# configuration for rpc-serialized server with YATG handlers
+rpc_serialized:
+    handlers:
+        yatg_store:    "RPC::Serialized::Handler::YATG::Store"
+        yatg_retrieve: "RPC::Serialized::Handler::YATG::Retrieve"
+net_server:
+    port: 1558
+    user: daemon
+    group: daemon

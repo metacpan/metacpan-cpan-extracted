@@ -1,0 +1,4 @@
+v 0.2
+    * add another parma for bizsearch
+v 0.1
+    * initial the Yahoo! taiwan lifestyle open APIs with Yahoo::BBAuth

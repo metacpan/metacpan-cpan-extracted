@@ -1,0 +1,2 @@
+<h2>This page should not be rendered.</h2>
+<?perl= use t_undef_error; t_undef_error()?>

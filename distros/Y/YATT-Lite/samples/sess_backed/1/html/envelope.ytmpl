@@ -1,0 +1,31 @@
+<!yatt:args title="html?">
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+<head>
+  <title>&yatt:title; (&yatt:config(sample_theme);)</title>
+  <link rel="stylesheet" type="text/css" href="main.css">
+</head>
+<body>
+<div id="wrapper">
+  <div id="header">
+    <h2>&yatt:title; <span class="theme">(&yatt:config(sample_theme);)</span></h2>
+  </div>
+
+  <div id="body">
+  <yatt:body/>
+  </div>
+
+  <div style="clear: both;">
+    <pre>
+
+    </pre>
+  </div>
+
+  <div id="footer">
+    Powered by YATT::Lite.
+  </div>
+
+</div>
+</div>
+</body>
+</html>

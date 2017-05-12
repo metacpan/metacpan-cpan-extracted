@@ -1,0 +1,43 @@
+2009-08-27 15:10  cvs
+
+	* Makefile.PL, lib/YAML/DBH.pm: Cleaned up documentation. Also made
+	  sure licence = perl, shows up.  Improved README file.
+
+2008-12-01 16:58  cvs
+
+	* lib/YAML/DBH.pm, t/03-sqlite.t: added ability to open sqlite db
+	  instead of mysql, this makes it easier to roll out tests etc..
+	  using a sqlite db for the super lazy/convenient
+
+2008-09-09 14:58  cvs
+
+	* Makefile.PL, lib/YAML/DBH.pm: took out use of Smart::Comments for
+	  dist
+
+2008-09-09 14:53  cvs
+
+	* Makefile.PL, README, lib/YAML/DBH.pm, t/02_open_from_confhash.pl,
+	  t/02_open_from_confhash.t: made sure real db connect tests do not
+	  happen unless via cli
+
+2008-09-08 09:37  cvs
+
+	* lib/YAML/DBH.pm, t/02_open_from_confhash.t: Added capacity for
+	  yaml_dbh() to take a conf hashref to scan, instead of just a path
+	  to a conf file.
+
+	  So that, if you already have a conf opened, you can pass that
+	  instead to yaml_dbh() to get your dbh.
+
+2008-08-26 09:36  cvs
+
+	* MANIFEST, Makefile.PL, README, lib/YAML/DBH.pm, t/00.t,
+	  t/01_find_confs_and_test.pl, t/dbh_yaml.conf, t/dbh_yaml2.conf,
+	  t/dbh_yaml3.conf: Initial revision
+
+2008-08-26 09:36  cvs
+
+	* MANIFEST, Makefile.PL, README, lib/YAML/DBH.pm, t/00.t,
+	  t/01_find_confs_and_test.pl, t/dbh_yaml.conf, t/dbh_yaml2.conf,
+	  t/dbh_yaml3.conf: init
+

@@ -1,0 +1,37 @@
+---
+abstract: 'Exercise a Yars server from the client side'
+author:
+  - 'Graham Ollis <plicease@cpan.org>'
+build_requires:
+  AnyEvent: '0'
+  AnyEvent::Open3::Simple: '0.83'
+  EV: '0'
+  Test::Clustericious::Cluster: '0.31'
+  Test::More: '0.94'
+  perl: '5.010'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  perl: '5.010'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Yars-Command-yars_exercise
+requires:
+  Clustericious: '1.20'
+  Log::Log4perl: '0'
+  Number::Bytes::Human: '0.09'
+  Parallel::ForkManager: '0'
+  Path::Tiny: '0'
+  Pod::Usage::CommandLine: '0.04'
+  YAML::XS: '0'
+  Yars::Client: '0'
+  perl: '5.010'
+resources:
+  bugtracker: https://github.com/clustericious/Yars-Command-yars_exercise/issues
+  homepage: https://metacpan.org/pod/Yars::Command::yars_exercise
+  repository: git://github.com/clustericious/Yars-Command-yars_exercise.git
+version: '0.07'
+x_serialization_backend: 'YAML::Tiny version 1.69'

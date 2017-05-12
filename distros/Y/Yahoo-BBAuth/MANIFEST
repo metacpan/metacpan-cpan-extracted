@@ -1,0 +1,10 @@
+Changes
+MANIFEST
+META.yml # Will be created by "make dist"
+Makefile.PL
+README
+eg/testMAIL.cgi
+eg/testPHOTOS.cgi
+lib/Yahoo/BBAuth.pm
+t/00_compile.t
+t/01_auth_url.t

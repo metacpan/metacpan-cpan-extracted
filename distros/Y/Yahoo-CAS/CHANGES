@@ -1,0 +1,4 @@
+v 0.2
+    * fixed some make file bugs.
+v 0.1
+    * initial the Yahoo! CAS for segment and concept extraction

@@ -1,0 +1,44 @@
+<!yatt:args current=?0 limit>
+<yatt:std:envelope title="Toy file editor, (without auth!;-)">
+
+<h3>Add new file:</h3>
+<yatt:theform action="save.ydo"/>
+
+<h3>List of current files:</h3>
+<ul>
+<yatt:foreach my=fnum list="&yatt:mh_files({current,:current,limit,:limit});">
+  <li>
+    <a href="edit.yatt?fnum=&yatt:fnum;">
+      (&yatt:fnum;)
+      &yatt:mh_load(:fnum){TITLE};
+    </a>
+  </li>
+</yatt:foreach>
+</ul>
+
+<h4>Template age: &yatt:template(){cf_age};</h4>
+</yatt:std:envelope>
+
+<!yatt:widget theform action=! size=?70 title BODY fnum buttons=html?>
+<form method="POST" action="&yatt:action;">
+<table cellspacing=0 cellpadding=0>
+  <tr>
+    <th>TITLE</th>
+    <td><input type="text" name="title" size="&yatt:size;" value="&yatt:title;"><br></td>
+  </tr>
+  <tr>
+    <th>BODY</th>
+    <td><textarea name="body" rows=10 cols="&yatt:size;">&yatt:BODY;</textarea></td>
+  </tr>
+  <tr>
+    <td colspan=2><input type="submit" name="!save" value="Save">
+      &yatt:buttons;
+    </td>
+  </tr>
+</table>
+<yatt:body/>
+
+<yatt:if "&yatt:fnum;">
+<input type=hidden name="fnum" value="&yatt:fnum;" />
+</yatt:if>
+</form>

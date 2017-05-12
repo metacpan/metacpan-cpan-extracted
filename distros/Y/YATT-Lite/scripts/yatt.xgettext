@@ -1,0 +1,103 @@
+#!/usr/bin/env perl
+# -*- coding: utf-8 -*-
+{
+  use strict;
+  use warnings qw(FATAL all NONFATAL misc);
+  use FindBin; BEGIN {do "$FindBin::RealBin/libdir.pl"}
+  #----------------------------------------
+  use YATT::Lite::Factory;
+  use YATT::Lite::Entities qw(*YATT *CON *SYS);
+  use YATT::Lite::Util::CmdLine qw(parse_opts parse_params);
+  use YATT::Lite::Breakpoint;
+
+  use YATT::Lite::Util::FindMethods; # For debugging aid.
+  # Try x FindMethods($this, qr/^entity_/)
+
+  #----------------------------------------
+  use parent qw/YATT::Lite::Object/;
+  use YATT::Lite::MFields
+    qw/site
+       cf_write
+       cf_lang
+       cf_quiet
+       cf_dir
+       cf_merge
+      /;
+
+  #----------------------------------------
+
+  my MY $cmd = MY->new(MY->parse_opts(\@ARGV, undef
+				      , {w => 'write'
+					 , q => 'quiet'
+					 , d => 'dir'
+					 , m => 'merge'
+					}));
+
+  my $site = YATT::Lite::Factory->load_factory_offline(dir => $cmd->{cf_dir})
+    or die "Can't find YATT app script!\n";
+
+  $cmd->{site} = $site;
+
+  foreach my $path (@ARGV ? @ARGV : $site->cget('doc_root')) {
+    if (-d $path) {
+      my $yatt = $site->load_yatt($path);
+      $yatt->configure(debug_cgen => $ENV{DEBUG});
+      my $saveas = $yatt->fn_msgfile($cmd->{cf_lang});
+      if ($cmd->{cf_merge} || $cmd->{cf_write}) {
+	$yatt->get_lang_msg($cmd->{cf_lang});
+      }
+      # XXX: Work around for ns confliction bug.
+      my @items = public_only($yatt, $yatt->list_items);
+      unless ($cmd->{cf_quiet}) {
+	print STDERR join("\n  ", "parsing:", @items), "\n";
+      }
+
+      my @msglist = $yatt->lang_extract_lcmsg($cmd->{cf_lang}, \@items);
+      unless (-r $saveas) {
+	unshift @msglist, $cmd->default_header;
+      }
+      if ($cmd->{cf_write}) {
+	Locale::PO->save_file_fromarray($saveas, \@msglist);
+	print "Saved: $saveas\n";
+      } else {
+	print $_->dump for @msglist;
+      }
+    } else {
+      die "NIMPL";
+    }
+  }
+}
+
+sub after_new {
+  (my MY $self) = @_;
+  $self->{cf_lang} ||= $self->default_lang;
+}
+
+sub default_lang {'en'}
+
+use POSIX qw/strftime/;
+sub default_header {
+  my ($pack) = @_;
+  my $po = Locale::PO->new(-msgid => '', -msgstr =>
+"Project-Id-Version: PACKAGE VERSION\n"
+."Report-Msgid-Bugs-To: \n"
+."POT-Creation-Date: ".strftime('%Y-%m-%d %H:%M%z', localtime time)."\n"
+."PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+."Last-Translator: FULL NAME <EMAIL\@ADDRESS>\n"
+."Language-Team: LANGUAGE <LL\@li.org>\n"
+."Language: \n"
+."MIME-Version: 1.0\n"
+."Content-Type: text/plain; charset=UTF-8\n"
+."Content-Transfer-Encoding: 8bit\n");
+  $po->fuzzy(1);
+  $po;
+}
+
+# 2011-12-07 18:16+0900
+
+sub public_only {
+  my ($yatt) = shift;
+  grep {
+    $yatt->find_part($_)->cget('public')
+  } @_;
+}

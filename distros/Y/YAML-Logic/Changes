@@ -1,0 +1,33 @@
+######################################################################
+Revision history for Perl extension YAML::Logic
+
+0.07  (2016/12/07)
+    (ms) Alexandr Ciornii fixed another unescaped left curly in the
+         test suite: https://github.com/mschilli/yaml-logic-perl/pull/1
+
+0.06  (2016/06/14)
+    (ms) [rt.cpan.org #115143] Fixed "Unescaped left brace" warning
+         in perl 5.25, reported by Slaven Rezic.
+
+0.05  (2011/08/05)
+    (ms) Fixed critical bug returning premature results with 'and' or
+         'or' sub-constructs.
+    (ms) Added github repository link to Makefile.PL
+
+0.04  (2009/04/01)
+    (ms) Better escaping of quotes
+    (ms) Worked around weird memory errors in perl5.8.6 by duplicating
+         hashes before interpolating their content.
+
+0.03  (2009/03/28)
+    (ms) Fixed slash escapes in regexes
+    (ms) Added test cases
+
+0.02  (2009/03/25)
+    (ms) Interpolating everything (not only lines starting with a variable)
+    (ms) Checking for common YAML [foo: !$var] error (quotes missing)
+    (ms) Added documentation on defined-ness and test cases.
+    (ms) Added <= and >= operators
+
+0.01  2008/12/28
+    (ms) Where it all began.

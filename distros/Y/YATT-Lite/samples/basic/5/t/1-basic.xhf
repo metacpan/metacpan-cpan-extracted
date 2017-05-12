@@ -1,0 +1,17 @@
+# -*- coding: utf-8 -*-
+
+FILE: varerr.yatt
+HEADER[
+Content-type: ^text/html; charset="?utf-8"?
+]
+BODY[
+- <title>ERROR\(No such variable &#39;foo&#39;\)</title>
+- <h2>No such variable &#39;foo&#39;</h2>
+]
+
+FILE: error.ytmpl
+SKIP_IF_ERROR: Forbidden
+HEADER[
+Content-type: ^text/plain; charset="?utf-8"?
+]
+BODY: Forbidden filetype: error.ytmpl

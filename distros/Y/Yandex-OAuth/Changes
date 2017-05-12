@@ -1,0 +1,26 @@
+Revision history for Perl extension Yandex-OAuth
+
+0.07 2015-10-16T19:48:20Z
+   - finally fixed test (thanks to https://github.com/wa-pis)
+
+0.06 2015-10-16T13:42:44Z
+
+    - fixed tests
+
+0.05 2015-05-01T09:42:51Z
+    - fix tests and add more info to POD
+
+0.04 2015-05-01T07:36:14Z
+    - changes test for hash structure
+
+0.03 2015-04-30T20:35:18Z
+    - Add more dependencies
+
+0.02 2015-04-30T20:31:16Z
+    - Add README.md and dependencies
+
+0.01 2015-04-30T20:14:20Z
+
+    - Add Yandex::OAuth get_code and get_token
+    - Add Yandex::OAuth::Client - base class for APIs
+

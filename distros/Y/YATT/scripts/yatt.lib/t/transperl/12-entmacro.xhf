@@ -1,0 +1,41 @@
+# -*- coding: utf-8 -*-
+
+TITLE: &yatt:if(:x,yes,:y); - true
+IN:
+ <!yatt:args x y %yatt:no_last_newline;>
+ &yatt:if(:x,yes,:y);
+PARAM[
+- 1
+- 2
+]
+OUT: yes
+
+
+TITLE: &yatt:if(:x,yes,:y); - false
+PARAM[
+- 0
+- ok
+]
+OUT: ok
+
+
+TITLE: &yatt:render(:type,x,:y); - hello
+IN:
+ <!yatt:args type y %yatt:no_last_newline;>
+ &yatt:render(:type,world,:y);
+ <!yatt:widget hello what how  %yatt:no_last_newline;>
+ Hello &yatt:how; &yatt:what;!
+ <!yatt:widget goodbye what how  %yatt:no_last_newline;>
+ Hello &yatt:how; &yatt:what;!
+PARAM[
+- hello
+- wonderful
+]
+OUT: Hello wonderful world!
+
+TITLE: &yatt:render(:type,x,:y); - goodbye
+PARAM[
+- goodbye
+- dirty
+]
+OUT: Hello dirty world!

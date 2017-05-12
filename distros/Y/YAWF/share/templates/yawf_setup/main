@@ -1,0 +1,13 @@
+[% BLOCK navlink %]
+[<a href="#" onClick="$.get('[% link %]SID=[% yawf.session.id %]',function(data){document.getElementById('setup_mainframe').innerHTML=data;});return false;">[% content %]</a>] &middot; 
+[% END;
+WRAPPER page page.title = 'YAWF project setup';
+	PROCESS yawf_setup/jquery;
+	WRAPPER navlink link="main?" %]Setup-Startseite[% END;
+	WRAPPER navlink link="database?" %]Datenbank[% END;
+	WRAPPER navlink link="objects?" %]Objekte[% END %]
+	[<a href="main.logout">Logout</a>]<p>
+	<div id="setup_mainframe" style="height:100%; width:100%; border-top:1px solid grey;border: none;min-height:600px;">
+	[% content %]
+	</div>
+[% END %]

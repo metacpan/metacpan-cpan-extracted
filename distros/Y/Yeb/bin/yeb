@@ -1,0 +1,46 @@
+#!/usr/bin/env perl
+# PODNAME: yeb
+# ABSTRACT: Executable to start your Yeb class directly
+
+use strict;
+use warnings;
+use Plack::Runner;
+use lib 'lib';
+use Carp;
+
+my $class = shift @ARGV;
+
+croak "yeb needs your application class as first parameter" unless defined $class;
+
+my $runner = Plack::Runner->new;
+$runner->parse_options(
+	'-M'.$class,
+	'-e'.$class.'->run_if_script',
+	@ARGV
+);
+$runner->run;
+
+__END__
+
+=pod
+
+=head1 NAME
+
+yeb - Executable to start your Yeb class directly
+
+=head1 VERSION
+
+version 0.104
+
+=head1 AUTHOR
+
+Torsten Raudssus <torsten@raudss.us>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2013 by Torsten Raudssus.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

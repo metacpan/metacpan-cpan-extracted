@@ -1,0 +1,24 @@
+This is the README file for Yahoo::Lifestyle, to offer a simple interface for Yahoo! Taiwan Lifestyle open APIs. In some APIs, it minght need the authentication, we use the Yahoo::BBAuth for these APIs. And we use XML::Simple to make it return perl hash. It might be easier than XML.  
+
+Please type "perldoc Yahoo::Lifestyle" after installation to see
+the module usage information.
+
+* Installation
+
+Yahoo::Lifestyle uses the standard perl module install process:
+
+cpansign -v             # optional; see SIGNATURE for details
+perl Makefile.PL
+make                    # or 'nmake' on Win32
+make test
+make install
+
+* Copyright
+
+Copyright 2008 by Hsin-Chan Chien <hcchien@hcchien.org>.
+
+All rights reserved.  You can redistribute and/or modify
+this bundle under the same terms as Perl itself.
+
+See <http://www.perl.com/perl/misc/Artistic.html>.
+

@@ -1,0 +1,58 @@
+YATT version 0.0.2
+==================
+
+  YATT is Yet Another Template Toolkit. Like PHP (and unlike HTML::Template),
+  YATT translates each template into (executable) Perl package(class)
+  so that you can define subs to build up your own abstraction architecture.
+  
+  This is (still) alpha release. Although template syntax become stable,
+  internal structure is still under heavy development.
+
+INSTALLATION
+
+  Its all pure Perl, so its ok to put the .pm files in their appropriate
+  local Perl subdirectories.
+
+  The easiest way to install this distribution is using the standard build
+  process for Perl modules:
+
+    perl Build.PL
+    ./Build
+    ./Build test
+    ./Build install
+
+
+SUPPORT AND DOCUMENTATION
+
+  After installing, you can find documentation for this module with
+  the perldoc command.
+
+    perldoc YATT::Manual
+
+  Unfortunately, there is no English manual yet.
+
+You can also look for information at:
+
+    Source Code Repository and Development Status.
+        http://sourceforge.net/projects/yatt-pm/
+        https://buribullet.net/svn/
+        http://buribullet.net/svntrac/buribullet/timeline
+
+    Search CPAN
+        http://search.cpan.org/dist/YATT
+
+    CPAN Request Tracker:
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=YATT
+
+    AnnoCPAN, annotated CPAN documentation:
+        http://annocpan.org/dist/YATT
+
+    CPAN Ratings:
+        http://cpanratings.perl.org/d/YATT
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2007, 2008 "KOBAYASI, Hiroaki"
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.

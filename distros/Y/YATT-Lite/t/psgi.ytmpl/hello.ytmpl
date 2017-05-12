@@ -1,0 +1,4 @@
+<!yatt:args hello id>
+<div id="&yatt:id;">
+  Hello <yatt:body/>!
+</div>

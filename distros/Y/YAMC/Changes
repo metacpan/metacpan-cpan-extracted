@@ -1,0 +1,9 @@
+Revision history for Perl extension YAMC.
+
+0.1  Mon Apr  1 19:02:28 2013
+	- original version; created by h2xs 1.23 with options
+		-AX -n YAMC
+0.2  Sun Apr 7 10:00:00 2013
+	- Added error handling 
+	- Fix help error
+  

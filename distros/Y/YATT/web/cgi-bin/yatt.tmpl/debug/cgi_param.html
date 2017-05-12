@@ -1,0 +1,35 @@
+<!perl:args url_param session border>
+
+<table border=&perl:border;>
+<perl:foreach my=key list="&perl:top:param();">
+<tr><td>&perl:key;</td><td>&perl:top:param($key);</td></tr>
+</perl:foreach>
+</table>
+
+<perl:if if="&perl:url_param;">
+  <h3>&perl:url_param;</h3>
+  <table border=&perl:border;>
+    <perl:foreach my=key list="&perl:top:url_param();">
+      <tr><td>&perl:key;</td><td>&perl:top:url_param($key);</td></tr>
+    </perl:foreach>
+  </table>
+</perl:if>
+
+<perl:if if="&perl:top:cookie;">
+  <h3>cookies</h3>
+  <table border=&perl:border;>
+    <perl:foreach my=key list="&perl:top:cookie();">
+      <tr><td>&perl:key;</td><td>&perl:top:cookie($key);</td></tr>
+    </perl:foreach>
+  </table>
+</perl:if>
+
+<perl:if if="&perl:session;">
+  <h3>&perl:session; <?perl= $this->toplevel->session->id?></h3>
+  <table border=&perl:border;>
+    <perl:foreach my=key list="&perl:top:session();">
+      <tr><td>&perl:key;</td><td>&perl:top:session($key);</td></tr>
+    </perl:foreach>
+  </table>
+</perl:if>
+

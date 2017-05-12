@@ -1,0 +1,19 @@
+
+module httpdusermysql 1.0;
+
+require {
+	type var_lib_t;
+	type mysqld_db_t;
+	type mysqld_var_run_t;
+	type httpd_user_script_t;
+	type mysqld_t;
+	class sock_file write;
+	class unix_stream_socket connectto;
+	class dir search;
+}
+
+#============= httpd_user_script_t ==============
+allow httpd_user_script_t mysqld_db_t:dir search;
+allow httpd_user_script_t mysqld_t:unix_stream_socket connectto;
+allow httpd_user_script_t mysqld_var_run_t:sock_file write;
+allow httpd_user_script_t var_lib_t:dir search;

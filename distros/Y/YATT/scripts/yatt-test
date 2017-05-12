@@ -1,0 +1,48 @@
+#!/usr/bin/perl -w
+use strict;
+use warnings qw(FATAL all NONFATAL misc);
+
+use File::Basename; # require is not ok for fileparse.
+use File::Spec; # require is not ok for rel2abs
+use FindBin;
+
+# pathname without extension.
+sub _rootname {
+  my $path = shift;
+  my ($basename, $dirname, $suffix) = fileparse($path, shift || qr{\.\w+});
+  join "/", File::Spec->rel2abs($dirname), $basename;
+}
+
+sub prog_libdirs {
+  my @libs;
+  foreach my $prog (@_) {
+    my $root = _rootname($prog);
+    if (-d (my $d = "$root.lib")) {
+      push @libs, $d;
+    }
+    if (-d (my $d = "$root.libs")) {
+      local *DIR;
+      if (opendir DIR, $d) {
+	push @libs,
+	  map  { "$d/$$_[1]" }
+	    sort { $$a[0] <=> $$b[0] }
+	      map  { /^(\d+)/ ? [$1, $_] : () }
+		readdir(DIR);
+	closedir DIR;
+      }
+    }
+  }
+  @libs;
+}
+
+use lib _rootname(dirname(dirname(File::Spec->rel2abs($0)))) . ".lib"
+  , prog_libdirs("$FindBin::Bin/yatt"
+		     , "$FindBin::RealBin/yatt")
+  ;
+
+#========================================
+use YATT::Test;
+use base qw(YATT::Test);
+
+__PACKAGE__->xhf_test("/tmp/yatt-test$$"
+		      , @ARGV ? @ARGV : '.')

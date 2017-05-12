@@ -1,0 +1,133 @@
+<yatt:envelope title="Submission form">
+<div style="float: left; width: 65%;">
+<yatt:req_form />
+</div>
+
+<yatt:sidenote />
+</yatt:envelope>
+
+<!yatt:widget req_form is_confirm="bool/0">
+<form method="POST">
+<div>
+  <yatt:text "name" is_confirm>
+    Your Name
+  </yatt:text>
+  <yatt:text "email" is_confirm>
+    E-Mail
+  </yatt:text>
+  <yatt:item>
+    <label>Gender</label>
+    <select name="gender">
+      <option &yatt:att_value_of(select,gender,0,{in,:sess_obj()});>-</option>
+      <option &yatt:att_value_of(select,gender,1,{in,:sess_obj()});>Female</option>
+      <option &yatt:att_value_of(select,gender,2,{in,:sess_obj()});>Male</option>
+    </select>
+  </yatt:item>
+
+  <yatt:item>
+    <label>Favorite Fruits</label>
+    <table>
+      <tr>
+	<td>&nbsp;</td>
+	<th class="top">Choose all you like</th>
+	<th class="top">Most Favorite</th>
+      </tr>
+      <yatt:foreach my=row list="&yatt:tsvfile(config/fruits);">
+      <tr>
+	<th class="left">&yatt:row[-1];</th>
+	<td class="center"><input &yatt:att_value_of(checkbox,fruits,:row[0],{in,:sess_obj()}); /></td>
+	<td class="center"><input &yatt:att_value_of(radio,fond_fruits,:row[0],{in,:sess_obj()}); /></td>
+      </tr>
+      </yatt:foreach>
+    </table>
+  </yatt:item>
+
+  <yatt:textarea "message" rows="5" cols="70" is_confirm>
+    Message
+  </yatt:textarea>
+  <div class="submit">
+    <yatt:if "&yatt:is_confirm;">
+      <input type="submit" name="~" value="Back"/>
+      <input type="submit" name="!register" value="Proceed"/>
+      <:yatt:else/>
+      <input type="submit" name="~confirm" value="Confirm"/>
+    </yatt:if>
+  </div>
+</div>
+</form>
+
+<!yatt:page confirm>
+
+<yatt:envelope title="Confirm">
+&yatt:session_start();
+
+<h2>Is this ok?</h2>
+<yatt:req_form is_confirm/>
+</yatt:envelope>
+
+<!yatt:action register>
+my ($this, $con) = @_;
+
+if (my $sess = $con->get_session) {
+  # dataref だと, おまけが多すぎる。
+  my %hash; $hash{$_} = $sess->param($_) for $sess->param;
+  require YAML::Tiny;
+  my $dump = YAML::Tiny::Dump(\%hash);
+  my ($fh, $name, $fnum) = $this->YATT->mh_alloc_newfh;
+  print $fh $dump;
+  $con->delete_session;
+  $this->render_thanks($con, $name, $fnum);
+} else {
+  die "session is (already) empty!\n";
+}
+
+<!yatt:widget thanks name fnum>
+<yatt:envelope title="Thank you!">
+Your request is successfully saved as:<br>
+<b>&yatt:name;</b>,<br>
+which is only visible to local user.<br>
+
+<a href="./">back</a>
+
+</yatt:envelope>
+
+<!yatt:widget item name is_confirm="bool/0" label=html?>
+<div class="item">
+<yatt:if "&yatt:name;"><label for="&yatt:name;">&yatt:label;</label></yatt:if>
+<yatt:if "&yatt:is_confirm;">
+<div class="input">
+&yatt:sess(:name);
+</div>
+<:yatt:else/>
+<yatt:body/>
+</yatt:if>
+</div>
+
+<!yatt:widget text item=[delegate] body=html? size=attr?35 >
+<yatt:item label=body>
+<input type="text" id="&yatt:name;" name="&yatt:name;" &yatt:size; value="&yatt:sess(:name);">
+</yatt:item>
+
+<!yatt:widget textarea item=[delegate]
+	      size=attr?10 rows=attr?5 cols=attr?7
+	      body=html?>
+<yatt:item label=body>
+<textarea name="&yatt:name;" id="&yatt:name;" &yatt:rows; &yatt:cols;>&yatt:sess(:name);</textarea>
+</yatt:item>
+
+<!yatt:widget debug_params>
+<table>
+<yatt:foreach my=name list="&yatt:CON:param();">
+  <tr>
+  <th>&yatt:name;</th>
+  <td>&yatt:CON:param(:name);</td>
+  </tr>
+</yatt:foreach>
+</table>
+
+<!yatt:widget sidenote fn="?00readme.html">
+<yatt:if "-r $fn">
+<div class="sidenote">
+  <iframe src="&yatt:fn;"></iframe>
+</div>
+</yatt:if>

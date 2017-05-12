@@ -1,0 +1,28 @@
+Revision history for Yaadgom
+
+0.07  2016-04-03 10:53:29 BRT
+    - Added missing "\n" after processing {extra}{fields}
+
+0.06  2015-10-27 19:30:21 BRST
+    - file => 'anything/foo' is now possible, this bypass automatic filename from URI
+
+0.05  2015-10-01 09:56:20 BRT
+    - Fix reading trigger results correctly instead of ARRAYREF(0x...)
+
+0.042  2015-09-13 07:21:09 BRT
+    - Fix slash_filename_replacement
+
+0.04  2015-09-13 07:16:24 BRT
+    - added slash_filename_replacement option
+
+0.03  2015-09-01 08:01:58 BRT
+        - Typos on documentation
+
+0.02  2015-08-31 20:03:21 BRT
+        - Add on_destroy callback
+        - Documment all methods
+        - Add an example using with Stash::REST
+
+0.01  2015-08-31 18:53:46 BRT
+
+        - Initial release

@@ -1,0 +1,39 @@
+2013-01-03 Guillaume Rousse <guillomovitch@zarb.org> 0.2.4
+	* Youri::Package::RPM:
+	    - recognize -debuginfo as debug packages too
+
+2013-01-03 Guillaume Rousse <guillomovitch@zarb.org> 0.2.3
+	* minor code cleanups
+	* Youri::Package::RPM::URPM:
+	    - revert changes introduced to support mandriva-specific URPM
+	      changes
+
+2011-01-30 Guillaume Rousse <guillomovitch@zarb.org> 0.2.2
+	* Youri::Package::RPM::RPM::RPM:
+	    - fix tagformat wrapper method
+
+2011-01-29 Guillaume Rousse <guillomovitch@zarb.org> 0.2.1
+	* Youri::Package::RPM::RPM::RPM:
+	    - only create SOURCES and SPECS directories when importing a
+	      source package, for consistency with RPM4
+
+2011-01-22 Guillaume Rousse <guillomovitch@zarb.org> 0.2.0
+	* Youri::Package::RPM::URPM:
+	    - adaptation to recent changes in URPM (Per Oyvind Karlsen)
+	* Youri::Package::RPM::Test:
+	    - adaptation to new rpm5-style filenames (Per Oyvind Karlsen)
+	* Youri::Package::RPM::RPM:
+	    - new RPM-based implementation (Per Oyvind Karlsen)
+	* Youri::Package::RPM::RPM4:
+	    - fix md5 return value for symlinks
+	* RPM/RPM4 abstraction layer
+
+2007-03-22 Guillaume Rousse <guillomovitch@zarb.org> 0.1.1
+	* Youri::Package::RPM::URPM:
+	    - fix a missing rpm macro in sign() method
+	* Youri::Package::RPM::Test:
+	    - fix get_canonical() method when source package is unknown
+	* test suite enhancements
+
+2007-03-05 Guillaume Rousse <guillomovitch@zarb.org> 0.1.0
+	* initial release

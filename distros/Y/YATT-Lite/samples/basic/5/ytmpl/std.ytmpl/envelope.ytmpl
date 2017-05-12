@@ -1,0 +1,23 @@
+<!yatt:args title="html?" head="html?">
+<!DOCTYPE html>
+<html>
+<head>
+  <title>&yatt:title;</title>
+&yatt:head;
+</head>
+<body>
+<div id="wrapper" style="width: 800px; margin: 0 auto;">
+<yatt:if "&yatt:title;">
+<div id="topnav">
+  <h2 style="display: inline;"><a href="./">&yatt:title;</a></h2>
+</div>
+</yatt:if>
+<center style="text-align: center;">
+<div id="body" style="text-align: left;">
+  <yatt:body/>
+</div>
+</center>
+</div>
+</div>
+</body>
+</html>

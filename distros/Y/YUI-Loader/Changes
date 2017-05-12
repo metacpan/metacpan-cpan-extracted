@@ -1,0 +1,32 @@
+0.071 Friday May 28 18:25:31 PDT 2010:
+    - Ad-hoc YUI version upgrade to 2.8.1 (from 2.5.1)
+    - Conversion to dzpl
+    - Applied patches from Martin Holste (rt57820)
+
+0.070 Monday February 23 13:38:23 PST 2009:
+    - Non-development release
+
+0.060_2 Saturday February 21 13:21:57 PST 2009:
+    - Updated "Changes"
+
+0.060_1 Saturday February 21 13:21:57 PST 2009:
+    - Moved out of JS::YUI::Loader namespace
+
+0.060 Wednesday May 28 15:10:29 PDT 2008: 
+    - Automatically include the default "sam" skin if an object is skinnable
+
+0.050 Saturday May 03 19:29:07 PDT 2008:
+    - Some documentation tweaks
+    - Changed JS::YUI::Loader::Source::YUIHost to ::Internet to be consistent with JS::jQuery::Loader
+
+0.040 Thursday May 01 21:06:48 PDT 2008:
+    - Moar documentation
+
+0.030 Tuesday April 29 11:57:55 PDT 2008:
+    - Ensure minimum version of 2.08 for JSON.pm
+
+0.020 Monday April 28 18:38:58 PDT 2008:
+    - Disable network testing by default in t/04-cache.t
+
+0.010 Monday April 28 18:34:38 PDT 2008:
+    - Initial release

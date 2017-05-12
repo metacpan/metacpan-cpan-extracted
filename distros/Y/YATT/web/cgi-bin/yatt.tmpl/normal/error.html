@@ -1,0 +1,46 @@
+<!yatt:args error info=value>
+<yatt:my error_is_object:value
+	 ="ref $error && UNIVERSAL::isa($error, 'YATT::Exception')"/>
+<html>
+<head>
+  <title>
+    <yatt:if &yatt:error_is_object; >&yatt:error:title();
+      <:yatt:else />&yatt:error;
+    </yatt:if>
+  </title>
+</head>
+<body>
+<yatt:if &yatt:error_is_object; >
+  <table>
+    <tr><th>Error: </th><td>&yatt:error:simple();</td></tr>
+    <tr><th>File: </th><td>&yatt:error:cf_file;</td></tr>
+    <tr><th>Line: </th><td>&yatt:error:cf_line;</td></tr>
+<yatt:if &yatt:error:cf_node;>
+    <tr><th>Node: </th><td><pre>&yatt:error:cf_node;</pre></td></tr>
+</yatt:if>
+<yatt:if &yatt:error:cf_node_obj;>
+<!--
+    <?yatt print YATT::Util::terse_dump($error->{cf_node_obj}->current) ?>
+-->
+</yatt:if>
+  </table>
+<:yatt:else/>
+&yatt:error;
+</yatt:if>
+
+<yatt:if "-r .htyattdebug">
+<h2>context info</h2>
+<table>
+<yatt:foreach my=key list="keys %$info">
+  <tr>
+    <th>&yatt:key;</th>
+    <td><?perl
+     my $val = &yatt:info{:key};;
+     print ref $val eq 'SCALAR' ? $$val : YATT::escape($val)?></td>
+  </tr>
+</yatt:foreach>
+</table>
+</yatt:if>
+
+</body>
+</html>

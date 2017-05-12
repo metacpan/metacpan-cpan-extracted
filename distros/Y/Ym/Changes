@@ -1,0 +1,12 @@
+Revision history for Perl extension Ym.
+
+0.02  Thu Nov 11 18:46:24 MSK 2010
+	Fix in Makefile.PL
+	Fix paths in 'require' statements.
+	More documentation.
+	Export many functions.
+	More accurate config.
+
+0.01  Tue Nov  9 19:48:15 2010
+	First release.
+

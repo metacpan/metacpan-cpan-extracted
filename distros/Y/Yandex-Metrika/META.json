@@ -1,0 +1,76 @@
+{
+   "abstract" : "It's module to get access to Yandex.Metrika API via OAuth",
+   "author" : [
+      "Andrey Kuzmin <chipsoid@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v2.4.0",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Yandex-Metrika",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.035"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Class::MOP" : "0",
+            "Modern::Perl" : "0",
+            "Moo" : "0",
+            "Yandex::OAuth::Client" : "0.04",
+            "perl" : "5.008001"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.98"
+         }
+      }
+   },
+   "provides" : {
+      "Yandex::Metrika" : {
+         "file" : "lib/Yandex/Metrika.pm",
+         "version" : "0.01"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/Chipsoid/yandex-metrika-perl/issues"
+      },
+      "homepage" : "https://github.com/Chipsoid/yandex-metrika-perl",
+      "repository" : {
+         "url" : "git://github.com/Chipsoid/yandex-metrika-perl.git",
+         "web" : "https://github.com/Chipsoid/yandex-metrika-perl"
+      }
+   },
+   "version" : "0.01"
+}

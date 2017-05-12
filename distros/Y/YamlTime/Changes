@@ -1,0 +1,71 @@
+0.19 Mon Feb 23 06:49:23 PST 2015
+ - Update to latest 2015 packaging
+
+0.18 Sat Aug 16 13:07:19 PDT 2014
+ - Meta 0.0.2
+
+0.17 Sat Aug 16 04:30:49 PDT 2014
+ - Eliminate spurious trailing whitespace
+
+0.16 Fri Aug 15 21:34:45 PDT 2014
+ - Remove t/use_ok.t
+
+0.15 Fri Aug 15 21:14:24 PDT 2014
+ - Add t/000-compile-modules.t
+
+0.14 Sat Aug  9 00:34:08 PDT 2014
+ - Fix swim errors
+
+0.13 Fri Aug  8 13:01:04 PDT 2014
+ - Switch hashbang to '#!/usr/bin/env perl'
+
+0.12 Tue Aug  5 11:40:36 PDT 2014
+ - Switch to Zilla-Dist
+
+0.11 Tue Oct 18 07:44:17 CDT 2011
+ - Make YAMLTIME_DEFAULT_COMMAND work.
+
+0.10 Thu Jul 28 14:22:37 CDT 2011
+ - Load plugins from 'YamlTime::' namespace instead of YamlTime::Extension
+ - Support $YAMLTIME_DEFAULT_COMMAND
+ - Support ~/.yamltime/
+
+0.09 Fri Jul  8 00:18:25 EDT 2011
+ - Add base command
+ - Fix 'go' math for adding hours/mins
+ - Fix 'delete' command
+
+0.08 Mon Jun 27 21:41:45 EDT 2011
+ - 0.07 was broken. add test, and make it work
+ - Now support YamlTime::Extension::Foo
+
+0.07 Mon Jun 27 08:59:13 EDT 2011
+ - rjbs++' changes
+
+0.06 Tue Jun 14 22:35:45 EST 2011
+ - Add better readline support and tab completion
+
+0.05 Sat Jun 11 16:22:00 EST 2011
+ - Add tag support to ranges
+ - Refactor error msgs
+ - Remove $HOME/.yt as a default. You can set YAMLTIME_BASE to it.
+
+0.04 Sat Jun 11 03:16:02 EST 2011
+ - Polish the help msgs
+ - Refactoring
+
+0.03 Fri Jun 10 01:42:52 EST 2011
+ - Finish the rest of the commands
+ - Fix extra blank line in yaml files
+ - Add dump action
+ - Add remove action
+ - Refactor default_command
+ - Better error msgs
+ - Check 'project' better.
+
+0.02 Wed Jun  8 18:47:05 EST 2011
+ - Fixed a newline down under.
+
+0.01 Wed Jun  8 18:43:36 EST 2011
+ - First Release
+

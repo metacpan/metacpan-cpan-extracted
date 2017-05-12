@@ -1,0 +1,205 @@
+# -*- coding: utf-8 -*-
+YATT_CONFIG[
+special_entities[
+- sum
+]
+]
+YATT_RC:
+ Entity sum => sub {
+   my ($pack, @args) = @_;
+   my $sum = 0;
+   $sum += $_ for @args;
+   $sum;
+ };
+ 
+ Entity new => sub {
+   my ($pack, @args) = @_;
+   bless [@args], $pack;
+ };
+ 
+ sub foo {
+   my $self = shift;
+   my $mul = 1;
+   foreach my $i (@$self, @_) {
+     $mul *= $i;
+   }
+   $mul
+ }
+
+TITLE: &yatt:sum(3,4,5);
+IN:
+ &yatt:sum(3,4,5);
+OUT:
+ 12
+
+
+TITLE: &sum();
+IN:
+ &sum(3,8);
+OUT:
+ 11
+
+TITLE: hashref
+IN:
+ <!yatt:args x=scalar y>
+ &yatt:x{foo}{:y};
+PARAM[
+{
+foo{
+bar: baz
+}
+}
+- bar
+]
+OUT:
+ baz
+
+TITLE: aref with var index
+IN:
+ <!yatt:args x=list y=scalar>
+ &yatt:x[:y];
+PARAM[
+[
+- 3
+- 4
+- 5
+]
+- 1
+]
+OUT:
+ 4
+
+TITLE: aref with call index
+IN:
+ <!yatt:args x=list >
+ &yatt:x[:sum(0,1,2)];
+PARAM[
+[
+- 3
+- 4
+- 5
+- 6
+]
+]
+OUT:
+ 6
+
+
+TITLE: aref nest
+IN:
+ <!yatt:args x=list y=scalar>
+ &yatt:x[0][:y][1];
+PARAM[
+[
+[
+- X
+[
+- x
+- o
+- y
+]
+]
+]
+- 1
+]
+OUT:
+ o
+
+TITLE: aref with path index
+IN:
+ <!yatt:args x=list y=list z=scalar>
+ &yatt:x[:y[0][:z]][1];
+PARAM[
+[
+- 3
+[
+- X
+- O
+]
+- 5
+]
+[
+[
+- 2
+- 1
+- 0
+]
+]
+- 1
+]
+OUT:
+ O
+
+TITLE: parse error (aref)
+IN:
+ <!yatt:args x=list y=scalar>
+ &yatt:x[0][0]][0];
+PARAM[
+[
+[
+]
+]
+]
+ERROR: Syntax error in entity: ':x\[0\]\[0\]\]\[0\];'
+
+
+TITLE: array literal
+IN:
+ &yatt:HTML(:dump([3]));
+OUT:
+ ['3']
+
+TITLE: array literal and aref
+IN:
+ &yatt:HTML([=3][0]);
+OUT:
+ 3
+
+
+TITLE: expr: or
+IN:
+ <!yatt:args list=list>
+ &yatt:if(=$$list[0]or$$list[1],yes,no);
+PARAM[
+[
+- 1
+- 0
+]
+]
+OUT:
+ yes
+
+
+TITLE: expr: ==
+IN:
+ <!yatt:args list=list>
+ &yatt:if(=$$list[0]*$$list[1]==24,yes,no);
+PARAM[
+[
+- 3
+- 8
+]
+]
+OUT:
+ yes
+
+
+TITLE: expr: (..)
+IN:
+ <!yatt:args list=list>
+ &yatt:if(=($$list[0]+$$list[1])==11,yes,no);
+PARAM[
+[
+- 3
+- 8
+]
+]
+OUT:
+ yes
+
+TITLE: expr: @var
+IN:
+ <yatt:my var:list="3..8"/>
+ &yatt:HTML(=@$var);
+OUT:
+ 345678

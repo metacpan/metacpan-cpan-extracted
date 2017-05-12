@@ -1,0 +1,29 @@
+0.09 Sat Aug 16 16:32:07 PDT 2014
+ - Change 'See' to 'See Also' in doc
+
+0.08 Sat Aug 16 15:52:06 PDT 2014
+ - Remove versions from module use
+
+0.07 Sat Aug 16 15:43:48 PDT 2014
+ - Remove 'use 5.x.x' from code
+
+0.06 Sat Aug 16 13:05:39 PDT 2014
+ - Meta 0.0.2
+
+0.05 Fri Aug 15 21:33:57 PDT 2014
+ - Remove t/use_ok.t
+
+0.04 Fri Aug 15 21:11:34 PDT 2014
+ - Add t/000-compile-modules.t
+
+0.03 Tue Aug 12 12:39:47 PDT 2014
+ - Switch to Zilla::Dist
+
+0.02 Thu Jul 28 14:33:34 CDT 2011
+ - Rename to YamlTime::Git.
+ - Make sure YamlTime::Extension::Git is not installed.
+ - Add SYNOPSIS
+
+0.01 Mon Jun 27 21:29:03 EDT 2011
+ - First Release
+

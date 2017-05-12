@@ -1,0 +1,92 @@
+=encoding utf8
+
+=head1 NAME
+
+YiJing::0x3b - Jie/ (Censorship)
+
+=head1 DESCRIPTION
+
+# XXX
+
+=head2 Judgment
+
+    節。亨。苦節不可貞。
+
+Harsh censorship can never last long.
+
+=head2 Interpretation
+
+    彖曰：節，亨，剛柔分，而剛得中。苦節不可貞，其道窮也。
+          說以行險，當位以節，中正以通。天地節而四時成，
+	  節以制度，不傷財，不害民。
+
+Censorship is funny; it splits the rigid people from flexible folks, and
+tries to satisfy the rigid ones. Draconian censorships will not bring
+anybody good, because their days are coming to an end.
+
+It's a sensitive topic; the government officials should take care, and
+choose the middle path.  Like how heaven and earth moderates the four
+seasons, censorship systems should be balanced, and never damage
+business or hurt civil liberty.
+
+=head2 Image
+
+    象曰。澤上有水。節。君子以制數度。議德行。
+
+Deep consideration is needed
+when talking about censorship.
+Regulations should be used to promote balance
+and encourage ethical behaviour.
+
+=head2 Lines
+
+# XXX
+
+=over 4
+
+=item *
+
+    初九。不出戶庭。無咎。
+    象曰。不出戶庭。知通塞也。
+
+Moderate your own post before you send it out, so you'll not be blamed.
+
+=item *
+
+    九二。不出門庭。凶。
+    象曰。不出門庭。失時極也。
+
+Setting up gateways to censor people will bring you misfortune.
+
+=item *
+
+    六三：不節若，則嗟若，無咎。
+    象曰。不節之嗟。又誰咎也。
+
+He who challanges censorship will probably regret it, although he actually
+did nothing wrong.
+
+=item *
+
+    六四。安節，亨。
+    象曰。安節之亨。承上道也。
+
+Balanced moderation. Good for everybody.
+
+=item *
+
+    九五。甘節。吉。往有尚。
+    象曰。甘節之吉。居位中也。
+
+# XXX
+
+=item *
+
+    上六。苦節。貞凶。悔亡。
+    象曰。苦節貞凶。其道窮也。
+
+# XXX
+
+=back
+
+=cut

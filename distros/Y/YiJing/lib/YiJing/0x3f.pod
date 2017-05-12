@@ -1,0 +1,105 @@
+=encoding utf8
+
+=head1 NAME
+
+YiJing::0x3f - Wei\ Ji\ (Not Ready For Prime Time)
+
+=head1 DESCRIPTION
+
+"You've done the first 90%; now you have only the other 90% left!"
+
+=head2 Judgment
+
+    未濟：亨，小狐汔濟，濡其尾，無攸利。
+
+Fun. If you let that small bug interfere with data stream, then
+you'll have to tail the log, because nothing will work.
+
+=head2 Interpretation
+
+    彖曰：未濟，亨﹔柔得中也。 小狐汔濟，未出中也。 濡其尾，無攸利﹔
+	  不續終也。 雖不當位，剛柔應也。
+
+It's fun before finishing a job; your software is stuck in the
+middle of schedule. Bugs keeps disturbing you, and the project
+is going nowhere. Tail the log to discover the problem, so you
+can solve it before deadline.
+
+Although all the bits are in the wrong place, at least the ones
+and zeros occur in turn.
+
+=head2 Image
+
+    象曰：火在水上，未濟﹔君子以慎辨物居方。
+
+Code hovering over Depth;
+the project is not ready for prime time.
+Therefore the Hacker is careful
+to find the nature of each objects,
+so that each finds its place.
+
+=head2 Lines
+
+=over 4
+
+=item *
+
+    初六：濡其尾，吝。
+    象曰：濡其尾，亦不知極也。
+
+Errors occurring in the tail of logfile. What a shame.
+
+... Haven't you had enough of that?
+
+=item *
+
+    九二：曳其輪，貞吉。
+    象曰：九二貞吉，中以行正。
+
+The Wheel object is moving along. Hack on will bring good fortune.
+
+... Keep to the right cause, and stay in course!
+
+=item *
+
+    六三：未濟，征凶，利涉大川。
+    象曰：未濟征凶，位不當也。
+
+Release before its time brings misfortune; try some large samples first.
+
+... Release untested software is the Wrong Thing to do.
+
+=item *
+
+    九四：貞吉，悔亡，震用伐鬼方，三年有賞于大國。
+    象曰：貞吉悔亡，志行也。
+
+Hack on, you're in luck! No need to regret, launch thunderous attack
+to the System from Hell; in three years, a large group will reward
+your effort.
+
+... Hack on without looking back, that's truly a devotion.
+
+=item *
+
+    六五：貞吉，無悔，君子之光，有孚，吉。
+    象曰：君子之光，其暉吉也。
+
+Hack on, you're in luck. No remorse. The light of True Hacker is with
+you. Hunt down the bug, good fortune.
+
+... The radiance of True Hacker shall bring you luck.
+
+=item *
+
+    上九：有孚于飲酒，無咎，濡其首，有孚失是。
+    象曰：飲酒濡首，亦不知節也。
+
+Hunt down bugs while drinking beer, no problem. But if alcohol went
+over your head, you'll end up create more bugs.
+
+... Got drunk in beer? Can't you control yourself?
+
+=back
+
+=cut

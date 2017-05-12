@@ -1,0 +1,84 @@
+#========
+# yt-cascade.pl
+#========
+Perl/5.14.2 x86_64-linux-thread-multi
+Text::Xslate/1.5009
+Text::MicroTemplate/0.18
+Text::MicroTemplate::Extended/0.12
+YATT::Lite/0.0.3_4
+1..2
+ok 1 - Xslate eq T::MT::Ex
+ok 2 - Xslate eq YL
+Benchmarks for template cascading
+        Rate  MTEx    YL    TX
+MTEx  5239/s    --  -12%  -91%
+YL    5966/s   14%    --  -90%
+TX   58513/s 1017%  881%    --
+
+
+#========
+# yt-for.pl
+#========
+Perl/5.14.2 x86_64-linux-thread-multi
+YATT::Lite/0.0.3_4
+Text::Xslate/1.5009
+Text::MicroTemplate/0.18
+HTML::Template::Pro/0.9505
+          Rate     YT     MT    HTP Xslate
+YT       852/s     --   -69%   -84%   -94%
+MT      2791/s   227%     --   -48%   -82%
+HTP     5338/s   526%    91%     --   -65%
+Xslate 15316/s  1697%   449%   187%     --
+
+
+#========
+# yt-x-poor-env.pl
+#========
+Perl/5.14.2 x86_64-linux-thread-multi
+Text::Xslate/1.5009
+Template/2.22
+HTML::Template/2.91
+Text::MicroTemplate/0.18
+Text::MicroTemplate::Extended/0.12
+YATT::Lite/0.0.3_4
+1..4
+ok 1 - TT: Template-Toolkit
+ok 2 - MT: Text::MicroTemplate
+ok 3 - HT: HTML::Template
+ok 4 - YT: YATT::Lite
+Partially Cached Benchmarks with 'include' (datasize=100)
+         Rate     TT Xslate     HT     YT     MT
+TT     74.1/s     --   -14%   -55%   -78%   -80%
+Xslate 86.1/s    16%     --   -48%   -75%   -77%
+HT      166/s   124%    93%     --   -51%   -56%
+YT      342/s   362%   297%   106%     --   -10%
+MT      380/s   413%   341%   129%    11%     --
+
+
+#========
+# yt-x-rich-env.pl
+#========
+Perl/5.14.2 x86_64-linux-thread-multi
+Text::Xslate/1.5009
+Text::MicroTemplate/0.18
+Text::MicroTemplate::Extended/0.12
+Template/2.22
+Text::ClearSilver/0.10.5.4
+HTML::Template::Pro/0.9505
+YATT::Lite/0.0.3_4
+1..5
+ok 1 - TT: Template-Toolkit
+ok 2 - MT: Text::MicroTemplate
+ok 3 - TCS: Text::ClearSilver
+ok 4 - HTP: HTML::Template::Pro
+ok 5 - YT: YATT::Lite
+Benchmarks with 'include' (datasize=100)
+          Rate     TT     YT     MT    TCS    HTP Xslate
+TT       119/s     --   -65%   -83%   -95%   -97%   -99%
+YT       339/s   184%     --   -53%   -86%   -92%   -98%
+MT       718/s   501%   112%     --   -70%   -82%   -96%
+TCS     2419/s  1925%   613%   237%     --   -40%   -87%
+HTP     4036/s  3279%  1090%   462%    67%     --   -78%
+Xslate 18270/s 15196%  5288%  2444%   655%   353%     --
+
+

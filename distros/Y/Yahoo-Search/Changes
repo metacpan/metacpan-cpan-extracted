@@ -1,0 +1,159 @@
+=head1 NAME
+
+Changes - List of significant changes to Yahoo::Search
+
+=head2 Changes in 1.11.3
+
+    Depend on LWP version instead of individual module versions.
+    Bump sub-module versions to make them shorter to avoid float issues.
+
+=head2 Changes in 1.11.2
+
+    Default XML to UTF-8 encoding if an explicit encoding isn't given.
+
+=head2 Changes in 1.11.1
+
+    Fixed to return UTF-8 strings when using the default internal
+        Yahoo::Search::XML parser, like it does when using the XML::Simple
+        parser.  Added tests for same. RT#45029 RT#35213 RT#31618
+
+    Fixed entity parsing thanks to Bernt Budde. RT#32011
+
+    Added Region parameter thanks to Hendrik Weimer. RT#54591
+
+    Changed MaxCount to simply be advisory, so searches requesting more
+      results aren't aborted by the module.
+
+    Converted to use Dist::Zilla for releases.
+
+    Added a note to the docs recording the fact that Jeffrey Friedl
+        has placed the 1.10.13 code into the public domain (CC0).
+
+=head2 Earlier Changes
+
+    1.10.13 Mar 20, 2007      jfriedl@yahoo.com
+    Had to add some fake VERSION lines to the non-main pm files to satisfy CPAN.
+
+    1.9.12 Mar 20, 2007      jfriedl@yahoo.com
+    Fixed AppId check to allow for new, longer AppIds. Mike Kabanoid actually reported
+    this to me two months ago, and I lamely forgot about it until now. Sorry!
+
+    1.8.11 Feb 23, 2007      jfriedl@yahoo.com
+    -------------------------------------------  
+    Changes per Yahoo for new API servers:
+        search.yahooapis.com
+        local.yahooapis.com
+
+    1.7.10 July 29, 2006     jfriedl@yahoo.com
+    -------------------------------------------  
+    Oops, had left in a spurious debugging message. Removed.
+
+    1.6.9  July 29, 2006     jfriedl@yahoo.com
+    -------------------------------------------  
+    Yahoo! yet again changed their XML in a way incompatible with
+    Yahoo::Search::XML. I can't really blame them, since their XML is quite
+    legal -- the problem is Yahoo::Search::XML.
+
+    I've updated Yahoo::Search::XML to handle the new XML, and updated
+    Yahoo::Search::Request to be a bit more graceful, reverting to
+    XML::Simple (if it exists) when Yahoo::Search::XML can't hanldle things.
+
+
+    1.5.8  March 2, 2006     jfriedl@yahoo.com
+    -------------------------------------------  
+    On a bad-request error, the error message returned in the XML is supplied
+    in $@, if available. (Otherwise, the HTTP status line message is
+    returned, as was the previous action.)
+
+    XML parser can now handle CDATA, and is more robust in general.
+
+    Fixed an XML parser bug WRT numeric entities (thanks to Ask Hansen, who
+    sent the report and fix in in November -- my bad for sitting on it so
+    long).
+
+
+
+    1.4.7  March 31, 2005     jfriedl@yahoo.com
+    -------------------------------------------
+    Added support for 'Terms' searches (reports which search terms in some
+    text are important), which Y! announced today.
+
+    Added 'Count' arg to 'Related' searches -- hadn't noticed that it
+    was supported by the backend.
+
+
+    1.3.6   March 24, 2005    jfriedl@yahoo.com
+    -------------------------------------------
+    Changed the 'all' value for Type to 'any' ('all' is still allowed, but
+    deprecated), as per changes Y! announced today.
+
+    Added 'Color' option to Image search (which I somehow forgot when it
+    was made available by Y! two weeks ago).
+
+    Added 'License' option to Doc search (which Y! announced today)
+
+
+    1.2.5   March 19, 2005    jfriedl@yahoo.com
+    -------------------------------------------
+
+    Added support for Y!Q contextual search (via the new 'Context' arg of a
+    Doc search). As part of this, have any request greater than a certain
+    size become a POST.
+
+
+    1.1.4   March 10, 2005    jfriedl@yahoo.com
+    -------------------------------------------
+
+    Added support for 'Lat' and 'Long' args to a 'Local' query.
+    See: http://developer.yahoo.net/blog/archives/2005/03/enhancements_to_1.html
+
+    No longer restrict a Language arg to a specific set of values -- let the
+    web services return an error if the language is not known. I made this
+    change because I suspect that the list of languages will be somewhat
+    dynamic, and I don't want people to have to install a new version of this
+    package just because Yahoo! added, say, Serbian to the list of languages.
+
+    Removed the prepended "ERROR " from all $@ values -- dunno why I had it
+    there in the first place.
+
+    Documented %Yahoo::Search::KnownLanguage (and added
+    %Yahoo::Search::KnownCountry).
+
+    Documented $Yahoo::Search::UseXmlSimple
+
+    Documented the PreRequestCallback argument
+
+    Added support for a 'Country' arg to a 'Doc' query.
+
+
+
+    1.0.3   March 6, 2005    jfriedl@yahoo.com
+    ------------------------------------------
+
+    A few doc typo corrections -- thanks John Gruber
+
+
+    1.0.2   March 1, 2005    jfriedl@yahoo.com
+    ------------------------------------------
+
+    Added env_proxy to LWP::UserAgent request -- thanks SIMONFLK
+
+
+    1.0.1   March 1, 2005    jfriedl@yahoo.com
+    ------------------------------------------
+
+    Fixed bonehead CPAN install error -- thanks Tatsuhiko Miyagawa.
+
+
+    1.0.0   Feb 28, 2005    jfriedl@yahoo.com
+    -----------------------------------------
+
+    Public release
+
+
+    0.9     Feb 18, 2005    jfriedl@yahoo.com
+    -----------------------------------------
+
+    Yahoo!-Internal release
+
+=cut

@@ -1,0 +1,13 @@
+Revision history for Perl extension YAPC.
+
+1.01  Thr Oct 25 16:30:00 2001
+	- Applied spelling and POD form patch from  Autrijus Tang
+
+1.00  Mon Oct 22 12:00:00 2001
+	- Fleshed out YAPC.pm and Venue.pm
+
+0.01  Mon Oct 22 07:35:58 2001
+	- original version; created by h2xs 1.20 with options
+		-n YAPC -A -X
+
+

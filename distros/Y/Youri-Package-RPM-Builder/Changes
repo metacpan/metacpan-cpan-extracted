@@ -1,0 +1,18 @@
+2011-01-22 Guillaume Rousse <guillomovitch@zarb.org> 0.3.0
+	* compatibility with either RPM or RPM4 perl bindings
+
+2009-09-13 Guillaume Rousse <guillomovitch@zarb.org> 0.2.0
+	* new stage argument
+	* rename rpm_options argument to options
+	* only parse the spec file if callbacks are defined, otherwise it's a
+	  waste of time
+	* rewrite change file in reverse order
+
+2008-02-15 Guillaume Rousse <guillomovitch@zarb.org> 0.1.2
+	* use rpmbuild, not rpm, for building packages
+
+2007-11-17 Guillaume Rousse <guillomovitch@zarb.org> 0.1.1
+	* subsequent release without incorrect test file
+
+2007-11-17 Guillaume Rousse <guillomovitch@zarb.org> 0.1.0
+	* initial release

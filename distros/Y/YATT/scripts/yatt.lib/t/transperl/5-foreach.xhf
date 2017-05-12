@@ -1,0 +1,255 @@
+# -*- coding: utf-8 -*-
+
+TITLE: foreach
+IN:
+ <!yatt:args x=list>
+ <ul>
+ <yatt:foreach my=i "&yatt:x:expand();"><li>&yatt:i;</li>
+ </yatt:foreach></ul>
+PARAM[
+[
+- 1
+- 2
+- 3
+]
+]
+OUT:
+ <ul>
+ <li>1</li>
+ <li>2</li>
+ <li>3</li>
+ </ul>
+
+
+TITLE: foreach list=x pass through
+IN:
+ <!yatt:args x=list>
+ <ul>
+ <yatt:foreach my=i list=x><li>&yatt:i;</li>
+ </yatt:foreach></ul>
+PARAM[
+[
+- 1
+- 2
+- 3
+]
+]
+OUT:
+ <ul>
+ <li>1</li>
+ <li>2</li>
+ <li>3</li>
+ </ul>
+
+
+TITLE: foreach list pass through
+IN:
+ <!yatt:args list=list>
+ <ul>
+ <yatt:foreach my=i list><li>&yatt:i;</li>
+ </yatt:foreach></ul>
+PARAM[
+[
+- 1
+- 2
+- 3
+]
+]
+OUT:
+ <ul>
+ <li>1</li>
+ <li>2</li>
+ <li>3</li>
+ </ul>
+
+
+TITLE: foreach list pass through, type mismatch.
+BREAK: 1
+IN:
+ <!yatt:args x>
+ <ul>
+ <yatt:foreach my=i list=x><li>&yatt:i;</li>
+ </yatt:foreach></ul>
+ERROR: ^yatt:foreach - should be list type \(list=x\)
+
+
+TITLE: foreach $_
+IN:
+ <!yatt:args x=list>
+ <ul>
+ <yatt:foreach "&yatt:x:expand();"><li>&yatt:_;</li>
+ </yatt:foreach></ul>
+PARAM[
+[
+- 1
+- 2
+- 3
+]
+]
+OUT:
+ <ul>
+ <li>1</li>
+ <li>2</li>
+ <li>3</li>
+ </ul>
+
+
+
+TITLE: block, Can have same name vars.
+IN:
+ <yatt:block><?perl my $var?></yatt:block>
+ <yatt:block><?perl my $var?></yatt:block>
+ ok
+OUT:
+ 
+ 
+ ok
+
+TITLE: block, Can isolate vars (static)
+IN:
+ <yatt:block>
+   <yatt:my x />
+ </yatt:block>
+ &yatt:x;
+ERROR: ^No such variable 'x' \(.*\)
+
+TITLE: my html
+IN:
+ <yatt:my x><h2>foo</h2></yatt:my>
+ <b>&yatt:x;</b>
+OUT:
+ 
+ <b><h2>foo</h2></b>
+
+TITLE: my text
+IN:
+ <!yatt:args x y>
+ <yatt:my foo=&yatt:x; bar=&yatt:y;/>
+ &yatt:foo; &yatt:bar;
+PARAM[
+- <h2>foo</h2>
+- &bar
+]
+OUT:
+ 
+ &lt;h2&gt;foo&lt;/h2&gt; &amp;bar
+
+TITLE: my list
+IN:
+ <!yatt:args x=list>
+ <yatt:my foo:list=&yatt:x:expand();/>
+ &yatt:foo:expand();
+PARAM[
+[
+- foo
+- bar
+- baz
+]
+]
+OUT:
+ 
+ foobarbaz
+
+FILE: doc/envelope.html
+IN:
+ <!yatt:args %yatt:no_last_newline;>
+ <div><yatt:body/></div>
+
+TITLE: my should not corrupt outer scope.
+IN:
+ <yatt:envelope>
+ <yatt:my x="foo"/>
+ <yatt:wrap />
+ </yatt:envelope>
+ 
+ <!yatt:widget wrap>
+ <yatt:envelope>
+ <yatt:my x="bar"/>
+ &yatt:x;
+ </yatt:envelope>
+OUT:
+ <div>
+ <div>
+ bar
+ </div>
+ 
+ </div>
+
+
+TITLE: newline of body with %yatt:no_last_newline
+IN:
+ <yatt:foo list="1..3"/>
+ <!yatt:widget foo list=list %yatt:no_last_newline;>
+ <yatt:bar list />
+ 
+ <!yatt:widget bar list=list %yatt:no_last_newline;>
+ <yatt:baz list>
+   <td>&yatt:num;</td>
+ </yatt:baz>
+ 
+ <!yatt:widget baz list=list body=[code num] %yatt:no_last_newline;>
+ <yatt:table list body/>
+ 
+ <!yatt:widget table list=list body=[code num]>
+ <table>
+ <yatt:foreach my=num list="&yatt:list:expand();">
+ <tr>
+ <yatt:body num/></tr>
+ </yatt:foreach></table>
+OUT:
+ <table>
+ <tr>
+   <td>1</td>
+ </tr>
+ <tr>
+   <td>2</td>
+ </tr>
+ <tr>
+   <td>3</td>
+ </tr>
+ </table>
+ 
+
+TITLE: format "(%s)"
+IN:
+ <!yatt:args name value>
+ <yatt:format "(%s)"
+ ><input type="text" name="&yatt:name;" value="&yatt:value;"
+ ></yatt:format>
+PARAM[
+- q1
+- foo
+]
+OUT:
+ (<input type="text" name="q1" value="foo" />)
+
+
+TITLE: format var
+IN:
+ <!yatt:args fmt name value>
+ <yatt:format fmt
+ ><input type="text" name="&yatt:name;" value="&yatt:value;"
+ ></yatt:format>
+PARAM[
+- [%s]
+- q2
+- bar
+]
+OUT:
+ [<input type="text" name="q2" value="bar" />]
+
+
+TITLE: format expr
+IN:
+ <!yatt:args fmt name value>
+ <yatt:format "foo&yatt:fmt;bar"
+ ><input type="text" name="&yatt:name;" value="&yatt:value;"
+ ></yatt:format>
+PARAM[
+- "%s"
+- q2
+- bar
+]
+OUT:
+ foo"<input type="text" name="q2" value="bar" />"bar
+

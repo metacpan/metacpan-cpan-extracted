@@ -1,0 +1,87 @@
+{
+   "resources" : {
+      "homepage" : "http://search.cpan.org/dist/YAML-Active/",
+      "repository" : "http://github.com/hanekomu/YAML-Active",
+      "bugtracker" : "http://rt.cpan.org/Public/Dist/Display.html?Name=YAML-Active"
+   },
+   "generated_by" : "Dist::Zilla version 1.100711",
+   "meta-spec" : {
+      "version" : 1.4,
+      "url" : "http://module-build.sourceforge.net/META-spec-v1.4.html"
+   },
+   "version" : "1.100810",
+   "name" : "YAML-Active",
+   "author" : [
+      "Marcel Gruenauer <marcel@cpan.org>"
+   ],
+   "license" : "perl",
+   "build_requires" : {},
+   "provides" : {
+      "YAML::Active::Plugin" : {
+         "version" : "1.100810",
+         "file" : "lib/YAML/Active/Plugin.pm"
+      },
+      "YAML::Active::Shuffle" : {
+         "version" : "1.100810",
+         "file" : "lib/YAML/Active.pm"
+      },
+      "YAML::Active::Eval" : {
+         "version" : "1.100810",
+         "file" : "lib/YAML/Active.pm"
+      },
+      "YAML::Active::Include" : {
+         "version" : "1.100810",
+         "file" : "lib/YAML/Active.pm"
+      },
+      "YAML::Active::ValueMutator" : {
+         "version" : "1.100810",
+         "file" : "lib/YAML/Active.pm"
+      },
+      "YAML::Active::uc" : {
+         "version" : "1.100810",
+         "file" : "lib/YAML/Active.pm"
+      },
+      "YAML::Active::Plugin::Array" : {
+         "version" : "1.100810",
+         "file" : "lib/YAML/Active/Plugin/Array.pm"
+      },
+      "YAML::Active::Print" : {
+         "version" : "1.100810",
+         "file" : "lib/YAML/Active.pm"
+      },
+      "YAML::Active" : {
+         "version" : "1.100810",
+         "file" : "lib/YAML/Active.pm"
+      },
+      "YAML::Active::Concat" : {
+         "version" : "1.100810",
+         "file" : "lib/YAML/Active.pm"
+      },
+      "YAML::Active::lc" : {
+         "version" : "1.100810",
+         "file" : "lib/YAML/Active.pm"
+      },
+      "YAML::Active::Plugin::Hash" : {
+         "version" : "1.100810",
+         "file" : "lib/YAML/Active/Plugin/Hash.pm"
+      }
+   },
+   "requires" : {
+      "Class::Accessor::Complex" : "0",
+      "Scalar::Util" : "0",
+      "English" : "0",
+      "constant" : "0",
+      "Exporter" : "0",
+      "YAML::XS" : "0",
+      "Carp" : "0",
+      "Test::More" : "0.88",
+      "perl" : "5.008",
+      "File::Find" : "0",
+      "File::Temp" : "0"
+   },
+   "abstract" : "Combine data and logic in YAML",
+   "configure_requires" : {
+      "ExtUtils::MakeMaker" : "6.11"
+   }
+}
+

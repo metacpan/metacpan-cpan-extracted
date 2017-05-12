@@ -1,0 +1,93 @@
+NAME
+    YUI::MenuBar::Markup - Generate YUI markup menus
+
+DESCRIPTION
+    YUI::MenuBar::Markup will help you create your YUI menus by using markup
+    (html).
+
+    It offers a very light interface to create your modules from any kind of
+    data, like *perl raw* (hashes) to even YAML.
+
+    There are no plans in giving support for creating YUI menus by
+    javascript data. Even, the html genearated doesn't allow modifications
+    such as changing the CSS class name of the items.
+
+    Please note that the string returned by generated() is the pure
+    javascript to start the menubar and the HTML of the menubar. It's your
+    responsibility to include the CSS and JS files. You can use YUI::Loader
+    for this.
+
+SYNOPSYS
+        use strict;
+        use warnings;
+        use YUI::MenuBar::Markup;
+        use YUI::MenuBar::Markup::YAML;
+
+        my $markup_yaml = YUI::MenuBar::Markup::YAML->new(
+                filename => 'examples/menu_yaml.yaml');
+        my $markup = YUI::MenuBar::Markup->new(
+                source_ref => $markup_yaml);
+        print $markup->generate();
+
+Attributes
+    source_class
+        If you have your own class (or module) for getting the data of the
+        menu please use this attribute. It should be the module name
+        (*Foo::Bar*) and have the module should have a *new()* method.
+
+        If your module doesn't have anything of the above please take a look
+        to source_ref.
+
+    source_ref
+        Similar to source_class but it should be the reference (eg, the
+        object) to the source.
+
+        The class contained in this refernece should have a method named
+        get_source and should return an array of hashes to be used for
+        building the menu.
+
+    data
+        The data that will be used for building the menu, should be an array
+        of hashes where
+
+    top_id
+        The menubar is made of lists (ul, li) and all these lists are
+        contained in a div element. By default the div element ID is
+        automatically generated (with a random number). In case you want to
+        use a different ID just set the value of this attribute to *that*.
+
+    autosubmenu
+        When the cursor is over a menu that has a submenu, then the submenu
+        will be displayed automatically without clicking on it.
+
+        This is turned on by default.
+
+    delay
+        Indicates the time (milliseconds) that should expire before a menu
+        is hidden.
+
+        In YUI this is known as the *hidedelay*.
+
+    lazy
+        Modifies the lazyload parameter of the YUI menubar to improve the
+        performance of the menubar by deferring the initialization and
+        rendering of submenus until the first time they are made visible.
+
+Methods
+  generate()
+    Builds the HTML and javascript caller for the menu and returns it as a
+    string
+
+SEE ALSO
+    * YUI Menu documentation: http://developer.yahoo.com/yui/menu
+    * YUI::Loader
+
+AUTHOR
+    Pablo Fischer (pablo@pablo.com.mx).
+
+COPYRIGHT
+    Copyright (C) 2010 by Pablo Fischer.
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

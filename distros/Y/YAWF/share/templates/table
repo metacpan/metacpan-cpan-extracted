@@ -1,0 +1,39 @@
+[% PROCESS common %]
+
+[% BLOCK table %]
+<table border=1><caption>[% title %]</caption>[% content %]</table>
+[% END %]
+
+[% BLOCK table_head;
+global.last_table_width = cols.size %]<tr>
+[% FOREACH col IN cols %]
+<td>[% col %]</td>
+[% END %]
+</tr>[% END %]
+
+[% BLOCK table_row %]<tr[% IF id; ' id="'; id; '"'; END; id=''; %]>[% content %]</tr>[% END %]
+
+[% BLOCK table_col %]<td
+[% prefix = '';
+suffix = '';
+
+IF link;
+	prefix = "$prefix<a href=\"$link&SID=$yawf.session.id\">";
+	suffix = "$suffix</a>";
+END %]
+[% IF type == 'money' %]
+align=right>&euro; [% prefix; content || '0.00' %]
+[% ELSIF type == 'number' %]
+align=right>[% prefix; content || '0' %]
+[% ELSIF type == 'bit' %]
+align=center>[% IF content %]Ja[% ELSE %]Nein[% END %]
+[% ELSE %]
+>[% prefix; content %]
+[% END;
+suffix %]</td>[% END %]
+
+[% BLOCK table_new;
+	WRAPPER table_row %]
+<td colspan="[% global.last_table_width || 1 %]"><a href="[% link %]&SID=[% yawf.session.id %]">[% content || "Neu..." %]</a></td>
+[%	END;
+END %]

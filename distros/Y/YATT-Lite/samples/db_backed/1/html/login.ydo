@@ -1,0 +1,26 @@
+use strict;
+my $i = 0;
+my $compiled_at = scalar localtime time;
+
+sub {
+  my ($this, $con) = @_;
+
+  my $login = $con->param_type
+    ('login', qr{^\w{4,12}$ }x
+     , 'Login name is alphabet + number only, length 4 to 12');
+
+  my $pass1 = $con->param('password')
+    or die "Password is empty";
+
+  if (my $err = $this->YATT->has_auth_failure($login, $pass1)) {
+    die $err;
+  }
+
+  $this->entity_set_logged_in($login);
+
+  if (my $url = $con->param('nx') || $con->referer) {
+    $con->redirect($url);
+  } else {
+    print $con "OK(".$i++."; $compiled_at)\n";
+  }
+};

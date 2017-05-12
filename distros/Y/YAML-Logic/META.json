@@ -1,0 +1,49 @@
+{
+   "abstract" : "Simple boolean logic in YAML",
+   "author" : [
+      "Mike Schilli <cpan@perlmeister.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.142690",
+   "license" : [
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "YAML-Logic",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Log::Log4perl" : "1",
+            "Safe" : "2.11",
+            "Template" : "2.15",
+            "YAML::Syck" : "0.97"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "url" : "http://github.com/mschilli/yaml-logic-perl"
+      }
+   },
+   "version" : "0.07"
+}

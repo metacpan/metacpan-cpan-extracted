@@ -1,0 +1,15 @@
+<h2>&yatt:CON:mkurl();</h2>
+
+<yatt:my env:value="&yatt:CON:cget(env);"/>
+<table>
+<yatt:foreach my="nm" list="sort keys %$env">
+<tr>
+  <th align="left">&yatt:nm;</th>
+  <td>&yatt:env{:nm};</td>
+</tr>
+</yatt:foreach>
+</table>
+
+
+
+

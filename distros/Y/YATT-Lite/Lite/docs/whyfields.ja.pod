@@ -1,0 +1,416 @@
+# -*- coding: utf-8 -*-
+
+=encoding utf-8
+
+=head1 NAME
+
+whyfields(ja) -- or Modern use of fields.pm and %FIELDS.
+
+=head1 DESCRIPTION
+
+L<Modern Perl|http://modernperlbooks.com/books/modern_perl/>
+では、 perl で OOP 開発をする場合には L<Moose|Moose::Manual> を使うよう
+L<勧めて|http://modernperlbooks.com/books/modern_perl/chapter_07.html>
+います。ですが、
+L<yatt_lite|YATT::Lite::docs::readme> は懐かしの L<fields> を活用して書かれています。
+ここでそのこだわりの理由を解説します。
+
+(なお、ここでは読み易さのために
+perl5.14 以後の C<package Name {...}> 構文を用います。古い perl で
+試す場合は C<{package Name; ...}> へと書き換えて下さい)
+
+
+=head1 fields.pm -- old story.
+
+L<fields> は、 C<use strict> のスペルミス検査を
+オブジェクトメンバーへの参照/代入にも適用可能にするためのものです。
+
+    use strict;
+    use 5.014; # For "package Name {block} syntax"
+    package Cat {
+       use fields qw/name birth_year/; # メンバー宣言
+       sub new {
+          my Cat $self = fields::new(shift); # 型注記付き my
+          $self->{name}       = shift; # Checked!
+          $self->{birth_year} = shift  # Checked!
+             // $self->_this_year;
+          $self;
+       }
+       sub age {
+          my Cat $self = shift;
+          return $self->_this_year
+                    - $self->{birth_year}; # Checked!
+       }
+       sub _this_year {
+          (localtime)[5] + 1900;
+       }
+    };
+
+    my @cats = map {Cat->new($_, 2010)} qw/Tuxie Petunia Daisy/;
+
+    foreach my Cat $cat (@cats) {
+       print $cat->{name}, ": ", $cat->age, "\n";
+       # print $cat->{namae}, "\n"; # コンパイルエラー!
+    }
+
+このプログラムではクラス C<Cat> にメンバー C<{name}> , C<{birth_year}> を宣言しています。
+ですので、 Cat を格納すると注記した変数 C<$self>, C<$cat>
+でメンバー名を間違えても、 B<コンパイル時に> エラーを検出することが出来ます。
+(unit test を書くまでもなく、です。もし vim の perl mode や
+yatt-lint-any-mode のような、
+B<< ファイル保存と同時に C<perl -wc> 検査 >> を行う仕組を使っていれば、
+間違いに即座に気付けるでしょう)
+
+=head2 Why most people do not use fields.pm?
+
+C<use strict> の重要性は perl コミュニティに広く知れ渡っています。
+なら fields の利用も広がってよさそうなのに、なぜ滅多に使われないのでしょう?
+
+それには幾つかの理由が考えられます。
+
+=over 4
+
+=item クラス名が長くなると、型注記を何度も書くのが辛くなる
+
+上記の例の C<Cat> 程度の長さならともかく、
+普通のクラス名は C<MyProject::SomeModule::SomeClass> のように長くなります。
+
+   my MyProject::SomeModule::SomeClass $obj = ...;
+
+とは、普通の perl プログラマーは書きたくないでしょう。時々見掛けるスタイルとして
+
+  my __PACKAGE__ $obj = ...;
+
+という書き方もありますが、依然として長過ぎます。
+
+=item アクセサやコンストラクタを自動作成してくれない
+
+オブジェクトのユーザにメンバー変数を直接参照/代入させることは、
+そもそも OOP のカプセル化の思想に逆行しています。ですから、
+結局ユーザ向けに(なんらかの手段で)アクセサを作らねばなりません。
+コンストラクタも同様です。
+
+つまり、 fields を宣言しただけでは十分に使いやすいクラスにならないため、
+結局 L<Class::Accessor> などを使う羽目になるのです。
+それなら最初からアクセサ作成用のモジュールだけ使おう、
+と考えるのは自然なことでしょう。
+
+=item 単一継承に縛られる
+
+fields が perl に導入されたのは perl5.005 に遡ります。
+当時はメモリー効率のため、 HASH の代わりに ARRAY ベースのオブジェクトが
+用いられました。メンバーは ARRAY 上のオフセットとして表現されました。
+このため、多重継承は禁止とされました。
+
+その後、 perl5.009 で C<fields::new> が本物の HASH を返すようになった後も、
+多重継承を禁止する仕様が (互換性維持のため) 残ってしまいました。
+
+=back
+
+=head1 A few tips you should know about fields.
+
+なら L<Moose> や L<Mouse> 使う、が結論でいいじゃない? と思う人も多いでしょう。
+でも、それは C<use strict> 検査を一つ諦めることに他なりません。
+メンバーアクセスの度に sub を呼ぶので速度も遅くなります。
+(perl の sub 呼び出しは、それなりに重い操作です)
+私から見れば、それは
+B<perl の強みを捨てて ruby や python の真似をする道>
+に見えます。外野から見れば、なら最初から ruby や python 使えば?
+と思ってしまうのではないでしょうか?
+
+ここでもう少し、 C<fields> と C<strict> の組合せの可能性を見直して頂くため、
+あまり知られていない事実を紹介します。
+
+=head2 C<fields> works even for unblessed HASH!
+
+fields と型注記によるメンバー名検査はコンパイル時に行われるため、
+実行時にその変数に何が入っているかは、実は無関係です。これはつまり、
+bless していない HASH にすらスペル検査を適用可能であることを意味します。
+以下は L<PSGI> の C<$env> を静的検査する例です。
+( C<YATT::Lite::PSGIEnv> の短縮版です)
+
+   use strict;
+   use 5.012;
+   {
+      package Env;
+      use fields qw/REQUEST_METHOD psgi.version/; # and so on...
+   };
+
+   return sub {
+      (my Env $env) = @_;
+      given ($env->{REQUEST_METHOD}) { # Checked!
+         when ("GET") {
+           return [200, header(), ["You used 'GET'"]];
+         }
+         when ("POST") {
+           return [200, header(), ["You used 'POST'"]];
+         }
+         default {
+           return [200, header()
+                  , ["Unsupported method $_\n", "psgi.version="
+                     , join(" ", $env->{'psgi.version'})]]; # Checked too!
+         }
+      }
+   };
+
+   sub header {
+      ["Content-type", "text/plain"]
+   }
+
+=head2 constant sub can be used for C<my TYPE> slot.
+X<TYPENAME-alias>
+
+実は型注記の箇所にはフルスペルのクラス名以外に、定数関数を書くことが出来ます。
+(参考: L<aliased>)
+
+ですので、
+
+   my MyProject::SomeModule::Purchase $obj = ...;
+
+は
+
+   sub Purchase () {'MyProject::SomeModule::Purchase'}
+
+   ...
+
+   my Purchase $obj = ...;
+
+と書き直すことが出来ます。
+この程度のキータイプ量なら、我慢できる人も増えるのではないでしょうか?
+
+また副次的なメリットとして、コンストラクタ呼び出し時のクラス名も短く出来る上に、
+サブクラス側でオーバライドすることも可能になります。
+
+     ...
+     # Subclass can override ->Purchase().
+     my Purchase $obj = $self->Purchase->new(...);
+     ...
+
+=head2 values of C<%FIELDS> can be anything now.
+
+L<fields> は C<%FIELDS> の抽象化APIです。
+perl の内部的には、コンパイル時検査はパッケージごとの
+C<%PKG::FIELDS> 変数を用いて行われます。
+perlのコンパイラーは、 C<my PKG $var> のようにスカラー変数の宣言に型注記がついていた場合、
+定数をキーとする hash 要素参照 C<< $var->{myfield} >>
+や代入 C<< $var->{myfield} = ... >> の式を見付ける度に、
+そのキー C<myfield> がその時点での C<%PKG::FIELDS> に含まれるかどうか検査します。
+見付からない場合はエラーとしてコンパイルを中断します。
+
+ところで、 C<%FIELDS> の value 側はどう使われるのでしょう?
+実は、最近の perl 5.12, 5.14 では value には何が入っていても構わないようです。
+...ならば、ここにメンバーに関するメタ情報を含めるスタイルもあり得るのではないでしょうか?!
+
+
+=head1 (Proposed) Modern use of fields and strict.
+
+以上を踏まえて、あまり頑張らなくても strict のメリットを享受できる、
+fields 活用スタイルを提案します。
+
+=head2 Divide and conquer.
+
+まず始めに、外部と内部、クラスのユーザー側と、
+そのクラスの中身を定義する側とを分けて考えることにします。
+
+つまり、ユーザー側コードがオブジェクトの中身を直接参照/操作することは害が大きいですが、
+それと比べてクラス定義本体の中でアクセサ関数を使うメリットは、
+せいぜいフックやデフォルト値を持ちやすくなること程度です。
+むしろアクセサのスペルミスが実行時まで検出されないことのデメリットの方が
+大きいのではないでしょうか?
+
+   my $foo = new Foo(width => 8, height => 3);
+   $foo->{width} * $foo->{height};  # Evil!
+
+   package Foo {
+     use fields qw/width height/;
+     sub area {
+       my Foo $self = shift;
+       $self->{width} * $self->{height};  # No problem.
+     }
+   };
+
+
+ですので、 fields + strict の静的検査は、
+モジュール内部のコード品質を改善するための道具と割り切って使うことにしましょう。
+
+=head2 C<my MY $obj>
+X<MY> X<MY-alias>
+
+型注記用の L<型名 alias|/TYPENAME-alias>
+に、もっと短い名前を予め決めておくのはどうでしょう。
+例えば、 package 宣言の先頭で C<sub MY () {__PACKAGE__}>
+と書くことにすれば、以後のメソッド定義では
+C<my> に加えて C<MY> を書き加えるだけで
+strict 検査を効かせることが出来ます。
+
+  package MyApp::Model::Company::LongLongProductName {
+    sub MY () {__PACKAGE__};
+    use fields qw/price/;
+
+    sub add_price {
+      (my MY $self, my $val) = @_;
+      $self->{price} += $val;
+      $self
+    }
+  };
+
+勿論、短くて分かりやすい alias が他に思い付くならそれを用いれば良いのですが、
+良い名前を考えることはそれなりの負担です。
+ならば、基本の名前を決めておくのも悪くはないでしょう。
+既に C<my> を書くことに慣れ親しんだ C<use strict> ready なプログラマーなら、
+更に三文字を加えることにはすぐ慣れるはずです。
+
+=head2 C<configure>, C<cget> + hand-made accessors.
+
+ではクラスのユーザーに提供するアクセサとコンストラクタはどうするのか...
+ここでも一つの妥協を提案します。
+
+メンバー名を引数とする汎用のアクセサ(cget と configure)と、
+コンストラクタを持った短いクラスを定義し、
+単にそれを継承して使うのです。
+(ここでは L<"Perl/Tk"|Tk::options> や tcl/tk の widget の API をモデルにします)。
+
+
+   # ユーザ側コードゆえ、型注記なし
+   my $obj = Foo->new(width => 8, height => 3);
+
+   print $obj->cget('width') * $obj->cget('height');
+
+   $obj->configure(height => undef, width => 3);
+
+   print $obj->cget('width') * $obj->cget('height', 8); # default value
+
+=over 4
+
+=item * (この例では) public メンバと private メンバの区別のために、
+コンベンションとして、 public なメンバーには全て C<cf_...> で始まる名前を
+付けることにします。なお、これは必須ではありません。
+従来のアクセサ生成モジュールと併用したい場合にはプレフィックスを付けません。
+
+=item * write hook が必要な場合は C<configure_$name> を実装します。
+これは公開メンバ名に別名を持たせるためにも使えます。
+
+   sub configure_file {
+     (my Foo $foo, my $fn) = @_;
+     $foo->{cf_string} = read_file($fn);
+   }
+
+=item * ゲッターは頻度の高いものだけ、手で実装します。
+(もちろん、アクセサ生成モジュールを併用する手もありえます)
+
+   sub dbh {
+     (my Foo $foo) = @_;
+     $foo->{DBH} //= do {
+        DBI->connect($foo->{cf_user}, $foo->{cf_password}, ...);
+     };
+   }
+
+=item * デフォルト値の設定は new から呼ばれる hook を作ってそこで処理します。
+デフォルト値をオーバーライド可能にしたい場合は、そのためのメソッドを用意します。
+
+   sub after_new {
+     (my Foo $foo) = @_;
+     $foo->{cf_name}       //= "(A cat not yet named)";
+     $foo->{cf_birth_year} //= $foo->default_birth_year;
+   }
+   sub default_birth_year {
+     _this_year();
+   }
+
+=back
+
+以下はサンプルとなるベースクラスです。 yatt の L<YATT::Lite::Object>
+の短縮版です。
+
+
+    use strict;
+    use 5.009;
+    package MyProject::Object { sub MY () {__PACKAGE__}
+       use Carp;
+       use fields qw//; # Note. No fields could cause a problem.
+       sub new {
+         my MY $self = fields::new(shift);
+         $self->configure(@_) if @_;
+         $self->after_new;
+         $self
+       }
+       sub after_new {}
+
+       sub configure {
+          my MY $self = shift;
+          my (@task);
+          my $fields = _fields_hash($self);
+          my @params = @_ == 1 && ref $_[0] eq 'HASH' ? %{$_[0]} : @_;
+          while (my ($name, $value) = splice @params, 0, 2) {
+            unless (defined $name) {
+              croak "Undefined key for configure";
+            }
+            if (my $sub = $self->can("configure_$name")) {
+              push @task, [$sub, $value];
+            } elsif (not exists $fields->{"cf_$name"}) {
+              confess "Unknown configure key: $name";
+            } else {
+              $self->{"cf_$name"} = $value;
+            }
+          }
+          $$_[0]->($self, $$_[1]) for @task;
+          $self;
+       }
+
+       sub cget {
+          (my MY $self, my $name, my $default) = @_;
+          my $fields = _fields_hash($self);
+          unless (not exists $fields->{"cf_$name"}) {
+              confess "Unknown configure key: $name";
+          }
+          $self->{"cf_$name"} // $default;
+       }
+
+       sub _fields_hash {
+         my ($obj) = @_;
+	 my $symtab = *{_globref($obj, '')}{HASH};
+	 return undef unless $symtab->{FIELDS};
+         my $sym = _globref($obj, 'FIELDS');
+         *{$sym}{HASH};
+       }
+       sub _globref {
+         my ($thing, $name) = @_;
+         my $class = ref $thing || $thing;
+         no strict 'refs';
+         \*{join("::", $class, defined $name ? $name : ())};
+       }
+    };
+    1;
+
+
+これを継承したクラスの例です。
+
+    package MyProject::Product; sub MY () {__PACKAGE__}
+    use base qw/MyProject::Object/;
+    use fields qw/
+                  cf_name
+                  cf_price
+               /;
+
+    1;
+
+=head2 XXX: fields for scripts (rather than modules)
+
+fields をコマンド行オプションに活用する手もあります。
+
+=head1 XXX: More radical use of C<fields> and C<%FIELDS>
+
+=head2 XXX: Write your own type builder.
+
+XXX: C<YATT::Lite::Types> の解説：
+モジュールの内部で使う、細かいレコード用のクラスのために
+一々 F<*.pm> を作るのは徒労感が激しい。データ構造を渡せば
+一群のクラスを生成して fields を定義してくれる、そんなモジュールを作っておけば便利。
+
+=head2 XXX: Direct use of C<%FIELDS>.
+
+XXX: C<YATT::Lite::MFields> の技法の解説
+
+=head2 XXX: B<Partial> instead of B<Role>.
+
+XXX: C<YATT::Lite::Partial> の技法の解説

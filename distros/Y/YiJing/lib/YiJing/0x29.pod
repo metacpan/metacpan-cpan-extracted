@@ -1,0 +1,85 @@
+=encoding utf8
+
+=head1 NAME
+
+YiJing::0x29 - Yi\ (Winnage)
+
+=head1 DESCRIPTION
+
+"Submit it, compile it, run it, ship it!  You can fix any bugs later."
+
+=head2 Judgment
+
+    益：利有攸往，利涉大川。
+
+# XXX
+
+=head2 Interpretation
+
+    彖曰。益。損上益下。民說無疆。自上下下。其道大光。利有攸往。中正有慶。
+	  利涉大川。木道乃行。益動而巽。日進無疆。天施地生。其益無方。
+	  凡益之道。與時偕行。
+
+# XXX
+
+=head2 Image
+
+    象曰。風雷。益。君子以見善則遷。有過則改。
+
+With Data and Passion
+you are on the way to Winnage.
+Wise hackers are glad to implement good features,
+and fix uncovered bugs.
+
+=head2 Lines
+
+# XXX
+
+=over 4
+
+=item *
+
+    初九。利用為大作。元吉。無咎。
+    象曰。元吉無咎。下不厚事也。
+
+Absolute success, starting now
+
+=item *
+
+    六二。或益之。十朋之龜弗克違。永貞吉。王用享于帝。吉。
+    象曰。或益之。自外來也。
+
+Bonus earned.
+
+=item *
+
+    六三。益之用凶事。無咎。有孚中行。告公用圭。
+    象曰。益用凶事。固有之也。
+
+Disastrous bug, impressive fix.
+
+=item *
+
+    六四。中行。告公從。利用為依遷國。
+    象曰。告公從。以益志也。
+
+Worthwhile interruption.
+
+=item *
+
+    九五。有孚惠心。勿問元吉。有孚惠我德。
+    象曰。有孚惠心。勿問之矣。惠我德。大得志也。
+
+Unspoken trust.
+
+=item *
+
+    上九。莫益之。或擊之。立心勿恆。凶。
+    象曰。莫益之。偏辭也。或擊之。自外來也。
+
+Hazardous unpopularity.
+
+=back
+
+=cut
+

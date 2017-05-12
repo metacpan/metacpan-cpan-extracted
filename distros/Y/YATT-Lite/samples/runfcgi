@@ -1,0 +1,33 @@
+#!/usr/bin/perl
+use strict;
+use warnings qw(FATAL all NONFATAL misc);
+use sigtrap die => qw(normal-signals);
+
+use FCGI;
+
+use FindBin;
+use lib "$FindBin::Bin/lib";
+use YATT::Lite::WebMVC0::SiteApp -as_base;
+
+chdir($FindBin::Bin) or die "Can't chdir to $FindBin::Bin: $!";
+
+my $sockfile = "$FindBin::Bin/var/tmp/fcgi.sock";
+my $appname = 'app.psgi';
+
+if (-e "$0.debug" || $ENV{DEBUG_YATT_PSGI}) {
+  require Plack::Runner;;
+  my @default = (qw(-s FCGI)
+		 , '--listen' => $sockfile
+		 , qw(--keep-stderr 1
+		      --nproc 0));
+  my $runner = Plack::Runner->new;
+  $runner->parse_options(@default, @ARGV, $appname);
+  $runner->run;
+} else {
+  MY->find_load_factory_script
+    ->runas_fcgi(\*STDOUT
+		 , \%ENV, \@ARGV
+		 , isolate_stderr => 1
+		 , listen => $sockfile
+		 , progname => MY->rel2abs(__FILE__));
+}

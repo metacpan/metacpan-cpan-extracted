@@ -1,0 +1,5 @@
+tmpl_encoding: utf8
+output_encoding: utf8
+namespace[
+- 漢字
+]

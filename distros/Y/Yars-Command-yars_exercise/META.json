@@ -1,0 +1,82 @@
+{
+   "abstract" : "Exercise a Yars server from the client side",
+   "author" : [
+      "Graham Ollis <plicease@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Yars-Command-yars_exercise",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "perl" : "5.010"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "File::Spec" : "0",
+            "FindBin" : "0",
+            "Test::CPAN::Changes" : "0",
+            "Test::EOL" : "0",
+            "Test::Fixme" : "0.07",
+            "Test::More" : "0.94",
+            "Test::NoTabs" : "0",
+            "Test::Pod" : "0",
+            "Test::Pod::Coverage" : "0",
+            "Test::Pod::Spelling::CommonMistakes" : "0",
+            "Test::Spelling" : "0",
+            "Test::Strict" : "0",
+            "YAML" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Clustericious" : "1.20",
+            "Log::Log4perl" : "0",
+            "Number::Bytes::Human" : "0.09",
+            "Parallel::ForkManager" : "0",
+            "Path::Tiny" : "0",
+            "Pod::Usage::CommandLine" : "0.04",
+            "YAML::XS" : "0",
+            "Yars::Client" : "0",
+            "perl" : "5.010"
+         }
+      },
+      "test" : {
+         "recommends" : {
+            "EV" : "0"
+         },
+         "requires" : {
+            "AnyEvent" : "0",
+            "AnyEvent::Open3::Simple" : "0.83",
+            "EV" : "0",
+            "Test::Clustericious::Cluster" : "0.31",
+            "Test::More" : "0.94",
+            "perl" : "5.010"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/clustericious/Yars-Command-yars_exercise/issues"
+      },
+      "homepage" : "https://metacpan.org/pod/Yars::Command::yars_exercise",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/clustericious/Yars-Command-yars_exercise.git",
+         "web" : "https://github.com/clustericious/Yars-Command-yars_exercise"
+      }
+   },
+   "version" : "0.07",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0225"
+}
+

@@ -1,0 +1,57 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+use 5.010;
+use Yars::Command::yars_fast_balance;
+
+Yars::Command::yars_fast_balance->main(@ARGV);
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+yars_fast_balance - Fix all files
+
+=head1 VERSION
+
+version 1.27
+
+=head1 SYNOPSIS
+
+ % yars_fast_balance
+ % yars_fast_balance --info
+
+=head1 DESCRIPTION
+
+Attempt to fix all files on this server.
+
+Don't run this unless all disks and servers are fully operational.
+
+If they are not, then failures will be expensive, and things won't get 
+balanced.
+
+=head1 AUTHOR
+
+Original author: Marty Brandon
+
+Current maintainer: Graham Ollis E<lt>plicease@cpan.orgE<gt>
+
+Contributors:
+
+Brian Duggan
+
+Curt Tilmes
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2013 by NASA GSFC.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

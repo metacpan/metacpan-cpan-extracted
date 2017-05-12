@@ -1,0 +1,11 @@
+<!yatt:args foo=value>
+<yatt:given "&yatt:foo;">
+<:yatt:when "undef"/>
+Oh no!
+<:yatt:when "1"/>
+One!
+<:yatt:when "[2..9]"/>
+Single(&yatt:foo;).
+<:yatt:default/>
+Other(&yatt:foo;).
+</yatt:given>

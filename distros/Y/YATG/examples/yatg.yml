@@ -1,0 +1,32 @@
+---
+yatg:
+    oids:
+        "sysUpTime":            [memcached]
+        "cpmCPUTotal5minRev":   [stdout]
+        "ifHCInOctets":         [ifindex, rpc]
+        "ifHCOutOctets":        [ifindex, rpc]
+        "ifInErrors":           [ifindex, memcached, diff]
+        "ifOutErrors":          [ifindex, memcached, diff]
+        "ifAdminStatus":        [ifindex, memcached]
+        "ifOperStatus":         [ifindex, memcached, nsca]
+        "ifAlias":              [ifindex, memcached, nsca]
+        "dot1dStpPortState":    [ifindex, disk, "192.2.1.10", "!192.1.1.0/24"]
+    communities: [public, anotherone]
+    dbi_connect:
+        - "dbi:Pg:dbname=netdisco"
+        - netdisco
+        - "MYPASSWORD"
+    graph_generator: "http://my.web-server.com/cgi-bin/yatggraph.cgi"
+    homepage: "/netdisco"
+cache_memcached:
+    servers: ["my.storage-server.example.com:11211"]
+rpc_serialized_client_inet:
+    io_socket_inet:
+        PeerAddr: "my.storage-server.example.com"
+        PeerPort: 1558
+        Proto:    tcp
+        Timeout:  3
+nsca:
+    nsca_server: 127.0.0.1
+    ignore_descr: '(?i-xsm:\[DNM\]|DRAX|Meter|SPAN|CCTV)'
+

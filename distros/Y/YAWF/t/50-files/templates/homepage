@@ -1,0 +1,5 @@
+(testdata=[% testdata %])
+(domain=[% yawf.config.domain %])
+(footab=[% footab.id %]:[% footab.bartext %])
+[%+ FOREACH foo IN foolist %](foolist[[% foo.id %]]=[% foo.bartext %])
+[%+ END %]

@@ -1,0 +1,15 @@
+Yahoo::Music::Ratings - A method for retrieving a Yahoo! Music members
+song ratings.
+
+
+This module provides a way to retrieve a user’s list of song ratings
+from Yahoo!’s Music service, including the LaunchCast and Unliminted
+services.
+
+As Yahoo! do not provide an offical feed for a member to download their
+ratings, the methods used within this module are subject to change and
+simply may not work tomorrow. However at the time of writing this
+README i would suspect the methods used should be stable for atleast a
+few days :)
+
+Please perdoc Yahoo::Music::Ratings for full documentation.

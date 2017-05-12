@@ -1,0 +1,7 @@
+<!yatt:args x y>
+<h2><yatt:hello/> &yatt:x; world!</h2>
+&yatt:y;
+
+
+<!yatt:widget hello>
+Hello

@@ -1,0 +1,21 @@
+<!yatt:args>
+<yatt:envelope>
+  <:yatt:title>Hello world!</:yatt:title>
+
+  <h2>Hello!</h2>
+
+</yatt:envelope>
+
+
+<!yatt:widget envelope title="html?" head="html?">
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>&yatt:title;</title>
+    &yatt:head;
+  </head>
+  <body>
+    <yatt:body/>
+  </body>
+</html>

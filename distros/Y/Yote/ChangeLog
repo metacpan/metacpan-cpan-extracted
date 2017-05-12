@@ -1,0 +1,360 @@
+2016-12-19 eric wolf  <coyocanid@gmail.com>
+	* Version 1.45
+	* added Yote::ObjStore::compress_store method
+	
+2016-11-20 eric wolf  <coyocanid@gmail.com>
+	* Version 1.43
+	* fixed stupid weak major subtle reference bug. was referencing weakly references rather than thingies in some cases.
+
+2016-10-30 eric wolf  <coyocanid@gmail.com>
+	* Version 1.42
+	* added _DUMP and _DUMP_ALL methods for Yote::Obj
+
+2016-09-01 eric wolf  <coyocanid@gmail.com>
+	* Version 1.41
+	* fixed out of order bug in loading/initializing objects that could lead into recursion loop
+	
+2016-05-11  eric wolf   <coyocanid@gmail.com>
+
+	* Version 1.39 (woo, not been keeping up with the updates, sorry folks)
+	* Just minor improvements and speed fixes.
+	* Removed VERSION from all subpackages
+
+2015-11-02 Eric Wolf  <coyocanid@gmail.com>
+	* Version 1.01
+	* Yote::ObjStore::fetch fixed bug where it would barf for instantiating subpackages of a file
+	* args are preserved in the Yote::ObjStore
+	
+2015-09-30 Eric Wolf  <coyocanid@gmail.com>
+	* Version 1.0
+	* Reduces complexity of Yote, bringing the core into a simple file.
+	* Keeps Yote::IO as a sub-package. The core depends on it.
+	* Removes the webserver part of it. That will be its own project.
+
+	
+2015-05-26 Eric Wolf  <coyocanid@gmail.com>
+	* Version 0.309
+	* Override equality and inequality operations for Yote::Obj instances. They are equal if they have the same id
+	
+2015-04-07 Eric Wolf  <coyocanid@gmail.com>
+	* Version 0.307
+	* Yote now has its own backend for the object store. Pure perl solution. No longer supports mysql or mongo for simplicity.
+	* fixed bug in templates : the body was not being parsed correctly for templates. Still have to test this on browsers other than chrome and firefox
+	
+2014-03-06  Eric Wolf  <coyocanid@gmail.com>
+
+	* Version 0.2
+	* Finally a dot release increment.
+	* The client side templating system is complete, though more debugging is certainly needed.
+	* The next huge thing to do is to write the documents.
+	* Fixed bug in sqlite where queries were too big
+	* updated hash template to include a before and after list part.
+
+2014-02-26  Eric Wolf  <coyocanid@gmail.com>
+
+	* Version 0.1023
+	* fixed bug in mongo db list_insert
+	* updated tests
+	* added sort example to templte testy.html page
+	* implemented reverse is wrapped list sort
+
+2014-02-17  Eric Wolf  <coyocanid@gmail.com>
+
+	* Version 0.1022
+	* added wrap_list method to javascript yote object. This returns an object that paginates a wholly loaded list.
+	* refactored button_actions to create and return a manager object.
+	* added allowable return headers for javascript.
+	* changed requests from GET to POST due to size of request reasons.
+	* fixed bug where request sockets were not being handled properly.
+	* added search and sort to template pagination via a list wrapper object (from yote obj)
+
+2014-02-07  Eric Wolf  <coyocanid@gmail.com>
+
+	* Version 0.1021
+	* fixed bug in edit field
+
+2014-01-14  Eric Wolf  <coyocanid@gmail.com>
+
+	* Version 0.1020
+	* reset password link activation also validates email
+	* fixed bug in client side pagination
+	* after_new_fun javascript function also takes data hash as an argument.
+	* new element designation in columns : ~ indicates just html to follow
+	* $$ item..the item in question
+	* new client server side templating
+
+2014-01-06  Eric Wolf  <coyocanid@gmail.com>
+
+	* Version 0.1019
+	* Mongo db tries 3 reconnects if it errors out connecting to mongo
+	* wrap cron actions in eval so it doesn't crash the server.
+	* added $.yote.util.refresh_ui function
+	* added _account_handles in Yote::AppRoot
+	* fixed bug in Yote::UserObj permissions.
+
+2014-01-02  Eric Wolf  <coyocanid@gmail.com>
+
+	* Version 0.1018
+	* fixed bug in yote_panel refresh
+
+	* Version 0.1017
+	* added Yote::Account::new_user_obj
+	* added new_object_type and new_requires to yote.util.js control_table method for controlling access to creating new objecs and specifying which object types those are.
+
+2013-12-27  Eric Wolf  <coyocanid@gmail.com>
+	* Version 0.1016
+	* count and paginate will return appropriate things by ObjProvider if they are operating on an empty field
+	* fixed a bug in mongo where the paginate was incorrect for hashed things
+
+2013-12-26  Eric Wolf  <coyocanid@gmail.com>
+
+	* Version 0.1015
+	* updated tests
+
+2013-12-13  Eric Wolf  <coyocanid@gmail.com>
+
+	* updated _check_root to just change the handle and password of the existing master account rather than created a new one
+	* javascript create_login changed to be called on the app, and also removed defunct register_login method (called from javascript).
+	* removed EMAIL and HANDLE cache vars from Yote::YoteRoot. These were buggy, given the threaded nature of Yote. This also revealed a bug in the hash function of mongo db. It was not escaping the periods in the keys properly.
+	* added a Yote::SimpleTemplate class with a _fill method
+	* $.yote.util.template_edit to edit templates
+	* added mail configuration options
+	* account can be created on mail now
+	* added mutexes in YoteRoot. These are just empty yote objects with their _lock and _unlock called at appropriate times.
+	* updated tests
+	* removed create_login and remove_login from yote.js
+	* new requires_validation field for Apps. If true, a validation must be given for account to work.
+	* validation logic
+	* recover password base logic
+
+
+2013-12-05  Eric Wolf  <coyocanid@gamil.com>
+
+	* VERSION 0.1014
+	* Changes to the javascript widgets. Added the ability for yote javascript to look for control_table and yote_panel classed items and produce a control table or yote panel in that control. A yote panel is an editable panel, but has the property that it can be in an edit mode for root but display mode otherwise.
+
+2013-11-27  Eric Wolf  <coyocanid@gmail.com>
+	* VERSION 0.1012
+	* removed Yote::Util::Counter. It doesn't fit in with the new Yote, which needs less classes for more bang.
+	
+2013-11-27  Eric Wolf  <coyocanid@gmail.com>
+	* VERSION 0.1012
+	* $.yote.util.init_ui method has been created. This will cause divs to become control tables, with attributes that mirror control table init arguments. These arguments can take functions ( for example columns="!colfunction" ) or json objecs ( column_names="['Foo','Bar','Baz']" ). Should a column be a string proceded with a star, it will become editable ( like columns=['foo','*bar','baz'] ).
+
+	
+2013-11-20  Eric Wolf  <coyocanid@gmail.com>
+
+	* VESION 0.1011
+	* Object creation off of Yote::YoteRoot with the methods new_user_obj, new_obj and new_root_obj. It is hard to overstate how important the subtle changes in this update are, on the web facing side. The control_table widget is now much more powerful. Items can be created with it with arbitrary fields, provided permissions are ahdered to. This means, using entirely client side programming, objects can be defined and managed.
+
+2013-09-19  Eric Wolf  <coyocanid@gmail.com>
+
+	* VERSION 0.1009
+	* count now can take arguments to return a count for searches too.
+	* tests for different IO modules now share a common test routine.
+	* object-locking is drastically changed. I've removed any automatic locking. Locks must now be called explicitly in order to work. I made this decision when I realized that most of the calls that were being made resulted in no collision most of the time. I would have kept the safer but it impacted performance way too much.
+	* control_table - fixed some bugs in how the control table rendered hashes rather than lists.
+	* removed stray use Yote::SQLiteIO from Yote.pm
+	* unit_tests.html now up to date with the new paginate.
+	* Yote::Obj now more permissive in list and hash operations
+	* Yote::RootObj added. It requires root permissions for any list or hash operation
+	* Yote::YoteRoot new methods : new_obj, new_root_obj - returns new Yote::Obj and Yote::RootObj objects
+	* changed list and hash names/operations for Yote::Obj
+
+2013-09-17  Eric Wolf  <coyocanid@gmail.com>
+
+	* VERSION 0.1008
+	* added --profiling option. This is a bit experimental and assumes you have Aspect installed. There is a new program, bin/perf_reader to analyze the output generated by the profiling. The perf output is to STDERR and is controlled by Yote::PerfAspect. I have not made Aspect a requirement of Yote yet, as this is not a core functionality of the program.
+	* removed removed MongoDB requirements. This only applies if you want to use mongo, and the MongoDB installation is a pain in the neck. Am keeping the DBD::MySQL because it's not so big and bad.
+	* is_master_root method. The initial account ( and it should only be this account ) cannot have root unset from it. This is a safety. Should __master_root and __is_root become unset, they will be reset for this account anytime the server starts up	
+	* added CronEntry object for cron. Yote::Obj wasn't going to be enough - this must be editable.
+	* Yote::ObjProvider::LOCK_MODE this is a very significant update as it changes how object locking happens. This can have 3 modes : LOCK_ON_WRITE, LOCK_NEVER and LOCK_ALWAYS. Yote had been locking all object access between the threads. Now I'm setting the default to be LOCK_ON_WRITE, though LOCK_NEVER is tempting too. As of this writing, the default can't be changed. This will be addressed in upcoming versions. Maybe the style should be that explicitly calling lock object. Maybe I will make Yote::ObjProvider::fetch_locked.
+	* removed Yote::YoteRoot::is_root because that was based on a half baked idea.
+	* admin.html changing this around to be more admin like. Sadly this is not finished, but the checkin will continue.
+	* $.yote.util.check_edit( fld, checked_fun, unchecked_fun, extra_classes, on_edit_f ) - a new widget to make checkbox to control a boolean property of something.
+
+2013-07-28  Eric Wolf  <coyocanid@gmail.com>
+
+	* VERSION 0.1007
+	* added paginate, a catch all method for list and hash pagination. It allows for search and sort
+	* control_table major work. Works with new paginate, has settings for automatic search
+	* moved MongoIO, MysqlIO and SQLiteIO to IO subpackage
+	* yote_server has arguments to reset password and change configuration
+
+2013-07-25  Eric Wolf  <coyocanid@gmail.com>
+
+	* VERSION 0.1006
+	* fixed javascript bug where uploads were not being set properly for set_foo property calls.
+	* added YOTE_ROOT/lib directory, which is automatically in the classpath yote uses.
+	* min width for javascript util edit boxes
+	* fixed bug where fail and pass functions were not being called properly for property set calls.
+
+
+2013-07-24  Eric Wolf  <coyocanid@gmail.com>
+
+	* VERSION 0.1005
+	* update with documentation changes.
+	* fixed the yote_classpath_updater.pl
+	* fixed major bug in Yote::Obj that didn't mark new things as dirty
+
+2013-07-24  Eric Wolf  <coyocanid@gmail.com>
+
+	* Version 0.1004
+	* The update that really wasn't
+
+2013-07-15  Eric Wolf  <coyocanid@gmail.com>
+
+	* Version 0.1003
+	* Minor fix to Yote::MysqlIO - removed incorrect dependency
+
+2013-07-09  Eric Wolf  <coyocanid@gmail.com>
+
+	* Version 0.1002
+	* This version has a faster multi processing for processing processes than the previous version.
+
+2013-06-27  Eric Wolf  <coyocanid@gmail.com>
+
+	* cleaned up useage printout
+	* have the server try to retart if the port is not yet clear.
+
+2013-06-19  Eric Wolf  <coyocanid@gmail.com>
+
+	* VERSION 0.1000
+	* Major changes. There are now two types of processes running : server and process
+	* server processes field requests and either serve up web pages, or queue up requests for process processes to do. The server processes wait for the answer from the processing processes.
+	* configuration file updates to include number of processes of both types to create
+
+2013-06-12  Eric Wolf  <coyocanid@gmail.com>
+
+	* VERSION 0.0996
+	* added number of processes as a configuration value
+
+2013-06-09  wolf  <coyocanid@gmail.com>
+
+	* VERSION 0.0994
+	* paginate updates. Now have paginate_list and paginate_hash to be more clear.
+
+2013-06-03  Eric Wolf  <coyocanid@gmail.com>
+
+	* VERSION 0.0993
+	* Big changes under the hood.
+	* Deprecated and removed xpath stuff. May reimplement if people call for it.
+	* Minor UI fixes.
+
+2013-05-26  Eric Wolf  <coyocanid@gmail.com>
+
+	* VERSION 0.0992
+	* yote.util.js - control_table new entry can now have more than textbox; Rather than a fieldname, an object can be used
+	* server_docs.html - content update
+	* samples.html - minor content update
+	* index.html - changed chat box to textarea
+	* admin.html - changed new news entry to textarea
+	* Obj.pm - set_ now returns the value that was set to
+	* sqlite.t - updated test to check set_ return value
+
+2013-05-21  Eric Wolf  <coyo@gmail.com>
+
+	* yote.util.js update - the table tag is now optional, allowing the output to be a horizontal list, for example
+
+2013-05-21  wolf  <coyocanid@gmail.com>
+
+	* VERSION 0.0991
+	* split logging into io, error and access
+
+2013-05-19  Eric Wolf  <coyocanid@gmail.com>
+
+	* VERSION 0.0989
+	* fixed utf-8 encoding bug
+	* used perlcritic and followed some suggestions
+
+2013-05-14  Eric Wolf  <coyocanid@gmail.com>
+
+	* VERSION 0.0987
+	* fixed bug in storing sqlite file location
+
+2013-05-13  Eric Wolf  <coyocanid@gmail.com>
+
+	* VERSION 0.0986 ( had not CPAN'd this version yet )
+	* fixed serious webserver bug where query parameters were being misinterpreted.
+
+2013-05-11  Eric Wolf  <coyocanid@gmail.com>
+
+	* VERSION 0.0987
+	* fixed bug where http_referer was not being read correctly
+	* fixed bug in Yote.pm where the first time Yote was launched, it wouldn't start.
+	* moved SQLite data file to yote root directory in Yote.pm 
+
+2013-05-10  Eric Wolf  <coyocanid@gmail.com>
+
+	* VERSION 0.0985
+	* added is_root method to accounts.
+	* updated web pages
+	* email parameter now optional for account creation
+	* files are now read much faster ( this includes serving up the web pages )
+	* updated version of javascript files
+	* include author in html files
+
+2013-05-02  Eric Wolf  <coyocanid@gmail.com>
+
+	* VERSION 0.0982
+	* fixed javascript bug where disabled fields were not being reenabled after call.
+
+2013-05-01  Eric Wolf  <coyocanid@gmail.com>
+
+	* VERSION 0.0981
+	* first account created by user is no longer automatically root
+	* root account is part of the configuration, which saves a hashed password
+	* root account is created automatically and its password aligned with what is in the configuration file.
+	* sync_all is now attached to the Yote::Obj base class and is thus available to all
+	* encrypt_pass second argument is now a handle strong, not a Yote::Login object
+	* Server return header set to 'Yote'
+	* Serves rather than referrs index.html pages.
+
+2013-04-27  Eric Wolf  <coyocanid@gmail.com>
+
+	* VERSION 0.0980
+	* fixed a weird upload bug. The iframe was wrapping the return value in a pre tag which could not be interpreted as JSON
+	* added more documentation for the site
+	* added more POD
+	* dist build is now working nicely
+
+2013-04-13  Eric Wolf  <coyocanid@gmail.com>
+
+	* fixed _load bug where it was being called too early.
+	* upped version to 0.0974
+
+2013-04-11  Eric Wolf  <coyocanid@gmail.com>
+
+	* Big list of changes. Purged a lot of old crud.
+	* Paired down the library and removed the Net::Server:: family, replacing it with IO::Socket::INET
+	* Fixed big error where two close consecutive hits would crash the system
+	* Updated the web unit test to test for close consecutive hits
+
+2013-03-04  Eric Wolf  <coyocanid@gmail.com>
+
+	* added sync_all method to Account. It's a no op that refreshes all changed objects
+	* refresh improvements for clients. If client A acts, then client B acts and changes data that client A sees, client A will have that data refreshed on next contact with the server.
+	* removed _extra fetch_method from app root as there are simpler and better ways to have the targetted data returned.
+	* removed load_direct_descends  as there are simpler and better ways to have the targetted data returned.
+	* fixed bug where guest token as not being read by the server
+	* added 301 redirect for index.html when accessing directories with an index.html
+	* added logged_out_function parameter to javascript util's make_login_bar convenience function
+
+2013-02-26  Eric Wolf  <coyocanid@gmail.com>
+
+	* fixed a bug in the test : parameter order was wrong for paginate there.
+	* updated javascript method calls to make sync the default but permit async
+
+2013-02-26  Eric Wolf  <coyocanid@gmail.com>
+
+	* Added Mongo driver
+	* fixed a bug in 'forgot password' javascript
+
+2013-01-27  Eric Wolf  <coyocanid@gmail.com>
+
+	* CHANGELOG:
+	* Added 'use strict' and 'use warnings' to all perl modules.
+	* added 'equals' method for javascript objects
+	* fixed bug where the javascript library interprets a null return as an object rather than null value
+	* upped Yote version to 0.0971
+

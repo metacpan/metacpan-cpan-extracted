@@ -1,0 +1,24 @@
+This is the README file for Yahoo::CAS, to offer a simple interface for Yahoo! CAS open APIs. It's a simple API to do the segmentation. You just need to pass the content. It will return the terms after segment or the terms for the concept of the article.
+
+Please type "perldoc Yahoo::CAS" after installation to see
+the module usage information.
+
+* Installation
+
+Yahoo::Lifestyle uses the standard perl module install process:
+
+cpansign -v             # optional; see SIGNATURE for details
+perl Makefile.PL
+make                    # or 'nmake' on Win32
+make test
+make install
+
+* Copyright
+
+Copyright 2009 by Hsin-Chan Chien <hcchien@hcchien.org>.
+
+All rights reserved.  You can redistribute and/or modify
+this bundle under the same terms as Perl itself.
+
+See <http://www.perl.com/perl/misc/Artistic.html>.
+

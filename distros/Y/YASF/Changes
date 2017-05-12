@@ -1,0 +1,20 @@
+Revision history for Perl module YASF
+
+0.004 - 2016-12-14
+  - More tests, based on coverage analysis.
+  - Removed useless elsif and croak.
+  - No longer needs the English module.
+  - Added . and .= operators, and tests for them.
+  - Documented the . and .= operators.
+0.003 - 2016-12-09
+  - Add a local perlcritic file, and perlcritic testing.
+  - Fix some perlcritic issues.
+  - Rewrite of the "compiler" part. Now reports errors in the string. Also
+    allows code to run on 5.008 Perl.
+  - Change Perl requirement in dist.ini and t/*.t to 5.008.
+  - More documentation of key syntax.
+0.002 - 2016-12-05
+  - Change Perl min version for now
+  - Some dzil plugin adjustments
+0.001 - 2016-12-04
+  - Initial release

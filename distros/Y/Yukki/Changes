@@ -1,0 +1,184 @@
+0.140290  2014-01-29 08:28:15 America/Chicago
+
+    * Bugfix: Path::Router found a bug. I was validating a :page at one point,
+      but needed to be validating a :file. Fixed.
+    * Bugfix: [rt.cpan.org #90688] Correct problems related to changes to the
+      syntax of enums in new versions of Moose. Thanks to Upasana Shukla and
+      Zoffix Znet.
+    * Bugfix: [rt.cpan.org #90921] Correct problems related to the deprecation
+      of Class::MOP::load_class. Now using Class::Load::load_class. Thanks to
+      Upasana Shukla and Zoffix Znet.
+
+0.132160  2013-08-03 21:01:25 America/Chicago
+
+    * Bugfix: Test failure because of a naughty semi-colon.
+
+0.121790  2012-06-26 21:29:22 America/Chicago
+
+    * Bugfix: The spreadsheet plugin could get stuck in a loop if a variable in
+      a page referred to itself. This problem has been corrected.
+    * Bugfix: Entering a non-existent user resulted in an ugly YAML error.
+      (Patched by Michael Aquilina)
+    * Bugfix: Entering a non-existent user resulted in a double error message. 
+      (Patched by Michael Aquilina)
+
+0.121700  2012-06-17 23:43:56 America/Chicago
+
+    * Bugfix: Corrected the "Fork me on Github" banner, which was showing a
+      broken image link.
+    * Bugfix: # Titles containing colons no longer confuse the Yukki page
+      viewer. These should display properly now.
+    * Bugfix: The git-version.t test runs without requiring a git repository
+      now. (HT: Michael Aquilina)
+    * Slides show a smaller font for lists and syntax highlighted code, which
+      works better on smaller screens.
+    * Adds a new "plain" view that provides the HTML with only a DIV wrapping
+      it, which is handy for embedding into another page.
+    * Upgrade to Plupload v1.5.4
+    * Upgrade to jQuery 1.7.2 and jQuery UI 1.8.21
+    * Now requires Git::Repository v1.18
+    * Now requires Cache::FastMmap. This is not a strict requirement, but if you
+      use the default configuration, you will need it. Added to make quick setup
+      easier.
+
+0.112770  2011-10-04 14:28:52 America/Chicago
+
+    * Bugfix: The diff viewer was broken and has been for a couple versions and
+      I didn't notice. This is fixed.
+    * Bugfix: If you have a version of git before 1.7.2, you will get a warning
+      in the tests and a special error message telling that diffs can't work
+      without an upgrade.
+    * Bugfix: A few visual issues have been cleaned up, particularly in the
+      Slides view.
+    * The Slides view will use any ID attributes set on a slide element to
+      update the page's hash tag, which allows for direct linking to a slide.
+    * The Slides vcentered class works with pure CSS (though, only with modern
+      browsers that support some version of the translate style).
+    * A new SyntaxHighlight plugin is available for syntax highlighting in the
+      yukkitext.
+
+0.111830  2011-07-02 15:53:44 America/Chicago
+    
+    * Bugfix: Upload buttons were still submits. Fixed again.
+    * Bugfix: New names were not properly validated during renaming.
+    * Bugfix: Removed a Dumper statement that was left in by mistake.
+    * Bugfix: Show the rename link for attachments that have formats..
+    * Adding page and attachment removal actions.
+    * A few enhancements to style, particularly for slide notes.
+    * Small refactoring of Yukki::Web::Controller.
+
+0.111720  2011-06-20 22:18:01 America/Chicago
+
+    * Bugfix: Certain errors that fellback to Plack's error handling are now
+      handled correctly within Yukki now.
+    * Bugfix: Hitting enter in the comment box on the page edit screen now
+      causes a Save, rather than opening the Choose Files list on browsers that
+      do not support drag-and-drop uploads.
+    * Added a Rename function so that pages and attachments may be renamed.
+    * The navigation menu is now split up into 3 different menus (repository,
+    * page, and user), which are much easier to use.
+    * Repositories are now listed in a specific order that can be set inside the
+      configuration file.
+    * Added a copyright notice for the software.
+    * "Yukki" does not appear quite so prominently anymore.
+
+0.111660  2011-06-14 20:50:32 America/Chicago
+
+    * Now uses jQuery events for periodic actions.
+    * Moved the title on the edit template to a better location.
+    * The edit preview now shows the part of the preview that is currently being
+      edited when it refreshes.
+    * Adding support for making slide presentations from Yukki documents.
+    * In the process of adding slide support, added a way to add other similar
+      kinds of views by creating a template and modifying the configuration
+      file.
+    * MultiMarkdown metadata is no longer shown at the top of the rendered HTML
+      text.
+
+0.111280  2011-05-07 20:45:11 America/Chicago
+
+    * Bugfix: Fixing a few more places that were not being rebased on the base
+      URL, particularly in redirects and JavaScript.
+    * Bugfix: The dropzone was showing even when drag-and-drop was unavailabel
+      for file upload.
+    * Upgraded Plupload to 1.4.3.2
+    * Now showing a file list on blank pages.
+    * App errors now look like part of the app instead of being ugly plaintext.
+
+0.111160  2011-04-25 22:11:07 America/Chicago
+
+    * Bugfix: There was a random "HERE" warning that was being output that
+      should never made it to release.
+    * Added the spreadsheet functionality to the wiki
+    * Yukkitext, attachments, and spreadsheet features now use the new plugins
+      system. Only the yukkitext and attachments plugins are on by default.
+    * The yukki-setup script shows the remote setup URL for the yukki repository
+      again.
+    * The base URL for the web site is more configurable. The scripts and styles
+      should not longer be specified in the configuration file using absolute
+      paths starting with a slash (unless you want them to be absolute and not
+      biased by the base URL of the yukki site).
+
+0.111060  2011-04-15 21:27:56 America/Chicago
+
+    * Bugfix: Corrected a problem with the navigation menu on edit pages
+    * There is now a "scripts" and "styles" section for listing JavaScript and
+      CSS files (respectively) for inclusion in the shell template. If not
+      present, a default list is provided. (See the man page for
+      Yukki::Web::Settings for details.)
+    * The yukki-setup script does a better job validating parameters.
+    * Made some small style adjustments
+    * Added more tests, particularly tests for setting up a new Yukki
+      installation.
+
+0.110900  2011-03-31 17:31:42 America/Chicago
+
+    * Added a diff viewer, which will show a diff for any selected pair of
+      revisions from the hsitory page. This differ is naive and makes some
+      uglifying mistakes that still need to be addressed.
+    * Added a history viewer, which will show all the revisions for a page.
+    * Added more tests
+
+0.110880  2011-03-28 22:07:48 America/Chicago
+    
+    * Bugfix: Links sometimes treated whitespace incorrectly
+    * Bugfix: Escaping links did not work in some cases
+    * Up until now passwords were stored in plain text. They will no be stored
+      as a salted hash using the digest configured in the digest directory (or
+      SHA-512 if not given). If someone out there has been trying this out, you
+      MUST run yukki-passwd for every user to hash the passwords.
+    * Added the yukki-passwd script to help with password changes.
+    * Added the first few unit tests.
+    * The configuration file is now checked for correctness when it is loaded.
+
+0.110850  2011-03-25 23:24:42 America/Chicago
+
+    * The repository is now the left-most breadcrumb item
+    * Directories will no longer be listed in attachment lists.
+    * URIs and links are better escaped and handle a wider variety of formats
+      and characters
+    * Links to pages that have not be created now show in red
+    * Better finding and handling of file name and file type.
+    * Breadcurmb and other automatic titles will not include the file suffix in
+      the title any longer (i.e., .yukki does not show so often)
+    * Various styling and layout fixes
+
+0.110840  2011-03-25 00:33:26 America/Chicago
+
+    * Improved links and the hierarchical arrangement of files in the
+      repository.
+        * You can put links in a sub-topic via ./Foo
+        * You can put links in a absolute path via /Foo
+        * Better labels for links, especially links to different parts of the
+          file tree
+    * Better formatting for pre and blockquote
+    * Sessions now persist across restarts via CHI and FastMmap caching.
+    * Added a breadcrumb to the shell template
+
+0.110830  2011-03-23 23:45:57 America/Chicago
+
+    * First release of Yukki to CPAN
+    * You can login and has support for groups and ACLs
+    * Anonymous users may edit or not depending on the reposotiry configuration
+    * Support for yukkitext with yukkilinks and attachment URLs
+    * You can upload attachments with drag and drop

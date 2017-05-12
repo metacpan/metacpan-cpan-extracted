@@ -1,0 +1,82 @@
+# -*- coding: utf-8 -*-
+
+=encoding utf-8
+
+=head1 NAME
+
+yatt_lite_readme -- Introduction to YATT::Lite
+
+=for code yatt
+
+=head1 SYNOPSIS
+
+In file F<index.yatt>:
+
+=for code yatt
+
+  <yatt:envelope title="test">
+    My first YATT App! &yatt:repeat(foo,3);
+  </yatt:envelope>
+
+In file F<.htyattrc.pl>:
+
+=for code perl
+
+  Entity repeat => sub {
+    my ($this, $what, $count) = @_;
+    $what x $count;
+  };
+
+
+In file F<envelope.ytmpl>:
+
+=for code yatt
+
+  <!yatt:args title="html?">
+  <!doctype html>
+  <html>
+  <head>
+  <title>&yatt:title;</title>
+  </head>
+  <body>
+  <h2>&yatt:title;</h2>
+  <yatt:body />
+  </body>
+  </html>
+
+Output will be:
+
+   <!doctype html>
+   <html>
+   <head>
+   <title>test</title>
+   </head>
+   <body>
+   <h2>test</h2>
+     My first YATT App! foofoofoo
+   </body>
+   </html>
+
+
+=head1 DESCRIPTION
+
+B<YATT> is Yet Another Template Toolkit.
+L<YATT::Lite> is latest version of YATT.
+
+Unlike other template engines, YATT::Lite comes with its own Web Framework
+(L<WebMVC0|YATT::Lite::WebMVC0::SiteApp>) which runs under L<PSGI>.
+So, you can concentrate on writing your most important parts: Views and Models.
+
+For more project details, see L<https://github.com/hkoba/yatt_lite>.
+
+=head1 Next Steps
+
+=head2 for Web Designers
+
+To learn how to write yatt templates, please read L<yatt_manual|YATT::Lite::docs::yatt_manual>.
+
+
+=head2 for Programmers
+
+To understand how yatt works, please read L<prog_guide|YATT::Lite::docs::prog_guide>.
+

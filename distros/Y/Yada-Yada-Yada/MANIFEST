@@ -1,0 +1,9 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/pod-coverage.t
+t/pod.t
+t/yada.t
+Yada.pm
+META.yml                                 Module meta-data (added by MakeMaker)

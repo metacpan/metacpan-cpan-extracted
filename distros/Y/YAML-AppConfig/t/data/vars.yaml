@@ -1,0 +1,54 @@
+---
+dapper: life
+breezy: $dapper is good
+hoary: $breezy, but so is food
+stable: $hoary and so, once again, $breezy.
+nonvar: $these are $non $vars with a var, $dapper
+circ1: $circ2 eep
+circ2: $circ3 oop
+circ3: $circ4 bop
+circ4: $circ1 lop
+refs: $list will not render, nor will $hash
+list:
+    -
+        -
+            -
+                -
+                    -
+                        -
+                            -
+                                - $dapper
+                                - $stable
+                            - $hoary
+hash:
+    key:
+        key:
+            key:
+                key:
+                    key: $breezy
+                    other: $dapper
+                something: $dapper
+nest1:
+    blah:
+        - harry potter
+        - golem
+        - mickey mouse
+        - $nestee
+    loop:
+        foopy:
+            - $nestee
+            - $breezy
+        boop: $nestee
+nest2:
+    cows:
+        - are
+        - good
+nestee:
+    food: $dapper
+    drink: 
+        - $nest2
+        - $breezy and ${dapper}yummy
+circrefref1:
+    - $circrefref2
+circrefref2:
+    - $circrefref1

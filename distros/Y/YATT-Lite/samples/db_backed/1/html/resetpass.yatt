@@ -1,0 +1,115 @@
+<!yatt:args>
+<yatt:envelope  guest_ok >
+  <:yatt:title>Reset Password</:yatt:title>
+
+  <p>
+    Just enter the email you registered and we'll let you reset it.
+  </p>
+
+  <div id="content" class="center_col narrow">
+    <form method="POST">
+      <div class="form fullwidth">
+	<dl>
+	  <dt>Email</dt>
+	  <dd><input type="text" name="email" size="15" /></dd>
+	</dl>
+
+	<div class="buttons">
+	  <input type="hidden" name="!!" value="sendmail">
+	  <input type="submit" value="Send reset link">
+	</div>
+      </div>
+    </form>
+  </div>
+</yatt:envelope>
+
+<!yatt:action sendmail>
+my ($this, $con) = @_;
+
+my $email = $this->YATT->fetch_email($con);
+
+my $token = $this->YATT->reset_password($email);
+
+my $url = $con->mkurl(undef, ['~reset' => 1, email => $email, token => $token]);
+
+if ($this->YATT->sendmail($con, $this, email => $email, $url)) {
+  $this->render_sent($con);
+} else {
+  die "Can't send email!";
+}
+
+<!yatt:widget email to url=html>
+From: &yatt:mail_sender();
+To: &yatt:to;
+Subject: Password reset is requested.
+Content-type: text/plain; charset="utf-8"
+
+To proceed password resetting, please click this link:
+
+&yatt:url;
+
+If you have received this mail without having requested it,
+please dispose this mail.
+
+<!yatt:widget sent>
+<yatt:envelope  guest_ok >
+  <div id="content" class="center_col register">
+  <h2>Password reset sent</h2>
+  </div>
+</yatt:envelope>
+
+<!yatt:page reset email=! token=!>
+
+<yatt:if "&yatt:this:YATT():can_change_password(:email,:token);">
+<yatt:envelope  guest_ok >
+  <:yatt:title>Enter new password</:yatt:title>
+
+  <div id="content" class="center_col narrow login">
+    <form method="POST">
+      <input type="hidden" name="email" value="&yatt:email;"/>
+      <input type="hidden" name="token" value="&yatt:token;"/>
+      <div class="form fullwidth">
+	<dl>
+	  <dt>Password:</dt>
+	  <dd><input type="password" name="password" class="required" size="15"></dd>
+	</dl>
+	
+	<dl>
+	  <dt>(Retype password):</dt>
+	  <dd><input type="password" name="password2" size="15"></dd>
+	</dl>
+
+	<div class="buttons">
+	  <input type="submit" name="!reset" value="Update">
+	</div>
+      </div>
+    </form>
+  </div>
+
+</yatt:envelope>
+<:yatt:else/>
+<yatt:envelope  guest_ok >
+  <:yatt:title>Invalid token!</:yatt:title>
+</yatt:envelope>
+</yatt:if>
+
+<!yatt:action reset email=! token=!>
+my ($this, $con) = @_;
+
+my $pass1 = $this->YATT->fetch_pass_pair($con);
+
+my $email = $this->YATT->fetch_email($con);
+
+my $token = $con->param_type('token', qr{^\w+$ }x );
+
+my $user = $this->YATT->do_change_password($email, $token, $pass1);
+
+$this->entity_set_logged_in($user->login);
+
+$this->render_done($con);
+
+<!yatt:widget done>
+<yatt:envelope  guest_ok >
+  <h2>Password reset success!</h2>
+  <a href="./">Top</a>
+</yatt:envelope>

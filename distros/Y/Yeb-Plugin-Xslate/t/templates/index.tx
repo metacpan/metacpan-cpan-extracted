@@ -1,0 +1,6 @@
+<html>
+<head></head>
+<body>
+index page_include[<: include page :>]
+</body>
+</html>

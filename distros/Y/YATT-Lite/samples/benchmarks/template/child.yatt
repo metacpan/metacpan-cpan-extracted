@@ -1,0 +1,9 @@
+<!yatt:args blog_entries=list>
+<yatt:base>
+  <:yatt:title>My amazing blog</:yatt:title>
+
+<yatt:foreach my:value=entry list=blog_entries>
+    <h2>&yatt:entry{title};</h2>
+    <p>&yatt:entry{body};</p>
+</yatt:foreach>
+</yatt:base>

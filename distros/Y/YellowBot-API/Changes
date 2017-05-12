@@ -1,0 +1,29 @@
+Revision history for YellowBot-API
+
+0.97   Jan 31, 2014
+       Fix pod encoding issues
+
+0.96   February 23, 2012
+       Fix signing of file uploads as parameters
+
+0.95   January 11, 2012
+       Support JSON POST requests
+
+0.94   June 2, 2011
+       Fix signin_url bug
+       More tests
+
+0.93   March 5, 2011
+       Support file uploads
+
+0.92   August 18, 2010
+       Add missing dependencies
+       Use JSON instead of JSON::XS
+
+0.91   August 17, 2010
+       Add signin_url method.
+       Documentation updates.
+
+0.90   August 17, 2010
+       First public version, released on an unsuspecting world.
+

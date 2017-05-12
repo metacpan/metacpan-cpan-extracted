@@ -1,0 +1,86 @@
+Yahoo-Marketing
+
+A module for using Yahoo Search Marketing's new Web Services.  See http://searchmarketing.yahoo.com/developer/docs/index.php
+
+SYNOPSIS
+
+This collection of modules makes interacting with Yahoo! Search Marketing's Web Services as easy as possible.  
+
+Sample Usage:
+
+    use Yahoo::Marketing::Keyword;
+    use Yahoo::Marketing::KeywordService;
+
+    my $service = Yahoo::Marketing::KeywordService->new;
+
+    # setup your credentials
+
+    $service->username( 'your username' );
+    $service->password( 'your password' );
+    $service->license( 'your license' );
+    $service->master_account( 'your master account ID' );
+    $service->account( 'your account ID' );
+    $service->endpoint( 'https://sandbox.marketing.ews.yahooapis.com/services/V3' );
+    $service->wsdl_init;
+
+    # OR
+
+    $service->parse_config( section => 'sandbox' );
+
+
+    # create a keyword object, and add it
+
+    my $keyword = Yahoo::Marketing::Keyword->new
+                                           ->adGroupID( $ad_group_id )
+                                           ->text( 'some text' )
+                                           ->alternateText( 'some alternate text' )
+                                           ->sponsoredSearchMaxBid( 1.00 )
+                                           ->status( 'On' )
+                                           ->advancedMatchON( 'true' )
+                                           ->url( 'http://www.someurl.com' )
+                  ;
+
+    my $keyword_response = $service->addKeyword( keyword => $keyword );
+
+    # added keyword will have ID set 
+
+    my $added_keyword = $keyword_response->keyword;
+    ...
+
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Build.PL
+    ./Build
+    ./Build test
+    ./Build install
+
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the perldoc command.
+
+    perldoc Yahoo::Marketing
+
+You can also look for information at:
+
+    Search CPAN
+        http://search.cpan.org/dist/Yahoo-Marketing
+
+    CPAN Request Tracker:
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Yahoo-Marketing
+
+    AnnoCPAN, annotated CPAN documentation:
+        http://annocpan.org/dist/Yahoo-Marketing
+
+    CPAN Ratings:
+        http://cpanratings.perl.org/d/Yahoo-Marketing
+
+COPYRIGHT AND LICENCE
+
+Copyright (c) 2009 Yahoo! Inc.  All rights reserved.  
+The copyrights to the contents of this file are licensed under the Perl Artistic License (ver. 15 Aug 1997) 
+

@@ -1,0 +1,7 @@
+<!yatt:args file>
+
+<yatt:foreach my=rec list="&yatt:xhf(:file);"
+><yatt:foreach my=k list="sort keys %$rec"
+>  &yatt:k; = &yatt:rec{:k};
+</yatt:foreach>
+</yatt:foreach>

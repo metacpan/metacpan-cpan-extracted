@@ -1,0 +1,17 @@
+Changes
+LICENSE
+MANIFEST
+META.json
+META.yml
+Makefile.PL
+README
+dist.ini
+lib/Yahoo/Search.pm
+lib/Yahoo/Search/Request.pm
+lib/Yahoo/Search/Response.pm
+lib/Yahoo/Search/Result.pm
+lib/Yahoo/Search/XML.pm
+t/10-search.t
+t/20-utf8.t
+t/release-pod-coverage.t
+t/release-pod-syntax.t

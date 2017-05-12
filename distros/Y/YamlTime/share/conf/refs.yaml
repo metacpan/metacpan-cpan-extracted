@@ -1,0 +1,7 @@
+# This is a map of regexps to url templates
+'^rt(.*)': http://rt.perl.org/rt3/Ticket/Display.html?id=$1
+
+# # These refs are the same in a given task yaml file:
+# refs:
+# - rt12345
+# - http://rt.perl.org/rt3/Ticket/Display.html?id=12345

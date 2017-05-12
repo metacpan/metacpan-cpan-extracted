@@ -1,0 +1,10 @@
+0.03  Fri Mar 13 11:24:21 CET 2009
+        - Added bool overload to prevent stringification in boolean context
+        - Fixed processing instructions so that they're round trip-able
+        - insert() now adds the child to the first position if no second
+          argument is specified
+        - correct DOCTYPE node handling
+
+0.02  Tue Dec 16 09:19:41 CET 2008
+        - Minor documentation fixes
+

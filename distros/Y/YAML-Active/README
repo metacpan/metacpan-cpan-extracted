@@ -1,0 +1,407 @@
+NAME
+    YAML::Active - Combine data and logic in YAML
+
+VERSION
+    version 1.100810
+
+SYNOPSIS
+      use YAML::Active;
+      my $data = Load(<<'EOYAML');
+      pid: /YAML::Active::PID
+        doit:
+      foo: bar
+      include_test: /YAML::Active::Include
+          filename: t/testperson.yaml
+      ticket_no: /YAML::Active::Concat
+        - '20010101.1234'
+        - /YAML::Active::PID
+          doit:
+        - /YAML::Active::Eval
+          code: sub { sprintf "%04d", ++(our $cnt) }
+      setup:
+        1: /Registry::YAML::Active::WritePerson
+           person:
+             personname: Foobar
+             handle: AB123456-NICAT
+        2: /Registry::YAML::Active::WritePerson
+           person: /YAML::Active::Include
+             filename: t/testperson.yaml
+      EOYAML
+
+DESCRIPTION
+    YAML is an intuitive way to describe nested data structures. This module
+    extends YAML's capabilities so that it ceases to be a static data
+    structure and become something more active, with data and logic
+    combined. This makes the logic reusable since it is bound to the data
+    structure. Without "YAML::Active", you have to load the YAML data, then
+    process it in some way. The logic describing which parts of the data
+    have to be processed and how was separated from the data. Using
+    "YAML::Active", the description of how to process the data can be
+    encapsulated in the data structure itself.
+
+    The way this works is to assign a transfer type to the YAML nodes you
+    want to process. The transfer type refers to a Perl package which is
+    expected to have a "yaml_active()" method which contains the logic; you
+    can think of the array or hash structure below that node as the
+    subroutine's arguments.
+
+    "YAML::Active" provides its own "Load()" and "LoadFile()" subroutines
+    which work like the subroutines of the same name in "YAML", except that
+    they also traverse the whole data structure, recognizing packages named
+    as transfer types that have a "yaml_active()" method and calling that
+    method on the given node.
+
+    An example:
+
+      some_string: /YAML::Active::Concat
+        - foo
+        - bar
+        - baz
+
+    defines a hash key whose value is an active YAML element. When you call
+    "YAML::Active"'s "Load()" on that data, at some point the hash value is
+    being encountered. The "YAML::Active::Concat" plugin (as a convenience
+    also defined in the same file as "YAML::Active") has a "yaml_active()"
+    method which expects to be called on an array reference (that is, the
+    thing blessed into "YAML::Active::Concat" is expected to be an array
+    reference). The method in turn activates all of the array's elements and
+    joins the results. So after loading the data structure, the result is
+    equivalent to
+
+      some_string: foobarbaz
+
+    Because "YAML::Active::Concat" also activates all of its arguments, you
+    can nest activation logic:
+
+      some_string /YAML::Active::Concat
+        - foo
+        - /YAML::Active::PID
+          doit:
+        - /YAML::Active::Eval
+          code: sub { sprintf "%04d", ++(our $cnt) }
+
+    This active YAML uses two more plugins, "YAML::Active::PID" and
+    "YAML::Active::Eval". "YAML::Active::PID" replaces its node with the
+    current process's id. Note that even though this plugin doesn't need any
+    arguments, we have to provide something - anything, in fact, whether it
+    be an array reference or a hash reference, because YAML can bless only
+    references. "YAML::Active::Eval" expects a hash reference with a "code"
+    key whose value is the source code for an anonymous sub which the plugin
+    calls and whose return value it uses to replace the activated node.
+
+    An activation plugin (that is, a package referred to by a node's
+    transfer type) can have any name, but if that name contains the string
+    "YAML::Active", it is being "required()" if it doesn't already provide a
+    "yaml_active()" method. This is merely a convenience so you don't have
+    to "use()" or "require()" the packages beforehand and things work a bit
+    more transparently. If you merely want to bless a node (that is, provide
+    a transfer type) into a package that's not an activation plugin, be sure
+    that the package name doesn't contain the string "YAML::Active".
+
+FUNCTIONS
+  Load
+    Like "YAML"'s "Load()", but activates the data structure after loading
+    it and returns the activated data structure.
+
+  Load_inactive
+    Like "YAML"'s "Load()", it doesn't activate the data structure.
+
+  Dump
+    Like "YAML"'s "Dump()".
+
+  Reload
+    Dumps, then loads the data structure and returns the result.
+
+  LoadFile
+    Like "YAML"'s "LoadFile()", but activates the data structure after
+    loading it and returns the activated data structure.
+
+  node_activate
+    Expects a reference and recursively activates it, returning the
+    resulting reference.
+
+    If it encounters an array, it calls "array_activate()" on the node and
+    returns the result.
+
+    If it encounters a hash, it calls "hash_activate()" on the node and
+    returns the result.
+
+    If it encounters a node that can be activated (i.e., that is blessed
+    into a package that has a "yaml_activate()" method, it activates the
+    node and returns the result. If the package name contains the string
+    "YAML::Active" and it doesn't have a "yaml_activate()" method,
+    "node_activate()" tries to "require()" the package (as a convenience).
+    That is, if you want to write a plugin, you can either include the
+    string "YAML::Active" somewhere in its package name, or use any other
+    name but then you'd have to "use()" or "require()" it before activating
+    some YAML.
+
+    Otherwise it just returns the node as it could be an unblessed scalar or
+    a reference blessed into a package that's got nothing to do with
+    activation.
+
+  array_activate
+    Takes an array reference and activates every array element in turn, then
+    returns a new array references containing the results. Null elements
+    (that is, elements blessed into "YAML::Active::NULL") are ignored.
+
+  hash_activate
+    Takes a hash reference and activates every value, then returns a new
+    hash references containing the results (the hash keys are left alone).
+    Keys with null values (that is, values blessed into
+    "YAML::Active::NULL") are ignored.
+
+  assert_arrayref
+    Checks that its argument is an array reference. If not, "die()"s
+    reporting the caller.
+
+  assert_hashref
+    Checks that its argument is a hash reference. If not, "die()"s reporting
+    the caller.
+
+  yaml_NULL
+    Returns an empty hash reference blessed into the "YAML::Active::NULL"
+    package. This function is used by side-effect-only plugins that don't
+    want to have a trace of their existence left in the activated data
+    structure. For an example see the "YAML::Active::Print".
+
+  NULL
+    This is a constant with the value "YAML::Active::NULL".
+
+  node_dump
+    Dumps a data structure node. It is used by "Dump()". It calls
+    "array_dump()" and "hash_dump()" as necessary. For scalar nodes, if the
+    node is a blessed reference and the package it is blessed into has a
+    "prepare_dump()" function, that function is called. Then, if the package
+    has a "yaml_dump()" function, that function is called as well. After the
+    recursive dump is finished, each package that had a "prepare_dump()"
+    function is checked for a "finish_dump()" function, which is called if
+    it exists.
+
+  array_dump
+    Dumps an array reference node. It is called by "node_dump()" and calls
+    "node_dump()" itself on the array elements.
+
+  hash_dump
+    Dumps a hash reference node. It is called by "node_dump()" and calls
+    "node_dump()" itself on the hash values.
+
+  should_process_node_in_phase
+    Takes as arguments a node and optionally a phase. If the phase argument
+    is given, return true for those nodes that have this phase requirements.
+    If the phase argument is not given, return true for those nodes that
+    don't have a phase requirements.
+
+EXPORT
+    Nothing is exported by default, but you can request each of the
+    subroutines individually or grouped by tags. The tags and their symbols
+    are, in YAML notation:
+
+      load:
+        - Load
+        - LoadFile
+      active:
+        - node_activate
+        - array_activate
+        - hash_activate
+      assert:
+        - assert_arrayref
+        - assert_hashref
+      null:
+        - yaml_NULL
+        - NULL
+
+    There is also the "all" tag, which contains all of the above symbols.
+
+DEFAULT PLUGINS
+    "YAML::Active::Concat"
+        Expects an array reference and joins the activated array elements,
+        returning the joined string.
+
+        For an example, see the DESCRIPTION above.
+
+    "YAML::Active::Eval"
+        Expects a hash reference with a "code" key. "eval"s the activated
+        hash value returns the result from executing the coderef (passing no
+        arguments).
+
+        Example:
+
+          - /YAML::Active::Eval
+            code: sub { sprintf "%04d", ++(our $cnt) }
+
+        Result:
+
+          - 1
+
+        At least, that's the answer the first time around.
+
+    "YAML::Active::Include"
+        Expects a hash reference with a "filename" key. Calls
+        "YAML::Active"'s "LoadFile()" on the activated filename. That is,
+        the filename can itself use an activation plugin, and the file
+        contents are activated as well.
+
+        Example:
+
+          description: /YAML::Active::Include
+            filename: description.yaml
+
+        Result:
+
+          description: >
+            The content of the included file goes here.
+
+    "YAML::Active::PID"
+        Returns the current process id.
+
+        Example:
+
+          the_pid: /YAML::Active::PID
+            whatever:
+
+        Result (for example):
+
+          the_pid: 12345
+
+        Note that, although this plugin doesn't require any arguments, we
+        have to give it either an array reference or a hash reference,
+        because "YAML" can't bless something that's not a reference. The
+        contents of the reference don't matter.
+
+    "YAML::Active::Shuffle"
+        Expects an array reference and returns another array reference with
+        the activated original elements in random order.
+
+        Example:
+
+          data: /YAML::Active::Shuffle
+                - 1
+                - 2
+                - 3
+                - 4
+                - 5
+
+        Result (for example):
+
+          data:
+            - 3
+            - 5
+            - 1
+            - 2
+            - 4
+
+    "YAML::Active::Print"
+        Expects an array reference and joins the activated array elements,
+        printing the result and returning a null (i.e., a
+        "YAML::Active::NULL") node. That is, the node won't appear in the
+        resulting activated data structure.
+
+        Example:
+
+          data:
+            - foo
+            - /YAML::Active::Print
+               - '# Hello, world!'
+               - 'Goodbye, world!'
+            - baz
+
+        Result:
+
+          data:
+            - foo
+            - baz
+
+        and the string "# Hello, world!Goodbye, world!" is printed.
+
+    "YAML::Active::uc"
+        Replaces node values (scalars, array elements and hash values) with
+        their lowercased value. Does not descend into deeper array
+        references or hash references, but passes them through unaltered.
+
+        Example:
+
+          data: /YAML::Active::uc
+            - Hello
+            - world and
+            - one: GOoD
+              two: byE
+            - wOrLd!
+
+        Result:
+
+          data:
+            - HELLO
+            - WORLD AND
+            - one: GOoD
+              two: byE
+            - WORLD!
+
+    "YAML::Active::lc"
+        Like "YAML::Active::uc", but lowercases the values.
+
+WRITING YOUR OWN PLUGIN
+    Suppose you want to write an activation plugin that takes a reference to
+    an array of numbers and adds them.
+
+    By including the string "YAML::Active" in the package name we can let
+    "YAML::Active" load the package when necessary. All we need to do is to
+    provide a "yaml_activate()" method that does the work.
+
+      package My::YAML::Active::Add;
+
+      use YAML::Active qw/array_activate assert_arrayref/;
+
+      sub yaml_activate {
+          my $self = shift;
+          assert_arrayref($self);
+          my $result;
+          $result += $_ for @{ array_activate($self) };
+          return $result;
+      }
+
+    Now you can do:
+
+      result: /My::YAML::Active::Add
+        - 1
+        - 2
+        - 3
+        - 7
+        - 15
+
+    And the result would be:
+
+      result: 28
+
+    This could be the beginning of a YAML-based stack machine or at least an
+    RPN calculator...
+
+INSTALLATION
+    See perlmodinstall for information and options on installing Perl
+    modules.
+
+BUGS AND LIMITATIONS
+    No bugs have been reported.
+
+    Please report any bugs or feature requests through the web interface at
+    <http://rt.cpan.org/Public/Dist/Display.html?Name=YAML-Active>.
+
+AVAILABILITY
+    The latest version of this module is available from the Comprehensive
+    Perl Archive Network (CPAN). Visit <http://www.perl.com/CPAN/> to find a
+    CPAN site near you, or see <http://search.cpan.org/dist/YAML-Active/>.
+
+    The development version lives at
+    <http://github.com/hanekomu/YAML-Active/>. Instead of sending patches,
+    please fork this project using the standard git and github
+    infrastructure.
+
+AUTHOR
+      Marcel Gruenauer <marcel@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2003 by Marcel Gruenauer.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

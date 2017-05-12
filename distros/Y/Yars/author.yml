@@ -1,0 +1,64 @@
+---
+pod_spelling_system:
+  # list of words that are spelled correctly
+  # (regardless of what spell check thinks)
+  stopwords:
+    - Duggan
+    - RESTful
+    - failover
+    - filename
+    - filenames
+    - startup
+    - url
+    - yars
+    - CGI
+    - JSON
+    - md
+    - Failover
+    - Yars
+    - unwriteable
+    - urls
+    - df
+    - kh
+    - GSFC
+    - testarch
+    - conf
+    - hostdisk
+    - hostname
+    - http
+    - https
+    - txt
+    - yarsclient
+    - Tilmes
+    - hypnotoad
+    - nginx
+    - useable
+    - diskmap
+    - md5
+    - md5s
+    - md5sum
+    - b642hex
+    - hex2b64
+    - Clustericious
+    - redownload
+    - BDUGGAN
+    - DAGOLDEN
+    - XDG
+    - Rebalance
+
+pod_coverage:
+  # format is "Class#method" or "Class", regex allowed
+  # for either Class or method.
+  private:
+    - Yars#startup
+    - Yars#secret
+    - Yars#sanity_check
+    - Yars#generate_config
+    - Yars::Command::.*
+    - Yars::Client#.*
+    - Yars::Routes#df
+
+unused_vars:
+  global:
+    ignore_vars:
+      - $class

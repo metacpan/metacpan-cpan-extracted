@@ -1,0 +1,45 @@
+severity = 1
+
+# I think these are really important, so always load them
+
+[TestingAndDebugging::RequireUseStrict]
+severity = 5
+
+[-TestingAndDebugging::RequireUseWarnings]
+#severity = 5
+
+# I think these are less important, so only load when asked
+
+#[RegularExpressions::RequireLineBoundaryMatching]
+#severity = 1
+
+# My custom configuration
+
+[Subroutines::ProhibitExcessComplexity]
+max_mccabe = 30
+
+[ControlStructures::ProhibitPostfixControls]
+allow = for if unless
+
+# Give these policies a custom theme.  I can activate just
+# these policies by saying `perlcritic -theme larry`
+
+#[Modules::RequireFilenameMatchesPackage]
+#add_theme = larry
+
+#[TestingAndDebugging::RequireTestLables]
+#add_theme = larry curly moe
+
+# I do not agree with these at all, so never load them
+
+# Don't prohibit unless blocks
+[-ControlStructures::ProhibitUnlessBlocks]
+# Declare scope at start of subroutine
+[-Variables::RequireLexicalLoopIterators]
+[-ValuesAndExpressions::RequireInterpolationOfMetachars]
+[-CodeLayout::RequireTidyCode]
+[-Subroutines::ProhibitBuiltinHomonyms]
+[-Subroutines::ProhibitSubroutinePrototypes]
+
+# For all other Policies, I accept the default severity,
+# so no additional configuration is required for them.

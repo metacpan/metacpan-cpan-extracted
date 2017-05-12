@@ -1,0 +1,52 @@
+---
+abstract: 'Serve up marshaled perl objects in javascript'
+author:
+  - 'Eric Wolf (coyocanid@gmail.com)'
+build_requires:
+  Module::Build: '0.4'
+  Test::More: '0'
+configure_requires:
+  Module::Build: '0.42'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4216, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Yote-Server
+provides:
+  Yote::Server:
+    file: lib/Yote/Server.pm
+    version: '1.26'
+  Yote::Server::Acct:
+    file: lib/Yote/Server/Acct.pm
+  Yote::Server::App:
+    file: lib/Yote/Server/App.pm
+  Yote::Server::ListContainer:
+    file: lib/Yote/Server/ListContainer.pm
+    version: '1.0'
+  Yote::Server::ModperlOperator:
+    file: lib/Yote/Server/ModperlOperator.pm
+  Yote::Server::ModperlOperatorStateManager:
+    file: lib/Yote/Server/ModperlOperator.pm
+  Yote::ServerObj:
+    file: lib/Yote/Server.pm
+  Yote::ServerRoot:
+    file: lib/Yote/Server.pm
+  Yote::ServerSession:
+    file: lib/Yote/Server.pm
+  Yote::ServerStore:
+    file: lib/Yote/Server.pm
+requires:
+  IO::Socket::SSL: '2.024'
+  JSON: '0'
+  Lock::Server: '1.73'
+  Test::More: '0'
+  URI::Escape: '0'
+  UUID::Tiny: '0'
+  Yote: '1.31'
+  perl: v5.12.0
+resources:
+  license: http://dev.perl.org/licenses/
+version: '1.26'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.012'

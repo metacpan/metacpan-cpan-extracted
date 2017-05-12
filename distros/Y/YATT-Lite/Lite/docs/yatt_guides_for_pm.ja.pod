@@ -1,0 +1,283 @@
+# -*- coding: utf-8 -*-
+
+=encoding utf-8
+
+=head1 NAME
+
+yatt_guides_for_pm(ja) - Perl Monger のための yatt (YATT::Lite) ガイド
+
+=head1 INTRODUCTION
+
+この文書では Perl Monger を対象に、yatt (YATT::Lite) で
+Web アプリを作る方法を解説します。
+特に、最初のシンプルなバージョンを自分で動かしたあとで、
+B<テンプレート書きをデザイナーさんにアウトソース>したり、
+システムとして顧客に納品して以後の
+B<ビジネスレベルの改良・拡張・カスタマイズは顧客が自分で進める> 、
+という業態を想定して説明を進めます。
+
+解説は複数のツアーに別れており、
+Hello world から初めて、テンプレートの部品化(widget 化)、
+外部モジュールの呼び出し…と段階的に進みます。
+
+=head1 TOUR1: Hello world!
+X<TOUR1>
+
+=head2 Install YATT::Lite from github
+
+説明を簡単にするため、一連のツアーは、github 上のインストーラを
+直接使う方法を用います。
+
+
+=for code sh
+
+まずターミナルを開いて、開発用のディレクトリを作り、そこに cd して下さい。
+
+    $ mkdir -p ~/public_apps/app1 && cd ~/public_apps/app1   # or wherever.
+
+次に、以下のようにインストーラを実行して下さい。
+
+    $ curl https://raw.githubusercontent.com/hkoba/yatt_lite/dev/scripts/skels/min/install.sh | bash
+      % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                     Dload  Upload   Total   Spent    Left  Speed
+    100  1274  100  1274    0     0   4425      0 --:--:-- --:--:-- --:--:--  4439
+    Using remote git https://github.com/hkoba/yatt_lite.git
+    # git init
+    Initialized empty Git repository in /home/hkoba/public_apps/app1/.git/
+    # mkdir -p lib
+    # git submodule add https://github.com/hkoba/yatt_lite.git lib/YATT
+    Cloning into 'lib/YATT'...
+    remote: Counting objects: 5775, done.
+    remote: Compressing objects: 100% (1488/1488), done.
+    remote: Total 5775 (delta 4029), reused 5775 (delta 4029)
+    Receiving objects: 100% (5775/5775), 1.32 MiB | 332.00 KiB/s, done.
+    Resolving deltas: 100% (4029/4029), done.
+    Checking connectivity... done.
+    # cpanm --installdeps .
+    --> Working on .
+    Configuring YATT-Lite-v0.0.9 ... OK
+    <== Installed dependencies for .. Finishing.
+    # cp -va lib/YATT/scripts/skels/min/approot/app.psgi lib/YATT/scripts/skels/min/approot/html .
+    `lib/YATT/scripts/skels/min/approot/app.psgi' -> `./app.psgi'
+    `lib/YATT/scripts/skels/min/approot/html' -> `./html'
+    `lib/YATT/scripts/skels/min/approot/html/index.yatt' -> `./html/index.yatt'
+    $
+
+インストールが終わると、以下のようなディレクトリが出来上がるはずです。
+
+    $ tree -L 2
+    .
+    ├── app.psgi
+    ├── html
+    │   └── index.yatt
+    └── lib
+        └── YATT
+    
+    3 directories, 2 files
+    $
+
+各ファイル・ディレクトリの説明です。
+
+=over 4
+
+=item F<app.psgi>
+
+F<app.psgi> は YATT::Lite (の WebMVC0::SiteApp) を用いた PSGI アプリです。
+これを C<plackup> で起動すれば、テンプレートとして
+F<*.yatt> を使える Web サーバーが動きます。
+この場合の app.psgi の中身は、以下のようになっているはずです。
+(勿論これはあくまでサンプルで、自分で書いても構いません。)
+
+=for code perl
+
+    # -*- perl -*-
+    sub MY () {__PACKAGE__}; # omissible
+    use FindBin;
+    use lib "$FindBin::Bin/lib";
+    use YATT::Lite::WebMVC0::SiteApp -as_base;
+    use YATT::Lite qw/Entity *CON/;
+    {
+      my $app_root = $FindBin::Bin;
+      my $site = MY->new(app_root => $app_root
+                     , doc_root => "$app_root/html");
+      Entity param => sub { my ($this, $name) = @_; $CON->param($name) };
+      return $site if MY->want_object;
+      $site->to_app;
+    }
+
+
+=item F<html/>
+
+F<html/> がこの Web アプリの document root になります。
+ファイル名を省略してアクセスした場合は
+F<index.yatt> がインデックスファイルとして表示されます。
+
+=item F<lib/>
+
+F<lib/> はこのアプリのためのモジュールを置く場所です。
+F<lib/YATT> 以下には C<git submodule> として L<YATT::Lite>
+の git リポジトリが登録されます。(symlink で共有することも可能です)
+
+=back
+
+=head2 Write your first "Hello world"!
+X<TOUR1-index.yatt>
+
+好みのエディタで、 F<html/index.yatt> を以下のように編集してみて下さい。
+
+=for code yatt
+
+    <!yatt:args foo="text?world" bar="text" baz>
+    <h2>Hello &yatt:foo;!</h2>
+    &yatt:bar;, &yatt:baz;
+
+その上で、 C<plackup> でアプリを起動してから以下の URL をアクセス
+してみて下さい。
+
+=over 4
+
+=item * L<http://0:5000/>
+
+=item * L<http://0:5000/?foo=aa&bar=bb>
+
+=item * L<http://0:5000/index?foo=cc&bar=dd>
+
+=item * L<http://0:5000/index.yatt?foo=ee&bar=ff&baz=gg>
+
+=back
+
+無事 "Hello world!", "Hello aa!", "Hello cc!"... などと表示されたでしょうか？
+(もしかすると 0: を localhost: に書き換えないと繋がらないかもしれません)
+
+上記の index.yatt テンプレートの、各部の意味は以下の通りです。
+
+=over 4
+
+=item (1行目) C<< <!yatt:args foo="text?world" bar="text" baz> >>
+
+C<< <!yatt:... >> で始まり C<< > >> で終わる行は、
+そのテンプレートで定義される部品( B<widget> ) の名前や引数を宣言する、
+L<yatt 宣言|YATT::Lite::docs::yatt_manual/YATT Declaration> です。
+主な yatt宣言には他に C<< <!yatt:page> >>, C<< <!yatt:widget> >>,
+C<< <!yatt:action> >> があります。
+
+この宣言の場合、 index.yatt テンプレート(の中の、デフォルト widget)に、
+C<foo> 、C<bar>、 C<baz> ３つの引数があることを意味しています。
+
+=over 4
+
+=item C<< foo="text?world" >>
+
+L<引数の宣言|YATT::Lite::docs::yatt_manual/Argument Declaration>は
+C<引数名 = "型名 フラグ文字 デフォルト値"> の形式で書かれます。
+型名は省略すると C<text> 型になり、出力時に自動的に escape されます。
+
+この例では引数 B<foo> が B<text> 型で、フラグ文字が B<?>、
+デフォルト値が B<world> となっています。
+デフォルトモードフラグが C<?> なので、 C<foo> の値が空文字列 C<""> か C<undef>
+の時にデフォルト値 C<world> が使われます。
+
+=back
+
+
+=item (2,3行目) C<&yatt:foo;>, C<&yatt:bar;>
+
+C<&yatt:> で始まり C<;> で終わる部分は、(html の entity 参照記法に習って)
+外から来た値を埋め込む(置換する)、L<Entity 参照|YATT::Lite::docs::yatt_manual/Entity reference> を表しています。
+
+この例では引数 foo, bar を html 中に埋め込んでいます。
+なお、entity 記法は引数以外に計算処理の式を埋め込むためにも使います。
+
+
+=back
+
+=head2 Emacs integration (strongly recommended)
+
+yatt の設計テーマは B<"use strict" のあるテンプレートエンジン> です。
+つまり、変数名や widget 名の綴り間違いが、
+web からアクセスするよりも前に、
+検知出来ることが最大の売りです。
+
+この yatt のメリットを享受するためには、
+エディタに静的検査コマンド(yatt lint)を連動させる必要が有ります。
+
+XXX: readme からここへ転記
+
+=head1 TOUR2: How to write yatt widgets and compose them.
+X<TOUR2>
+
+今度は複数の widget を組み合わせる方法を解説します。
+L<先ほど|/TOUR1-index.yatt>の F<html/index.yatt> を次のように myhello.yatt へと rename して下さい。
+
+=for code sh
+
+   mv -v html/index.yatt html/myhello.yatt
+
+次に、エディタで改めて F<html/index.yatt> を新規作成し、
+次のように書いて下さい。
+
+=for code yatt
+
+   <!yatt:args>
+   <yatt:layout>
+      <yatt:myhello/>
+      <yatt:myhello foo="xxx" bar='yyy' />
+   </yatt:layout>
+
+   <!yatt:widget layout>
+   <!doctype html>
+   <style>h2 {border: solid blue; border-width: 5px 0;}</style>
+   <body>
+      <yatt:body/>
+   </body>
+
+保存したら L<http://0:5000/> をアクセスしてみて下さい。今度は h2 タグが
+css で着色されて表示されたのではないでしょうか？
+
+この例では、新たに 2つの widget が出てきました。rename して出来た
+F<html/myhello.yatt> が表す C<yatt:myhello> と、
+F<html/index.yatt> の後半で定義された、C<yatt:layout>です。
+
+前半の
+
+   <yatt:layout>
+      <yatt:myhello/>
+      <yatt:myhello foo="xxx" bar='yyy' />
+   </yatt:layout>
+
+は C<yatt:layout> widget の呼び出しです。この layout タグで囲まれた部分は
+L<body 引数|YATT::Lite::docs::yatt_manual/body>と呼ばれる
+closure として扱われます。ここでは更に
+C<yatt:myhello> の呼び出しを二回書いています。ここで layout に渡した closure は
+
+  ...
+   <body>
+      <yatt:body/>
+   </body>
+
+の C<< <yatt:body/> >> の所で呼び出されます。
+
+=head2 XXX: genperl
+
+=head2 XXX: delegate
+
+
+   <!yatt:args mh=[delegate:myhello]>
+   <yatt:layout>
+      <yatt:mh/>
+   </yatt:layout>
+
+=cut
+
+# 
+# =head1 XXX: error ytmpl, backtrace, inspect
+# 
+# =head1 XXX: <:yatt:arg>..</:yatt:arg>, <:yatt:arg />..
+# 
+# =head1 TOURx: XXX: param as arg, sigil と routing
+# 
+# =head1 TOURx: XXX: sigil と routing
+# 
+# =head1 XXX: Entity
+# 
+# =head1 XXX: my, foreach, if

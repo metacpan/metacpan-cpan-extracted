@@ -1,0 +1,9 @@
+Changes
+extra/YAPE.pm
+MANIFEST
+Makefile.PL
+README
+Regex.pm
+Regex/Element.pm
+test.pl
+META.yml                                 Module meta-data (added by MakeMaker)

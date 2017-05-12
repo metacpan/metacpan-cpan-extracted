@@ -1,0 +1,51 @@
+# -*- coding: utf-8 -*-
+
+=encoding utf-8
+
+=head1 NAME
+
+yatt_manual -- yatt syntax manual
+
+=for code yatt
+
+=head1 Overview
+
+In yatt, templates are almost like ordinally HTML.
+In basic setup, all yatt-specific items are written
+with B<(specified) namespace>, which is overridable.
+In this document, I use C<yatt> for explanation.
+
+=over 4
+
+=item * C<< <!yatt:...> >>
+
+Declaration. (beginning of a element, usually)
+
+=item * C<< &yatt:...; >>
+
+Variable reference and call of entity function.
+
+=item * C<< <yatt:.../> >>, C<< <yatt:...> ～ </yatt:...> >>
+
+Call of a widget.
+
+=item * C<< <:yatt:.../> ～ >>, C<< <:yatt:...> ～ </:yatt:...> >>
+
+Call of a widget, with tag style arguments.
+
+=item * C<< <?yatt ... ?> >>
+
+General source code embedition (like php)
+
+=item * C<< &yatt[[; ... &yatt]]; >>
+
+=item * C<< &yatt#num[[; ...singular... &yatt||; ...plural...  &yatt]]; >>
+
+Internationalized message.
+
+=item * C<< <!--#yatt ... --> >>
+
+Comment, which is not parsed by yatt.
+
+=back
+

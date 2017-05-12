@@ -1,0 +1,243 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+use Time::Local;
+use File::Temp;
+use File::Copy;
+use Scriptalicious;
+use Lingua::EN::Inflect qw( PL );
+use File::Basename;
+
+# Helper function to use Scripalicious::say rather than CORE::say.
+# Could monkey around with the symbol table, but that's more trouble
+# than it's worth.
+#
+# Isn't strictly needed here as we are not using 5.14, but I do this for
+# all my scripts :).
+sub _say {
+    Scriptalicious::say(@_);
+}
+
+sub usage {
+    print STDERR <<HERE;
+USAGE: $0 [OPTIONS] FILENAME [AMOUNT_YOU_WANT_LOPPED_OFF]";
+
+    Amount is in seconds, unless h, d or m is appended (m == minute).
+    Defaults to one day (86400 seconds);
+
+    A way to script this up into a recursive way to claw back space is
+    the following:
+
+    find /var/lib/yatg -type f -name '2011*' -print -exec $0 {} 365d \;
+
+OPTIONS:
+    --quiet No output
+    --verbose Verbose output
+    --debug Debugging output
+
+For more details, see the perldoc for this script.
+HERE
+}
+
+sub usage_and_die {
+    print STDERR @_, "\n-- \n";
+    usage;
+    die "\n";
+}
+
+getopt;
+my $path = $ARGV[0];
+usage_and_die "ERROR: Missing path" unless $path;
+die "Invalid filename $path\n" unless -f $path;
+my ( $filename, $directory ) = fileparse($path);
+
+my $how_much_to_lop_off = $ARGV[1] // 86400;    # Default to a day
+
+if ( $how_much_to_lop_off =~ /\A(\d+)([hmd])\Z/ ) {
+    my $convertion_units = {
+        h => 60 * 60,
+        m => 60,
+        d => 60 * 60 * 24,
+    };
+    $how_much_to_lop_off = $1 * $convertion_units->{$2};
+}
+$how_much_to_lop_off =~ /\A\d+\Z/
+  or usage_and_die "Invalid lop off amount: $how_much_to_lop_off\n";
+
+my ( $year, $month, $day, $hour, $minute, $second, $interval ) =
+  ( $filename =~ /(\d+)-(\d+)-(\d+)_(\d+)-(\d+)-(\d+)Z,(\d+)$/ );
+
+die "Invalid filename format"
+  unless $year
+  and $month
+  and $day
+  and defined $hour
+  and defined $minute
+  and defined $second
+  and $interval;
+
+# Get the epoch of the start of this yatg file.
+# Month is 0 indexed...
+my $epoch = timegm( $second, $minute, $hour, $day, $month - 1, $year );
+whisper("Epoch of old file: $epoch");
+
+my $number_of_intervals_to_lose = int $how_much_to_lop_off / $interval;
+_say sprintf "Going to lop off %s %s (approximately %s %s)",
+  $number_of_intervals_to_lose, PL( 'interval', $number_of_intervals_to_lose ),
+  $how_much_to_lop_off,         PL( 'second',   $how_much_to_lop_off );
+
+if ( $number_of_intervals_to_lose < 1 ) {
+    die "Aborting. Invalid number of intervals given: $number_of_intervals_to_lose\n";
+}
+
+# Check to see if we're lopping off too much.
+if ( $how_much_to_lop_off + $epoch > time ) {
+    die sprintf( "New file will be in the future. (Epoch %s). Aborting\n",
+        $epoch + $how_much_to_lop_off );
+}
+
+# Create a temp file and write new data to it.
+my $tmpfile = File::Temp->new( DIR => $directory );
+whisper "Tempfile created: $tmpfile";
+
+#Open old file, read the contents we wish, and write to the tempfile
+open( my $oldfile, "<", $path ) or die "Cannot open $path: $!\n";
+while (<$oldfile>) {
+
+    # $. is the line number of the last used filehandle. In
+    # this case it's $oldfile.
+    if ( not $. <= $number_of_intervals_to_lose ) {
+        print $tmpfile $_;
+    }
+    else {
+        chomp $_;
+        whisper "Discarding old data '$_', line $.";
+    }
+
+}
+close $oldfile;
+
+
+# Find the new epoch of the yatg file with the new start date.
+my $new_epoch = $epoch + $number_of_intervals_to_lose * $interval;
+whisper( "Epoch of new file: $new_epoch" );
+
+# Extract all relevant time variables from the epoch.
+my ( $new_second, $new_minute, $new_hour, $new_day, $new_month, $new_year ) =
+  gmtime($new_epoch);
+
+$new_year  += 1900;
+$new_month += 1;      # Month is 0 indexed
+
+my $new_filename = sprintf(
+    "%02d-%02d-%02d_%02d-%02d-%02dZ,%d",
+    $new_year,   $new_month,  $new_day, $new_hour,
+    $new_minute, $new_second, $interval
+);
+
+my $new_path = File::Spec->catfile( $directory, $new_filename );
+mutter "New file will be called $new_path";
+whisper "Moving '$tmpfile' to '$new_path'";
+
+if ( -d $new_path ) {
+    die "ERROR: $new_path is a directory. Aborting\n";
+}
+if ( -e $new_path ) {
+    moan "$new_path already exists. Overwriting";
+}
+rename( $tmpfile, $new_path );
+mutter "Successfully trimmed data from $path";
+
+__END__
+
+=head1 NAME
+
+  yatg-trim - A trim script to delete old data from yatg files.
+
+=head1 SYNOPSIS
+
+  yatg-trim [OPTIONS] FILENAME [PERIOD]
+
+FILENAME is a L<YATG::Store::Disk> generated file containing polling data.
+PERIOD is the amount of historical data you wish to lose. It can be in seconds
+(e.g. "5"), minutes (e.g. "5m"), hours (e.g. "5h") or days (e.g. "5d").
+
+
+  yatg-trim 192.168.56.1/ifHCOutOctets/Vlan42/2011-09-13_12-45-00Z,300 5d
+  yatg-trim /var/lib/yatg/10.10.6.1/ifHCOutOctets/Vlan42/2011-09-13_12-45-00Z,300
+  yatg-trim --verbose /var/lib/yatg/10.10.6.1/ifHCOutOctets/Vlan42/2011-09-13_12-45-00Z,300
+
+Options allow you to specify the level of output, be it "--quiet", "--debug"
+or "--verbose"
+
+=head1 DESCRIPTION
+
+This script takes one yatg file, and removes the bottom (i.e. oldest) polls from
+that file. YATG itself will read the most recent file in the directory so in theory
+the newly generated file will be in use as soon as it is created, and the two
+can live side-by-side. In practice you will probably want to delete the old file
+after the script has run.
+
+=head2 Running the script iteratively
+
+This script only runs on one file at a time. Used in conjunction with find though
+an iterative effect can be achived, particularly since the filename holds the data
+on how much information should be in the file.
+
+    find /var/lib/yatg -type f -name '2011*' -print -exec yatg-trim {} 365d \;
+
+This will take all files that have been around for over a year and trim a year's
+worth of data from it.
+
+If you are sure this script is fine to delete the old file and clear up
+space as you go you can live dangerously
+
+    find /var/lib/yatg -type f -name '2011*' -print -exec yatg-trim {} 365d \; -delete
+
+
+Be warned that the examples above assume that filenames starting in 2011 are of
+a format consistent with yatg filenames. If not, yatg-trim will emit an error.
+
+=head1 BUGS AND CAVEATS
+
+This script is a very small script to free up space on servers at Oxford
+University IT Services. It filled that need, but I feel it my duty to point
+out certain caveats
+
+=over 4
+
+=item Race condition
+
+The script can potentially cause a race condition where YATG can write to the
+file as it is being trimmed. You will lose that particular poll.
+
+=item Speed
+
+This script is not meant to be run often and as such there has been no
+accounting for the speed at which it runs.
+
+=item Portability
+
+There has only been minor consideration of operating systems other than *nix
+based ones. This script may run on other OSes, but it may not.
+
+=item Portability (again).
+
+This script assumes that the backend storage for L<YATG::Store::Disk> remains
+newline delimited. If that ever changes, then this script will need to be
+altered to accommodate it (by altering $/).
+
+=back
+
+=head1 AUTHOR
+
+Christopher Causer E<lt>networks@it.ox.ac.ukE<gt>
+
+=head1 COPYRIGHT AND LICENCE
+
+This script is free software; you can redistribute it and/or modify it under
+the same terms as defined in YATG.
+
+=cut

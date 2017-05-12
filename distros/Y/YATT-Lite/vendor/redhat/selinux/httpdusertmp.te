@@ -1,0 +1,19 @@
+
+module httpdusertmp 1.0;
+
+require {
+	type tmp_t;
+	type httpd_user_script_t;
+	class dir { write remove_name add_name };
+	class file { read lock create getattr write ioctl unlink open };
+}
+
+#============= httpd_user_script_t ==============
+#!!!! The source type 'httpd_user_script_t' can write to a 'dir' of the following type:
+# httpd_user_rw_content_t
+
+allow httpd_user_script_t tmp_t:dir { write remove_name add_name };
+#!!!! The source type 'httpd_user_script_t' can write to a 'file' of the following type:
+# httpd_user_rw_content_t
+
+allow httpd_user_script_t tmp_t:file { read lock create ioctl write getattr unlink open };

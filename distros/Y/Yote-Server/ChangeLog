@@ -1,0 +1,52 @@
+2017-01-02 eric wolf  <coyocanid@gmail.com>
+	* Version 1.26 - fixed one off bug in session getid and fetch. set content type properly
+2016-12-05 eric wolf  <coyocanid@gmail.com>
+	* Version 1.24 - certain updated objects were not being returned by the server. Fixed that.
+	
+2016-11-30 eric wolf  <coyocanid@gmail.com>
+	* Version 1.23 : quick fix for log foulup
+2016-11-29 eric wolf  <coyocanid@gmail.com>
+	* Version 1.22 : added a handler for yote json requests for the remote proc'y interface in the ModperlHandler
+	* upload file bug in yote.js
+	* yote.js added a way to run functions only when the yote system is ready. onReady
+2016-09-01 eric wolf  <coyocanid@gmail.com>
+	* Version 1.20 : added Yote::ServerSession class which can do a (probably too simple)
+	replacement of object id with a session specific id for that object.
+	The point of this is to not leak object ids.
+2016-09-01 eric wolf  <coyocanid@gmail.com>
+	* Version 1.19 : Added Yote::Server::ModperlOperator
+	* This thing needs documentation *sigh*
+	
+2016-09-01 eric wolf  <coyocanid@gmail.com>
+        * Version 1.18 : unicode support for input/output
+        * Version 1.17 : added a needs resync error case to send back to the client
+        * Version 1.16 : logins are case insensitive now
+        * Version 1.14 : correctly handle undefined values being passed in
+	*                simplified update protocol
+	* Version 1.13 : dumb javascript error
+	* Version 1.12 : fixed nit in UUID call
+	*  on the javascript side, yote calls unroll the server results into arguments for the callback functions.
+	*  fixed a bug in yote.js where objects were not being reconsituted with their correct methods.
+	* Version 1.11
+	* added onLogin method for accounts
+	* added protocol for file uploads
+2016-06-06  eric wolf  <wolf@talisman>
+	* CHANGELOG: 1.08 : All errors return as JSON. Those not specific just have the message 'ERROR'
+
+2016-06-05  eric wolf  <wolf@talisman>
+	* CHANGELOG: 1.07 : added _onLogin method to login object that is called when the login succeeds.
+
+	
+2016-05-15  eric wolf  <wolf@talisman>
+
+	* CHANGELOG: Version 1.06 API change. Changes how things are passed back to client. Previously, only things directly passed back were passed back. Now it passes back all the things in the return list plus all the things those directly reference.
+	* change was is passed by to client by default
+	* passes all in return list, plus all those directly reference
+	* assumes that some encapsulation will be done with private members
+
+
+	1.04 - added a cgi/modperl flavor. The API between client and server was updated for this.
+	Updating both yote.js and Yote::Server ( as part of a normal upgrade ) will make this
+	transparent
+
+

@@ -1,0 +1,33 @@
+Revision history for YAPC::Russia
+
+1.0.0   2014-05-03
+        * First public release
+
+1.1.0   2014-05-07
+        [Minor]
+        * Method get_place() returns city
+
+        [Patch]
+        * Fixing bug in get_place() method
+        * Specifying min perl version 5.8.0
+        * Info in POD that SemVer is used
+
+1.1.1   2014-05-08
+        [Patch]
+        * Using head2 for methods in POD
+        * Small changes in POD to make it better
+
+2.0.0   2015-03-05
+        [Major]
+        * Info about YAPC::Russia 2015
+
+3.0.0   2016-06-25
+        [Major]
+        * Info about YAPC::Russia 2016
+
+4.0.0   2016-06-25
+        [Major]
+        * Using perl library Moment insted of Class::Date
+
+        [Minor]
+        * New method is_live()

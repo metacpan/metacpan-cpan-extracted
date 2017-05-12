@@ -1,0 +1,11 @@
+Revision history for Perl extension Yahoo::Music::Ratings.
+
+2.00  Sun Jul  3 12:00:00 2006
+	- Renamed getRatings to getSongs, however getRatings should still work
+	- Added getAlbums
+	- Added getArtists
+
+1.00  Sat Mar  4 07:41:00 2006
+	- original version; created by h2xs 1.23 with options
+		-X -n Yahoo::Music::Ratings
+

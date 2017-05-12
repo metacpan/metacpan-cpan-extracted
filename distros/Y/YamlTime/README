@@ -1,0 +1,96 @@
+NAME
+
+    YamlTime - YAML-based Personal Time Tracking App
+
+VERSION
+
+    This document describes YamlTime version 0.19. ";
+
+SYNOPSIS
+
+        > yt help
+
+DESCRIPTION
+
+    YamlTime is an application that allows you do your personal project
+    time tracking from the command line. It saves your data in plain text
+    YAML files. You can use a version control system (like git) to back up
+    the data.
+
+    YamlTime can supports multiple customers, multiple projects and
+    multiple rates. It has reporting, spreadsheets, tagging, time/tag
+    selection and 3rd party plugin modules.
+
+    YamlTime comes with a command line app called yt that does everything.
+
+COMMAND LINE USAGE
+
+    The following commands are supported.
+
+        yt                  - Show current yt status of today's tasks
+        yt help             - Get help
+        yt help <command>   - Get help for a specific command
+        yt init             - Create a new YamlTime store
+        yt new              - Start a new task
+        yt stop             - Stop the current task
+        yt go               - Restart the current task
+        yt create <task>    - Create a new task for a specific date/time
+        yt edit <task>      - Edit a task's yaml file in $EDITOR
+        yt dump <task>      - Read a task file and print to STDOUT
+        yt delete <task>    - Delete a task file
+        yt check <tasks>    - Check the data in the range for errors
+        yt status <tasks>   - Show the current yt status
+        yt report <tasks>   - Create a report for a time period
+                                using a certain reporting style
+
+    The <yt new> command will prompt you for some information. You can use
+    tab completion for many of the fields. The values that you put in your
+    config files are the values that are offered (and the only ones you can
+    use).
+
+    Some of the fields may be left blank. You can use yt edit to fix up any
+    task, later on.
+
+ Options
+
+    yt commands have the following options:
+
+    --from=<date_string>
+
+      Commands that need a time range, use this to set the start time. The
+      default is the previous midnight. A human friendly string can be
+      used, like: '3 days ago'.
+
+    --to=<date_string>
+
+      Commands that need a time range, use this to set the end time. The
+      default is now.
+
+    --tag=<tag_list>
+
+      A comma separated list of tags. Matches tasks the match all the tags.
+      You can specify more than once to combine ('or' logig) groups.
+
+    --style=<report-style>
+
+      This names a YamlTime reporting style. The default is CSV, which can
+      be used as a spreadsheet.
+
+KUDOS
+
+    Many thanks to the good people of Strategic Data in Melbourne Victoria
+    Australia, for supporting me and this project. o/
+
+AUTHOR
+
+    Ingy döt Net <ingy@cpan.org>
+
+COPYRIGHT AND LICENSE
+
+    Copyright 2011-2015. Ingy döt Net.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+    See http://www.perl.com/perl/misc/Artistic.html
+

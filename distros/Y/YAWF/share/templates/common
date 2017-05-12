@@ -1,0 +1,9 @@
+[%~ BLOCK javascript %]
+<script type="text/javascript" language="Javascript"><!--
+[%+ content +%]
+//--></script>
+[% END ~%]
+
+[% BLOCK htmlcode %]
+<tt>[% content.html %]</tt>
+[% END %]

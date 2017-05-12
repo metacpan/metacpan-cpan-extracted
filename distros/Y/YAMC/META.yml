@@ -1,0 +1,33 @@
+---
+abstract: 'Yast Another Configuration Module'
+name: YAMC
+version: 0.2
+author:
+  - 'Alessandro Pioli <apioli@cpan.org>'
+license: perl
+provides:
+  YAMC:
+    file: lib/YAMC.pm
+    version: 0.2
+distribution_type: module
+requires:
+  Config: 0
+  Cwd: 0
+  Data::Dumper: 0
+  ExtUtils::Install: 0
+  IO::File: 0
+  perl: 5.00
+  YAML: 0.35
+recommends:
+  ExtUtils::Install: 0.3
+  ExtUtils::ParseXS: 2.02
+  Pod::Text: 0
+build_requires:
+  Test::More: 0
+resources:
+  license: http://dev.perl.org/licenses/
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+generated_by: 'Module::Build version 0.38, CPAN::Meta::Converter version 2.112150'
+

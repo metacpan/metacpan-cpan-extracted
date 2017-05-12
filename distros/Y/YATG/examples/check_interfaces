@@ -1,0 +1,86 @@
+#!/usr/bin/perl
+# Guy Edwards
+# Oliver Gorwits
+#
+# Copyright (c) The University of Oxford 2007.
+
+# This is a Nagios2 check script which takes a single argument, the IP address
+# of a device. It then contacts a memcached server and checks the latest state
+# of all ports on that device. Only ports which are polled are reported, and
+# only ports which are administratively up, but down, are flagged for error.
+
+use strict;
+use warnings;
+
+use Cache::Memcached;
+use Regexp::Common 'net';
+use Readonly;
+
+Readonly my $memcached_conf => {
+    servers   => ['my.storage-server.example.com:11211'],
+    namespace => 'yatg:',
+#    debug     => 1,
+};
+
+my $do_quit = sub {
+    my ($msg, $status) = @_;
+    $status = 1 if !defined $status;
+
+    print "$msg\n";
+    exit $status;
+};
+
+my $combined_error = q{}; # combine the error messages to fit in nagios report 
+my $combined_ok    = q{}; # combine the ok messages to fit in nagios report 
+
+my $target_host = $ARGV[0]
+    or $do_quit->( 'ERROR: No target host specified' );
+
+$target_host =~ m/^$RE{net}{IPv4}$/
+    or $do_quit->( 'ERROR: Target host must be an IPv4 address' );
+
+my $m = Cache::Memcached->new($memcached_conf)
+    or $do_quit->( 'ERROR: Failed to connect to memcached server' );
+
+my @devices = eval { @{ $m->get('yatg_devices') } }
+    or $do_quit->( 'ERROR: Failed to get list of devices from memcached' );
+
+((scalar grep m/^$target_host$/, @devices) != 0)
+    or $do_quit->( "ERROR: YATG did not poll $target_host ports" );
+
+my @ports = eval { @{ $m->get("ports_for:$target_host") } }
+    or $do_quit->( "ERROR: Failed to get ports list for $target_host" );
+
+
+# look for ports on this host which are administratively up, but not connected
+#
+# NB: memcached will only contain ports which are administratively up, and are
+# not excluded for being uninteresting (e.g. stack ports)
+
+foreach my $port (@ports) {
+    (my $O_key = join ':', $target_host, 'ifOperStatus', $port) =~ s/\s/_/g;
+    my $ifOperStatus = eval { $m->get($O_key) }
+        or $combined_error .= " ERR: Failed to get ifOperStatus for '$O_key';";
+
+    (my $A_key = join ':', $target_host, 'ifAlias', $port) =~ s/\s/_/g;
+    my $ifAlias = eval { $m->get($A_key) } || ''; # not a problem to fail
+
+    if ($ifOperStatus eq 'up') {
+        $combined_ok .= " i/f $port ($ifAlias) up;";
+    }
+    else {
+        $combined_error .= " WARN: $port ($ifAlias) is $ifOperStatus;";
+    }
+}
+
+$do_quit->( "ERROR: $target_host$combined_error", 2 ) if $combined_error ne '';
+$do_quit->( "OK: $target_host$combined_ok", 0 ) if $combined_ok ne '';
+$do_quit->( 'UNKNOWN: Please check the Nagios configuration', 1 );
+
+__END__
+
+Copyright (c) The University of Oxford 2007.
+
+This library is free software; you can redistribute it and/or modify it under
+the same terms as Perl itself.
+

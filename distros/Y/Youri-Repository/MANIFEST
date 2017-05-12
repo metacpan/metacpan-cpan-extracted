@@ -1,0 +1,12 @@
+ChangeLog
+lib/Youri/Repository.pm
+lib/Youri/Repository/Test.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+t/kwalitee.t
+t/perlcritic.t
+t/pod-coverage.t
+t/pod.t
+t/test.t
+META.yml                                 Module meta-data (added by MakeMaker)

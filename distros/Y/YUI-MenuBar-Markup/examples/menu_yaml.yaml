@@ -1,0 +1,30 @@
+menu:
+    -
+        name: Searchers
+        menu:
+            -
+                name: Yahoo!
+                link: http://search.yahoo.com
+            -
+                name: Google
+                link: http://www.google.com
+            -
+                name: Altavista
+                link: http://www.altavista.com
+    -
+        name: Mail
+        menu:
+            -
+                name: Yahoo Mail!
+                link: http://mail.yahoo.com
+            -
+                name: Gmail
+                link: http://gmail.com
+            -
+                name: Old and horrible providers
+                menu:
+                    -
+                        name: Hotmail
+                        link: http://www.hotmail.com
+            
+

@@ -1,0 +1,455 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg width="262.467mm" height="150.989mm"
+ viewBox="0 0 744 428"
+ xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"  version="1.2" baseProfile="tiny">
+<title>Qt Svg Document</title>
+<desc>Generated with Qt</desc>
+<defs>
+</defs>
+<g fill="none" stroke="black" stroke-width="1" fill-rule="evenodd" stroke-linecap="square" stroke-linejoin="bevel" >
+
+<g fill="none" stroke="#ff0000" stroke-opacity="1" stroke-width="1" stroke-linecap="square" stroke-linejoin="bevel" transform="matrix(1,0,0,1,-40,-10)"
+font-family="Cantarell" font-size="11" font-weight="400" font-style="normal" 
+>
+<polyline fill="none" vector-effect="non-scaling-stroke" points="390,300 390,220 " />
+<polyline fill="none" vector-effect="non-scaling-stroke" points="390,170 390,70 " />
+<polyline fill="none" vector-effect="non-scaling-stroke" points="150,170 150,90 " />
+<polyline fill="none" vector-effect="non-scaling-stroke" points="640,370 640,90 " />
+<polyline fill="none" vector-effect="non-scaling-stroke" points="210,40 340,40 " />
+<polyline fill="none" vector-effect="non-scaling-stroke" points="440,40 590,40 " />
+<polyline fill="none" vector-effect="non-scaling-stroke" points="150,370 150,250 " />
+<polyline fill="none" vector-effect="non-scaling-stroke" points="390,370 390,340 " />
+</g>
+
+<g fill="#ffffff" fill-opacity="1" stroke="none" transform="matrix(1,0,0,1,-40,-10)"
+font-family="Cantarell" font-size="11" font-weight="400" font-style="normal" 
+>
+<path vector-effect="non-scaling-stroke" fill-rule="evenodd" d="M390,70 L383,81 L397,81 L390,70"/>
+</g>
+
+<g fill="#ffffff" fill-opacity="1" stroke="none" transform="matrix(1,0,0,1,-40,-10)"
+font-family="Cantarell" font-size="11" font-weight="400" font-style="normal" 
+>
+<path vector-effect="non-scaling-stroke" fill-rule="evenodd" d="M150,90 L143,101 L157,101 L150,90"/>
+</g>
+
+<g fill="#ffffff" fill-opacity="1" stroke="none" transform="matrix(1,0,0,1,-40,-10)"
+font-family="Cantarell" font-size="11" font-weight="400" font-style="normal" 
+>
+<path vector-effect="non-scaling-stroke" fill-rule="evenodd" d="M640,90 L633,101 L647,101 L640,90"/>
+</g>
+
+<g fill="#ffffff" fill-opacity="1" stroke="none" transform="matrix(1,0,0,1,-40,-10)"
+font-family="Cantarell" font-size="11" font-weight="400" font-style="normal" 
+>
+<path vector-effect="non-scaling-stroke" fill-rule="evenodd" d="M210,40 L220,44 L232,40 L220,36 L210,40"/>
+</g>
+
+<g fill="#ffffff" fill-opacity="1" stroke="none" transform="matrix(1,0,0,1,-40,-10)"
+font-family="Cantarell" font-size="11" font-weight="400" font-style="normal" 
+>
+<path vector-effect="non-scaling-stroke" fill-rule="evenodd" d="M440,40 L450,44 L462,40 L450,36 L440,40"/>
+</g>
+
+<g fill="#ffffff" fill-opacity="1" stroke="none" transform="matrix(1,0,0,1,-40,-10)"
+font-family="Cantarell" font-size="11" font-weight="400" font-style="normal" 
+>
+<path vector-effect="non-scaling-stroke" fill-rule="evenodd" d="M150,250 L143,261 L157,261 L150,250"/>
+</g>
+
+<g fill="#ffffff" fill-opacity="1" stroke="none" transform="matrix(1,0,0,1,-40,-10)"
+font-family="Cantarell" font-size="11" font-weight="400" font-style="normal" 
+>
+<path vector-effect="non-scaling-stroke" fill-rule="evenodd" d="M390,340 L383,351 L397,351 L390,340"/>
+</g>
+
+<g fill="#ffffff" fill-opacity="1" stroke="none" transform="matrix(1,0,0,1,-40,-10)"
+font-family="Cantarell" font-size="11" font-weight="400" font-style="normal" 
+>
+<path vector-effect="non-scaling-stroke" fill-rule="evenodd" d="M390,220 L383,231 L397,231 L390,220"/>
+</g>
+
+<g fill="none" stroke="#ff0000" stroke-opacity="1" stroke-width="1" stroke-linecap="square" stroke-linejoin="bevel" transform="matrix(1,0,0,1,-40,-10)"
+font-family="Cantarell" font-size="11" font-weight="400" font-style="normal" 
+>
+<polyline fill="none" vector-effect="non-scaling-stroke" points="390,340 397,351 " />
+<polyline fill="none" vector-effect="non-scaling-stroke" points="390,220 383,231 " />
+<polyline fill="none" vector-effect="non-scaling-stroke" points="383,351 397,351 " />
+<polyline fill="none" vector-effect="non-scaling-stroke" points="383,231 397,231 " />
+<polyline fill="none" vector-effect="non-scaling-stroke" points="390,340 383,351 " />
+</g>
+
+<g fill="#ffff00" fill-opacity="1" stroke="#ff0000" stroke-opacity="1" stroke-width="1" stroke-linecap="square" stroke-linejoin="bevel" transform="matrix(1,0,0,1,-40,-10)"
+font-family="Cantarell" font-size="11" font-weight="400" font-style="normal" 
+>
+<path vector-effect="non-scaling-stroke" fill-rule="evenodd" d="M340,10 L443,10 L443,65 L340,65 L340,10"/>
+</g>
+
+<g fill="#ffff00" fill-opacity="1" stroke="#000000" stroke-opacity="1" stroke-width="1" stroke-linecap="square" stroke-linejoin="bevel" transform="matrix(1,0,0,1,-40,-10)"
+font-family="Sans Serif" font-size="10" font-weight="700" font-style="normal" 
+>
+<text fill="#000000" fill-opacity="1" stroke="none" xml:space="preserve" x="363.5" y="22" font-family="Sans Serif" font-size="10" font-weight="700" font-style="normal" 
+ >YATT::Lite</text>
+</g>
+
+<g fill="#ffff00" fill-opacity="1" stroke="#ff0000" stroke-opacity="1" stroke-width="1" stroke-linecap="square" stroke-linejoin="bevel" transform="matrix(1,0,0,1,-40,-10)"
+font-family="Sans Serif" font-size="10" font-weight="700" font-style="normal" 
+>
+<polyline fill="none" vector-effect="non-scaling-stroke" points="340,27 442,27 " />
+</g>
+
+<g fill="#ffff00" fill-opacity="1" stroke="#000000" stroke-opacity="1" stroke-width="1" stroke-linecap="square" stroke-linejoin="bevel" transform="matrix(1,0,0,1,-40,-10)"
+font-family="Sans Serif" font-size="10" font-weight="400" font-style="normal" 
+>
+<text fill="#000000" fill-opacity="1" stroke="none" xml:space="preserve" x="345" y="39" font-family="Sans Serif" font-size="10" font-weight="400" font-style="normal" 
+ >+ vfs : </text>
+</g>
+
+<g fill="#ffff00" fill-opacity="1" stroke="#ff0000" stroke-opacity="1" stroke-width="1" stroke-linecap="square" stroke-linejoin="bevel" transform="matrix(1,0,0,1,-40,-10)"
+font-family="Sans Serif" font-size="10" font-weight="400" font-style="normal" 
+>
+<polyline fill="none" vector-effect="non-scaling-stroke" points="340,44 442,44 " />
+</g>
+
+<g fill="#ffff00" fill-opacity="1" stroke="#000000" stroke-opacity="1" stroke-width="1" stroke-linecap="square" stroke-linejoin="bevel" transform="matrix(1,0,0,1,-40,-10)"
+font-family="Sans Serif" font-size="10" font-weight="400" font-style="normal" 
+>
+<text fill="#000000" fill-opacity="1" stroke="none" xml:space="preserve" x="345" y="56" font-family="Sans Serif" font-size="10" font-weight="400" font-style="normal" 
+ >+ render()</text>
+</g>
+
+<g fill="none" stroke="#ff0000" stroke-opacity="1" stroke-width="1" stroke-linecap="square" stroke-linejoin="bevel" transform="matrix(1,0,0,1,-40,-10)"
+font-family="Sans Serif" font-size="10" font-weight="400" font-style="normal" 
+>
+<polyline fill="none" vector-effect="non-scaling-stroke" points="383,81 397,81 " />
+</g>
+
+<g fill="#ffff00" fill-opacity="1" stroke="#ff0000" stroke-opacity="1" stroke-width="1" stroke-linecap="square" stroke-linejoin="bevel" transform="matrix(1,0,0,1,-40,-10)"
+font-family="Sans Serif" font-size="10" font-weight="400" font-style="normal" 
+>
+<path vector-effect="non-scaling-stroke" fill-rule="evenodd" d="M590,370 L752,370 L752,406 L590,406 L590,370"/>
+</g>
+
+<g fill="#ffff00" fill-opacity="1" stroke="#000000" stroke-opacity="1" stroke-width="1" stroke-linecap="square" stroke-linejoin="bevel" transform="matrix(1,0,0,1,-40,-10)"
+font-family="Sans Serif" font-size="10" font-weight="700" font-style="normal" 
+>
+<text fill="#000000" fill-opacity="1" stroke="none" xml:space="preserve" x="622" y="382" font-family="Sans Serif" font-size="10" font-weight="700" font-style="normal" 
+ >*.yatt (template)</text>
+</g>
+
+<g fill="#ffff00" fill-opacity="1" stroke="#ff0000" stroke-opacity="1" stroke-width="1" stroke-linecap="square" stroke-linejoin="bevel" transform="matrix(1,0,0,1,-40,-10)"
+font-family="Sans Serif" font-size="10" font-weight="700" font-style="normal" 
+>
+<polyline fill="none" vector-effect="non-scaling-stroke" points="590,387 751,387 " />
+</g>
+
+<g fill="#ffff00" fill-opacity="1" stroke="#ff0000" stroke-opacity="1" stroke-width="1" stroke-linecap="square" stroke-linejoin="bevel" transform="matrix(1,0,0,1,-40,-10)"
+font-family="Sans Serif" font-size="10" font-weight="400" font-style="normal" 
+>
+<polyline fill="none" vector-effect="non-scaling-stroke" points="590,395 751,395 " />
+</g>
+
+<g fill="none" stroke="#ff0000" stroke-opacity="1" stroke-width="1" stroke-linecap="square" stroke-linejoin="bevel" transform="matrix(1,0,0,1,-40,-10)"
+font-family="Sans Serif" font-size="10" font-weight="400" font-style="normal" 
+>
+<polyline fill="none" vector-effect="non-scaling-stroke" points="390,70 383,81 " />
+<polyline fill="none" vector-effect="non-scaling-stroke" points="390,70 397,81 " />
+<polyline fill="none" vector-effect="non-scaling-stroke" points="150,90 157,101 " />
+<polyline fill="none" vector-effect="non-scaling-stroke" points="150,90 143,101 " />
+<polyline fill="none" vector-effect="non-scaling-stroke" points="143,101 157,101 " />
+<polyline fill="none" vector-effect="non-scaling-stroke" points="640,90 647,101 " />
+<polyline fill="none" vector-effect="non-scaling-stroke" points="640,90 633,101 " />
+<polyline fill="none" vector-effect="non-scaling-stroke" points="633,101 647,101 " />
+<polyline fill="none" vector-effect="non-scaling-stroke" points="220,44 232,40 " />
+<polyline fill="none" vector-effect="non-scaling-stroke" points="210,40 220,44 " />
+<polyline fill="none" vector-effect="non-scaling-stroke" points="232,40 220,36 " />
+<polyline fill="none" vector-effect="non-scaling-stroke" points="220,36 210,40 " />
+<polyline fill="none" vector-effect="non-scaling-stroke" points="440,40 450,44 " />
+<polyline fill="none" vector-effect="non-scaling-stroke" points="450,44 462,40 " />
+<polyline fill="none" vector-effect="non-scaling-stroke" points="462,40 450,36 " />
+<polyline fill="none" vector-effect="non-scaling-stroke" points="450,36 440,40 " />
+<polyline fill="none" vector-effect="non-scaling-stroke" points="150,250 143,261 " />
+<polyline fill="none" vector-effect="non-scaling-stroke" points="150,250 157,261 " />
+<polyline fill="none" vector-effect="non-scaling-stroke" points="143,261 157,261 " />
+<polyline fill="none" vector-effect="non-scaling-stroke" points="390,220 397,231 " />
+</g>
+
+<g fill="#ffff00" fill-opacity="1" stroke="#ff0000" stroke-opacity="1" stroke-width="1" stroke-linecap="square" stroke-linejoin="bevel" transform="matrix(1,0,0,1,-40,-10)"
+font-family="Sans Serif" font-size="10" font-weight="400" font-style="normal" 
+>
+<path vector-effect="non-scaling-stroke" fill-rule="evenodd" d="M60,370 L234,370 L234,403 L60,403 L60,370"/>
+</g>
+
+<g fill="#ffff00" fill-opacity="1" stroke="#000000" stroke-opacity="1" stroke-width="1" stroke-linecap="square" stroke-linejoin="bevel" transform="matrix(1,0,0,1,-40,-10)"
+font-family="Sans Serif" font-size="10" font-weight="700" font-style="normal" 
+>
+<text fill="#000000" fill-opacity="1" stroke="none" xml:space="preserve" x="86" y="382" font-family="Sans Serif" font-size="10" font-weight="700" font-style="normal" 
+ >app.psgi (boot script)</text>
+</g>
+
+<g fill="#ffff00" fill-opacity="1" stroke="#ff0000" stroke-opacity="1" stroke-width="1" stroke-linecap="square" stroke-linejoin="bevel" transform="matrix(1,0,0,1,-40,-10)"
+font-family="Sans Serif" font-size="10" font-weight="700" font-style="normal" 
+>
+<polyline fill="none" vector-effect="non-scaling-stroke" points="60,387 233,387 " />
+</g>
+
+<g fill="#ffff00" fill-opacity="1" stroke="#ff0000" stroke-opacity="1" stroke-width="1" stroke-linecap="square" stroke-linejoin="bevel" transform="matrix(1,0,0,1,-40,-10)"
+font-family="Sans Serif" font-size="10" font-weight="400" font-style="normal" 
+>
+<polyline fill="none" vector-effect="non-scaling-stroke" points="60,395 233,395 " />
+</g>
+
+<g fill="none" stroke="#000000" stroke-opacity="1" stroke-width="1" stroke-linecap="square" stroke-linejoin="bevel" transform="matrix(1,0,0,1,-40,-10)"
+font-family="Sans Serif" font-size="10" font-weight="400" font-style="normal" 
+>
+<path vector-effect="non-scaling-stroke" fill-rule="evenodd" d="M40,290 L784,290 L784,438 L40,438 L40,290"/>
+</g>
+
+<g fill="#ffff00" fill-opacity="1" stroke="#ff0000" stroke-opacity="1" stroke-width="1" stroke-linecap="square" stroke-linejoin="bevel" transform="matrix(1,0,0,1,-40,-10)"
+font-family="Sans Serif" font-size="10" font-weight="400" font-style="normal" 
+>
+<path vector-effect="non-scaling-stroke" fill-rule="evenodd" d="M590,10 L735,10 L735,86 L590,86 L590,10"/>
+</g>
+
+<g fill="#ffff00" fill-opacity="1" stroke="#000000" stroke-opacity="1" stroke-width="1" stroke-linecap="square" stroke-linejoin="bevel" transform="matrix(1,0,0,1,-40,-10)"
+font-family="Sans Serif" font-size="10" font-weight="700" font-style="normal" 
+>
+<text fill="#000000" fill-opacity="1" stroke="none" xml:space="preserve" x="609.5" y="22" font-family="Sans Serif" font-size="10" font-weight="700" font-style="normal" 
+ >YATT::Lite::Entities</text>
+</g>
+
+<g fill="#ffff00" fill-opacity="1" stroke="#ff0000" stroke-opacity="1" stroke-width="1" stroke-linecap="square" stroke-linejoin="bevel" transform="matrix(1,0,0,1,-40,-10)"
+font-family="Sans Serif" font-size="10" font-weight="700" font-style="normal" 
+>
+<polyline fill="none" vector-effect="non-scaling-stroke" points="590,27 734,27 " />
+</g>
+
+<g fill="#ffff00" fill-opacity="1" stroke="#000000" stroke-opacity="1" stroke-width="1" stroke-linecap="square" stroke-linejoin="bevel" transform="matrix(1,0,0,1,-40,-10)"
+font-family="Sans Serif" font-size="10" font-weight="400" font-style="normal" 
+>
+<text fill="#000000" fill-opacity="1" stroke="none" xml:space="preserve" x="595" y="39" font-family="Sans Serif" font-size="10" font-weight="400" font-style="normal" 
+ ># $YATT : </text>
+</g>
+
+<g fill="#ffff00" fill-opacity="1" stroke="#000000" stroke-opacity="1" stroke-width="1" stroke-linecap="square" stroke-linejoin="bevel" transform="matrix(1,0,0,1,-40,-10)"
+font-family="Sans Serif" font-size="10" font-weight="400" font-style="normal" 
+>
+<text fill="#000000" fill-opacity="1" stroke="none" xml:space="preserve" x="595" y="56" font-family="Sans Serif" font-size="10" font-weight="400" font-style="normal" 
+ ># $SYS : </text>
+</g>
+
+<g fill="#ffff00" fill-opacity="1" stroke="#000000" stroke-opacity="1" stroke-width="1" stroke-linecap="square" stroke-linejoin="bevel" transform="matrix(1,0,0,1,-40,-10)"
+font-family="Sans Serif" font-size="10" font-weight="400" font-style="normal" 
+>
+<text fill="#000000" fill-opacity="1" stroke="none" xml:space="preserve" x="595" y="73" font-family="Sans Serif" font-size="10" font-weight="400" font-style="normal" 
+ ># $CON : </text>
+</g>
+
+<g fill="#ffff00" fill-opacity="1" stroke="#ff0000" stroke-opacity="1" stroke-width="1" stroke-linecap="square" stroke-linejoin="bevel" transform="matrix(1,0,0,1,-40,-10)"
+font-family="Sans Serif" font-size="10" font-weight="400" font-style="normal" 
+>
+<polyline fill="none" vector-effect="non-scaling-stroke" points="590,78 734,78 " />
+</g>
+
+<g fill="#ffff00" fill-opacity="1" stroke="#ff0000" stroke-opacity="1" stroke-width="1" stroke-linecap="square" stroke-linejoin="bevel" transform="matrix(1,0,0,1,-40,-10)"
+font-family="Sans Serif" font-size="10" font-weight="400" font-style="normal" 
+>
+<path vector-effect="non-scaling-stroke" fill-rule="evenodd" d="M290,370 L536,370 L536,403 L290,403 L290,370"/>
+</g>
+
+<g fill="#ffff00" fill-opacity="1" stroke="#000000" stroke-opacity="1" stroke-width="1" stroke-linecap="square" stroke-linejoin="bevel" transform="matrix(1,0,0,1,-40,-10)"
+font-family="Sans Serif" font-size="10" font-weight="700" font-style="normal" 
+>
+<text fill="#000000" fill-opacity="1" stroke="none" xml:space="preserve" x="321" y="382" font-family="Sans Serif" font-size="10" font-weight="700" font-style="normal" 
+ >(.htyattrc.pl) (per-dir controller)</text>
+</g>
+
+<g fill="#ffff00" fill-opacity="1" stroke="#ff0000" stroke-opacity="1" stroke-width="1" stroke-linecap="square" stroke-linejoin="bevel" transform="matrix(1,0,0,1,-40,-10)"
+font-family="Sans Serif" font-size="10" font-weight="700" font-style="normal" 
+>
+<polyline fill="none" vector-effect="non-scaling-stroke" points="290,387 535,387 " />
+</g>
+
+<g fill="#ffff00" fill-opacity="1" stroke="#ff0000" stroke-opacity="1" stroke-width="1" stroke-linecap="square" stroke-linejoin="bevel" transform="matrix(1,0,0,1,-40,-10)"
+font-family="Sans Serif" font-size="10" font-weight="400" font-style="normal" 
+>
+<polyline fill="none" vector-effect="non-scaling-stroke" points="290,395 535,395 " />
+</g>
+
+<g fill="#ffff00" fill-opacity="1" stroke="#ff0000" stroke-opacity="1" stroke-width="1" stroke-linecap="square" stroke-linejoin="bevel" transform="matrix(1,0,0,1,-40,-10)"
+font-family="Sans Serif" font-size="10" font-weight="400" font-style="normal" 
+>
+<path vector-effect="non-scaling-stroke" fill-rule="evenodd" d="M320,170 L469,170 L469,221 L320,221 L320,170"/>
+</g>
+
+<g fill="#ffff00" fill-opacity="1" stroke="#000000" stroke-opacity="1" stroke-width="1" stroke-linecap="square" stroke-linejoin="bevel" transform="matrix(1,0,0,1,-40,-10)"
+font-family="Sans Serif" font-size="10" font-weight="700" font-style="normal" 
+>
+<text fill="#000000" fill-opacity="1" stroke="none" xml:space="preserve" x="371" y="182" font-family="Sans Serif" font-size="10" font-weight="700" font-style="normal" 
+ >..DirApp</text>
+</g>
+
+<g fill="#ffff00" fill-opacity="1" stroke="#ff0000" stroke-opacity="1" stroke-width="1" stroke-linecap="square" stroke-linejoin="bevel" transform="matrix(1,0,0,1,-40,-10)"
+font-family="Sans Serif" font-size="10" font-weight="700" font-style="normal" 
+>
+<polyline fill="none" vector-effect="non-scaling-stroke" points="320,187 468,187 " />
+</g>
+
+<g fill="#ffff00" fill-opacity="1" stroke="#000000" stroke-opacity="1" stroke-width="1" stroke-linecap="square" stroke-linejoin="bevel" transform="matrix(1,0,0,1,-40,-10)"
+font-family="Sans Serif" font-size="10" font-weight="400" font-style="normal" 
+>
+<text fill="#000000" fill-opacity="1" stroke="none" xml:space="preserve" x="325" y="199" font-family="Sans Serif" font-size="10" font-weight="400" font-style="normal" 
+ >+ dir : </text>
+</g>
+
+<g fill="#ffff00" fill-opacity="1" stroke="#ff0000" stroke-opacity="1" stroke-width="1" stroke-linecap="square" stroke-linejoin="bevel" transform="matrix(1,0,0,1,-40,-10)"
+font-family="Sans Serif" font-size="10" font-weight="400" font-style="normal" 
+>
+<polyline fill="none" vector-effect="non-scaling-stroke" points="320,204 468,204 " />
+</g>
+
+<g fill="#ffff00" fill-opacity="1" stroke="#000000" stroke-opacity="1" stroke-width="1" stroke-linecap="square" stroke-linejoin="bevel" transform="matrix(1,0,0,1,-40,-10)"
+font-family="Sans Serif" font-size="10" font-weight="400" font-style="normal" 
+>
+<text fill="#000000" fill-opacity="1" stroke="none" xml:space="preserve" x="325" y="216" font-family="Sans Serif" font-size="10" font-weight="400" font-style="normal" 
+ >+ handle()</text>
+</g>
+
+<g fill="none" stroke="#000000" stroke-opacity="1" stroke-width="1" stroke-linecap="square" stroke-linejoin="bevel" transform="matrix(1,0,0,1,-40,-10)"
+font-family="Sans Serif" font-size="10" font-weight="400" font-style="normal" 
+>
+<text fill="#000000" fill-opacity="1" stroke="none" xml:space="preserve" x="228" y="154" font-family="Sans Serif" font-size="10" font-weight="400" font-style="normal" 
+ >YATT::Lite::WebMVC0</text>
+</g>
+
+<g fill="#ffff00" fill-opacity="1" stroke="#ff0000" stroke-opacity="1" stroke-width="1" stroke-linecap="square" stroke-linejoin="bevel" transform="matrix(1,0,0,1,-40,-10)"
+font-family="Sans Serif" font-size="10" font-weight="400" font-style="normal" 
+>
+<path vector-effect="non-scaling-stroke" fill-rule="evenodd" d="M60,170 L217,170 L217,246 L60,246 L60,170"/>
+</g>
+
+<g fill="#ffff00" fill-opacity="1" stroke="#000000" stroke-opacity="1" stroke-width="1" stroke-linecap="square" stroke-linejoin="bevel" transform="matrix(1,0,0,1,-40,-10)"
+font-family="Sans Serif" font-size="10" font-weight="700" font-style="normal" 
+>
+<text fill="#000000" fill-opacity="1" stroke="none" xml:space="preserve" x="112" y="182" font-family="Sans Serif" font-size="10" font-weight="700" font-style="normal" 
+ >..SiteApp</text>
+</g>
+
+<g fill="#ffff00" fill-opacity="1" stroke="#ff0000" stroke-opacity="1" stroke-width="1" stroke-linecap="square" stroke-linejoin="bevel" transform="matrix(1,0,0,1,-40,-10)"
+font-family="Sans Serif" font-size="10" font-weight="700" font-style="normal" 
+>
+<polyline fill="none" vector-effect="non-scaling-stroke" points="60,187 216,187 " />
+</g>
+
+<g fill="#ffff00" fill-opacity="1" stroke="#ff0000" stroke-opacity="1" stroke-width="1" stroke-linecap="square" stroke-linejoin="bevel" transform="matrix(1,0,0,1,-40,-10)"
+font-family="Sans Serif" font-size="10" font-weight="400" font-style="normal" 
+>
+<polyline fill="none" vector-effect="non-scaling-stroke" points="60,195 216,195 " />
+</g>
+
+<g fill="#ffff00" fill-opacity="1" stroke="#000000" stroke-opacity="1" stroke-width="1" stroke-linecap="square" stroke-linejoin="bevel" transform="matrix(1,0,0,1,-40,-10)"
+font-family="Sans Serif" font-size="10" font-weight="400" font-style="normal" 
+>
+<text fill="#000000" fill-opacity="1" stroke="none" xml:space="preserve" x="65" y="207" font-family="Sans Serif" font-size="10" font-weight="400" font-style="normal" 
+ >+ to_app()</text>
+</g>
+
+<g fill="#ffff00" fill-opacity="1" stroke="#000000" stroke-opacity="1" stroke-width="1" stroke-linecap="square" stroke-linejoin="bevel" transform="matrix(1,0,0,1,-40,-10)"
+font-family="Sans Serif" font-size="10" font-weight="400" font-style="normal" 
+>
+<text fill="#000000" fill-opacity="1" stroke="none" xml:space="preserve" x="65" y="224" font-family="Sans Serif" font-size="10" font-weight="400" font-style="normal" 
+ >+ call()</text>
+</g>
+
+<g fill="#ffff00" fill-opacity="1" stroke="#000000" stroke-opacity="1" stroke-width="1" stroke-linecap="square" stroke-linejoin="bevel" transform="matrix(1,0,0,1,-40,-10)"
+font-family="Sans Serif" font-size="10" font-weight="400" font-style="normal" 
+>
+<text fill="#000000" fill-opacity="1" stroke="none" xml:space="preserve" x="65" y="241" font-family="Sans Serif" font-size="10" font-weight="400" font-style="normal" 
+ >+ make_connection()</text>
+</g>
+
+<g fill="none" stroke="#000000" stroke-opacity="1" stroke-width="1" stroke-linecap="square" stroke-linejoin="bevel" transform="matrix(1,0,0,1,-40,-10)"
+font-family="Sans Serif" font-size="10" font-weight="400" font-style="normal" 
+>
+<path vector-effect="non-scaling-stroke" fill-rule="evenodd" d="M40,140 L491,140 L491,267 L40,267 L40,140"/>
+</g>
+
+<g fill="#ffff00" fill-opacity="1" stroke="#ff0000" stroke-opacity="1" stroke-width="1" stroke-linecap="square" stroke-linejoin="bevel" transform="matrix(1,0,0,1,-40,-10)"
+font-family="Sans Serif" font-size="10" font-weight="400" font-style="normal" 
+>
+<path vector-effect="non-scaling-stroke" fill-rule="evenodd" d="M60,10 L212,10 L212,87 L60,87 L60,10"/>
+</g>
+
+<g fill="#ffff00" fill-opacity="1" stroke="#000000" stroke-opacity="1" stroke-width="1" stroke-linecap="square" stroke-linejoin="bevel" transform="matrix(1,0,0,1,-40,-10)"
+font-family="Sans Serif" font-size="10" font-weight="700" font-style="normal" 
+>
+<text fill="#000000" fill-opacity="1" stroke="none" xml:space="preserve" x="83" y="22" font-family="Sans Serif" font-size="10" font-weight="700" font-style="normal" 
+ >YATT::Lite::Factory</text>
+</g>
+
+<g fill="#ffff00" fill-opacity="1" stroke="#ff0000" stroke-opacity="1" stroke-width="1" stroke-linecap="square" stroke-linejoin="bevel" transform="matrix(1,0,0,1,-40,-10)"
+font-family="Sans Serif" font-size="10" font-weight="700" font-style="normal" 
+>
+<polyline fill="none" vector-effect="non-scaling-stroke" points="60,27 211,27 " />
+</g>
+
+<g fill="#ffff00" fill-opacity="1" stroke="#000000" stroke-opacity="1" stroke-width="1" stroke-linecap="square" stroke-linejoin="bevel" transform="matrix(1,0,0,1,-40,-10)"
+font-family="Sans Serif" font-size="10" font-weight="400" font-style="normal" 
+>
+<text fill="#000000" fill-opacity="1" stroke="none" xml:space="preserve" x="65" y="39" font-family="Sans Serif" font-size="10" font-weight="400" font-style="normal" 
+ >+ doc_root : </text>
+</g>
+
+<g fill="#ffff00" fill-opacity="1" stroke="#000000" stroke-opacity="1" stroke-width="1" stroke-linecap="square" stroke-linejoin="bevel" transform="matrix(1,0,0,1,-40,-10)"
+font-family="Sans Serif" font-size="10" font-weight="400" font-style="normal" 
+>
+<text fill="#000000" fill-opacity="1" stroke="none" xml:space="preserve" x="65" y="56" font-family="Sans Serif" font-size="10" font-weight="400" font-style="normal" 
+ >+ app_ns : </text>
+</g>
+
+<g fill="#ffff00" fill-opacity="1" stroke="#ff0000" stroke-opacity="1" stroke-width="1" stroke-linecap="square" stroke-linejoin="bevel" transform="matrix(1,0,0,1,-40,-10)"
+font-family="Sans Serif" font-size="10" font-weight="400" font-style="normal" 
+>
+<polyline fill="none" vector-effect="non-scaling-stroke" points="60,61 211,61 " />
+</g>
+
+<g fill="#ffff00" fill-opacity="1" stroke="#000000" stroke-opacity="1" stroke-width="1" stroke-linecap="square" stroke-linejoin="bevel" transform="matrix(1,0,0,1,-40,-10)"
+font-family="Sans Serif" font-size="10" font-weight="400" font-style="normal" 
+>
+<text fill="#000000" fill-opacity="1" stroke="none" xml:space="preserve" x="65" y="73" font-family="Sans Serif" font-size="10" font-weight="400" font-style="normal" 
+ >+ get_yatt()</text>
+</g>
+
+<g fill="#ffff00" fill-opacity="1" stroke="#ff0000" stroke-opacity="1" stroke-width="1" stroke-linecap="square" stroke-linejoin="bevel" transform="matrix(1,0,0,1,-40,-10)"
+font-family="Sans Serif" font-size="10" font-weight="400" font-style="normal" 
+>
+<path vector-effect="non-scaling-stroke" fill-rule="evenodd" d="M290,300 L526,300 L526,340 L290,340 L290,300"/>
+</g>
+
+<g fill="#ffff00" fill-opacity="1" stroke="#000000" stroke-opacity="1" stroke-width="1" stroke-linecap="square" stroke-linejoin="bevel" transform="matrix(1,0,0,1,-40,-10)"
+font-family="Sans Serif" font-size="10" font-weight="700" font-style="normal" 
+>
+<text fill="#000000" fill-opacity="1" stroke="none" xml:space="preserve" x="322" y="312" font-family="Sans Serif" font-size="10" font-weight="700" font-style="normal" 
+ >(MyApp) (for all-dir, omissible)</text>
+</g>
+
+<g fill="#ffff00" fill-opacity="1" stroke="#ff0000" stroke-opacity="1" stroke-width="1" stroke-linecap="square" stroke-linejoin="bevel" transform="matrix(1,0,0,1,-40,-10)"
+font-family="Sans Serif" font-size="10" font-weight="700" font-style="normal" 
+>
+<polyline fill="none" vector-effect="non-scaling-stroke" points="290,317 525,317 " />
+</g>
+
+<g fill="#ffff00" fill-opacity="1" stroke="#ff0000" stroke-opacity="1" stroke-width="1" stroke-linecap="square" stroke-linejoin="bevel" transform="matrix(1,0,0,1,-40,-10)"
+font-family="Sans Serif" font-size="10" font-weight="400" font-style="normal" 
+>
+<polyline fill="none" vector-effect="non-scaling-stroke" points="290,325 525,325 " />
+</g>
+
+<g fill="none" stroke="#000000" stroke-opacity="1" stroke-width="1" stroke-linecap="square" stroke-linejoin="bevel" transform="matrix(1,0,0,1,-40,-10)"
+font-family="Sans Serif" font-size="10" font-weight="400" font-style="normal" 
+>
+<text fill="#000000" fill-opacity="1" stroke="none" xml:space="preserve" x="263" y="424" font-family="Sans Serif" font-size="10" font-weight="400" font-style="normal" 
+ >Per-installation, user written app.psgi(MySite), MyApp, index.yatt...</text>
+</g>
+</g>
+</svg>

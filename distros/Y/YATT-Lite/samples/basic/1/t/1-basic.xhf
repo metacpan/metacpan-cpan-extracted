@@ -1,0 +1,43 @@
+# -*- coding: utf-8 -*-
+
+FILE: index.yatt
+HEADER[
+Content-type: ^text/html; charset="?utf-8"?
+]
+BODY:
+ <!DOCTYPE html>
+ <html>
+ <head>
+   <title>Hello World!</title>
+ </head>
+ <body>
+ <div id="wrapper" style="width: 800px; margin-left: 50px;">
+ <div id="topnav">
+   <h2 style="display: inline;"><a href="./">Hello World!</a></h2>
+ </div>
+ <center>
+ <div id="body" style="text-align: left;">
+   RUOK?</div>
+ </center>
+ </div>
+ </div>
+ </body>
+ </html>
+
+FILE: varerr.yatt
+ERROR: ^No such variable 'foo'
+
+FILE: perlerr.yatt
+ERROR: ^Global symbol "\$unknown_var" requires explicit package name (\(did you forget to declare "my \$unknown_var"\?\) )?at \.?(?:/[^/]+)*/+perlerr\.yatt line 4\.
+
+FILE: noncode.ydo
+ERROR: ^file '(?:/[^/]*)*/noncode\.ydo' should return CODE \(but not\)!
+
+FILE: foobar.yatt
+PARAM{
+x: 3
+y: 8
+}
+BODY:
+ <h2>3</h2>
+ <h3>8</h3>

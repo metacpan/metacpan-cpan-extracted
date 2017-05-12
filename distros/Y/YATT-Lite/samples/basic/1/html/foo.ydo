@@ -1,0 +1,13 @@
+use strict;
+
+sub {
+  my ($this, $con) = @_;
+
+  my $subtype = $con->param('subtype') || 'plain';
+  unless ($subtype =~ /^\w+$/) {
+    die "Invalid subtype!";
+  }
+
+  $con->set_header(-type => "text/$subtype");
+  print {$con} "<h2>Hello</h2>";
+};

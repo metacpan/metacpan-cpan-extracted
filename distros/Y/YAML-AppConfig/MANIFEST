@@ -1,0 +1,22 @@
+Changes
+lib/YAML/AppConfig.pm
+LICENSE
+Makefile.PL
+MANIFEST
+README.md
+t/00-load.t
+t/01-basic.t
+t/02-normal.t
+t/03-vars.t
+t/04-api.t
+t/05-scoping.t
+t/data/basic.yaml
+t/data/config.yaml
+t/data/merge.yaml
+t/data/normal.yaml
+t/data/scoping.yaml
+t/data/vars.yaml
+t/lib/helpers.pl
+t/lib/MatthewTestClass.pm
+META.yml                                 Module meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

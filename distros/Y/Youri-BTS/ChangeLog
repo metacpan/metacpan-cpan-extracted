@@ -1,0 +1,6 @@
+2007-03-05 Guillaume Rousse <guillomovitch@zarb.org> 0.1.0
+	* initial release
+
+2007-04-22 Guillaume Rousse <guillomovitch@zarb.org> 0.1.1
+	* insert a default milestone when creating a package,
+	  otherwise no bug can be reported

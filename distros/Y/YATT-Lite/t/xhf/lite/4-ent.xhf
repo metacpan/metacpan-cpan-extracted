@@ -1,0 +1,316 @@
+# -*- coding: utf-8 -*-
+YATT_CONFIG[
+special_entities[
+- HTML
+]
+]
+
+TITLE: &yatt:dump();
+IN:
+ <!yatt:args x=list>
+ &yatt:HTML(:dump(:x));
+PARAM[
+[
+- foo
+- bar
+]
+]
+OUT:
+ ['foo','bar']
+
+
+TITLE: &HTML(:var);
+IN:
+ <!yatt:args x=html>
+ &HTML(:x);
+PARAM[
+- <h2>foo</h2>
+]
+OUT:
+ <h2>foo</h2>
+
+
+TITLE: &yatt:template();
+IN:
+ <!yatt:config usage="For template entity">
+ &yatt:template(){cf_usage};.
+OUT:
+ For template entity.
+
+TITLE: &yatt:concat();
+IN:
+ <!yatt:args x y z>
+ &yatt:concat(:x,:y,foo,:z);
+PARAM[
+- A
+- B
+- C
+]
+OUT:
+ ABfooC
+
+
+TITLE: &yatt:join(); and &yatt:lexpand();
+IN:
+ <!yatt:args x=list>
+ &yatt:join(-,:lexpand(:x));
+PARAM[
+[
+- A
+- B
+-
+- C
+]
+]
+OUT:
+ A-B-C
+
+
+TITLE: :lexpand(:var:path())
+IN:
+ <!yatt:args x=value>
+ (&yatt:join(-,:lexpand(:x{foo}));)
+PARAM[
+{
+foo[
+- x
+- y
+- z
+]
+}
+]
+OUT:
+ (x-y-z)
+
+TITLE: &yatt:format(fmt,values);
+IN:
+ <!yatt:args fmt x=list>
+ &yatt:format(:fmt,:lexpand(:x));
+PARAM[
+- foo%2$sbar%1$sbaz
+[
+- X
+- Y
+]
+]
+OUT:
+ fooYbarXbaz
+
+
+TITLE: &yatt:breakpoint();
+IN:
+ A &yatt:breakpoint(); B
+OUT:
+ A  B
+
+
+TITLE: entity in pi
+IN:
+ <!yatt:args x=list>
+ <?perl= &yatt:join(-,:lexpand(:x));  ?>
+PARAM[
+[
+- A
+- B
+-
+- C
+]
+]
+OUT:
+ A-B-C
+
+
+TITLE: Nested hash &yatt:foo:bar:baz;
+IN:
+ <!yatt:args foo=value>
+ &yatt:foo:bar:baz;
+PARAM[
+{
+bar{
+baz: hoehoe
+}
+}
+]
+OUT:
+ hoehoe
+
+
+TITLE: render(name,arg...) h2
+IN:
+ <!yatt:args wname x y>
+ header
+ &yatt:render(t_$wname,:x,:y);
+ footer
+ 
+ <!yatt:widget t_h2 a b>
+ <h2>&yatt:a;</h2>
+ &yatt:b;
+ 
+ <!yatt:widget t_ol a list=list>
+ <ol class="&yatt:a;">
+  <yatt:foreach my=row list>
+  <li>&yatt:row;</li>
+  </yatt:foreach>
+ </ol>
+PARAM[
+- h2
+- title
+- body
+]
+OUT:
+ header
+ <h2>title</h2>
+ body
+ 
+ footer
+
+TITLE: render(name,arg...) ol
+PARAM[
+- ol
+- ordered
+[
+- apple
+- lemon
+- orange
+]
+]
+OUT:
+ header
+ <ol class="ordered">
+  
+  <li>apple</li>
+  
+  <li>lemon</li>
+  
+  <li>orange</li>
+  
+ </ol>
+ 
+ footer
+
+
+TITLE: render([foo,bar],args) => foo_bar
+IN:
+ <!yatt:args ls=list>
+ &yatt:render(:ls,X);
+ 
+ <!yatt:widget foo_bar x>
+ foo &yatt:x; bar
+ <!yatt:widget foo_ x>
+ fooonly x=&yatt:x;
+ <!yatt:widget _bar x>
+ baronly x=&yatt:x;
+PARAM[
+[
+- foo
+- bar
+]
+]
+OUT:
+ foo X bar
+ 
+
+TITLE: render([=undef,bar],args);
+PARAM[
+[
+= #null
+- bar
+]
+]
+OUT:
+ baronly x=X
+ 
+
+TITLE: render([foo,=undef],args);
+PARAM[
+[
+- foo
+= #null
+]
+]
+OUT:
+ fooonly x=X
+ 
+
+TITLE: datetime
+REQUIRE: DateTime
+IN:
+ <!yatt:args>
+ <yatt:my dt:value="&yatt:datetime(new,year,1964,month,10,day,10);"/>
+ &yatt:dt:year();
+ &yatt:dt:month();
+ &yatt:dt:day();
+OUT:
+ 1964
+ 10
+ 10
+
+TITLE: url_encode
+IN:
+ <!yatt:args url>
+ &yatt:url_encode(:url);
+PARAM[
+- http://0:5000/foo?x=y&z=w;p=q
+]
+OUT:
+ http://0:5000/foo%3Fx%3Dy%26z%3Dw%3Bp%3Dq
+
+
+TITLE: alternative
+IN:
+ ja->&yatt:alternative(ja,[en,ja]);
+ en->&yatt:alternative(en,[en,ja]);
+ x->&yatt:alternative(x,[en,ja]);
+OUT:
+ ja->en
+ en->ja
+ x->en
+
+
+TITLE: append_params
+IN:
+ <!yatt:args url list=list>
+ &yatt:append_params(:url,:lexpand(:list));
+PARAM[
+- http://0:5000/foo
+[
+[
+- nx
+- /bar?a=b
+]
+]
+]
+OUT:
+ http://0:5000/foo?nx=%2Fbar%3Fa%3Db
+
+
+TITLE: append_params(more params)
+PARAM[
+- http://0:5000/bar?x=y
+[
+[
+aaa: bbb
+]
+[
+ccc: ddd
+]
+[
+aaa: fff
+]
+]
+]
+OUT:
+ http://0:5000/bar?x=y&amp;aaa=bbb&amp;ccc=ddd&amp;aaa=fff
+
+
+TITLE: append_params(replace same param)
+PARAM[
+- http://0:5000/baz?x=X
+[
+[
+x: Y
+]
+]
+]
+OUT:
+ http://0:5000/baz?x=Y

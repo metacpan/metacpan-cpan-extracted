@@ -1,0 +1,99 @@
+# -*- coding: utf-8 -*-
+
+TITLE: base=[delegate]
+IN:
+ <!yatt:args x y z w %yatt:no_last_newline;>
+ <yatt:derived x y z w/>
+ <!yatt:widget base x y z %yatt:no_last_newline;>
+ &yatt:x; - &yatt:y; - &yatt:z;
+ <!yatt:widget derived base=[delegate] w %yatt:no_last_newline;>
+ <yatt:base/> - &yatt:w;
+PARAM[
+- 1
+- 2
+- 3
+- 4
+]
+OUT: 1 - 2 - 3 - 4
+
+
+TITLE: [delegate] order. widget -> args
+IN:
+ <!yatt:widget base x y z %yatt:no_last_newline;>
+ &yatt:x; - &yatt:y; - &yatt:z;
+ <!yatt:args x y z w base=[delegate] %yatt:no_last_newline;>
+ <yatt:base/> - &yatt:w;
+PARAM[
+- 1
+- 2
+- 3
+- 4
+]
+OUT: 1 - 2 - 3 - 4
+
+
+TITLE: base=[delegate] should be virtual(compile only) var.
+IN:
+ <!yatt:args x y z w %yatt:no_last_newline;>
+ <yatt:derived x y z w/>
+ <!yatt:widget base x y z %yatt:no_last_newline;>
+ &yatt:x; - &yatt:y; - &yatt:z;
+ <!yatt:widget derived base=[delegate] w %yatt:no_last_newline;>
+ <?perl= $base ?> - &yatt:w;
+ERROR: ^Global symbol "\$base" requires explicit package name
+
+
+TITLE: base=[delegate], with body
+IN:
+ <!yatt:args x y z w %yatt:no_last_newline;>
+ <yatt:derived x y z w><h2>&yatt:line;</h2></yatt:derived>
+ 
+ <!yatt:widget base x y z body=[code line] %yatt:no_last_newline;>
+ &yatt:x; - &yatt:y; - &yatt:z;(<yatt:body line="foo"/>)
+ 
+ <!yatt:widget derived base=[delegate] w %yatt:no_last_newline;>
+ <yatt:base/> - &yatt:w;
+PARAM[
+- 1
+- 2
+- 3
+- 4
+]
+OUT: 1 - 2 - 3(<h2>foo</h2>) - 4
+
+
+
+TITLE: base=[delegate:foo]
+IN:
+ <!yatt:args x y z w %yatt:no_last_newline;>
+ <yatt:derived x y z w/>
+ <!yatt:widget foo x y z %yatt:no_last_newline;>
+ &yatt:x; - &yatt:y; - &yatt:z;
+ <!yatt:widget derived base=[delegate:foo] w %yatt:no_last_newline;>
+ <yatt:base/> - &yatt:w;
+PARAM[
+- 1
+- 2
+- 3
+- 4
+]
+OUT: 1 - 2 - 3 - 4
+
+
+TITLE: foo=[delegate] should not have argument 'foo'
+IN:
+ <yatt:bar />
+ <!yatt:widget foo foo>
+ <!yatt:widget bar foo=[delegate]>
+ERROR: delegate 'foo' hides argument 'foo' of widget foo
+
+TITLE: foo=[delegate] should not have argument 'foo'
+IN:
+ <yatt:bar />
+ <!yatt:widget foo foo>&yatt:foo;
+ <!yatt:widget bar baz=[delegate:foo]>
+ <yatt:baz foo="No error."/>
+OUT:
+ No error.
+ 
+ 

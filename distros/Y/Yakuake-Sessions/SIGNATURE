@@ -1,0 +1,51 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.73.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 b4468ca52a76bd3f8f66ad6039a097a8aec48806 Build.PL
+SHA1 1b21d700409cea4355ab6206375f6686921b5641 Changes
+SHA1 b8415dc6fd6293b168bcc15a552f4383175e2f2f LICENSE
+SHA1 11520f6a20e9a07c2b279d7ee979582d89154fda MANIFEST
+SHA1 a388bc37b956bc9349db772620b6cecd08622169 META.json
+SHA1 b0f5e3b46ad7607b6a1eff211e4e438a7adacaf7 META.yml
+SHA1 ec1263cd61cb1c4e4c8425a53976a0e6107d40b0 README
+SHA1 8f4a1a3c8316b3d8074dea2c6153a042727b90e4 bin/yakuake_session
+SHA1 4c4e371086f8e406a6f3b33467825155925ed8f2 bin/yakuake_session_tt_cd
+SHA1 ae1207a1ab914ac568297dec6ecbad70826201b5 lib/Yakuake/Sessions.pm
+SHA1 ec3b8cf5cdff449458c2a717428a00351f0b9231 lib/Yakuake/Sessions/Base.pm
+SHA1 518e673ce0231aece0ef2b2a51fda7c9fc5207a8 lib/Yakuake/Sessions/Config.pm
+SHA1 86c6342a6660a0b824530e0d90135e3a7e626208 lib/Yakuake/Sessions/TraitFor/DBus.pm
+SHA1 c3e35e8e7a43eebd236a90f4490196c19448e505 lib/Yakuake/Sessions/TraitFor/FileData.pm
+SHA1 21f80a92065a66da137e76d7a580ec8501156460 lib/Yakuake/Sessions/TraitFor/Management.pm
+SHA1 e5d579a749a995ea116d7555ecceefec02eb20ae lib/Yakuake/Sessions/TraitFor/TabTitles.pm
+SHA1 433d5591629e03faaef4738c70ea173329e0f1eb t/01always_pass.t
+SHA1 427b1a5820b3d6bc52044b99c999e458eba7d6dc t/02pod.t
+SHA1 905a84ed4a01bba172b682620964560f04ff93d2 t/03podcoverage.t
+SHA1 c1c29d14c961c30f0ea1ff84dd3b6acb7f4d3e81 t/05kwalitee.t
+SHA1 8b1ef2c2000dda84911be6a6bf76d4de88a4d4dc t/06yaml.t
+SHA1 97d0e669275f7bfbbd182acc779835f4926c4dca t/07podspelling.t
+SHA1 8c8d03f797c2ded82096d805b42c176ae72bdcf2 t/10test_script.t
+SHA1 00aa2e48a788f7ec7de8365693f0ba278f86c98c t/critic.rc
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.12 (GNU/Linux)
+
+iQEcBAEBAgAGBQJUFDynAAoJEK492j4Im1Bpyx4H/1BcZZb9AzEI6rR+DZPf1JSu
+KkRNY/0Hqk4KJMkh42/tUUCrk1PM3CWKJulGUIAVCLXyBAlkPdxnjCGxoNSw/ysN
+GD55u8THg2gbcKBdVRoNkpJTQ1ckF7+b3eL7Fv6ZIEUWMLR+vi4Sns5ueT82rjIy
+U2ALGJGrTmTMQws7U5pXvYvN7iWmILhX+15sjK3pOjsprHgHLoFabOgwDZ6F21Ub
+0+G+l0mFejZp8HdOjPDHtFQnqwu4oKgKWZ3Y8/mQVDfAAMbXD8K/LTIhCjHhPn3v
+RPB8iphFVSPpJUSofcA5B2iLhgQqAOIZLzhlIIpTfZBQEdxEh+nBvNYu0YeacnQ=
+=PkSF
+-----END PGP SIGNATURE-----

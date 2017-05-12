@@ -1,0 +1,26 @@
+Youri::Media
+------------
+
+Packages set abstraction layer
+
+Description
+-----------
+This class provides an uniform view over various kind of packages set.
+
+Installation
+------------
+To install, just use:
+perl Makefile.PL
+make
+make test
+
+Copyright and License
+---------------------
+Copyright (c) 2002-2007 YOURI project
+
+This program is free software; you can redistribute it and/or modify it under
+the same terms as Perl itself.
+
+Authors
+-------
+Guillaume Rousse <guillomovitch@zarb.org>

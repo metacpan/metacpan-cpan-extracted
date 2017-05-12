@@ -1,0 +1,65 @@
+Yandex::Translate version 1.000005
+
+
+DESCRIPTION
+
+This module uses the Yandex.Translate API for machine translation.
+A Yandex API key is required; see https://translate.yandex.com/developers
+for more information.
+
+Note also that the “Yandex Terms of Use of API Yandex.Translate Service”
+at https://yandex.com/legal/translate_api/ must be observed.
+
+
+DEPENDENCIES
+
+This module has the following modules as runtime prerequisites:
+
+    HTML::Entities (3.69 or newer recommended)
+    HTTP::Tiny (0.070 or newer recommended)
+    JSON (2.90 or newer recommended)
+    URI::Escape (3.31 or newer recommended)
+
+Additionally, the following module is a testing prerequisite:
+
+    Test::More
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Yandex::Translate
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Yandex::Translate
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Yandex::Translate
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/Yandex::Translate
+
+    Search CPAN
+        http://search.cpan.org/dist/Yandex::Translate/
+
+
+COPYLEFT AND LICENSE
+
+Copyleft © 2017 James Axl
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.

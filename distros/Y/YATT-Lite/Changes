@@ -1,0 +1,132 @@
+Revision history for YATT::Lite
+
+0.101     2016-05-24
+    * Just tagged 0.101 (from 0.100_003)
+
+0.100_003 2015-11-05
+    * Bug fix for [RT #108427] [GH #62] Undeclared dependency on Test::Kantan
+
+0.100_002 2015-10-31
+    * New features
+        - [GH #57] `yattup` - `plackup` alike command for `*.yatt` files.
+        - [GH #54] - !yatt:base "file_or_dir" to inherit templates.
+	
+    * Enhancement (Potentially breaking)
+        - [GH #51] Add experimental `per_role_docroot` feature.
+        - [GH #56] Install psgi_fallback by default (to make `yattup` useful).
+        - Add new option `always_refresh_deps` to fix [GH #1] partially.
+        - [GH #60] Set HTTP Status for "Not found" and "Bad request" errors.
+          To revert old behavior, set `overwrite_status_code_for_errors_as` to 200.
+        - YATT::Lite::Error now exports type alias 'Error' by default.
+        - New method: `($yatt|$con)->error_with_status($code, $msg, @args)`
+
+    * Misc changes:
+        - [GH #59] yatt, yattup should resolve symlink once and only once.
+        - [GH #58] c3 mro support in `use YATT::Lite::Factory -as_base`.
+    
+   * BUG fixes:
+        - [GH #61] no warnings 'redundant' for sprintf. (partially)
+        - [GH #55] *base* templates accidentally inherit their *user* directory bug 
+        - [GH #53] - Allow setting dont_map_args in SiteApp.
+
+0.100_001 2015-09-03
+    * Enhanement (API Change) for unicode handling:
+	- [GH #48] decode input params by default. Add new option `no_unicode` for backward compatibility.
+	- [GH #45] YATT::Lite::Factory->render now returns decoded string by default.
+    * Enhanement to help testing:
+	- [GH #47] $site->mount_action($location => $action_sub)) and $dir->set_action_handler($filename => sub ($this, $con))
+	- [GH #16] $site->mount_psgi($location => $psgi_app)
+    * Fixes
+        - [GH #50] [RT #106776] Test failure (caused by SQLite).
+	- [GH #49] use safer fatalized warnings.
+	- [GH #46] convert_array_param(parse_nested_query) conflicts with Plack::Request->upload.
+
+0.100 2015-04-28
+    * Docs
+        - Better docs for YATT::Lite::LRXML::Syntax
+    * Enhanement
+        - [GH #43] - allow use of ".html" instead of ".yatt"
+    * Fixes
+        - Add Locale::PO to cpanfile
+
+0.0.9_002 2015-04-09
+    * fixes
+        - [GH #42] [RT#103406] Test suite fails if LANG environment variable is unset (0.0.9_001)
+        - [GH #41] [RT #103393] - YATT::Lite::Util::define_const
+        - [GH #35] CGI->multi_param adaption
+        - [GH #40] yatt.render / yatt.genperl relative path problems
+        - [GH #38] - Add $CON->raw_body .. without tests(><)
+        - [GH #37] - Fix test failures on LC_ALL=C
+        - [GH #36] - to adapt recent mmm-mode
+        - [GH #34] - Just added $this->SITE, $this->DIR. no tests.
+        - [GH #32] - DirApp should inherit SiteApp
+        - [GH #31] - samples/sess_backed/1 :att_value_of(radio,:name,:value,{in,:dict}) bug.
+        - [GH #30] - to detect TAG mismatch for attribute element.
+        - [GH #29] - to make error messages shorter for entity path syntax errors.
+
+0.0.9 2014-05-26
+
+ * To revert $app_root/.htdebug_env feature.
+ * Not to invoke yatt-lint-any-mode unless yatt-lint-any-mode
+
+0.0_9 2014-05-14
+
+ * Mainly fix for perl 5.20 RC
+ * Also, YATT::Lite::Types pod and tests.
+ *  YATT::Lite::Types now correctly handles fields inheritance.
+
+0.0.8 2014-05-13
+
+ Major changes:
+
+ * GH#20 - New type "bool" is introduced for yatt:widget arguments.
+ * GH#23 - Detect cyclic inheritance error.
+
+ Also minor fixes:
+
+ * GH#7  - Wrong line number is reported for element-attribute errors.
+ * GH#22 - CGI related tests didn't work.
+ * GH#27 - RT#95388 t/lite_xhf.t fails with non-UTF-8 locale.
+
+0.0_8 2013-08-25
+
+ * Mainly for README.md polishment
+ * As its side effect, YATT::Lite::Factory now supports render() method;-)
+
+0.0.7 2013-06-20
+
+ * GH#19 PHP/RoR like hash-and-array parameters.
+ * GH#2 support for .htyattconfig.yml
+ * SiteApp psgi_fallback, for 404 not found handler.
+ * better backtrace in ytmpl/error.ytmpl
+ * escape($array_or_hash) behavior change. This is still experimental.
+ * yatt:foreach nth
+
+ * ylpodview more for alt_lang link.
+ * To pass/skip safely more tests on MSWin.
+
+0.0.6 2013-05-18
+
+ * To make sure all tests are runnable for cpantesters (except on perl-5.17)
+
+0.0_4 2013-05-15
+
+ * First CPAN release
+
+0.0.3_4 2012-05-04
+
+ * Directory layout is totally changed.
+   Previous runyatt.lib/YATT is current top directory.
+
+ * Also, massive internal changes.
+   class Web::* namespace is renamed to WebMVC0::*.
+   Some options (eg. appns and baseclass) are changed.
+
+0.0.3  2011-11-16
+
+ * PSGI Adaption. It is usable, but I'm not enough satisfied though.
+   In next release, to adapt more for psgi, massive internal change will occur.
+
+0.0.1  2010-10-18
+
+ * Initial release.

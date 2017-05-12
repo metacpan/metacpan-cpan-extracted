@@ -1,0 +1,260 @@
+# -*- coding: utf-8 -*-
+
+FILE: doc/.htyattroot
+IN:
+ no_lineinfo: 0
+
+TITLE: (static) missing close tag
+IN:
+ foo
+ <yatt:my bar>
+ERROR: Missing close tag 'my' at line 2
+
+
+TITLE: (static) tag open/close mismatch
+IN:
+ foo
+ <yatt:my bar>
+ </yatt:foreach>
+ERROR: TAG 'my' line 2 closed by /foreach at file \S+ line 3
+
+
+TITLE: (static) var in toplevel
+IN:
+ &yatt:x;
+ERROR: ^No such variable 'x' \(.*\), at file \S+ line 1\n$
+
+TITLE: (static) var in widget
+IN:
+ <yatt:foo/>
+ <!yatt:widget foo>
+ &yatt:x;
+ERROR: ^No such variable 'x' \(.*\), at file \S+ line 3\n$
+
+TITLE: (static) var in body
+IN:
+ <yatt:foo>
+  &yatt:y;
+ </yatt:foo>
+ 
+ <!yatt:widget foo body = [code x]>
+ <yatt:body/>
+ERROR: ^No such variable 'y' \(.*\), at file \S+ line 2\n$
+
+TITLE: (static) var after macro
+IN:
+ <!yatt:args x=value>
+ <html>
+ <body>
+ <yatt:if if="&yatt:x; > 1">
+ foo
+ bar
+ baz
+ </yatt:if>
+ hoe
+ &yatt:z;
+ moe
+ERROR: ^No such variable 'z' \(.*\), at file \S+ line 10\n$
+
+TITLE: (static) empty element.
+# x のエラーメッセージを作るときに y の行番号が計算される
+IN:
+ <yatt:y/>
+ foo
+ bar
+ baz
+ <yatt:x/>
+ foo
+ bar
+ baz
+ <yatt:y/>
+ foo
+ bar
+ <!yatt:widget y>
+ <h2>y</h2>
+ERROR: ^No such widget \(<yatt:x />\), at file \S+ line 5\n$
+
+TITLE: (static) empty element in body
+# x のエラーメッセージを作るときに y の行番号が計算される
+IN:
+ <yatt:y>
+ foo
+ bar
+ baz
+ <yatt:x/>
+ foo
+ bar
+ baz
+ </yatt:y>
+ <!yatt:widget y>
+ <h2>y</h2>
+ foo
+ <yatt:body/>
+ bar
+ baz
+ERROR: ^No such widget \(<yatt:x />\), at file \S+ line 5\n$
+
+TITLE: (static) after long declaration
+IN:
+ <!yatt:args
+   x
+   y
+   z
+ >
+ &yatt:w;
+ERROR: ^No such variable 'w' \(.*\), at file \S+ line 6\n$
+
+TITLE: (static) after long element
+IN:
+ <yatt:foo
+   x="bar"
+   y="baz"
+ />
+ &yatt:z;
+ 
+ <!yatt:widget foo x y>
+ <h2>foo</h2>
+ERROR: ^No such variable 'z' \(.*\), at file \S+ line 5\n$
+
+TITLE: (runtime) var in toplevel
+IN:
+ <!yatt:args x=html>
+ &yatt:x;
+PARAM[
+]
+ERROR: ^Use of uninitialized value (?:\$html_x )?in print at \S+ line 2\.\n$
+
+TITLE: (runtime) var in widget
+IN:
+ <yatt:foo/>
+ <!yatt:widget foo x=html>
+ &yatt:x;
+ERROR: ^Use of uninitialized value (?:\$html_x )?in print at \S+ line 3\.\n$
+
+TITLE: (runtime) var in body
+IN:
+ <yatt:foo>
+  &yatt:x;
+ </yatt:foo>
+ 
+ <!yatt:widget foo body = [code x=html]>
+ <yatt:body/>
+ERROR: ^Use of uninitialized value (?:\$html_x )?in print at \S+ line 2\.\n$
+
+TITLE: (runtime) var in nested body 
+IN:
+ <yatt:foo>
+ <yatt:bar>
+ &yatt:x;
+ </yatt:bar>
+ </yatt:foo>
+ 
+ <!yatt:widget foo>
+ <yatt:body/>
+ <!yatt:widget bar body = [code x=html]>
+ <yatt:body/>
+ERROR: ^Use of uninitialized value (?:\$html_x )?in print at \S+ line 3\.\n$
+
+TITLE: (runtime) pi var in body
+IN:
+ <yatt:foo>
+ <?perl===&yatt:x;?>
+ </yatt:foo>
+ 
+ <!yatt:widget foo body = [code x=html]>
+ <yatt:body/>
+ERROR: ^Use of uninitialized value (?:\$html_x )?in print at \S+ line 2\.\n$
+
+TITLE: (runtime) undef after long widget call.
+IN:
+ <!yatt:args>
+ <yatt:foo a='
+ ' b="
+ " />
+ <?perl===undef?>
+ <!yatt:widget foo a b >
+ERROR: ^Use of uninitialized value (?:\$html_x )?in print at \S+ line 5\.\n$
+
+TITLE: (runtime) undef after newlined widget call w/o body.
+IN:
+ <!yatt:args>
+ <yatt:foo 
+ 
+ />
+ <?perl===undef?>
+ <!yatt:widget foo a b >
+ERROR: ^Use of uninitialized value (?:\$html_x )?in print at \S+ line 5\.\n$
+
+TITLE: (runtime) var after newlined widget call with body.
+SKIP: Not yet solved.
+IN:
+ <!yatt:args x=html>
+ <yatt:foo
+ 
+ >
+ &yatt:x;
+ </yatt:foo>
+ <!yatt:widget foo a b >
+ <yatt:body/>
+ERROR: ^Use of uninitialized value (?:\$html_x )?in print at \S+ line 5\.\n$
+
+
+TITLE: (runtime) after element.
+IN:
+ <yatt:y>
+ foo
+ bar
+ baz
+ </yatt:y>
+ foo
+ bar
+ <?perl===undef?>
+ <!yatt:widget y>
+ <h2>y</h2>
+ <yatt:body/>
+ERROR: ^Use of uninitialized value in print at \S+ line 8\.\n$
+
+TITLE: (runtime) after empty element in body
+IN:
+ <yatt:x>
+ foo
+ <yatt:y/>
+ bar
+ <?perl===undef?>
+ baz
+ </yatt:x>
+ 
+ 
+ <!yatt:widget x>
+ <yatt:body/>
+ <!yatt:widget y>
+ <h2>y</h2>
+ foo
+ bar
+ baz
+ERROR: ^Use of uninitialized value in print at \S+ line 5\.\n$
+
+TITLE: (runtime) after element with body
+IN:
+ <yatt:x>
+ foo
+ <yatt:y/>
+ bar
+ baz
+ </yatt:x>
+ <?perl===undef?>
+ 
+ <!yatt:widget x>
+ <yatt:body/>
+ <!yatt:widget y>
+ <h2>y</h2>
+ foo
+ bar
+ baz
+ERROR: ^Use of uninitialized value in print at \S+ line 7\.\n$
+
+
+TITLE: entpath
+IN:
+ &yatt:array[func(x,:y)];
+ERROR: ^Can't parse entity_path group .*?, at file \S+ line 1\n$

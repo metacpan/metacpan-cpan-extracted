@@ -1,0 +1,3 @@
+<!yatt:args xa xb>
+<h2>bar: &yatt:xa;</h2>
+&yatt:xb;

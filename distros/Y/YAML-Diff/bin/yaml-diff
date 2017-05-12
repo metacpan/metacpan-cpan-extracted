@@ -1,0 +1,5 @@
+#!/usr/bin/env perl
+
+use YAML::Diff::Command;
+
+YAML::Diff::Command->new(args => \@ARGV)->run;

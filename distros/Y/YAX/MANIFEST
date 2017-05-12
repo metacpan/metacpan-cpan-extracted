@@ -1,0 +1,25 @@
+Changes
+inc/Module/Install.pm
+inc/Module/Install/Base.pm
+inc/Module/Install/Can.pm
+inc/Module/Install/Fetch.pm
+inc/Module/Install/Makefile.pm
+inc/Module/Install/Metadata.pm
+inc/Module/Install/Win32.pm
+inc/Module/Install/WriteAll.pm
+lib/YAX.pm
+lib/YAX/Builder.pm
+lib/YAX/Constants.pm
+lib/YAX/Document.pm
+lib/YAX/Element.pm
+lib/YAX/Fragment.pm
+lib/YAX/Node.pm
+lib/YAX/Parser.pm
+lib/YAX/Query.pm
+lib/YAX/Text.pm
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+t/01-parser.t
+t/02-builder.t
+t/03-query.t

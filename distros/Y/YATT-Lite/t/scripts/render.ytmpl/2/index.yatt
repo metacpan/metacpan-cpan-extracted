@@ -1,0 +1,2 @@
+<!yatt:args x y>
+&yatt:x; + &yatt:y; = <?perl= &yatt:x; + &yatt:y;?>

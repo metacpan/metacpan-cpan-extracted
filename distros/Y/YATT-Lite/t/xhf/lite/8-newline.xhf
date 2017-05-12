@@ -1,0 +1,67 @@
+# -*- coding: utf-8 -*-
+# First paragraph is used as configuration params for YATT::Lite itself.
+# In this file, it is empty.
+
+TITLE: <!yatt:config ignore_trailing_newlines>
+IN:
+ <!yatt:config ignore_trailing_newlines>
+ <!yatt:args x y>
+ <yatt:foo x/>bar<yatt:baz y/>
+ 
+ <!yatt:widget foo x>
+ &yatt:x;foo
+ 
+ <!yatt:widget baz y>
+ baz&yatt:y;
+ 
+ 
+PARAM[
+- A
+- B
+]
+OUT: AfoobarbazB
+
+TITLE: <!yatt:config ignore_trailing_newlines="0">
+IN:
+ <!yatt:config ignore_trailing_newlines="0">
+ <!yatt:args x y>
+ <yatt:foo x/>bar<yatt:baz y/>
+ 
+ <!yatt:widget foo x>
+ &yatt:x;foo
+ 
+ 
+ <!yatt:widget baz y>
+ baz&yatt:y;
+ 
+ 
+PARAM[
+- A
+- B
+]
+OUT:
+ Afoo
+ barbazB
+ 
+
+
+TITLE: 0, 1, 0
+SKIP: multiple decl of ignore_trailing_newlines is not yet supported.
+IN:
+ <!yatt:config ignore_trailing_newlines="0">
+ <!yatt:args x y>
+ <yatt:foo x/>bar<yatt:baz y/>
+ 
+ <!yatt:config ignore_trailing_newlines="1">
+ <!yatt:widget foo x>
+ &yatt:x;foo
+ 
+ 
+ <!yatt:config ignore_trailing_newlines="0">
+ <!yatt:widget baz y>
+ baz&yatt:y;
+ 
+ 
+OUT:
+ foobarbaz
+ 

@@ -1,0 +1,11 @@
+2011-01-19 Guillaume Rousse <guillomovitch@zarb.org> 0.2.1
+	* include parser error in exception thrown for invalid syntax
+
+2007-04-02 Guillaume Rousse <guillomovitch@zarb.org> 0.2.0
+	* allow non-mandatory configuration file
+
+2007-03-07 Guillaume Rousse <guillomovitch@zarb.org> 0.1.1
+	* bump release, as previous archive was wrong
+
+2007-03-05 Guillaume Rousse <guillomovitch@zarb.org> 0.1.0
+	* initial release

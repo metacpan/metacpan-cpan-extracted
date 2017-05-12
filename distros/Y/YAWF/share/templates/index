@@ -1,0 +1,8 @@
+[% IF ! page.title; page.title="Index page"; END %]
+[% WRAPPER page %]
+	[% WRAPPER msg title="URI: $yawf.request.uri" %]
+		Diese Seite ist eine Standard-Indexseite von YAWF, um sie zu ersetzen,
+		erstellen Sie im Projekt - Template - Verzeichnis eine Datei mit dem Namen
+		<em>index</em>.
+	[% END %]
+[% END %]

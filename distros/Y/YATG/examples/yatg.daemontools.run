@@ -1,0 +1,10 @@
+#!/bin/bash
+
+# this is an example run file for djb daemontools
+# use it to start a monitored YATG poller
+# I tend to HUP it once a day using svc -h ...
+
+desc="yatg"
+
+echo "starting $desc"
+exec setuidgid yatg /usr/bin/yatg_updater /etc/yatg.yml

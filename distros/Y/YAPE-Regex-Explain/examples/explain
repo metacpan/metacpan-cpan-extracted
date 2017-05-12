@@ -1,0 +1,26 @@
+#!/usr/bin/perl -w
+
+use YAPE::Regex::Explain;
+
+use strict;
+
+if (@ARGV and $ARGV[0] eq '-h') {
+  die << "USAGE";
+usage: explain [ismx] < regex
+
+  ismx   the regex modifiers in effect
+  regex  the regex, either on standard input, or as the second arg
+
+USAGE
+}
+
+my $mode = shift || '';
+my $regex;
+my $exp;
+
+{ local $/; chop($regex = <>) }
+
+$exp = YAPE::Regex::Explain->new(eval "qr/\$regex/$mode");
+$exp->parse or $exp->error and die "explain error: " . $exp->error . "\n";
+
+print $exp->explain;

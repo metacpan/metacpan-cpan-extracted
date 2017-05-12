@@ -1,0 +1,95 @@
+<script type="text/javascript" src="/ckeditor/ckeditor.js"></script>
+[% PROCESS common %]
+
+[% BLOCK edit %]
+<style type=text/css><!--
+.edit_error { border:1px solid red; }
+--></style><form action="[% action %]" method="[% method || "GET" %]"[% IF name +%] name="[% name %]"[% END %] accept-charset="UTF-8"[% IF method=="POST" %] enctype="multipart/form-data"[% END %]>
+<input type=hidden name=SID value="[% yawf.session.id %]">
+[%~ IF idvar; WRAPPER edit_hidden name="$idvar" ~%][%~ END; END ~%]
+<table><caption>[% title %]</caption>[% content %]</table></form>
+[% END %]
+
+[% BLOCK edit_errorclass;
+IF has_error.$name +%] class="edit_error"[% END; END %]
+
+[% BLOCK edit_hidden %]
+<input type=hidden name="[% name %]" value="[% value || item.$name %]">
+[% END %]
+
+[% BLOCK edit_info %]
+<tr><td valign=top>[% content %]:</td>
+<td>[% value %]</td></tr>
+[% END %]
+
+[% BLOCK edit_text; global.edit_text_count = global.edit_text_count + 1 %]
+<tr[% PROCESS edit_errorclass %]><td valign=top>[% content %]:</td>
+<td>[% prefix %]<input type=text name="[% name %]" size="[% size || 30 %]" value="[% value || item.$name.html %]"[%
+IF onchange +%] onChange="[% onchange %]"[% END;
+IF countdown; trigger_event="edit_text_countdown($global.edit_text_count,$countdown);"
++%] id="[% global.edit_text_count %]" onChange="[% trigger_event %]" onKeyUp="[% trigger_event %]" onKeyPress="[% trigger_event %]"[% END %]>[% suffix;
+IF countdown +%] (<span id="countdown_[% global.edit_text_count %]">[% countdown %]</span> Zeichen verbleiben)
+[% WRAPPER javascript; trigger_event; END; END %]</td></tr>
+[% END %]
+
+[% BLOCK edit_date; PROCESS edit_text; END %]
+[% BLOCK edit_time; PROCESS edit_text; END %]
+[% BLOCK edit_datetime; PROCESS edit_text; END %]
+
+[% BLOCK edit_password %]
+<tr[% PROCESS edit_errorclass %]><td valign=top>[% content %]:</td>
+<td><input type=password name="[% name %]" size="[% size || 15 %]"></td></tr>
+[% END %]
+
+[% BLOCK edit_textarea %]
+<tr[% PROCESS edit_errorclass %]><td valign=top>[% content %]:</td>
+<td>[% prefix %]<textarea[% IF noeditor != 1 -%] class="ckeditor"[% END %] name="[% name %]" rows=[% rows || 10 %] cols=[% cols || 50 %]>[% value || item.$name %]</textarea></td></tr>
+[% END %]
+
+[% BLOCK edit_dropdown %]
+<tr[% PROCESS edit_errorclass %]><td valign=top>[% content %]:</td>
+<td>[% prefix %]<select name="[% name %]"[% IF id %] id="[% id %]"[% END; IF onChange %] onChange="[% onChange %]" onBlur="[% onChange %]"[% END %]>
+[% IF ! value_key; value_key="value"; END;
+IF ! text_key; text_key="text"; END;
+FOREACH edit_dropdown_option IN options %]
+<option value="[% edit_dropdown_option.$value_key %]"[% IF edit_dropdown_option.$value_key == (value || item.$name) +%] selected[% END %]>
+[%~ edit_dropdown_option.$text_key %]</option>
+[% END %]
+</select>[% suffix %]</td></tr>
+[% END %]
+
+[% BLOCK edit_save %]
+<tr><td colspan=2 align=center><input type=submit value="[% value || "Speichern" %]" name=save></td></tr>
+[% END %]
+
+[% BLOCK edit_submit %]
+<tr><td colspan=2 align=center><input type=submit value="[% content || "OK" %]" name="[% name || "submit" %]"></td></tr>
+[% END %]
+
+[% BLOCK edit_money;
+WRAPPER edit_text size=$size || 9 prefix="&euro; " suffix=" $type";
+content;
+END;
+END %]
+
+[% BLOCK edit_date;
+WRAPPER edit_text size=$size || 10;
+content;
+END;
+END %]
+
+[% BLOCK edit_bit %]
+[% IF value.defined; edit_bit_value = value; ELSE; edit_bit_value = item.$name; END %]
+<tr[% PROCESS edit_errorclass %]><td valign=top>[% content %]:</td>
+<td><select name="[% name %]">
+<option value=1[% IF edit_bit_value -%] selected[% END %]>Ja</option>
+<option value=0[% IF ! edit_bit_value -%] selected[% END %]>Nein</option>
+</select>[% suffix %]</td></tr>
+[% END %]
+
+[% WRAPPER javascript %]
+function edit_text_countdown(object_no,maxlength) {
+	document.getElementById('countdown_' + object_no).innerHTML =
+		maxlength - document.getElementById(object_no).value.length;
+}
+[% END %]

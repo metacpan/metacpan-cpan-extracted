@@ -1,0 +1,13 @@
+2007-03-23 Guillaume Rousse <guillomovitch@zarb.org> 0.2.1
+	* still requires UNIVERSAL::require...
+
+2007-03-22 Guillaume Rousse <guillomovitch@zarb.org> 0.2.0
+	* add log_message function
+	* drop deprecated load_class function
+	* test suite enhancements
+
+2007-03-07 Guillaume Rousse <guillomovitch@zarb.org> 0.1.1
+	* requires UNIVERSAL::require
+
+2007-03-05 Guillaume Rousse <guillomovitch@zarb.org> 0.1.0
+	* initial release

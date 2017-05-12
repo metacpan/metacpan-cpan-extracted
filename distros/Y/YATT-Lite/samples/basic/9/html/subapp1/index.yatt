@@ -1,0 +1,4 @@
+&yatt:sum(3,5,8);
+&yatt:site_prefix();/
+&yatt:file_rootname();
+&yatt:if(:is_debug_allowed_ip(255.255.255.255),yes,no);

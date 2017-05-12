@@ -1,0 +1,262 @@
+=encoding utf-8
+
+=head1 NAME
+
+YATT::Lite::LRXML::Syntax - Loose but Recursive XML (LRXML) format.
+
+=for code perl
+
+=head1 SYNOPSIS
+
+  require YATT::Lite::LRXML;
+  my $container = YATT::Lite::LRXML->load_from(string => <<'END');
+  <!yatt:args x y>
+  <h2>&yatt:x;</h2>
+  &yatt:y;
+
+  <!yatt:widget foo id x>
+  <div id="&yatt:id;">
+    &yatt:x;
+  </div>
+  END
+
+=head1 DESCRIPTION
+
+Loose but Recursive XML (B<LRXML>), which I'm defining here,
+is an XML-like template format. LRXML is first used in
+my template engine L<YATT> and then extended in
+my latest template engine L<YATT::Lite>.
+
+LRXML format consists of B<3 layers> of syntax definitions
+which are L<"LRXML multipart container"|/LRXML-multipart-container>
+(or simply I<container>),
+L<"LRXML template"|/LRXML-template> (I<template>)
+and L<"LRXML entity reference"|/LRXML-entity-reference> (I<entref>).
+A container can carry multiple parts.
+Each part can have a boundary (header) and it can carry meta information
+(usually used as a declaration) for the body of the part.
+Each part can be a template or other type of text payload.
+Entref can appear in templates and other text payload.
+
+LRXML format only defines syntax and doesn't touch semantics,
+like S-expression in Lisp.
+Actually, the current implementation of L<LRXML parser|YATT::Lite::LRXML>
+determines the types of each part by (predefined) I<declaration keywords>
+(such as I<"widget">, I<"page">, I<"action">...),
+but the declaration keywords are B<not> part of this LRXML format specification.
+It is opened for each user of LRXML format.
+
+=head2 XXX: Brief introduction of LRXML
+
+
+=head1 FORMAT SPECIFICATION
+X<FORMAT> X<SYNTAX>
+
+=head2 Syntax Notation (ABNF with negative-match)
+X<syntax-notation> X<BNF>
+
+In this document, I (roughly) use L<ABNF|https://tools.ietf.org/html/rfc5234>,
+with some modifications/extensions.
+
+=over 4
+
+=item C<[..]> means a character set, like regexp in perl5.
+
+In original ABNF, C<[..]> means optional element.
+
+=item The operator "C<?>" is equivalent of C<*1> and indicates I<optional element>.
+
+For optional element, I chose C<< ?<elem> >> instead of C<< [<elem>] >>.
+
+=item The operator "C< ¬ >" preceding an element indicates I<negative-match>.
+
+If an element is written like:
+
+   ¬ elem
+
+then this pattern matches I<longest> possible character sequence
+which do not match C<elem>. This operator helps defining customizable namespace.
+
+=item Rule can take parameters.
+
+If left-hand-side of a rule definition consists of two or more words,
+it is a parametric rule. Parametric rule is used like C<< <rule Param> >>.
+
+   group C          =  *term C
+
+   ...other rule... =   <group ")">
+
+
+=back
+
+=head3 Customizable namespace qualifier
+
+In LRXML, every top-level constructs are marked by I<namespace qualifier>
+(or simply I<namespace>).
+Namespace can be customized to arbitrary set of words.
+For simplicity, in this document, I put a "sample" definition of
+customizable namespace rule C<CNS> like:
+
+  CNS             = ("yatt")
+
+But every implementation of LRXML parser should allow overriding this rule like
+following instead:
+
+  CNS             = ("yatt" / "js" / "perl")
+
+=head2 BNF of LRXML multipart container
+X<LRXML-multipart-container>
+
+  lrxml-container = ?(lrxml-payload) *( lrxml-boundary lrxml-payload
+                                      / lrxml-comment )
+
+  lrxml-boundary  = "<!" CNS ":" NSNAME decl-attlist ">" EOL
+
+  lrxml-comment   = "<!--#" CNS *comment-payload "-->"
+
+  lrxml-payload   = ¬("<!" (CNS ":" / "#" CNS))
+
+  decl-attlist    = *(1*WS / inline-comment / att-pair / decl-macro)
+
+  inline-comment  = "--" comment-payload "--"
+
+  comment-payload = *([^-] / "-" [^-])
+
+  decl-macro      = "%" NAME *[0-9A-Za-z_:\.\-=\[\]\{\}\(,\)] ";"
+
+  att-pair        = ?(NSNAME "=") att-value
+
+  att-value       = squoted-att / dquoted-att / nested-att / bare-att
+
+  squoted-att     = ['] *[^'] [']
+
+  dquoted-att     = ["] *[^"] ["]
+
+  nested-att      = '[' decl-attlist ']'
+
+  bare-att        = 1*[^'"\[\]\ \t\n<>/=]
+
+  NSNAME          = NAME *(":" NAME)
+
+  NAME            = 1*[0-9A-Za-z_]
+
+  WS              = [\ \t\n]
+
+  EOL             = ?[\r] [\n]
+
+
+Some notes on current spec and future changes:
+
+=over 4
+
+=item NAME may be allowed to contain unicode word.
+X<unicode-name>
+
+In current YATT::Lite, C<NAME> can cotain C<\w> in perl unicode semantics.
+
+=back
+
+=head2 BNF of LRXML template syntax
+X<LRXML-template>.
+
+  lrxml-template   = ?(template-payload) *( (template-tag / lrxml-entref )
+                                           ?(template-payload) )
+
+  template-payload = ¬( tag-leader / ent-leader )
+
+  tag-leader       = "<" ( CNS ":"
+                         / "?" CNS
+                         )
+
+  ent-leader       = "&" ( CNS (":" / lcmsg )
+                         / special-entity
+                         )
+
+  template-tag     = element / pi
+
+  element          = "<" (single-elem / open-tag / close-tag) ">"
+
+  pi               = "<?" CNS ?NSNAME pi-payload "?>"
+
+  single-elem      = CNS NSNAME elem-attlist "/"
+
+  open-tag         = CNS NSNAME elem-attlist
+
+  close-tag        =  "/" CNS NSNAME *WS
+
+  elem-attlist     = *(1*WS / inline-comment / att-pair)
+
+  pi-payload       = *([^?] / "?" [^>])
+
+=head2 BNF of LRXML entity reference syntax
+X<LRXML-entity-reference> X<LRXML-entref>
+
+  lrxml-entref     = "&" ( CNS (pipeline / lcmsg)
+                         / special-entity "(" <group ")">
+                         )
+                     ";"
+
+  pipeline         = 1*( ":" NAME ?( "(" <group ")">)
+                       / "[" <group "]">
+                       / "{" <group "}">
+                       )
+
+  group CLO        = *ent-term CLO
+
+  ent-term         = ( ","
+                     / ( etext / pipeline ) ?[,:]
+                     )
+
+  etext            = etext-head *etext-body
+
+  etext-head       = ( ETEXT *( ETEXT / ":" )
+                     / paren-quote
+                     )
+
+  etext-body       = ( ETEXT *( ETEXT / ":" )
+                     / paren-quote
+                     / etext-any-group
+                     )
+
+  etext-any-group  = ( "(" <etext-group ")">
+                     / "{" <etext-group "}">
+                     / "[" <etext-group "]">
+                     )
+
+  etext-group CLO  = *( ETEXT / [:,] ) *etext-any-group CLO
+
+  paren-quote      = "(" *( [^()] / paren-quote ) ")"
+
+  lcmsg            = lcmsg-open / lcmsg-sep / lcmsg-close
+
+  lcmsg-open       = ?("#" NAME) 2*"["
+
+  lcmsg-sep        = 2*"|"
+
+  lcmsg-close      = 2*"]"
+
+  special-entity   = SPECIAL_ENTNAME
+
+  ETEXT            = [^\ \t\n,;:(){}\[\]]
+
+=head3 Special entity name
+
+I<Special entity> is another customizable syntax element.
+For example, it is usually defined like:
+
+  SPECIAL_ENTNAME  = ("HTML")
+
+And then you can write C<&HTML(:var);>.
+
+But every implementation of LRXML parser should allow overriding this rule like
+following instead:
+
+  SPECIAL_ENTNAME  = ("HTML" / "JSON" / "DUMP")
+
+=head1 AUTHOR
+
+"KOBAYASI, Hiroaki" <hkoba@cpan.org>
+
+=head1 LICENSE
+
+This library is free software; you can redistribute it and/or modify it under the same terms as Perl itself.

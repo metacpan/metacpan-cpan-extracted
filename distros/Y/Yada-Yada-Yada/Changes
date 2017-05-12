@@ -1,0 +1,11 @@
+Revision history for Perl extension Yada::Yada::Yada.
+
+1.00 Sat Sep  3 19:45:05 UTC 2005
+  - Quote module names in Makefile.PL for broken 5.8.0
+
+0.02  2001-11-16 
+	- only filter code
+
+0.01  2001-06-14 
+	- original version
+

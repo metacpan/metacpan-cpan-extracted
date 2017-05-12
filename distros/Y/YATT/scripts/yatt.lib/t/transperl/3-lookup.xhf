@@ -1,0 +1,192 @@
+# -*- coding: utf-8 -*-
+#========================================
+# サブディレクトリからの継承
+
+FILE: doc/fromsub/.htyattrc
+IN: use YATT::Registry base => 'base'
+
+TITLE: Inherit from subdirectory.
+FILE: doc/fromsub/index.html
+IN: <yatt:envelope title="Hello world!">This is a test.</yatt:envelope>
+OUT:
+ <html>
+ <head>
+ <title>Hello world!</title>
+ </head>
+ <body>
+ <h2>Hello world!</h2>
+ This is a test.
+ </body>
+ </html>
+
+
+FILE: doc/fromsub/base/envelope.html
+IN:
+ <!yatt:args title>
+ <html>
+ <head>
+ <title>&yatt:title;</title>
+ </head>
+ <body>
+ <h2>&yatt:title;</h2>
+ <yatt:body/>
+ </body>
+ </html>
+
+#========================================
+# 親ディレクトリからの継承
+
+FILE: doc/testbase/fromparent/.htyattrc
+IN: use YATT::Registry base => '/testbase'
+
+
+TITLE: Inherit from parent directory.
+FILE: doc/testbase/fromparent/index.html
+IN: <yatt:envelope title="Hello world!">This is a test.</yatt:envelope>
+OUT:
+ <html>
+ <head>
+ <title>Hello world!</title>
+ </head>
+ <body>
+ <h2>Hello world!</h2>
+ This is a test.
+ </body>
+ </html>
+
+FILE: doc/testbase/envelope.html
+IN:
+ <!yatt:args title>
+ <html>
+ <head>
+ <title>&yatt:title;</title>
+ </head>
+ <body>
+ <h2>&yatt:title;</h2>
+ <yatt:body/>
+ </body>
+ </html>
+
+
+#========================================
+# ライブラリディレクトリからの継承
+
+FILE: doc/fromlib/.htyattrc
+IN: use YATT::Registry base => '/baselib'
+
+TITLE: Inherit from libdir.
+FILE: doc/fromlib/index.html
+IN: <yatt:envelope title="Hello world!">This is a test.</yatt:envelope>
+OUT:
+ <html>
+ <head>
+ <title>Hello world!</title>
+ </head>
+ <body>
+ <h2>Hello world!</h2>
+ This is a test.
+ </body>
+ </html>
+
+FILE: lib/baselib/envelope.html
+IN:
+ <!yatt:args title>
+ <html>
+ <head>
+ <title>&yatt:title;</title>
+ </head>
+ <body>
+ <h2>&yatt:title;</h2>
+ <yatt:body/>
+ </body>
+ </html>
+
+#========================================
+# ファイルの継承 (同一ディレクトリ)
+
+FILE: doc/fromfile/base.html
+IN:
+ <!yatt:widget foo x>
+ <h2>&yatt:x;</h2>
+
+FILE: doc/fromfile/base2.html
+IN:
+ <!yatt:widget bar x>
+ <h2>&yatt:x;</h2>
+
+FILE: doc/fromfile/index.html
+TITLE: Inherit from template
+IN:
+ <!yatt:base "base">
+ <yatt:foo x=baz/>
+OUT:
+ <h2>baz</h2>
+ 
+
+FILE: doc/fromfile/index2.html
+TITLE: Render from inherited template
+IN:
+ <!yatt:base "base2">
+ &yatt:render(bar,bar);
+OUT:
+ <h2>bar</h2>
+ 
+
+#========================================
+# ファイルの継承 (継承した、別ディレクトリから)
+
+FILE: doc/fromfileinsub/index.html
+TITLE: Inherit from template in library
+IN:
+ <!yatt:base "base">
+ <yatt:foo x="bar"/>
+OUT:
+ <h2>bar</h2>
+ 
+
+FILE: doc/fromfileinsub/.htyattrc
+IN: use YATT::Registry base => 'lib'
+
+FILE: doc/fromfileinsub/lib/base.html
+IN:
+ <!yatt:widget foo x>
+ <h2>&yatt:x;</h2>
+
+#========================================
+FILE: doc/mix/envelope.html
+IN:
+ <!yatt:args title=html>
+ <div id="title">&yatt:title;</div>
+ <div id="contents">
+ <yatt:body/>
+ </div>
+
+FILE: doc/mix/mixbase/test.html
+IN:
+ <h2>test</h2>
+
+FILE: doc/mix/.htyattrc
+IN:
+ use YATT::Registry base => 'mixbase';
+
+TITLE: Direct element for dir which has base.
+FILE: doc/mix/index.html
+IN:
+ <yatt:envelope>
+ <:yatt:title>Mixed</:yatt:title>
+ <h4>ok?</4></yatt:envelope>
+OUT:
+ <div id="title">Mixed</div>
+ <div id="contents">
+ <h4>ok?</4>
+ </div>
+ 
+
+#========================================
+# XXX: 同一ファイル内の widget 参照
+# XXX: 継承を使わない、絶対参照 (dir, lib 共)
+# XXX: Registry base_template 指定(ディレクトリでなく、ファイルの継承)
+# XXX: <!yatt:base> 指定
+# XXX: 入れ子レベルを深くした場合のテスト。
+
+# XXX:  ← 継承先が、再び何かを継承していた場合のテストも。

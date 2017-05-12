@@ -1,0 +1,21 @@
+# -*- perl -*-
+use strict; use warnings FATAL => qw/FATAL all NONFATAL misc/;
+use Encode;
+
+sub {
+  my ($this, $con) = @_;
+  my MY $yatt = $this->YATT;
+
+  my $title = $con->param('title')
+    or die "Title is empty\n";
+  my $body = $con->param('body')
+    or die "Body is empty\n";
+
+  # XXX: This can create empty file!
+  my ($fh, $name, $fnum) = $yatt->mh_alloc_newfh;
+
+  print $fh "TITLE: ", $yatt->escape_nl($title), "\n";
+  print $fh "BODY: ", $yatt->escape_nl($body), "\n";
+
+  $con->redirect('./');
+};

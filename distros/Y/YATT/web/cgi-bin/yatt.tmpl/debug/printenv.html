@@ -1,0 +1,6 @@
+<!yatt:args envref="value?\%ENV" border=attr>
+<table&yatt:border;>
+<yatt:foreach my=key list="sort keys %$envref">
+  <tr><td>&yatt:key;</td><td>&yatt:envref{:key};</td></tr>
+</yatt:foreach>
+</table>

@@ -1,0 +1,36 @@
+==================================================
+Changes from 1740-06-09 00:00:00 +0000 to present.
+==================================================
+
+------------------------------------------
+version 0.101 at 2014-03-24 23:12:39 +0000
+------------------------------------------
+
+  Change: 6d2e0c09db91c3d32d158dc0a54c78165413cbca
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2014-03-25 00:11:27 +0000
+
+    Added all possible attributes to the plugin to set the JSON, adding
+    true/false function 
+
+  Change: 910c8bc9cd5093a3bad46e9a09bc5f9a255d809d
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2014-03-22 23:38:57 +0000
+
+    Added travis config 
+
+  Change: 4ae564ca08da9aff1f204a98ad0e248a44c84197
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2014-03-22 23:27:48 +0000
+
+    First release, taking out Yeb main package 
+
+  Change: 7986622e626b3fef0809cca6d3186bde55d10457
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2014-03-22 22:37:42 +0000
+
+    initial commit 
+
+================
+End of releases.
+================

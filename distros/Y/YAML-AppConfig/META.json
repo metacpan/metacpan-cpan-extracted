@@ -1,0 +1,61 @@
+{
+   "abstract" : "Manage configuration files with YAML and variable references.",
+   "author" : [
+      "Matthew O'Connor <matthew@canonical.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.92, CPAN::Meta::Converter version 2.140640",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "YAML-AppConfig",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Storable" : "0",
+            "YAML" : "0.38",
+            "perl" : "5.006000",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://rt.cpan.org/Dist/Display.html?Name=YAML-AppConfig"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/Xaerxess/YAML-AppConfig.git",
+         "web" : "https://github.com/Xaerxess/YAML-AppConfig"
+      }
+   },
+   "version" : "0.19"
+}

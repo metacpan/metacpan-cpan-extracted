@@ -1,0 +1,107 @@
+* { margin: 0; padding: 0; color: #333; font-family: Optima, Georgia, serif }
+* body { background: #ddf; font-size: 12pt; }
+li { margin-left: 2em; }
+p { margin: 1em 0; }
+input { border: 1px solid #99f; font-size: 1.1em; }
+textarea { font-size: 1.1em; border: 1px solid #99f; }
+table th { text-align: left }
+button { margin: 0.5em; }
+
+em em { font-style: normal }
+
+table { border-collapse: collapse }
+table tbody { border: 1px solid #99f }
+
+th { vertical-align: bottom; padding: 3px; border: 1px solid #aaaaff; background: #aaaaff url(lib/jquery/images/ui-bg_glass_65_aaaaff_1x400.png) 50% 50% repeat-x; font-weight: normal; color: #212155; }
+td { vertical-align: top; padding: 3px }
+
+blockquote, pre { margin: 1em 1em; padding: 1em; border: 1px solid #ddf; background-color: #eef; font-family: Menlo, monospace; font-size: 0.9em }
+code { border: 1px solid #ddf; background-color: #eef; font-family: Menlo, monospace; font-size: 0.9em }
+code *, pre * { font-family: Menlo, monospace }
+pre code { border: none }
+
+del, del * { background-color: #fdd; text-decoration: none }
+ins, ins * { background-color: #dfd; text-decoration: none }
+
+#topnav { padding: 4px 1em; background-color: #eef; height: 22px }
+#nav-repository .navigation { margin: 0 3px; list-style: none; float: left }
+#nav-user .navigation { margin: 0 3px; list-style: none; float: right }
+#masthead { padding: 1em 1em 2em 1em; background: #ddf; }
+#masthead .main-title { color: #339; }
+#nav-page .navigation, #nav-page_bottom .navigation { margin: 0 3px; list-style: none; float: left }
+#nav-page_bottom { padding: 1em 1em }
+
+#main { padding: 1em; background: #fff; }
+#main h1, #main h2, #main h3 { margin: 0.5em 0; border-bottom: 1px solid #ccf; color: #225; }
+#breadcrumb li { list-style: none; display: inline-block; margin: 0; }
+
+#copyright { margin: 1em; font-size: 0.8em; float: right; text-align: right; width: 330px; padding-bottom: 1em }
+
+div.field { margin: 1em; }
+div.field label { display: inline-block; width: 10em; text-align: right }
+
+div.button-group { text-align: right }
+div.progress { height: 15px }
+
+.links li { display: inline-block; margin: 0 3px; list-style: none }
+
+li.error, li.warning, li.info { list-style: none }
+.error { padding: 3px; margin: 3px; border: 1px solid #CD0A0A; color: #CD0A0A; background-color: #FEF1EC }
+.warning { padding: 3px; margin: 3px; border: 1px solid #CDCD0A; color: #CDCD0A; background-color: #FEFEEC }
+.info { padding: 3px; margin: 3px; border: 1px solid #0A0ACD; color: #0A0ACD; background-color: #ECF1FE }
+
+/*** Login ***/
+
+#login-page { width: 30em; margin: 8em auto }
+
+/*** Page ***/
+
+a.not-exists { color: #800; }
+a.footnote { color: #33f; font-size: 0.5em; vertical-align: super }
+a.footnote:before { content: '[' }
+a.footnote:after { content: ']' }
+
+textarea#yukkitext { width: 100%; height: 20em; }
+input#comment { width: 100%; }
+input#yukkiname_new { font-size: 2em; width: 100% }
+
+.pane { width: 48% }
+div#preview-yukkitext { border: 1px solid #99f; padding: 5px; height: 28em; overflow: auto; float: right; position: relative }
+
+/*** File Upload ***/
+
+div.attachments { border: 1px solid #ddf; margin-top: 0.5em; padding: 3px }
+div.attachments .attachment-list.empty { text-align: center }
+table.attachment-table { width: 100% }
+table.attachment-table .filename { width: 65% }
+table.attachment-table .size { width: 10% }
+table.attachment-table .action { width: 25% }
+div.attachment-dropzone { display: none; background: #eef; text-align: center; padding: 1em; margin: 0.5em 0 }
+
+/* silly div that make the browser scroll for pages on long wiki edits */
+/* div.plupload.html5 { display: none; } */
+
+/* Syntax Highlight */
+.syntax-highlight { margin: 1em 1em; padding: 1em; border: 1px solid #ddf; background-color: #eef; font-family: Menlo, monospace; font-size: 0.9em }
+.syntax-highlight { border: 1px solid #ddf; background-color: #eef; font-family: Menlo, monospace; font-size: 0.9em }
+.syntax-highlight * { font-family: Menlo, monospace }
+
+.syntax-alert { color: #6060ff }
+.syntax-base-n { color: #60ff60 }
+.syntax-b-string { color: #c9afff }
+.syntax-char { color: #ff60ff }
+.syntax-comment { color: #afafaf }
+.syntax-data-type { color: #6060ff }
+.syntax-dec-val { color: #6060ff }
+.syntax-error { color: #ff6060 }
+.syntax-float { color: #6060ff }
+.syntax-function { color: #60ff60 }
+.syntax-i-string { color: #ff6060 }
+.syntax-keyword { font-weight: bold }
+.syntax-operator { color: #ffa500 }
+.syntax-others { color: #b03060 }
+.syntax-region-marker { color: #96b9ff }
+.syntax-reserved { color: #9b30ff }
+.syntax-string { color: #ff6060 }
+.syntax-variable { color: #6060ff }
+.syntax-warning { color: #6060ff }

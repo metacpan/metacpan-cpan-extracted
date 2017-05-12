@@ -1,0 +1,199 @@
+{
+   "abstract" : "Yet Another Template Toolkit",
+   "author" : [
+      "\"KOBAYASI, Hiroaki\" <hkoba@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4211",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "YATT",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "CGI" : "0",
+            "File::Remove" : "0",
+            "List::Util" : "0",
+            "Test::Differences" : "0",
+            "Test::More" : "0",
+            "perl" : "v5.7.2",
+            "version" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "YATT" : {
+         "file" : "web/cgi-bin/yatt.lib/YATT.pm",
+         "version" : "v0.0.10"
+      },
+      "YATT::ArgMacro" : {
+         "file" : "web/cgi-bin/yatt.lib/YATT/ArgMacro.pm",
+         "version" : "v0.0.10"
+      },
+      "YATT::ArgTypes" : {
+         "file" : "web/cgi-bin/yatt.lib/YATT/ArgTypes.pm",
+         "version" : "v0.0.10"
+      },
+      "YATT::Class::ArrayScanner" : {
+         "file" : "web/cgi-bin/yatt.lib/YATT/Class/ArrayScanner.pm",
+         "version" : "v0.0.10"
+      },
+      "YATT::Class::Configurable" : {
+         "file" : "web/cgi-bin/yatt.lib/YATT/Class/Configurable.pm",
+         "version" : "v0.0.10"
+      },
+      "YATT::Class::Tcl" : {
+         "file" : "web/cgi-bin/yatt.lib/YATT/Class/Tcl.pm",
+         "version" : "v0.0.10"
+      },
+      "YATT::DBSchema" : {
+         "file" : "web/cgi-bin/yatt.lib/YATT/DBSchema.pm",
+         "version" : "v0.0.10"
+      },
+      "YATT::Exception" : {
+         "file" : "web/cgi-bin/yatt.lib/YATT/Exception.pm",
+         "version" : "v0.0.10"
+      },
+      "YATT::Fields" : {
+         "file" : "web/cgi-bin/yatt.lib/YATT/Fields.pm",
+         "version" : "v0.0.10"
+      },
+      "YATT::Inc" : {
+         "file" : "web/cgi-bin/yatt.lib/YATT/Inc.pm",
+         "version" : "v0.0.10"
+      },
+      "YATT::LRXML" : {
+         "file" : "web/cgi-bin/yatt.lib/YATT/LRXML.pm",
+         "version" : "v0.0.10"
+      },
+      "YATT::LRXML::EntityPath" : {
+         "file" : "web/cgi-bin/yatt.lib/YATT/LRXML/EntityPath.pm",
+         "version" : "v0.0.10"
+      },
+      "YATT::LRXML::MetaInfo" : {
+         "file" : "web/cgi-bin/yatt.lib/YATT/LRXML/MetaInfo.pm",
+         "version" : "v0.0.10"
+      },
+      "YATT::LRXML::Node" : {
+         "file" : "web/cgi-bin/yatt.lib/YATT/LRXML/Node.pm",
+         "version" : "v0.0.10"
+      },
+      "YATT::LRXML::NodeCursor" : {
+         "file" : "web/cgi-bin/yatt.lib/YATT/LRXML/NodeCursor.pm",
+         "version" : "v0.0.10"
+      },
+      "YATT::LRXML::Parser" : {
+         "file" : "web/cgi-bin/yatt.lib/YATT/LRXML/Parser.pm",
+         "version" : "v0.0.10"
+      },
+      "YATT::Registry" : {
+         "file" : "web/cgi-bin/yatt.lib/YATT/Registry.pm",
+         "version" : "v0.0.10"
+      },
+      "YATT::Test" : {
+         "file" : "web/cgi-bin/yatt.lib/YATT/Test.pm",
+         "version" : "v0.0.10"
+      },
+      "YATT::Toplevel::CGI" : {
+         "file" : "web/cgi-bin/yatt.lib/YATT/Toplevel/CGI.pm",
+         "version" : "v0.0.10"
+      },
+      "YATT::Toplevel::FCGI" : {
+         "file" : "web/cgi-bin/yatt.lib/YATT/Toplevel/FCGI.pm",
+         "version" : "v0.0.10"
+      },
+      "YATT::Toplevel::Server" : {
+         "file" : "web/cgi-bin/yatt.lib/YATT/Toplevel/Server.pm",
+         "version" : "v0.0.10"
+      },
+      "YATT::Translator::Perl" : {
+         "file" : "web/cgi-bin/yatt.lib/YATT/Translator/Perl.pm",
+         "version" : "v0.0.10"
+      },
+      "YATT::Translator::Perl::macro_dbfetch" : {
+         "file" : "web/cgi-bin/yatt.lib/YATT/Translator/Perl/macro_dbfetch.pm",
+         "version" : "v0.0.10"
+      },
+      "YATT::Types" : {
+         "file" : "web/cgi-bin/yatt.lib/YATT/Types.pm",
+         "version" : "v0.0.10"
+      },
+      "YATT::Util" : {
+         "file" : "web/cgi-bin/yatt.lib/YATT/Util.pm",
+         "version" : "v0.0.10"
+      },
+      "YATT::Util::CGICompat" : {
+         "file" : "web/cgi-bin/yatt.lib/YATT/Util/CGICompat.pm",
+         "version" : "v0.0.10"
+      },
+      "YATT::Util::CmdLine" : {
+         "file" : "web/cgi-bin/yatt.lib/YATT/Util/CmdLine.pm",
+         "version" : "v0.0.10"
+      },
+      "YATT::Util::DictOrder" : {
+         "file" : "web/cgi-bin/yatt.lib/YATT/Util/DictOrder.pm",
+         "version" : "v0.0.10"
+      },
+      "YATT::Util::DirTreeBuilder" : {
+         "file" : "web/cgi-bin/yatt.lib/YATT/Util/DirTreeBuilder.pm",
+         "version" : "v0.0.10"
+      },
+      "YATT::Util::Enum" : {
+         "file" : "web/cgi-bin/yatt.lib/YATT/Util/Enum.pm",
+         "version" : "v0.0.10"
+      },
+      "YATT::Util::Finalizer" : {
+         "file" : "web/cgi-bin/yatt.lib/YATT/Util/Finalizer.pm",
+         "version" : "v0.0.10"
+      },
+      "YATT::Util::RLimit" : {
+         "file" : "web/cgi-bin/yatt.lib/YATT/Util/RLimit.pm",
+         "version" : "v0.0.10"
+      },
+      "YATT::Util::Symbol" : {
+         "file" : "web/cgi-bin/yatt.lib/YATT/Util/Symbol.pm",
+         "version" : "v0.0.10"
+      },
+      "YATT::Util::SymbolHash" : {
+         "file" : "web/cgi-bin/yatt.lib/YATT/Util/SymbolHash.pm",
+         "version" : "v0.0.10"
+      },
+      "YATT::Util::Taint" : {
+         "file" : "web/cgi-bin/yatt.lib/YATT/Util/Taint.pm",
+         "version" : "v0.0.10"
+      },
+      "YATT::Util::VarExporter" : {
+         "file" : "web/cgi-bin/yatt.lib/YATT/Util/VarExporter.pm",
+         "version" : "v0.0.10"
+      },
+      "YATT::Util::redundant_sprintf" : {
+         "file" : "web/cgi-bin/yatt.lib/YATT/Util/redundant_sprintf.pm",
+         "version" : "v0.0.10"
+      },
+      "YATT::Widget" : {
+         "file" : "web/cgi-bin/yatt.lib/YATT/Widget.pm",
+         "version" : "v0.0.10"
+      },
+      "YATT::XHF" : {
+         "file" : "web/cgi-bin/yatt.lib/YATT/XHF.pm",
+         "version" : "v0.0.10"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "v0.0.10"
+}

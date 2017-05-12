@@ -1,0 +1,30 @@
+bin/yatg-trim
+bin/yatg_updater
+Changes
+examples/check_interfaces
+examples/rpc-serialized.daemontools.run
+examples/rpc-serialized.server.yml
+examples/yatg.daemontools.run
+examples/yatg.yml
+examples/yatg_graph.pl
+lib/RPC/Serialized/Handler/YATG/Retrieve.pm
+lib/RPC/Serialized/Handler/YATG/Store.pm
+lib/YATG/Callback.pm
+lib/YATG/Config.pm
+lib/YATG/Retrieve/Disk.pm
+lib/YATG/Retrieve/RPC.pm
+lib/YATG/SharedStorage.pm
+lib/YATG/Store/Disk.pm
+lib/YATG/Store/Memcached.pm
+lib/YATG/Store/NSCA.pm
+lib/YATG/Store/RPC.pm
+lib/YATG/Store/STDOUT.pm
+lib/YATG/Tutorial.pod
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+t/pod-coverage.t
+t/pod.t
+usr/lib/cgi-bin/yatggraph.cgi
+usr/lib/cgi-bin/yatgview.cgi
+META.json                                Module JSON meta-data (added by MakeMaker)

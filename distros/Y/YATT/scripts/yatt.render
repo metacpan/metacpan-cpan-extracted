@@ -1,0 +1,91 @@
+#!/usr/bin/perl -w
+use strict;
+use warnings qw(FATAL all NONFATAL misc);
+
+use FindBin;
+use lib grep(-d
+	     , "$FindBin::Script.lib", "$FindBin::RealScript.lib"
+	     , "$FindBin::Bin/yatt.lib", "$FindBin::Bin/lib"
+	     , grep {defined} $ENV{YATT_LIB});
+
+use File::Basename;
+
+use YATT::Inc;
+use YATT::Util;
+use YATT::Toplevel::CGI qw(*CGI *REQUEST_URI *PATH_INFO);
+use YATT::Exception;
+use base qw(YATT::Toplevel::CGI);
+sub MY () { __PACKAGE__ }
+
+YATT::Toplevel::CGI::use_env_vars();
+
+MY->parse_opts(\@ARGV, \ my %opts);
+MY->parse_params(\@ARGV, \ my %common);
+
+my $direct_mode = delete $opts{direct};
+
+local $YATT::Toplevel::CGI::CONFIG
+  = my $config = MY->new_config(%opts, no_header => 1);
+
+my ($instpkg, $rootdir, $registry) = do {
+  my $file = $ARGV[0]; # Keep original.
+
+  unless (defined $file and -r $file) {
+    die "Usage: $0 file ?name=value ...?\n"
+  }
+
+  my $dir = dirname(MY->rel2abs($file));
+  $config->try_load_config($dir);
+
+  my $instpkg = MY->prepare_export($config);
+
+  # XXX: テンプレートディレクトリの指定も。
+  ($instpkg
+   , $dir
+   , $instpkg->new_translator([DIR => $dir], $config->translator_param
+			      , debug_translator => $ENV{DEBUG}
+			      , no_lineinfo => YATT::Util::no_lineinfo()));
+};
+
+# [1] Compile all.
+my @command;
+{
+  while (@ARGV) {
+    my $file = shift @ARGV;
+    my %param = %common;
+    MY->parse_params(\@ARGV, \%param);
+
+    # XXX: render 以外も。
+    my ($handler, $pkg, $widget) = $registry->get_handler_to
+      (render => MY->widget_path_in($rootdir, MY->rel2abs($file)));
+    push @command, [$file, $handler, $pkg
+		    , scalar $widget->reorder_params(\%param)];
+  }
+}
+
+# [2] Execute all.
+
+foreach my $cmd (@command) {
+  my ($file, $sub, @args) = @$cmd;
+  local $CGI = $instpkg->new_cgi();
+  # XXX: die handler.
+  if ($direct_mode) {
+    $sub->(@args);
+  } else {
+    local $ENV{REQUEST_METHOD} = 'GET';
+    map {
+      s{([^/]*)$}{$file};
+    } ($REQUEST_URI, $PATH_INFO);
+    # XXX: $instpkg にしたい。prepare_dispatch に頼るべきか?
+    eval {
+      $instpkg->dispatch_action($registry, $sub, @args);
+    };
+    if (my ($file, $cgi) = can_retry($@)) {
+      print "INTERNAL REDIRECT: $file\n";
+      $instpkg->run_retry_max(3, $registry, $file, $cgi);
+    } elsif (not is_normal_end($@)) {
+      $file ||= "(null)";
+      print "\nERROR $file\n($@)\n\n";
+    }
+  }
+}

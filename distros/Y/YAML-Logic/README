@@ -1,0 +1,455 @@
+######################################################################
+    YAML::Logic 0.07
+######################################################################
+
+NAME
+    YAML::Logic - Simple boolean logic in YAML
+
+SYNOPSIS
+        use YAML::Syck qw(Load);
+        use YAML::Logic;
+
+        my $logic = YAML::Logic->new();
+
+          ### Tests defined somewhere in a YAML file ...
+        my $data = Load(q{
+          # is $var equal to "foo"?
+        rule:
+          - $var
+          - foo
+        });
+
+          ### Tests performed in application code:
+        if( $logic->evaluate( $data->{rule}, 
+                              { var => "foo" }) ) {
+            print "True!\n";
+        }
+
+DESCRIPTION
+    YAML::Logic allows users to define simple boolean logic in a
+    configuration file, without permitting them to run arbitrary code.
+
+    While Perl code can be controlled with the "Safe" module, "Safe" can't
+    prevent the user from defining infinite loops, exhausting all available
+    memory or crashing the interpreter by exploiting well-known perl bugs.
+    YAML::Logic isn't perfect in this regard either, but it makes it
+    reasonably hard to define harmful code.
+
+    The syntax for the boolean logic within a YAML file was inspired by John
+    Siracusa's "Rose::DB::Object::QueryBuilder" module, which provides data
+    structures to define logic that is then transformed into SQL.
+    YAML::Logic takes the data structure instead and transforms it into Perl
+    code.
+
+    For example, the data structure to check whether a variable $var is
+    equal to a value "foo", looks like this:
+
+        [$var, "foo"]
+
+    It's a reference to an array containing both the value of the variable
+    and the value to compare it with. In YAML, this looks like
+
+        rule: 
+          - $var
+          - foo
+
+    and this is exactly the syntax that YAML::Logic accepts. Note that after
+    parsing the YAML configuration above, you need to pass *only* the array
+    ref inside the "rule" entry to YAML::Logic's "evaluate()" method:
+
+        $logic->evaluate( $yaml_data->{rule},  ...
+
+    Passing the entire YAML data would cause an error with YAML::Logic, as
+    it expects to receive an array ref.
+
+  Variable Interpolation
+    Note that variables like $var will be interpolated so that they'll
+    represent their value before the evaluation starts.
+
+    So if you have
+
+        rule:
+          - $var
+          - foo
+
+    and run
+
+        my $data = YAML::Load( $yaml );
+        my $rc = $logic->evaluate( $data->{rule}, { var => "bar" } );
+
+    then YAML::Logic will substitute $var by the string "bar", and then run
+    the test
+
+        ["bar", "foo"]
+
+    which checks if "bar" equals "foo". Since this is false, "evaluate"
+    returns false.
+
+    Variable interpolation happens on both sides of the comparison, so
+    comparing
+
+        rule: 
+          - $foo
+          - $bar
+
+    will search for two variables, "foo" and "bar", replace the placeholders
+    by the variable values and then compare the two entries.
+
+    If a referenced variable is immediately followed by some text, you can
+    also use Perl's "${foo}" notation to reference a variable:
+
+        rule: 
+          - ${foo}text
+          - $bar
+
+    Several comparisons can be combined by lining them up in the array. The
+    lineup
+
+        [$var1, "foo", $var2, "bar"]
+
+    returns true if $var1 is equal to "foo" *and* $var2 is equal to "bar".
+    In YAML::Logic syntax, these two ANDed comparisons are written as
+
+        rule: 
+          - $var1
+          - foo
+          - $var2
+          - bar
+
+    in a YAML file.
+
+    Interpolation is done by the "Template Toolkit", so all the magic it
+    does for arrays and hashes applies:
+
+        rule:
+          - $hash.somekey
+          - foo
+
+    with
+
+        my $data = YAML::Load( $yaml );
+        my $rc = $logic->evaluate( $data->{rule}, 
+                                   { hash => { somekey => "foo" } } );
+
+    will test if "foo" equals "foo" and hence return a true value.
+
+    Likewise,
+
+        rule:
+          - $array.1
+          - el2
+
+    with
+
+        my $data = YAML::Load( $yaml );
+        my $rc = $logic->evaluate( $data->{rule}, 
+                                   { array => [ 'el1', 'el2' ] } );
+
+    will test if "el2" equals "el2" and return a true value. Check "perldoc
+    Template" or read the O'Reilly Template Toolkit book for a more detailed
+    explanation of Template's variable interpolation magic.
+
+  Other Comparators
+    Not only equality can be tested. In addition, these Perl operators are
+    supported:
+
+        eq 
+        ne 
+        lt 
+        gt 
+        < 
+        <=
+        > 
+        >=
+        == 
+        !=
+        =~ like
+
+    The way to specify a different operator $op is to put it as key into a
+    hash:
+
+        [ $var, { $op, $value } ]
+
+    So, the previous rule comparing $var to "foo" can be written as
+
+        rule:
+          - $var
+          - eq: foo
+
+    which is essentially running
+
+        $var eq "foo"
+
+    in Perl. To perform a numerical comparison, use the "==" operator,
+
+        rule:
+          - $var
+          - ==: 123
+
+    which runs a test of "$var == 123" instead.
+
+  Regular Expressions
+    Regular expression matching is supported as well, so to verify if $var
+    matches the regular expression "/^foo/", use
+
+        rule:
+          - $var
+          - like: "^foo"
+
+    or
+
+        rule:
+          - $var1
+          - =~: "^foo"
+
+    Both are equivalent.
+
+    Regular expressions are given without delimiters, e.g. if you want to
+    match against /abc/, simply use
+
+        rule:
+          - '$var'
+          - like: abc
+
+    To add regex modifiers like "/i" or "/ms", use the "(?...)" syntax. The
+    setting
+
+        rule:
+          - '$var'
+          - like: (?i)abc
+
+    will match like "$var =~ /abc/i".
+
+  Logical NOT
+    A logical NOT is expressed by putting an exclamation mark in front of
+    the variable, so
+
+        ["!$var1", "foo"]
+
+    will return true if $var1 is NOT equal to "foo". The YAML notation is
+
+        rule: 
+          - "!$var1"
+          - foo
+
+    for this logical expression. Note that YAML requires putting a string
+    starting with an exclatmation mark in quotes.
+
+    By default, additional rules are chained up with a logical AND operator,
+    so to check if a variable is not set to "foo" and not set to "bar", use:
+
+        rule:
+          - '!$var'
+          - foo
+          - '!$var'
+          - bar
+
+    And to verify that the variable matches neither /^foo.*/ nor /^bar.*/,
+    use:
+
+        rule:
+            - '!$var'
+            -
+              - like: "^foo.*"
+              - like: "^bar.*"
+
+    Also note that "^foo.*" requires quotes in YAML.
+
+  Logical OR
+    To specify a rule that is satisfied if *any* of a series of tests
+    succeeds, use the 'or' keyword in place of a variable:
+
+        [ "or", [ $var, "foo", $var, "bar" ] ]
+
+    This data structure indicates that the entire test is supposed to return
+    true if either "$var eq "foo"" or "$var eq "bar"" holds true. It looks
+    like this in YAML:
+
+        rule: 
+          - or
+          -
+            - $var
+            - foo
+            - $var
+            - bar
+
+    Pay close attention to the indentation: After the "- or" follows a line
+    with a dash at the same indentation level, followed by a sub-array which
+    has its elements indented to the next level.
+
+  Logical AND
+    By default, YAML::Logic chains up clauses by logical ANDs, i.e.
+
+        rule:
+          - $var1
+          - foo
+          - $var2
+          - bar
+
+    checks if $var1 is equal to "foo" *and* $var2 is equal to "bar".
+    Alternatively, the "and" keyword can be used similar to the "or" keyword
+    explained in the previous section:
+
+        rule: 
+          - and
+          -
+            - $var
+            - foo
+            - $var
+            - bar
+
+    With the above, you can't have variables named "and" or "or". If you do,
+    use a hash key, as explained below.
+
+  Defined-ness
+    The Template Toolkit interpolates undefined variables as empty strings.
+    But using TT's virtual methods, you can test if a variable is defined in
+    the template context or not. The YAML logic
+
+        rule: 
+          - $var1.defined
+          - 1
+
+    will return true if $var1 has been defined. Conversely,
+
+        rule: 
+          - $var1.defined
+          - ""
+
+    will return true if the variable $var1 is *not* defined. Note that
+    defined returns 1 on definedness and the empty string ("") if the
+    variable is not defined.
+
+  Logical Set Operations
+    (not yet implemented)
+
+        rule: 
+          - $var1
+          -
+            - element1
+            - element2
+
+    (not yet implemented)
+
+        rule: 
+          - $var1
+          - like:
+              - element1
+              - element2
+
+YAML Traps
+    The original YAML implementation has a number of nasty bugs (e.g.
+    RT42015), so using YAML::Syck is recommended, which is a both faster and
+    more reliable parser.
+
+    Also, YAML as a configuration format can be tricky at times. For example
+    if you type in
+
+        my $data = Load(q{
+          # is $var equal to "foo"?
+        rule:
+          - $var
+          - foo
+        });
+
+    literally (like in the SYNOPSIS section of this document), keeping the
+    indentation intact, YAML will complain that it's not happy about the
+    final blank line, which contains whitespace characters:
+
+        Code: YAML_PARSE_ERR_NO_FINAL_NEWLINE
+
+    To avoid this, either use a YAML file, in which not using unnecessary
+    indentation will feel natural. When using YAML strings, make sure
+    there's no last line containing just whitespace, before feeding it to
+    the YAML parser:
+
+        my $yaml_string = q{
+              # is $var equal to "foo"?
+            rule:
+              - $var
+              - foo
+        };
+        $yaml_string =~ s/^\s+\Z//m;
+        my $data = Load($yaml_string);
+
+    Also, certain characters have a special meaning in YAML, so you can't
+    write
+
+        # WRONG
+        rule:
+          - $var
+          - !blah!
+
+    because YAML will parse that to
+
+        [$var, undef]
+
+    within the "rule" hash entry. Why? Lines starting with an exclamation
+    mark are *tags* in YAML. To avoid getting tripped up by this, use
+    quotes:
+
+        # CORRECT
+        rule:
+          - $var
+          - "!blah!"
+
+    which correctly parses to
+
+        [$var, "!blah!"]
+
+    within the "rule" hash entry instead.
+
+ERROR HANDLING
+    If a rule fails, the error() method can be used to obtain a detailed
+    textual description on why a comparison or a regex match failed.
+
+        if( $logic->evaluate( $data->{rule}, 
+                              { var => "foo" }) ) {
+            print "True!\n";
+        } else {
+            print "Failed, reason is: ", $logic->error();
+        }
+
+    This will print something like
+
+        Failed, reason is: Test ["foo" eq "bar"] returned []
+
+    saying the when it compared "foo" to "bar", the result was the empty
+    string (Perl's idea of 'false').
+
+TROUBLESHOOTING
+    Error Message: Unknown type: HASH(0x857d51c) at YAML/Logic.pm
+        This means that you've fed a hash to YAML::Logic. For example, if
+        your YAML file says
+
+            rule:
+              - "foo"
+              - "bar"
+
+        you've probably read the YAML file like
+
+            my $data = LoadFile( $file );
+
+        and now the data looks like
+
+            { rule => ["foo", "bar"] }
+
+        which, when you feed it unmodified to YAML::Logic as in
+
+            $logic->evaluate( $data );
+
+        presents the "rule" field to YAML::Logic, which it doesn't
+        understand. Pass the content of the rule to YAML::Logic instead:
+
+            $logic->evaluate( $data->{rule} );
+
+        and it will work as expected.
+
+LEGALESE
+    Copyright 2008 by Mike Schilli, all rights reserved. This program is
+    free software, you can redistribute it and/or modify it under the same
+    terms as Perl itself.
+
+AUTHOR
+    2008, Mike Schilli <cpan@perlmeister.com>
+

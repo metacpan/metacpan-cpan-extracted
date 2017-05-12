@@ -1,0 +1,17 @@
+Revision history for YVDHOVE::String
+************************************
+
+YVDHOVE::String v1.05
+	* changes to documentation
+	
+YVDHOVE::String v1.04
+	* changes to documentation
+
+YVDHOVE::String v1.03
+	* changes to documentation
+	
+YVDHOVE::String v1.02
+	* added extra module tests
+
+YVDHOVE::String v1.01
+	* original version; created by h2xs 1.23 with options '-AXc -n YVDHOVE::String'

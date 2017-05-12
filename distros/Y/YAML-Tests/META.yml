@@ -1,0 +1,14 @@
+abstract: Common Test Suite for Perl YAML Implementations
+author: "Ingy d\xC3\xB6t Net <ingy@cpan.org>"
+distribution_type: module
+generated_by: Module::Install version 0.64
+license: perl
+name: YAML-Tests
+no_index: 
+  directory: 
+    - inc
+    - t
+requires: 
+  Test::Harness: 2.42
+  perl: 5.005003
+version: 0.05

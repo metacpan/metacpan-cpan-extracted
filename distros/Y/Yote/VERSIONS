@@ -1,0 +1,19 @@
+May 2016
+
+1.39 --------------------------
+  No API changes, just removed sub-package versions
+
+
+Nov 2, 2015
+# --------Version 1.01
+
+minor bugfixes
+
+# ----------------------------------------------------------
+
+Sept 28, 2015
+# ----- Version 1.0
+
+This version breaks from earlier versions in that it splits
+off the app server into a separate project, and greatly 
+simplifies the API of yote.

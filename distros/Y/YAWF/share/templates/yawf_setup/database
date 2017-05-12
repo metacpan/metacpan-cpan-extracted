@@ -1,0 +1,8 @@
+<h2>Datenbankeinstellungen:</h2>
+<li>DBI-Connectstring = [% yawf.config.database.dbi %]</li>
+<li>Datenbank = [% yawf.config.database.database %]</li>
+[% IF reloaded %]
+	Datenbankstruktur wurde neu eingelesen.
+[% ELSE %]
+	Datenbankstruktur <a href="database.reload?SID=[% yawf.session.id %]">aktualisieren</a>.
+[% END %]

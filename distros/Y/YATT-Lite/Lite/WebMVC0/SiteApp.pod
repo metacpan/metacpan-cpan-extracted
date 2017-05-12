@@ -1,0 +1,157 @@
+=head1 NAME
+
+YATT::Lite::WebMVC0::SiteApp - PSGI Handler for yatt
+
+=head1 SYNOPSIS
+
+  # In app.psgi
+
+  use FindBin;
+  use YATT::Lite::WebMVC0::SiteApp -as_base;
+  use YATT::Lite qw/Entity *CON/;
+
+  return do {
+
+    my $site = MY->new(doc_root => "$FindBin::Bin/html");
+
+    #----- You can define entities here. ----
+    Entity session => sub {
+      my ($this, $key) = @_;
+      my $sess = $CON->get_session
+        or return;
+      $sess->param($key);
+    };
+
+    if (YATT::Lite::Factory->want_object) {
+
+      # When app.psgi is loaded from yatt support scripts(eg. yatt lint),
+      # return bare object, not app.
+
+      $site;
+
+    } else {
+
+      # Otherwise, normal PSGI. You can use Plack::Builder and/or middleware.
+
+      $site->to_app;
+    }
+  };
+
+=head1 DESCRIPTION
+
+C<SiteApp> is a L<Factory|YATT::Lite::Factory>
+of L<DirApp|YATT::Lite::WebMVC0::DirApp>, which is a web specific
+subclass of L<YATT::Lite>.
+
+SiteApp takes a template directory tree at startup
+and becomes a L<PSGI> application.
+
+When SiteApp called for incoming request,
+it first determins a sub-directory for the request.
+Then SiteApp looks for DirApp from own cache, load/build it when necessary,
+and finally invoke DirApp to handle do rest of work.
+
+=head1 CONFIGS
+
+SiteApp accepts L<YATT::Lite::Object> style configurations.
+
+=head2 doc_root
+
+Document root of this PSGI application. F<*.yatt> should be placed under this.
+Usually, F<$FindBin::Bin/html>
+
+=head2 app_ns
+
+Namespace of per-directory L<YATT::Lite> class. Default is C<MyApp>.
+This will also be used as a base class of each C<YATT::Lite> instances.
+This class will be loaded at startup (but can be missing).
+If it exists, it must be a subclass of C<YATT::Lite>.
+
+=head2 app_root
+
+The application directory where F<app.psgi> lives in.
+Sometime omissible, but recommended to set as C<$FindBin::Bin>.
+
+=head2 app_base
+
+Base DirApp for all DirApp under C<doc_root>.
+A.k.a inheritance of app-directory.
+Omissible. Usually, F<$FindBin::Bin/ytmpl>.
+
+=head2 site_prefix
+
+If your F<app.psgi> is located under subpath, specify this.
+You can refer this from F<*.yatt> via C<&yatt:site_prefix();>.
+
+=head2 header_charset
+
+Default charset for HTTP response headers. Default is utf-8.
+
+=head2 tmpl_encoding, output_encoding
+
+Encoding of F<*.yatt> and HTTP response body, respectively.
+
+XXX: should note about widechars....
+
+=head2 no_nested_query
+
+By default, yatt turns specific parameters into hashes/arrays
+like L<PHP|http://www.php.net/manual/en/faq.html.php#faq.html.arrays>
+and L<Ruby on Rails|http://guides.rubyonrails.org/action_controller_overview.html#hash-and-array-parameters>.
+This feature is useful(I hope), but is experimental.
+So if you don't want this feature, turn this config on.
+
+=head2 psgi_static
+
+Requests other than F<*.yatt>, F<*.ytmpl>, F<*.ydo> are passed to this PSGI app.
+Default is:
+
+  Plack::App::File->new(root => $self->{cf_doc_root})->to_app
+
+
+=head2 backend
+
+Room for your Model instance.
+If it is given and it has C<startup> method is implemented,
+C<< $backend->startup($siteapp, @all_dirapps) >>
+will be called when C<prepare_app>.
+
+=head1 METHODS
+
+=head2 call($env)
+
+PSGI entry function. SiteApp uses C<$env> as following:
+
+=over 4
+
+=item PATH_TRANSLATED, REDIRECT_STATUS
+
+If C<< $env->{REDIRECT_STATUS} >> is C<200> and
+has non empty C<< $env->{PATH_TRANSLATED} >>,
+yatt tries to serve specified path.
+
+=item PATH_INFO
+
+Otherwise, yatt examines C<< $env->{PATH_INFO} >>
+under F<doc_root> and F<app_base>, in this order.
+
+=back
+
+=head2 prepare_app
+
+PSGI startup hook.
+
+=head2 render($path_info, $args)
+
+Aid for batch execution.
+
+=head2 make_connection($parent_fh, @config)
+
+Build helper for L<YATT::Lite::WebMVC0::Connection> object.
+C<$parent_fh> can be undef.
+If specified, C<< $con->flush >> will flush buffered contents to $parent_fh.
+
+=head1 HOOKS
+
+=head2 before_dirhandler($dirapp, $connection, $filename)
+

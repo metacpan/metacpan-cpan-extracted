@@ -1,0 +1,146 @@
+# -*- coding: utf-8 -*-
+
+TITLE: ifonly, nameless
+IN:
+ <!yatt:args x>
+ <yatt:if "&yatt:x; >= 2">
+ <h2>Hello</h2>
+ </yatt:if>world!
+PARAM[
+- 1
+]
+OUT:
+ world!
+
+PARAM[
+- 2
+]
+OUT:
+ <h2>Hello</h2>
+ world!
+
+TITLE: ifonly, if=
+IN:
+ <!yatt:args x>
+ <yatt:if if="&yatt:x; >= 2">
+ <h2>Hello</h2>
+ </yatt:if>world!
+PARAM[
+- 1
+]
+OUT:
+ world!
+
+PARAM[
+- 2
+]
+OUT:
+ <h2>Hello</h2>
+ world!
+
+
+TITLE: if else
+IN:
+ <!yatt:args x>
+ <h2>Hello</h2>
+ <yatt:if "&yatt:x; >= 2">
+ world!
+ <:yatt:else/>
+ space!
+ </yatt:if>
+PARAM[
+- 1
+]
+OUT:
+ <h2>Hello</h2>
+ space!
+ 
+
+PARAM[
+- 2
+]
+OUT:
+ <h2>Hello</h2>
+ world!
+ 
+
+TITLE: if elsif else
+IN:
+ <!yatt:args x>
+ <h2>Hello</h2>
+ <yatt:if "not defined &yatt:x;">
+ space!
+ <:yatt:else if="&yatt:x; >= 2"/>
+ world!
+ <:yatt:else/>
+ decades!
+ </yatt:if>
+OUT:
+ <h2>Hello</h2>
+ space!
+ 
+
+PARAM[
+- 1
+]
+OUT:
+ <h2>Hello</h2>
+ decades!
+ 
+
+PARAM[
+- 2
+]
+OUT:
+ <h2>Hello</h2>
+ world!
+ 
+
+TITLE: if elsif else, inline style.
+IN:
+ <!yatt:args x>
+ <h2>Hello</h2>
+ <yatt:if "not defined &yatt:x;">space!
+ <:yatt:else if="&yatt:x; >= 2"/>world!
+ <:yatt:else/>decades!
+ </yatt:if>
+OUT:
+ <h2>Hello</h2>
+ space!
+ 
+
+PARAM[
+- 1
+]
+OUT:
+ <h2>Hello</h2>
+ decades!
+ 
+
+PARAM[
+- 2
+]
+OUT:
+ <h2>Hello</h2>
+ world!
+ 
+
+TITLE: if 0 correctly hides body
+IN:
+ You should see empty line:
+ <yatt:if "0">
+  But it is not!
+ </yatt:if>
+OUT:
+ You should see empty line:
+ 
+
+TITLE: yatt:if if="0" correctly hides body too.
+IN:
+ You should see empty line:
+ <yatt:if if="0">
+  But it is not!
+ </yatt:if>
+OUT:
+ You should see empty line:
+ 

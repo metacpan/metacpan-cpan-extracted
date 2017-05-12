@@ -1,0 +1,43 @@
+requires "Clustericious" => "1.20";
+requires "Log::Log4perl" => "0";
+requires "Number::Bytes::Human" => "0.09";
+requires "Parallel::ForkManager" => "0";
+requires "Path::Tiny" => "0";
+requires "Pod::Usage::CommandLine" => "0.04";
+requires "YAML::XS" => "0";
+requires "Yars::Client" => "0";
+requires "perl" => "5.010";
+
+on 'test' => sub {
+  requires "AnyEvent" => "0";
+  requires "AnyEvent::Open3::Simple" => "0.83";
+  requires "EV" => "0";
+  requires "Test::Clustericious::Cluster" => "0.31";
+  requires "Test::More" => "0.94";
+  requires "perl" => "5.010";
+};
+
+on 'test' => sub {
+  recommends "EV" => "0";
+};
+
+on 'configure' => sub {
+  requires "ExtUtils::MakeMaker" => "0";
+  requires "perl" => "5.010";
+};
+
+on 'develop' => sub {
+  requires "File::Spec" => "0";
+  requires "FindBin" => "0";
+  requires "Test::CPAN::Changes" => "0";
+  requires "Test::EOL" => "0";
+  requires "Test::Fixme" => "0.07";
+  requires "Test::More" => "0.94";
+  requires "Test::NoTabs" => "0";
+  requires "Test::Pod" => "0";
+  requires "Test::Pod::Coverage" => "0";
+  requires "Test::Pod::Spelling::CommonMistakes" => "0";
+  requires "Test::Spelling" => "0";
+  requires "Test::Strict" => "0";
+  requires "YAML" => "0";
+};

@@ -1,0 +1,144 @@
+Revision history for Yahoo-Marketing
+
+0.01    07 June 2006
+        First version.  Comments welcome!
+
+0.02    03 August 2006
+        Second version, lots of changes for 1.0 sandbox release
+        - new Response types
+        - automatically encode values
+        - proper types for ComplexTypes
+
+0.03    07 August 2006
+        Couple of documentation fixes
+        Removed pending field from Ad (no longer used)
+
+0.04    23 October 2006
+        Little tweaks to coinside with new sandbox release
+        Better error message when getMasterAccountLocation calls fail
+        Make http addresses in the POD link
+
+0.05    24 October 2006
+        Fix for SetGeographicLocationResponse with empty ambiguousMatch
+        Added cache clearing example to Yahoo::Marketing POD
+
+0.06    13 November 2006
+        Fix for multiple ApiFaults in response
+        Fix MakeMaker incompatible versions
+
+0.07    17 November 2006
+        New CombinedAccountStatus complex type
+
+0.08    20 November 2006
+        Fix for DateTime::Format::W3CDTF being used
+        MasterAccountService tests fixed
+
+0.09    17 January 2007
+        Added immortal option to prevent dying on SOAP faults.
+        Added automatic handling of Date/Timestamp fields
+            - DateTime objects can now be passed in directly
+            - DateTime objects are now returned from getters
+            They should stringify correctly so this functionality
+            should be more or less transparent
+                
+0.10    19 March 2007
+        Added work around for accountID in header for getMasterAccountLocation call
+        Missing DateTime::Format:: prereqs added
+                
+1.01    20 April 2007
+        Reuse SOAP::Lite objects to prevent leaking memory
+        Fixed bug email address in docs
+        Fix for getRelatedKeywords when no related keywords are returned
+        Major version # bumped.  Going forward, the major version # of Yahoo::Marketing will correspond to the major version of EWS that the release is associated with.
+
+2.01    14 May 2007
+        Major version # bumped for EWS V2.  All changes neccessary to support V2 added.
+
+2.02    27 June 2007
+        New tests for new functionality with V2.1.  Some misc cleanup.
+
+3.01    02 October 2007
+        Changes for EWS V3.  New VaultService, new get/set/delete BlockedDomainListForAccount commands in AccountService.
+
+3.02    16 January 2007
+        Fixed double-encoding for HTML encoded UTF-8 chars.
+
+4.01    4 March 2008
+        Major version # bumped for EWS V4.  All changes necessary to support V4 added.
+        Override SOAP::Serializer::as_string.
+
+4.02    5 March 2008
+        Fix for tests under EU::MM.
+
+4.03    6 March 2008
+        Remove the use of depreciated Yahoo::Marketing::ResponseType in Yahoo::Marketing::AdGroupOptimizationGuidelinesResponse.
+
+4.04    28 March 2008
+        Add two new elements in Account data object.
+
+4.05    1 July 2008
+        Make Yahoo::Marketing::Service more flexible to inherit.
+
+4.20    15 July 2008
+        Change for EWS V4.20. Add new data objects.
+
+4.21    29 July 2008
+        Add 'Long' data type support.
+        Add CDATA section support.
+
+4.30    25 September 2008
+        Change for EWS V4.30. Add new data objects.
+        Add attribute xsi:nil="true" to node if value is UNDEF.
+        
+4.31    1 November 2008
+        Fix bug to handle DateTime object correctly.
+        Add regionWOEIDs param to ForecastRequestData data object.
+
+5.01    28 January 2009
+        Major version # bumped for EWS V5.  All changes neccessary to support V5 added.
+
+5.02    17 March 2009
+        Change parameter in HistoricalKeyword data object.
+
+5.03    12 May 2009
+        Fix encoding problem for the string contains '&'.
+
+5.04    14 May 2009
+        Change simple_type_exceptions to be a method.
+
+5.05    15 May 2009
+        Add documentation for simple_type_exceptions to avoid 'naked subroutine' complaint.
+
+5.06    19 May 2009
+        Fix a typo in method name.
+
+5.10    23 July 2009
+        Minor version # bumped for EWS V5.1.0.
+
+5.20    8 September 2009
+        Minor version # bumped for EWS V5.2.0.
+
+5.21    8 September 2009
+        Add MobileDictionaryService.
+
+6.01    6 October 2009
+        Major version # bumped for EWS V6.  All changes neccessary to support V6 added.
+
+6.02    7 October 2009
+        Add ConverterService.
+
+6.03    9 November 2009
+        Add element 'warnings' in HistoricalResponseData data object;
+        Add element 'vatRegistrationCountry' in Account data object.
+
+6.11    21 January 2010
+        Minor version # bumped for EWS V6.1.0.
+
+7.01    26 March 2010
+        Major version # bumped for EWS V7.  All changes neccessary to support V7 added.
+
+7.02    1 April 2010
+        Add _add_account_to_header sub in ConverterService.pm.
+
+7.03    9 April 2010
+        Make adAutoOptimizationON value settable in AdGroup data obj.

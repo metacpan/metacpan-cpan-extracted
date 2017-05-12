@@ -1,0 +1,508 @@
+#!/usr/bin/perl
+
+eval 'exec /usr/bin/perl  -S $0 ${1+"$@"}'
+    if 0; # not running under some shell
+
+use strict;
+use warnings FATAL => 'all';
+
+use YATG::SharedStorage;
+YATG::SharedStorage->factory(qw(cache results));
+
+use YAML::XS;
+use YATG::Config;
+use YATG::Callback;
+
+use File::stat;
+use Symbol;
+use Readonly;
+use Time::HiRes qw(time sleep);
+
+use DBI;
+use SNMP;
+use SNMP::Effective;
+die "must not use SNMP::Effective 1.0\n"
+    if $SNMP::Effective::VERSION == 1.0;
+use Net::Netmask;
+use Regexp::Common 'net';
+
+use Sys::Syslog 0.25;
+use Log::Dispatch::Syslog;
+use Data::Printer;
+
+use POSIX;
+use FindBin;
+use File::Basename;
+use File::Spec::Functions;
+
+my $config = YATG::Config->parse(@ARGV) || die "failed to load config\n";
+Readonly my $INTERVAL => $ENV{YATG_INTERVAL} || $config->yatg->{'interval'};
+Readonly my $POLLERS  => $config->yatg->{'max_pollers'};
+Readonly my $TIMEOUT  => $config->yatg->{'timeout'};
+Readonly my $DEBUG    => $ENV{YATG_DEBUG} || $config->yatg->{'debug'};
+$ENV{YATG_DEBUG} = $DEBUG; # copy from config for use in backends
+
+# p $config if $ENV{YATG_DEBUG};
+
+my $logger = Log::Dispatch::Syslog->new($config->log_dispatch_syslog);
+sub to_log {
+    my $msg = shift;
+    return unless $msg;
+
+    print STDERR $msg if $DEBUG;
+    $msg =~ s/^/[$$] /gm;
+
+    $logger->log(
+        level => $config->log_dispatch_syslog->{'min_level'},
+        message => $msg
+    );
+}
+
+Readonly my @modules => qw( Disk RPC Memcached NSCA STDOUT );
+Readonly my @basic_oids => (
+        'ifDescr'       => '.1.3.6.1.2.1.2.2.1.2',
+        'ifAdminStatus' => '.1.3.6.1.2.1.2.2.1.7',
+);
+
+my $results = YATG::SharedStorage->results({});
+my $cache   = YATG::SharedStorage->cache({
+    oid_for  => { @basic_oids },
+    leaf_for => { reverse @basic_oids },
+});
+
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+# POSIX unmasks the sigprocmask properly
+my $sigset = POSIX::SigSet->new;
+my $action = POSIX::SigAction->new(
+    'hup_handler', $sigset, &POSIX::SA_NODEFER
+);
+POSIX::sigaction(&POSIX::SIGHUP, $action);
+
+chomp(my $command = (qx/ps -o args $$/)[1]);
+sub hup_handler {
+    to_log("SIGHUP received, restarting...\n");
+    exec ($command) or die "Couldn't restart $0: $!\n";
+}
+
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# rebuild device cache (also on sigHUP)
+to_log("YATG Loaded.\n") if $DEBUG;
+
+sub get_hosts {
+    # list of all device ips
+    my $dbh = DBI->connect(
+        @{$config->yatg->{'dbi_connect'}},
+        {PrintError => 1, RaiseError => 1, AutoCommit => 1}
+    ) or die $DBI::errstr;
+
+    $cache->{devices} = $dbh->selectcol_arrayref(
+        $config->yatg->{'dbi_ip_query'});
+
+    # build resolver table for host names for device IPs
+    if ($config->yatg->{'dbi_host_query'}) {
+        $cache->{'host_for'} = { map {$_->{ip} => $_->{name}} @{
+            $dbh->selectall_arrayref(
+              $config->yatg->{'dbi_host_query'},
+              { Slice => {} },
+            )}
+        };
+    }
+
+    # p $cache->{host_for} if exists $cache->{host_for};
+
+    # build filter list of interfaces for ifIndex items for each device
+    if ($config->yatg->{'dbi_interfaces_query'}) {
+        foreach my $ip (@{$cache->{devices}}) {
+            $cache->{'interfaces_for'}->{$ip} = {
+                map { $_ => 1 } @{
+                  $dbh->selectcol_arrayref(
+                    $config->yatg->{'dbi_interfaces_query'},
+                    {}, $ip)
+                }
+            };
+
+            # a device with no interfaces means allow all interfaces
+            delete $cache->{'interfaces_for'}->{$ip}
+              if 0 == scalar keys %{ $cache->{'interfaces_for'}->{$ip} };
+        }
+    }
+
+    # p $cache->{'interfaces_for'} if exists $cache->{'interfaces_for'};
+    $dbh->disconnect;
+}
+
+# initialise hosts list
+&get_hosts;
+
+# work out what OIDs to grab, and how
+SNMP::addMibDirs(@{$config->yatg->{'mibdirs'}});
+SNMP::loadModules('ALL');
+my %modhash = map{lc($_) => $_} @modules;
+my @to_load = ();
+
+foreach my $leaf (keys %{$config->yatg->{'oids'}}) {
+    my %tokens = map {lc($_) => 1} @{$config->yatg->{'oids'}->{$leaf}};
+
+    # difference or counter
+    $cache->{oids}->{$leaf}->{diff} = $tokens{diff} ? 1 : 0;
+
+    # store module to load
+    my (%union, %isect);
+    foreach my $e (keys %modhash, keys %tokens) { $union{$e}++ && $isect{$e}++ }
+    my @store_list = keys %isect;
+
+    $cache->{oids}->{$leaf}->{store_list} = [ map {$modhash{$_}} @store_list ];
+    push @to_load, @{$cache->{oids}->{$leaf}->{store_list}};
+
+    # transate leaf to OID
+    $cache->{oid_for}->{$leaf} = SNMP::translateObj($leaf)
+        or die "Failed to translate leaf $leaf to OID\n";
+}
+
+sub get_community {
+    my $ip = shift;
+
+    # shortcut if there is only one community supplied
+    if (scalar @{$config->yatg->{'communities'}} == 1) {
+        $cache->{community_for}->{$ip}
+            = $config->yatg->{'communities'}->[0];
+        return;
+    }
+
+    foreach my $c (@{$config->yatg->{'communities'}}) {
+        my $sess = SNMP::Session->new(
+            DestHost  => $ip,
+            Version   => 1,
+            Timeout   => 500000,
+            Community => $c,
+        );
+        my $val = $sess->get('sysUpTime.0');
+
+        # failure, go to next community
+        next if !$val or $sess->{ErrorNum} or $sess->{ErrorStr};
+
+        # success, use this community and go to next device
+        $cache->{community_for}->{$ip} = $c;
+        # to_log("commnity for $ip discovered as $c\n") if $DEBUG;
+        last;
+    }
+
+    to_log("warning: Failed to find community for [$ip] !\n")
+      if !exists $cache->{community_for}->{$ip};
+}
+
+sub prime_cache {
+    to_log("Generating oid/host map... \n") if $DEBUG;
+
+    foreach my $leaf (keys %{$config->yatg->{'oids'}}) {
+        my %tokens = map {lc($_) => 1} @{$config->yatg->{'oids'}->{$leaf}};
+
+        my $oid = $cache->{oid_for}->{$leaf};
+        $cache->{leaf_for}->{ $oid } = $leaf;
+
+        # prune IPs for each OID
+        my @nets_incl = grep {$_ = Net::Netmask->new2($_)}
+                        grep {m#^$RE{net}{IPv4}(?:/\d+)?$#} keys %tokens;
+        my @nets_excl = grep {$_ = Net::Netmask->new2($_)}
+                        grep {m#^!$RE{net}{IPv4}(?:/\d+)?$#} keys %tokens;
+
+        if (scalar @nets_incl == 0 and scalar @nets_excl == 0) {
+            # short-circuit
+            map { $cache->{get_for}->{$_}->{ $oid } = 1 }
+                @{$cache->{devices}};
+        }
+        else {
+            foreach my $ip (@{$cache->{devices}}) {
+                $cache->{get_for}->{$ip}->{ $oid } = 1
+                    if  ((scalar grep { $_->match($ip) } @nets_incl) > 0
+                        and (scalar grep { $_->match($ip) } @nets_excl) == 0)
+                    or  (scalar @nets_incl == 0
+                        and (scalar grep { $_->match($ip) } @nets_excl) == 0);
+            }
+        }
+
+        # indexed oid?
+        if ($tokens{ifindex}) {
+            $cache->{oids}->{$leaf}->{indexer} = 'iid';
+            foreach my $ip (
+                grep { exists $cache->{get_for}->{$_}->{ $oid } }
+                    @{$cache->{devices}} ) {
+
+                $cache->{get_for}->{$ip}->{ $cache->{oid_for}->{ifDescr} } = 1;
+                $cache->{get_for}->{$ip}->{ $cache->{oid_for}->{ifAdminStatus} } = 1;
+                $cache->{$ip}->{build_ifindex} = 1;
+            }
+        }
+        else {
+            $cache->{oids}->{$leaf}->{indexer} = 0;
+        }
+    }
+
+    to_log("Getting communities... \n") if $DEBUG;
+
+    # connect to each device and find out its community,
+    # shortcut if there is only one community supplied
+    if (scalar @{$config->yatg->{'communities'}} == 1) {
+        map {$cache->{community_for}->{$_}
+                    = $config->yatg->{'communities'}->[0]}
+            @{$cache->{devices}};
+    }
+    else {
+        # build lookup table for snmp communities
+        if ($config->yatg->{'dbi_community_query'}) {
+            my $dbh = DBI->connect(
+                @{$config->yatg->{'dbi_connect'}},
+                {PrintError => 1, RaiseError => 1, AutoCommit => 1}
+            ) or die $DBI::errstr;
+
+            $cache->{'community_for'} = { map {$_->{ip} => $_->{snmp_community}} @{
+                $dbh->selectall_arrayref(
+                  $config->yatg->{'dbi_community_query'},
+                  { Slice => {} },
+                )}
+            };
+
+            # p $cache->{'community_for'} if exists $cache->{'community_for'};
+            $dbh->disconnect;
+        }
+        else {
+            foreach my $ip (@{$cache->{devices}}) {
+                # to_log("finding community string for $ip...\n") if $DEBUG;
+                &get_community($ip);
+            }
+        }
+    }
+}
+
+sub check_newhosts_watch {
+    return unless exists $config->{'yatg'}->{'newhosts_watch'};
+
+    my $file = $config->{'yatg'}->{'newhosts_watch'};
+    return unless length $file and -e $file;
+
+    my $mtime = stat($file)->mtime;
+    return if $mtime < (time - $INTERVAL);
+
+    to_log("newhosts_watch updated - getting new hosts...\n");
+    &get_hosts;
+    &prime_cache;
+}
+
+# load storage module(s)
+foreach my $module (@to_load) {
+    die "Request to load undefined module\n" if !defined $module;
+    eval "require YATG::Store::$module"
+        or die "Failed to load $module store module: $@\n";
+}
+
+&prime_cache;
+to_log(sprintf "Initial cache build took %.3f seconds.\n", (time - $^T));
+
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+while (1) {
+    my $naptime = $INTERVAL - (time % $INTERVAL);
+    to_log("Sleeping for $naptime seconds...\n") if $DEBUG;
+    sleep $naptime;
+
+    # see if we need to refresh the cache
+    &check_newhosts_watch;
+
+    my $se = SNMP::Effective->new(
+        MaxSessions   => $POLLERS,
+        MasterTimeout => $TIMEOUT,
+    );
+
+    foreach my $ip (@{$cache->{devices}}) {
+        next unless scalar (keys %{$cache->{get_for}->{$ip}}) > 0;
+        next unless $cache->{community_for}->{$ip};
+
+        $se->add(
+            desthost => $ip,
+            args      => {
+                Community => $cache->{community_for}->{$ip},
+                Timeout   => 5000000,
+            },
+            callback => \&YATG::Callback::snmp_callback,
+            walk     => [ keys %{$cache->{get_for}->{$ip}} ],
+        );
+    }
+
+    my $exec = time;
+    $se->execute;
+    to_log(sprintf "Execute run took %.3f seconds.\n", (time - $exec));
+
+    my $update = time;
+    my $stamp = floor($update - ($update % $INTERVAL));
+    (($stamp % $INTERVAL) == 0) or die "yatg: FATAL: time is shifting!\n";
+
+    # send gathered data from this run to storage
+    foreach my $mod (keys %$results) {
+        &{*{Symbol::qualify_to_ref('store',"YATG::Store::$mod")}}
+            ({%$config}, $stamp, $results->{$mod});
+    }
+
+    to_log(sprintf "Remote update took %.3f seconds.\n", (time - $update));
+
+    $results = YATG::SharedStorage->results({});
+    last if $ENV{YATG_SINGLE_RUN};
+}
+
+# ABSTRACT: Fast SNMP data poller daemon, with storage and graphing
+# PODNAME: YATG
+
+
+__END__
+=pod
+
+=head1 NAME
+
+YATG - Fast SNMP data poller daemon, with storage and graphing
+
+=head1 VERSION
+
+version 5.20002
+
+=head1 DESCRIPTION
+
+YATG is a daemon (background process) which at intervals wakes up and polls
+network devices for SNMP data, and then stores or prints that data. In this
+distribution are also included examples for presenting simple CGI web pages
+with graphs.
+
+YATG is flexible, efficient and powerful. It can poll a large number of
+devices with thousands of ports in just a few seconds. The configuration is
+very simple, and the defaults sane (it's designed for sysadmins, after all).
+
+You can use YATG both for historical logging, such as traffic counters on
+ports, as well as short-term monitoring which might feed into, say, Nagios.
+Wherever possible, data is translated to human-friendly formats for storage,
+such as using Leaf Names instead of OIDs, translated values (C<up>, C<down>,
+etc) and device port names rather than SNMP Interface Indexes.
+
+=head1 How Does It Work?
+
+At startup, C<yatg_updater> loads its configuration from local files and a
+database, performs some basic SNMP connections to build a cache about device
+capabilities and so on, and then goes to sleep.
+
+Periodically, as determined by the configuration, C<yatg_updater> wakes up and
+polls all devices, then stores results, again according to instructions in the
+configuration.
+
+If you have only the essential dependencies installed (see below) then you can
+only output results to STDOUT. With other modules, you have more options such
+as local or remote disk, or memcached based storage.
+
+C<yatg_updater> will re-load all its configuration if given a HUP signal. If
+you run the daemon persistently (for example with C<daemontools>) then a cron
+job once a day is a good way to refresh the configuration. There is reference
+to this in one of the bundled example files.
+
+=head1 What's in this distribution
+
+=over 4
+
+=item C<yatg_updater>
+
+This is the main application, designed to be run persistently. It does not
+accept any input and only produces output when in debugging mode. It is a
+smart wrapper for the L<SNMP::Effective> module.
+
+=item YATG::Store family of modules
+
+These are modules which take the SNMP poll results and store them to either
+local Disk, a Memcached server, the disk on a remote networked server, or
+Nagios via NSCA.
+
+=item YATG::Retrieve family of modules
+
+These are modules which read stored results back to you, for a given time
+window. The data can be retrieved from local Disk, a Memcached server, or the
+disk on a remote networked server.
+
+=item C<yatg_trim>
+
+If using the Disk Store backend for results, eventually you'll want to save
+space by deleting old data. This script understands the backend file format
+and, given a duration, removes that amount of historical data from the file.
+
+=item RPC::Serialized handlers
+
+If storing and/or retrieving on a remote networked server, it should run an
+instance of L<RPC::Serialized>, and these are the RPC Handlers for that server
+(see that module's documentation for further details).
+
+=item CGI
+
+For the special case of viewing graphs of disk-based poll results for switch
+port traffic counters, there is are two CGI scripts. One is a wrapper which
+presents an HTML page embedded with PNG images created from the other script.
+
+=item Examples
+
+The C<examples/> folder includes a copy of each of the files you should need
+for a complete deployment of YATG. Obviously some of them contain dummy data.
+
+=back
+
+=head1 Where to go from here
+
+To begin with, you probably want to see how to configure C<yatg_updater> in
+L<YATG::Config>.
+
+Alongside that, there are examples of all the files you should need to
+install, in the C<examples/> folder of this distribution.
+
+Each of the Store and Retrieve modules might have additional Perl module
+dependencies (i.e. from CPAN) - see the relevant docs for more details.
+
+=head1 LOGGING and TESTING
+
+This module uses "Log::Dispatch::Syslog" for logging, and by default will log
+timing data to your system's syslog service. More information is provided in
+the L<YATG::Config> documentation.
+
+To run in debug mode, where timing data is output to standard out rather than
+syslog, set the environment variable C<YATG_DEBUG> to a true value.
+
+To run the poller just once, set the C<YATG_SINGLE_RUN> environment variable
+to a true value. This is great for development. It makes C<yatg_updater> load
+its configuration, generate the device hints cache, sleep and then run just
+one poll cycle before exiting.
+
+To override the interval between polling runs, set the C<YATG_INTERVAL>
+environment variable to a number of seconds.
+
+For example:
+
+ YATG_DEBUG=1 YATG_SINGLE_RUN=1 /usr/bin/yatg_updater /etc/yatg.yml
+
+=head1 SEE ALSO
+
+=over 4
+
+=item L<SNMP::Effective>
+
+This system uses SNMP::Effective at its core do the polling.
+
+=item L<RPC::Serialized>
+
+Store polled data on another server using RPC::Serialized.
+
+=back
+
+=head1 AUTHOR
+
+Oliver Gorwits <oliver@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2015 by University of Oxford.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut
+

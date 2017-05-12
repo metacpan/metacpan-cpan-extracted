@@ -1,0 +1,12 @@
+# -*- coding: utf-8 -*-
+
+FILE: subapp1/index.yatt
+HEADER[
+Content-type: ^text/html; charset="?utf-8"?
+]
+BODY:
+ 16
+ /
+ index
+ no
+

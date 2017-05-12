@@ -1,0 +1,5 @@
+# -*- perl -*-
+sub foo ($) {
+  $CGI->param(@_);
+}
+

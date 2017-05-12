@@ -1,0 +1,23 @@
+---
+abstract: 'Generate YUI markup menus'
+author:
+  - 'Pablo Fischer (pablo@pablo.com.mx).'
+distribution_type: module
+generated_by: 'Module::Install version 0.76'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: YUI-MenuBar-Markup
+no_index:
+  directory:
+    - examples
+    - inc
+    - examples
+requires:
+  Mouse: 0.27
+  YAML::Syck: 1.07
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: http://github.com/pfischer/YUI-MenuBar-Markup
+version: 0.01

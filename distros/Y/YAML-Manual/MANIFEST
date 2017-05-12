@@ -1,0 +1,24 @@
+Changes
+inc/Module/Install.pm
+inc/Module/Install/Base.pm
+inc/Module/Install/Can.pm
+inc/Module/Install/Fetch.pm
+inc/Module/Install/Makefile.pm
+inc/Module/Install/Metadata.pm
+inc/Module/Install/Win32.pm
+inc/Module/Install/WriteAll.pm
+lib/YAML/Manual.pm
+lib/YAML/Manual/Cookbook.pod
+lib/YAML/Manual/FAQ.pod
+lib/YAML/Manual/Intro.pod
+lib/YAML/Manual/Modules.pod
+lib/YAML/Manual/RefCard.pod
+lib/YAML/Manual/RoadMap.pod
+lib/YAML/Manual/Syntax.pod
+lib/YAML/Manual/Tutorial.pod
+lib/YAML/Manual/Usage.pod
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+README
+t/load.t

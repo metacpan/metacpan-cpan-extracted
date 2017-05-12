@@ -1,0 +1,17 @@
+sudo: false
+language: perl
+perl:
+  - "5.20"
+  - "5.18"
+  - "5.16"
+  - "5.14"
+  - "5.12"
+addons:
+  apt:
+    packages:
+      - zsh
+before_install:
+  - "cpanm -n Devel::Cover::Report::Coveralls\n"
+script:
+  cd .. && mkdir lib && mv yatt_lite lib/YATT && cd lib/YATT &&
+  t/runtests.zsh

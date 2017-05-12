@@ -1,0 +1,40 @@
+Revision history for Yakuake::Sessions
+
+0.15.1    2014-09-13 13:45:50
+          - Bumped version and released
+          - Added a catch block and remdial action to retain functionality
+            Konsole removed the close method from the API - thanks
+          - Fixed cmd line string options
+          - Refactored session stabiliztion code
+          - Removed N::DB::Annotations calls are sync by default
+
+0.14.1    2014-08-17 17:32:58
+          - Made DBus calls syncronous
+          - Replaced namespace::sweep with autoclean
+          - Fixed TCs in TraitFor::DBus
+          - Added fury badge
+
+0.13.1    2014-05-01 13:55:12
+          - Bumped version to release
+          - Removed Ident and VERSIONs
+
+0.12.1    2014-01-15 17:57:29
+          - Now using exception classes
+          - Updated Build.PL
+          - Using DZ::P::AbstractFromPOD and LicenseFromModule
+          - Dropped DZ::P::MarkdownInRoot from dist.ini
+          - Added select option
+
+0.11.1    2013-11-23 13:09:24
+          - Dropped MooX::Options
+          - Updated git hooks
+
+0.10.3    2013-11-23 01:12:23
+          - Fixed metadata after switch to DZ
+
+0.9.1     2013-08-15 23:33:26
+          - Switched to Dist::Zilla
+
+0.8.1     2013-08-07 18:49:48
+          - Reset min perl testing to original behaviour
+

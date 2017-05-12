@@ -1,0 +1,96 @@
+# -*- coding: utf-8 -*-
+
+=encoding utf-8
+
+=head1 NAME
+
+todo(ja) -- 課題の一覧
+
+=head1 Issues
+
+=over 4
+
+=item yatt xgettext 初回データの問題
+
+最初の一度目に生成される .htyattmsg.en.po が, 複数行形式になっていない。
+
+=back
+
+=head1 TODOs
+
+=over 4
+
+=item English translation and internal documentation.
+
+英訳しなきゃ... .pm 側の pod も書かなきゃ
+
+=item rename scripts/yatt.* to scripts/yatt-*
+
+F<yatt.*> だと windows で困るから。 F<yatt-*.pl> とかに rename しようかと。
+でもその前にラッパースクリプト F<scripts/yatt> を完成させなきゃ。
+
+=item nginx.conf とか systemd.service とか
+
+設定ファイルの生成支援もの、手元の環境依存のままサンプルとして出すのか、
+ちゃんと汎用化してから出すか...
+
+=item F<*.ytmpl> の再読み込みを簡単にさせられないか
+
+アプリのリスタートをせずに済むようにしたい
+
+=item F<.htyatt*> の再読み込みを簡単に...
+
+同じく。 L<Factory|YATT::Lite::docs::prog_guide/Factory> API
+の改良が必要になるはず。
+
+=item C<< DirApp->cmd_SUB >> に C<$CON> を渡すべき
+
+DirApp 毎の CLI 用ユーザ拡張コマンド C<sub cmd_COMMAND> の引数仕様を変更したい。
+現在は C<< $dirapp->cmd_COMMAND(@ARGV) >> だが、これだと例えば
+dbh も $dirapp の中にキャッシュすることになり、不便。
+やはり C<< $dirapp->cmd_COMMAND($CON, @ARGV) >> にして、
+作業用オブジェクトを外から渡せるようにしたい。
+
+もしくは、 C<with_connection()> のような API を整理して、
+C<*CON> 経由で渡すか。その方が、現在の実装との差は少ないが...
+
+=item AppPath API の全面改定
+
+全てが気に入らない。
+
+=back
+
+=head1 Arguments
+
+=over 4
+
+=item SiteApp, DirApp という名前は適切か?
+
+PSGI との用語の違いを名前で際立たせよう、という意図で付けた名前だった。
+(App という用語が二つの粒度で使われる、と。サイト全体 vs その中の各ディレクトリ)
+
+SiteApp を WebMVC0.pm にする手もあった。しかしそれだと、 git submodule 化が出来ない。
+
+元々の役割は Dispatcher なので、そう呼んでも良かったかもしれない。
+
+DirApp も、単に App と呼びたかった。でもそれでは PSGI App と誤解されうる。
+
+=back
+
+=head1 Wish list
+
+=over 4
+
+=item CGen::JS
+
+試作品はあるけど、使い方が気に入らない。
+
+=item starman 向けに、起動時一括コンパイルモードも欲しい
+
+fork 後にコンパイルするのは無駄だし。
+あと、運用形態次第では、アプリ起動時にテンプレートエラーが分かると嬉しいケースもあるはず。
+
+あと、コンパイルが済んだテンプレート関連データは捨てられるようにすべき。
+(今はメモリーに残してる)
+
+=back

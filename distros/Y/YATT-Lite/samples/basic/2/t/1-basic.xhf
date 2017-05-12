@@ -1,0 +1,26 @@
+# -*- coding: utf-8 -*-
+
+FILE: index.yatt
+HEADER[
+Content-type: ^text/html; charset="?utf-8"?
+]
+BODY:
+ <!DOCTYPE html>
+ <html>
+ <head>
+   <title>Hello World!</title>
+ 
+ </head>
+ <body>
+ <div id="wrapper" style="width: 800px; margin: 0 auto;">
+ <div id="topnav">
+   <h2 style="display: inline;"><a href="./">Hello World!</a></h2>
+ </div>
+ <center style="text-align: center;">
+ <div id="body" style="text-align: left;">
+   RUOK?</div>
+ </center>
+ </div>
+ </div>
+ </body>
+ </html>

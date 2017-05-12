@@ -1,0 +1,5 @@
+steps = FindVersion, ChangeVersion, CheckChangeLog, DistTest, Commit, Tag, MakeDist, UploadCPAN
+
+git.push_to = git@github.com:hkoba/yatt-pm.git
+
+CheckChangeLog.files = Changes

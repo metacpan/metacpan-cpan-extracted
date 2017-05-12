@@ -1,0 +1,35 @@
+=head1 Yeb - Yet another webframework
+
+B<ALPHA SOFTWARE>
+
+=head2 INSTALLATION
+
+After checking out, you require to install the requirements. You must have
+installed B<Dist::Zilla>, then you can do the following to install the base
+Perl requirements:
+
+  dzil authordeps --missing | cpanm
+  dzil listdeps --missing | cpanm
+
+You can also just install the release via cpan:
+
+  cpanm Yeb
+
+=head1 SUPPORT
+
+IRC
+
+  Join #web-simple on irc.perl.org. Highlight Getty for fast reaction :).
+  
+=head1 AUTHOR
+
+Torsten Raudssus <torsten@raudss.us>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2013 by Torsten Raudssus.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

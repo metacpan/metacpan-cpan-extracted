@@ -1,0 +1,183 @@
+#!/usr/bin/env perl
+
+##########################################
+# This program launches the yote server. #
+##########################################
+
+
+use strict;
+use warnings;
+no  warnings 'uninitialized';
+use vars qw($VERSION);
+
+use Daemon::Daemonize qw/ :all /;
+use Data::Dumper;
+
+use Yote::Server;
+
+$VERSION = '1.1';
+
+$SIG{ __DIE__ } = sub { 
+    Carp::confess( @_ );
+};
+eval('use Yote::ConfigData');
+my $yote_root_dir = $@ ? '/opt/yote' : Yote::ConfigData->config( 'yote_root' );
+
+
+my %options_explanations = (
+    '--help|-?|-help'                  => 'display this help',
+    '--yote_root_dir=<directory>'      => 'directory for object store, other data and configuration',
+    '--yote_host=<ip-or-hostname>'     => "The default is '127.0.0.1'. It would be odd for it to be somethi
+ng else",
+    '--yote_port=<portnumber>'         => "default port for yote requests. Default is 8881",
+    '--lock_port=<portnumber>'         => "yote internally uses a lock server that runs on this port. Default is 8004",
+    '--lock_host=<ip-or-hostname>'     => "default port for internal lock server. Default is 8881",
+    '--lock_attempt_timeout=<seconds>' => "amount of time a server process will spend trying to get a lock. default is 12",
+    '--lock_timeout=<seconds>'         => "amount of time a lock may be kept. default is 12",
+    );
+
+
+my $options = Yote::Server::load_options( $yote_root_dir );
+
+#
+# Override options and find command 
+#
+my $cmd = 'start';
+while( @ARGV ) {
+    $_ = shift @ARGV;
+
+    if( /^-?-?(\?|help)/i ) {
+        print "yote_server <options> start|stop|restart\n\t" .
+            join( "\n\t", map { "$_ $options_explanations{$_}" } sort keys %options_explanations ) .
+            "\n";
+        exit;
+    }
+    elsif( /^--([^=]+)(=(.*))?/ ) {
+        if( defined( $options->{$1} ) ) {
+            $options->{$1} = $3;
+        } else {
+            print STDERR "Unknown option '$_'\n";
+        }
+    } elsif( /^(start|stop|restart)$/ ) {
+        $cmd = $_;
+    } else {
+        print STDERR "Unknown argument '$_'\n";
+    }
+}
+
+my $pidfile = "$options->{yote_root_dir}/yote.pid";
+
+if( $cmd eq 'stop' ) {
+    if( my $pid = check_pidfile( $pidfile ) ) {
+        print "Stopping $0 ( $pid )\n";
+        kill 'INT', $pid;
+        sleep 2;
+        print "Done\n";
+        exit;
+    }    
+    print "yote is not running\n";
+    exit;
+}
+
+if( $cmd eq 'start' ) {
+    if( check_pidfile( $pidfile ) ) {
+        print "yote is already running\n";
+        exit;
+    }
+    start_yote();
+    exit;
+}
+
+if( $cmd eq 'restart' ) {
+    if( my $pid = check_pidfile( $pidfile ) ) {
+        print "Stopping $0\n";
+        kill 'INT', $pid;
+        sleep 4;
+        print "Done\n";
+    }    
+    start_yote();
+    exit;
+}
+
+if( $cmd eq 'status' ) {
+    print check_pidfile( $pidfile ) ? "yote is running\n" : "yote is not running\n";
+    exit;
+}
+
+# ------------------------------------------------------------------
+
+sub start_yote {
+
+    daemonize( close => 0, run => sub {
+        write_pidfile( $pidfile );
+        my $serv = new Yote::Server( $options );
+        $serv->run;
+               } );
+
+
+} #start_yote
+__END__
+
+=head1 NAME
+
+yote_server - Turn on and off the Yote Server/Webserver
+
+=head1 SYNOPSIS
+
+The Yote server serves up web pages and IO for javascript Yote requests.
+
+yote_server --help
+yote_server --show_config
+yote_server --generate     # create new configuration and run yote
+yote_server start          # run yote
+
+
+=head1 DESCRIPTION
+
+This program is the Yote server. At the time of writing this is not daemonized 
+( there are some issues using the forks module together with daemonization ).
+
+This uses the configuration in the yote.conf file in the yote root directory. 
+The yote root directory is set upon installation and is usually /opt/yote.
+
+When yote is run for the first time, it asks a series of configuration questions.
+These can be revisited by 
+
+=head1 FILES
+
+yote.conf
+
+=head1 DIAGNOSTICS
+
+Though Yote has unit tests that are run upon install, its web based components are 
+written in javascript, and a javascript interpreter has not been created for this test
+framework yet. There is a test that can be manually run. To run, start the yote server
+and point a browser to http://localhost:yoteport/yote/unit_tests.html. Also included
+are tests for file uploads at http://localhost:yoteport/yote/upload_test.html
+
+=head1 CAVEATS
+
+Most systems will require root permissions to run this. 
+Since this cannot be run at this time as a daemon, it can be run manually in a screen. 
+To stop the server, hit control C.
+
+=head1 BUGS
+
+There are no known bugs, but since this software is Beta or below, bugs are highly likely 
+to exist. Please inform the author if bugs are encountered.
+
+=head1 AUTHOR
+
+Eric Wolf
+coyocanid@gmail.com
+http://madyote.com
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright (C) 2011-2015 Eric Wolf
+
+This module is free software; it can be used under the same terms as perl
+itself.
+
+=cut
+

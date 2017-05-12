@@ -1,0 +1,7 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/String.t
+lib/YVDHOVE/String.pm
+META.yml                                 Module meta-data (added by MakeMaker)

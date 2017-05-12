@@ -1,0 +1,40 @@
+---
+abstract: "It's module to get access to Yandex.Metrika API via OAuth"
+author:
+  - 'Andrey Kuzmin <chipsoid@cpan.org>'
+build_requires:
+  Test::More: '0.98'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v2.4.0, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Yandex-Metrika
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Yandex::Metrika:
+    file: lib/Yandex/Metrika.pm
+    version: '0.01'
+requires:
+  Class::MOP: '0'
+  Modern::Perl: '0'
+  Moo: '0'
+  Yandex::OAuth::Client: '0.04'
+  perl: '5.008001'
+resources:
+  bugtracker: https://github.com/Chipsoid/yandex-metrika-perl/issues
+  homepage: https://github.com/Chipsoid/yandex-metrika-perl
+  repository: git://github.com/Chipsoid/yandex-metrika-perl.git
+version: '0.01'

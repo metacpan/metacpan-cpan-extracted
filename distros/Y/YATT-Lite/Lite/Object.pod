@@ -1,0 +1,84 @@
+=head1 NAME
+
+YATT::Lite::Object - fields based, Tcl/Tk like object
+
+=head1 SYNOPSIS
+
+  package MyProduct {
+     sub MY () {__PACKAGE__}          # Shorthand alias.
+     use base qw/YATT::Lite::Object/; # For fields, you must use 'base'.
+     use fields qw/cf_name cf_price/; # Or YATT::Lite::MFields, if you like.
+
+     sub as_string {
+       (my MY $self, my ($fmt)) = @_;
+       $fmt //= '%s (%d)';
+       sprintf $fmt, $self->{cf_name}, $self->{cf_price}; # statically checked!
+     }
+  }
+
+  1;
+
+Then you can use this class like this:
+
+  my $prod = MyProduct->new(name => 'foo', price => 100);
+  print $prod->cget('name');
+
+=head1 DESCRIPTION
+
+
+
+XXX: See L<YATT::Lite::docs::whyfields>.
+(But it is not yet translated to English:-<)
+
+=head1 METHODS
+
+=head2 new
+
+  my $obj = YATT::Lite::Object->new(cf1 => val1, cf2 => val2, ...);
+
+  my $obj = YATT::Lite::Object->new({cf1 => val1, cf2 => val2, ...});
+
+=head2 configure
+
+Bulk setter(sets multiple configs at once).
+
+  $obj->configure(cf1 => val1, cf2 => val2, ...);
+
+  $obj->configure({cf1 => val1, cf2 => val2, ...});
+
+
+=head2 cget
+
+  $obj->cget('cf1')
+
+  $obj->cget('cf1', 'default')
+
+=head1 HOOKS
+
+
+
+=head2 configure_CFx
+
+If your class has method named C<configure_CFx>,
+it is called whenever C<< $obj->configure(CFx => val) >> is called.
+
+=head2 after_new
+
+Mainly used for initializing default config values. Typical code will be:
+
+   sub after_new {
+     (my MY $self) = @_;
+     $self->SUPER::after_new;
+     $self->{cf_xxx} //= "foo";
+     $self->{cf_yyy} //= "bar";
+     # ...
+   }
+
+=head2 _before_after_new
+
+Ideally, having two hooks is useless. But user-level programmers
+could forget to call C<SUPER::new> in their <after_new> hook,
+which can lead hard to debug situation. So, I divided hooks,
+one for user-level programmers and the other for framework designers.
+This C<_before_after_new> is the later one.
+

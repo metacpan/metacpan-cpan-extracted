@@ -1,0 +1,49 @@
+==================================================
+Changes from 1740-06-09 00:00:00 +0000 to present.
+==================================================
+
+------------------------------------------
+version 0.003 at 2014-03-24 23:53:11 +0000
+------------------------------------------
+
+  Change: b152bf79416bf85943f0b67df6001b98394eb2e1
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2014-03-25 00:49:20 +0000
+
+    I should not copy & paste ABSTRACT, I should not copy & paste
+    ABSTRACT, I should not copy & paste ABSTRACT, I should not copy &
+    paste ABSTRACT 
+
+  Change: c7172998d194ad0d7793cbdcf3515d9118692c7d
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2014-03-25 00:45:49 +0000
+
+    Added updated travis yml 
+
+  Change: cbd7cdc05628fba3bc516ede69aba2ddf25cdcc8
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2014-03-25 00:44:43 +0000
+
+    Added new minimum Yeb and made load test without Test::LoadAllModules 
+
+  Change: c6b6e7c4b7dfd0c7501c399a423160f1b99aa091
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2013-12-22 16:23:39 +0000
+
+    Added travis config 
+
+  Change: 773e889fcee360cb9ee44cacb20a6033d89a5482
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2013-12-22 16:23:14 +0000
+
+    First working implementation 
+
+  Change: 02aa677d089f207f4f05c2cb2abe7a80104939c9
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2013-12-21 23:34:07 +0000
+
+    initial commit 
+
+================
+End of releases.
+================

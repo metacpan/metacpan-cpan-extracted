@@ -1,0 +1,46 @@
+YAML::DBH
+=========
+
+Point and shoot method of getting a database handle with only a yaml 
+configuration file as argument. 
+
+This is meant for people learning perl who just want to get up and running.
+It's the simplest customizable way of getting a database handle with very little code.
+
+This is mostly for mysql- the default driver used. The conf file may also tell to 
+use a sqlite db instead.
+
+
+
+INSTALLATION
+
+   tar -xvf ./$this_package_file
+   cd $package_dir_created
+   perl Makefile.PL
+   make test
+   make install
+
+TESTING
+
+For real testing you will need to have a running mysqld server.
+
+You need to be able to make a connection to a database as per 
+
+./t/mysql_credentials.conf
+
+   username: testing
+   database: testing
+   password: testing
+   hostname: localhost
+
+If you do have this set up, run 
+
+   perl t/01_find_confs_and_test.pl
+
+If you want to set up your own parameters, throw in a bunch of 
+config files in t/ that you know will work.
+Each file must end in '.conf'.
+
+If you have further questions:
+
+Leo Charre leocharre at cpan dot org

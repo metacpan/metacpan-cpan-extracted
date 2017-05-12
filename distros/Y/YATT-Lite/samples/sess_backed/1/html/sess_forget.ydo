@@ -1,0 +1,14 @@
+my $i = 0;
+my $compiled_at = scalar localtime time;
+
+sub {
+  my ($this, $con) = @_;
+
+  $this->YATT->session_destroy;
+
+  if (my $url = $con->param('back') || $con->referer) {
+    $con->redirect($url);
+  } else {
+    $con->redirect('./');
+  }
+};

@@ -1,0 +1,22 @@
+<!yatt:args foo>
+<h2>request sigil mapping</h2>
+<form method="POST">
+<input type="text" name="foo" size="10" value="&yatt:foo;">
+<input type="submit" name="~" value="show this">
+<input type="submit" name="~bar" value="show bar">
+<input type="submit" name="!baz" value="do baz">
+</form>
+
+<!yatt:page bar foo>
+<h2>page bar</h2>
+foo=&yatt:foo;
+
+<!yatt:action baz>
+my ($this, $con) = @_;
+my $foo = $con->param('foo');
+print $con "OK. foo=", $foo // "(NULL)";
+
+<!yatt:page testlistarg chklst=list>
+checked=
+<yatt:foreach my=v list=chklst>&yatt:v;
+</yatt:foreach>.

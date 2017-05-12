@@ -1,0 +1,27 @@
+<div>
+<h1>Edit <span id="yukkiname">PageName</span></h1>
+<div class="pane" id="preview-yukkitext">
+</div>
+<div class="pane" id="edit-pane">
+<form method="POST" class="edit-page">
+    <input type="hidden" name="yukkitext_position" id="yukkitext_position" value="0"/>
+    <textarea id="yukkitext" name="yukkitext">Markdown goes in here...</textarea>
+
+    <label for="coment">Comment:</label>
+    <input id="comment" name="comment" type="text"/>
+
+    <div id="attachments" class="attachments">
+        <div id="attachments-list" class="attachment-list empty">No files attached.</div>
+        <div id="attachments-dropzone" class="attachment-dropzone">Drop files here for upload.</div>
+        <div class="button-group">
+            <button type="button" id="attachments-picker" class="attachment-picker">Choose Files...</button>
+            <button type="button" id="attachments-start" class="attachment-start">Upload Now</button>
+        </div>
+    </div>
+
+    <div class="button-group">
+        <button type="submit" id="submit" name="submit">Save</button>
+    </div>
+</form>
+</div>
+</div>

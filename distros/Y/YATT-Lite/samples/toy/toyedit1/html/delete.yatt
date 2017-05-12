@@ -1,0 +1,14 @@
+<!yatt:args fnum>
+<yatt:std:envelope title="Delete file # &yatt:fnum; ?">
+
+<h2>Do you really want to delete &yatt:fnum;?</h2>
+<h3>TITLE: &yatt:mh_load(:fnum){TITLE};</h3>
+
+<form action="delete.ydo">
+  <input type="submit" name="!delete" value="Yes, delete it.">
+  <input type="submit" name="!cancel" value="No, thank you.">
+  <input type="hidden" name="fnum" value="&yatt:fnum;">
+</form>
+
+</yatt:std:envelope>
+

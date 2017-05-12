@@ -1,0 +1,98 @@
+#!/usr/bin/perl
+
+# PODNAME: yarsclient
+# ABSTRACT: Upload, download, and delete files to Yars.
+our $VERSION = '1.27'; # VERSION
+
+use strict;
+use warnings;
+use File::Spec;
+use File::Basename 'dirname';
+use Clustericious::Log;
+
+use Yars::Client;
+use Clustericious::Client::Command;
+use Clustericious::Log::CommandLine (':all', ':loginit' => <<"EOT");
+           log4perl.rootLogger = WARN, Screen
+           log4perl.appender.Screen = Log::Log4perl::Appender::ScreenColoredLevels
+           log4perl.appender.Screen.layout = Log::Log4perl::Layout::PatternLayout
+           log4perl.appender.Screen.layout.ConversionPattern = [%-5p] %d %F{1} (%L) %m %n
+EOT
+
+Clustericious::Client::Command->run(Yars::Client->new, @ARGV);
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+yarsclient - Upload, download, and delete files to Yars.
+
+=head1 VERSION
+
+version 1.27
+
+=head1 SYNOPSIS
+
+ # Send a file to Yars.
+ yarsclient upload <filename>
+ 
+ # Get the file back, write it to the current directory.
+ yarsclient download <filename> <md5>
+ 
+ # Put some content to somefilename.txt
+ echo 'some content' | yarsclient put somefilename.txt
+ 
+ # Get just the content back to stdout.
+ yarsclient get <filename> <md5>
+ 
+ # Delete the file from Yars.
+ yarsclient remove <filename> <md5>
+ 
+ # Check the status of all the yars hosts and disks.
+ yarsclient servers_status
+ 
+ # Check the usage of the disks, either from the configured host, or all hosts
+ yarsclient disk_usage
+ yarsclient disk_usage --all 1
+
+ # Mark a disk down
+ yarsclient set_status --host http://host1 --disk /acps/f101 --state down
+ 
+ # Mark a disk up
+ yarsclient set_status --host http://host2 --disk /acps/f101 --state up
+ 
+ # Check a manifest file
+ yarsclient check_manifest /my/dir/MANIFEST
+ # Just emit "ok" or "not ok"
+ yarsclient check_manifest -c /my/dir/MANIFEST
+ # Also do a server side md5 check
+ yarsclient check_manifest --show_corrupt 1 /my/dir/MANIFEST
+
+=head1 DESCRIPTION
+
+Command-line interface to Yars::Client.  Client for Yars.
+
+=head1 AUTHOR
+
+Original author: Marty Brandon
+
+Current maintainer: Graham Ollis E<lt>plicease@cpan.orgE<gt>
+
+Contributors:
+
+Brian Duggan
+
+Curt Tilmes
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2013 by NASA GSFC.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

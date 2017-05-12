@@ -1,0 +1,35 @@
+==================================================
+Changes from 1740-09-20 00:00:00 +0000 to present.
+==================================================
+
+------------------------------------------
+version 0.001 at 2014-07-05 01:12:05 +0000
+------------------------------------------
+
+  Change: 8a280791fd3b5e09fddf8c8e01dd20f3fe3fd40d
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2014-07-05 03:06:39 +0000
+
+    Added minimum SQL::Translator for working tests 
+
+  Change: a3f755a4b5c138d5aaf9f6b9d85fbfabc5898ebd
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2014-07-05 03:00:04 +0000
+
+    Added .travis.yml 
+
+  Change: d71b9d389ea40595f5f7a5a2a4d1a0884a2dba60
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2014-07-05 02:58:18 +0000
+
+    First implementation with test 
+
+  Change: 965636d2019740979792ce92ab07deea360ac35b
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2014-07-04 23:57:30 +0000
+
+    initial commit 
+
+================
+End of releases.
+================

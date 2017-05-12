@@ -1,0 +1,39 @@
+---
+foo: top scope
+hello: world
+bar:
+    qux: $foo
+blah:
+    blah: self ref test
+    ego: $blah
+circ:
+    circ: $prolog
+    prolog: $cows_are_good
+    cows_are_good: $circ
+simple_circ:
+    simple_circ: $simple_circ
+bigcirc:
+    thing: $level3
+    level1:
+        level2:
+            level3:
+                level4: 
+                    level5: $thing
+baz:
+    foo: baz scope
+    qux: $foo qux
+    test: $hello
+    quxx:
+        -
+            food:
+                burger: $foo
+                test: $hello
+            fries: $qux
+            test: $hello
+        -
+            foo: inner scope
+            food:
+                burger: $foo
+                test: $hello
+            fries: $qux
+            test: $hello

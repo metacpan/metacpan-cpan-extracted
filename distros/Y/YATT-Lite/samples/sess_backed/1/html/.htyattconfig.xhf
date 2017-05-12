@@ -1,0 +1,4 @@
+dont_map_args: 1
+config{
+sample_theme: Example of session based input restoration
+}

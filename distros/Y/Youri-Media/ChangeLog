@@ -1,0 +1,11 @@
+2007-04-22 Guillaume Rousse <guillomovitch@zarb.org> 0.2.1
+	* fix lazy loading
+
+2007-03-22 Guillaume Rousse <guillomovitch@zarb.org> 0.2.0
+	* Youri::Media::URPM:
+	    - preload switch
+	    - caching switch
+	* test suite enhancements
+
+2007-03-05 Guillaume Rousse <guillomovitch@zarb.org> 0.1.0
+	* initial release

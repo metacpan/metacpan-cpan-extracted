@@ -1,0 +1,43 @@
+---
+abstract: 'Yet another web framework'
+author:
+  - 'Sebastian Willing, C<< <sewi at cpan.org> >>'
+  - 'Sebastian Willing <sewi@cpan.org>'
+build_requires:
+  DBD::SQLite: 0
+  ExtUtils::MakeMaker: 6.42
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 1.01'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: YAWF
+no_index:
+  directory:
+    - inc
+    - share
+    - t
+recommends:
+  CGI: 3.48
+requires:
+  Apache::Session::SharedMem: 0
+  CGI: 3.43
+  CGI::Cookie: 0
+  Class::XSAccessor: 0
+  DBI: 0
+  DBIx::Class: 0
+  DBIx::Class::Schema: 0
+  File::ShareDir: 0
+  File::Spec: 0
+  FindBin: 0
+  HTML::Entities: 0
+  Template: 0
+  Template::Stash: 0
+  Time::Local: 0
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.01

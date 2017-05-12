@@ -1,0 +1,2 @@
+<!yatt:base "base2">
+<yatt:bar xa="qux" xb="quux"/>

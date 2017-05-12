@@ -1,0 +1,33 @@
+Youri::Config
+-------------
+
+Youri configuration handler.
+
+Description
+-----------
+YOURI stands for "Youri Offers an Upload & Repository Infrastucture". It aims
+to build tools making management of a coherent set of packages easier.
+
+This package provides configuration handling for other youri programs.
+
+Installation
+------------
+To install, just use:
+perl Makefile.PL
+make
+make test
+
+Copyright and License
+---------------------
+Copyright (C) 2002-2006, YOURI project
+
+This program is free software; you can redistribute it and/or modify it under
+the same terms as Perl itself.
+
+Authors
+-------
+Guillaume Rousse <guillomovitch@zarb.org>,
+Pascal Terjan <pterjan@zarb.org>
+Damien Krotkine <dams@zarb.org>
+Olivier Thauvin <nanardon@zarb.org>
+Ville Skyttä <ville.skytta@iki.fi>

@@ -1,0 +1,72 @@
+#!/usr/bin/env perl
+use 5.12.1;
+
+use Yukki;
+
+use IO::Prompter;
+use YAML qw( LoadFile DumpFile );
+
+my $app = Yukki->new;
+my $digest = $app->hasher;
+
+my $username = prompt 'Login name:';
+
+my $user_file = $app->locate('user_path', $username);
+if (not -f "$user_file") {
+    die "User $username does not exist. Please create this user before setting the password.\n";
+}
+
+my $user = LoadFile("$user_file");
+
+my $password = prompt 'Password:', -echo => '', -v;
+
+$digest->add($password);
+my $password = $digest->generate;
+
+$user->{password} = $password;
+
+chmod 0600, "$user_file";
+DumpFile("$user_file", $user);
+chmod 0400, "$user_file";
+
+# ABSTRACT: set the password for a user
+# PODNAME: yukki-passwd
+
+__END__
+
+=pod
+
+=head1 NAME
+
+yukki-passwd - set the password for a user
+
+=head1 VERSION
+
+version 0.140290
+
+=head1 SYNOPSIS
+
+  yukki-passwd
+
+=head1 DESCRIPTION
+
+Interactively asks for login name and password to give a user.
+
+=head1 ENVIRONMENT
+
+Normally, this script tries to find F<etc/yukki.conf> from the current working
+directory. If no configuraiton file is found, it checks C<YUKKI_CONFIG> for the
+path to this file.
+
+=head1 AUTHOR
+
+Andrew Sterling Hanenkamp <hanenkamp@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2014 by Qubling Software LLC.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

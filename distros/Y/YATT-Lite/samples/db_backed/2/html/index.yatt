@@ -1,0 +1,6 @@
+<yatt:envelope>
+  <:yatt:title>DB backed, member only site sample</:yatt:title>
+
+  Hello, &yatt:sess(:LOGIN());!<br>
+
+</yatt:envelope>

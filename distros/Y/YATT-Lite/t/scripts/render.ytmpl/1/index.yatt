@@ -1,0 +1,3 @@
+<yatt:show msg="Hello!" />
+<!yatt:widget show msg>
+<h2>&yatt:msg;</h2>

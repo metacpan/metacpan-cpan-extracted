@@ -1,0 +1,110 @@
+#!/usr/bin/env perl
+use 5.12.1;
+
+use Yukki::Web;
+
+use autodie;
+use File::ShareDir qw( module_dir );
+use File::Copy::Recursive qw( dircopy );
+use Path::Class;
+use YAML qw( LoadFile );
+
+my $site_dir = shift;
+
+die "usage: $0 path/to/new-site-directory\n" unless $site_dir;
+die qq[A file or directory named "$site_dir" already exists, will not overwrite.\n]
+    if -e $site_dir;
+
+my $module_dir = module_dir('Yukki::Web');
+my @files = glob "$module_dir/*";
+
+$File::Copy::Recursive::KeepMode = 0;
+dircopy($module_dir, $site_dir);
+
+my $root = dir($site_dir)->absolute;
+my $yaml = file($root, 'etc', 'yukki.conf');
+
+# Don't use YAML to load the file or we'll lose spaces and comments
+rename $yaml, "$yaml~";
+open my $out_config, '>', $yaml;
+open my $in_config, '<', "$yaml~";
+while (my $line = <$in_config>) {
+    given ($line) {
+        when (/^root:/) {
+            $line = "root: $root\n";
+        }
+    }
+    print $out_config $line;
+}
+close $out_config;
+close $in_config;
+unlink "$yaml~";
+
+chmod 0444, "$yaml";
+
+my $config = LoadFile("$yaml");
+
+say "Please read the installation instructions if you have not:\n";
+say "\tperldoc Yukki::Manual::Installation\n";
+
+say "The rest of these remarks assume you run this first:\n";
+say "\tcd $site_dir\n";
+
+say "You probably want to setup your repositories by running:\n";
+for (sort keys %{ $config->{repositories} }) {
+    when ('yukki') { say "\tyukki-git-init $_ git://github.com/zostay/yukki-help.git" }
+    default        { say "\tyukki-git-init $_" }
+}
+print "\n";
+
+say "And then you'll want at least one user, so run:\n";
+say "\tyukki-add-user\n";
+
+say "To start your Yukki server, run:\n";
+say "\tcd $site_dir; plackup yukki.psgi\n";
+
+say "Have a nice day!";
+
+# ABSTRACT: constructs the boilerplate needed to start a Yukki site
+# PODNAME: yukki-setup
+
+__END__
+
+=pod
+
+=head1 NAME
+
+yukki-setup - constructs the boilerplate needed to start a Yukki site
+
+=head1 VERSION
+
+version 0.140290
+
+=head1 SYNOPSIS
+
+  yukki-setup site-directory
+
+=head1 DESCRIPTION
+
+Creates a new Yukki site directory at the location named in the single command line argument. Everything else is automatic.
+
+After it completes it reminds you to take a few additional required actions.
+
+=head1 ENVIRONMENT
+
+Normally, this script tries to find F<etc/yukki.conf> from the current working
+directory. If no configuraiton file is found, it checks C<YUKKI_CONFIG> for the
+path to this file.
+
+=head1 AUTHOR
+
+Andrew Sterling Hanenkamp <hanenkamp@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2014 by Qubling Software LLC.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

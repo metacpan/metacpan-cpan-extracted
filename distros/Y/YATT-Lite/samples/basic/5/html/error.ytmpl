@@ -1,0 +1,7 @@
+<!yatt:args err>
+<yatt:std:envelope title="ERROR(&yatt:err:reason();)">
+<h2>&yatt:err:reason();</h2>
+<div>
+  &yatt:err:place();
+</div>
+</yatt:std:envelope>

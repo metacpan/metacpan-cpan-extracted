@@ -1,0 +1,47 @@
+{
+   "abstract" : "University of Granada proposal for YAPC::EU 2015",
+   "author" : [
+      "UGR + Barcelona.pm + Madrid.pm"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.140640",
+   "license" : [
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "YAPC-Europe-UGR",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "App::pod2pdf" : "0",
+            "Test::More" : "0",
+            "Test::Pod" : "0",
+            "Test::PureASCII" : "0",
+            "Test::Spelling" : "0",
+            "experimental" : "0",
+            "version" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "v0.9.1"
+}
