@@ -1,0 +1,23 @@
+Revision history for anarch
+
+0.04  8 November, 2009
+    • New -add-extensions option.
+    • Binary files can now be  downloaded  to  folders  that  do  not
+      already exist. They used to be skipped.
+
+0.03  1 July, 2009
+      A serious bug that caused binary files to be  overwritten  with
+      the referring page after  they  had  been  downloaded  has  now
+      been fixed.
+
+0.02  27 June, 2009
+    • In sync mode,  local files that had not been modified would  be
+      scanned for links,  even if they were binary  files;  now  such
+      files are simply skipped.
+    • Makefile.PL  has been fixed so that  the  dummy.pm  file is  no
+      longer installed.
+    • Binary files are now downloaded straight to disk,  and  are  no
+      longer kept in memory.
+
+0.01  24 June, 2009
+      First release.

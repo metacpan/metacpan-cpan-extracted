@@ -1,0 +1,65 @@
+###################################################
+# 
+#   Title: Authen::RBAC
+#  Author: Dennis Opacki, dopacki@adotout.com
+#    Date: 9/12/2003
+#
+###################################################
+
+Purpose:
+--------
+
+This set of perl modules is designed as a structured backend for 
+authorization of a username, command and hostname triad. The design is 
+sufficiently extensible to provide authorization features to a
+great range of applications. 
+
+Examples include:
+
+Tacacs+ authorization to routers
+Unix role-based access control
+Application differential access control
+
+Usage:
+------
+
+use Authen::RBAC; 
+
+my $acs = new Authen::RBAC( conf =>'/usr/local/etc/auth' ); 
+
+# returns 1 for authorized, undef for denied
+my $result = $acs->authorize( $user, $command, $hostname );
+
+Sample XML Configuration (place in /usr/local/etc/auth/):
+------------------------
+
+<xml>
+        <group>
+                <groupname>systems</groupname>
+                <acl info="core routers">
+                        <hostmask>core.*</hostmask>
+                        <default>DENY</default>
+                        <permit cmd="show">
+                                <argmask>line.*</argmask>
+                                <argmask>interface.*</argmask>
+                        </permit>
+                </acl>
+	</group>
+</xml>
+
+The above configuration defines a single authorization group called 
+"systems". This group contains all users who are members of the UNIX 
+group "systems" at the time $acs->parse() is executed.
+
+Under this group, a single ACL is defined called "core routers". This ACL 
+applies to all hostnames passed to $acs->authorize() which match the 
+"core.*" perl regular expression. 
+
+The configuration next sets the default policy of this ACL to "deny". This 
+default policy will be applied if no "permit" or "deny" directives match 
+the passed command parameter.
+
+Next, a permit directive is added. The permit directive above adds two 
+regular expressions; "show line.*" and "show interface.*". Deny directives 
+are allowed as well to restrict specific commands.
+

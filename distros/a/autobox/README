@@ -1,0 +1,31 @@
+autobox version 2.85
+====================
+
+The autobox pragma allows methods to be called on integers, floats, strings, arrays, hashes, and code references in exactly the same manner as blessed references.
+
+Autoboxing is transparent: values are not blessed into their (user-defined) implementation class (unless the method elects to bestow such a blessing) - they simply use its methods as though they are.
+
+autobox is lexically scoped, and bindings for an outer scope can be overridden or countermanded in a nested scope.
+
+See the POD for more details.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  Scope::Guard
+
+COPYRIGHT AND LICENCE
+
+This module is free software; you can redistribute it and/or modify it under the same terms as Perl itself.
+
+Copyright (c) 2003-2017 chocolateboy <chocolate@cpan.org>

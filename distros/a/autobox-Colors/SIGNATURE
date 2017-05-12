@@ -1,0 +1,54 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.73.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 55ac697642a18dd7d974736a3d06fd531aa82382 .travis.yml
+SHA1 2875821bf2acac2b1ae2ff620ea4aabae743d711 Changes
+SHA1 8d0db187c15f2eef45300961acc402a2bc6f229d INSTALL
+SHA1 5603e5a0c8c6b1e4bd671f2e841faf028c1b9dd6 LICENSE
+SHA1 ddb1ae256595f5cf45656b3150bf16d3a4eeeb06 MANIFEST
+SHA1 2741f35f59dba4d8c46047066063733094c2b1c7 META.json
+SHA1 97b441f9c763b4e9795c27c6cd4240030ac9bcc9 META.yml
+SHA1 a2dfaefa11f951dfb3a14e41c714c0f8e5f6c237 Makefile.PL
+SHA1 d175018af4991058d97641b2117b4cd349768a48 README
+SHA1 da39a3ee5e6b4b0d3255bfef95601890afd80709 README.md
+SHA1 cb9f56a8509c4d7f0f8fd411502a6e2204ffda0c cpanfile
+SHA1 7bfbbb79b950180c951ba5d2784b55c0c24389b0 dist.ini
+SHA1 36284b0310a59acab894f74d471c705dfcc8257a lib/autobox/Colors.pm
+SHA1 f6d7a8d06a7cc8f42c3f180a7c84beb9c0cf4332 t/00-check-deps.t
+SHA1 4903442ab0a1002428ea24205771a6200adc58be t/00-compile.t
+SHA1 6630340c83ca8074c62f91e70750cfe9c7041969 t/000-report-versions-tiny.t
+SHA1 4b0f13cb10c9f14091b1269bc70144b3af60d199 t/author-pod-spell.t
+SHA1 c44376ea73bef0e6ed6b51d29422dac0e9a9cc14 t/decolorize.t
+SHA1 9c3627ff37f4fd5bddc34bf46cf3359eaf76a060 t/release-consistent-version.t
+SHA1 a032c41ef6887fab1b900669c2d304fab46680e2 t/release-eol.t
+SHA1 4f6692569173537ebcaf0d6f1ea2d7c58e992e15 t/release-has-version.t
+SHA1 742e643d0fa45cbba48f338222f0ca82df2356ce t/release-minimum-version.t
+SHA1 bec3e2d02c379b570b4e3a39310315c59b33a8ff t/release-no-smart-comments.t
+SHA1 c92460a770dbe8242edbfdda6dfb5b651ceec108 t/release-no-tabs.t
+SHA1 87a7fc08a86f29df8b542f3144a5f065525ff460 t/release-pod-coverage.t
+SHA1 2549a20fc4648d989ffa61650f0cb793b8613d71 t/release-pod-linkcheck.t
+SHA1 39e379de5a4b908baa772173c7b1c81d02077a12 t/release-pod-syntax.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.11 (GNU/Linux)
+
+iQEcBAEBAgAGBQJSSiE/AAoJEOd5N1CvIgQkSnUIALOUhGl2eAyq9B5od7D9uhTv
+VDiav9ObQKBV39aQjCqZ4nJGQtqOnJ8J3e3BMK6+UNG6zxbqnBQrMHaEr5iB/L/3
+7JiM8vaao/9z41Fd9P2vgZfVeapJIAR9phlPcS0JnTECvHVujFcxtKFPpa2KRjWI
+84RqVd4b3KCyogqjzyh6sJiPG1xHsALjrIpZiwGjluOsZ96Wiaf2KQ7npJCnuU61
+Q4MEjNFrO9I+dn46DKnWlkvK7GgxYMjZhHWhsBqeMAkmDN2IYpuajQFOlNC7jed7
+KUYGf9RHh63rAseb1aOCqvw2CyvGa8tUIH4DzMn85dmgJMj9sWNPzuTLabvXG48=
+=G8VI
+-----END PGP SIGNATURE-----

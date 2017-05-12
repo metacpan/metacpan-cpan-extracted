@@ -1,0 +1,10 @@
+Changes
+lib/assertions.pm
+lib/assertions/activate.pm
+lib/assertions/compat.pm
+Makefile.PL
+MANIFEST
+README
+t/assertions.t
+t/asstcompat.t
+META.yml                                 Module meta-data (added by MakeMaker)

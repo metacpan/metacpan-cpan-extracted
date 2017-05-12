@@ -1,0 +1,67 @@
+SYNOPSIS
+
+      #!/usr/bin/perl
+    
+      use strict;
+      use anywhere qw/ feature say /;
+      use Greet;
+    
+      Greet::hello();
+    
+      # in Greet.pm
+      package Greet;
+      use strict;
+      sub hello {
+        say "Helloooooo!!!!";
+      }
+
+DESCRIPTION
+
+    anywhere is a fork of everywhere 0.07 while waiting my proposed change
+    to be merged (if ever). It currently only has one difference compared
+    to everywhere: it sets %INC entry to the file path instead of letting
+    Perl set it to CODE(0x...) so other modules see the used module more
+    normally and anywhere can work with things like true.
+
+    The rest is from everywhere documentation:
+
+    I got tired of putting "use 5.010" at the top of every module. So now I
+    can throw this in my toplevel program and not have to Repeat Myself
+    elsewhere.
+
+    In theory you should be able to pass it whatever you pass to use.
+
+    Also, I just made it so you can do:
+
+      use anywhere 'MooseX::Declare',
+        matching => '^MyApp',
+        use_here => 0;
+
+    for example and then it will only apply this module to things matching
+    your regex. And not use it here. You can also throw in 'package_level
+    => 1' to use your package after every "package ..." line. All these are
+    experimental :)
+
+EVERYWHERE'S BUGS
+
+    Currently you can only use this once.
+
+SEE ALSO
+
+    https://rt.cpan.org/Public/Bug/Display.html?id=120238
+
+    Acme::use::strict::with::pride -- from which most code came!
+
+    Also look at use and feature.
+
+EVERYWHERE'S AUTHOR
+
+      Brock Wilcox <awwaiid@thelackthereof.org> - http://thelackthereof.org/
+      Thanks to mst and #moose ;-)
+
+EVERYWHERE'S COPYRIGHT
+
+      Copyright (c) 2008-2011 Brock Wilcox <awwaiid@thelackthereof.org>. All rights
+      reserved.  This program is free software; you can redistribute it and/or
+      modify it under the same terms as Perl 5.10 or later.
+

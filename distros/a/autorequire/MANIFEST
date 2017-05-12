@@ -1,0 +1,12 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/01_autorequire.t
+t/02_autodynaload_default.t
+t/03_autodynaload_hook.t
+t/lib/t/file.pm
+t/lib/t/handle.pm
+lib/autorequire.pm
+lib/autodynaload.pm
+META.yml                                 Module meta-data (added by MakeMaker)

@@ -1,0 +1,3 @@
+use inc::Module::Package[% IF plugin %] '[% plugin %]'[% END %];
+
+clean_files('Makefile.PL');

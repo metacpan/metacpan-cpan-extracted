@@ -1,0 +1,19 @@
+#!/usr/bin/env perl
+use strict;
+use UNIVERSAL::require;
+die q{[usage]
+$ unitary '2->megabytes' '3.days'
+2097152
+259200
+} if @ARGV == 0 || $ARGV[0] =~ /^--?h/;
+my @modules;
+for my $m qw(autobox autobox::Numeric::Bytes autobox::Numeric::Time) {
+    push @modules, $m if $m->require;
+}
+my $use = join '', map {"use $_; "} @modules;
+for (@ARGV) {
+    s/^(\d+(?:\.\d+)?)\.([a-zA-Z]+)$/$1->$2/; # transform N.unit to N->unit
+    my $e = "$use $_";
+    # warn $e."\n";
+    print eval($e), "\n";
+}

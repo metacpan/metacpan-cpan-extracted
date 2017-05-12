@@ -1,0 +1,87 @@
+{
+   "abstract" : "Autobox methods to transform Arrays and Hashes",
+   "author" : [
+      "Johan Lindstrom, C<< <johanl [AT] cpan.org> >>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v3.0.1",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "autobox-Transform",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.035"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "List::MoreUtils" : "0",
+            "Sort::Maker" : "0",
+            "autobox" : "0",
+            "autobox::Core" : "0",
+            "perl" : "5.010",
+            "true" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Moo" : "0",
+            "Test::Differences" : "0",
+            "Test::Exception" : "0",
+            "Test::More" : "0.98"
+         }
+      }
+   },
+   "provides" : {
+      "autobox::Transform" : {
+         "file" : "lib/autobox/Transform.pm",
+         "version" : "1.029"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/jplindstrom/p5-autobox-Transform/issues"
+      },
+      "homepage" : "https://github.com/jplindstrom/p5-autobox-Transform",
+      "repository" : {
+         "url" : "git://github.com/jplindstrom/p5-autobox-Transform.git",
+         "web" : "https://github.com/jplindstrom/p5-autobox-Transform"
+      }
+   },
+   "version" : "1.029",
+   "x_authority" : "cpan:JOHANL",
+   "x_contributors" : [
+      "Johan Lindstrom <johan.lindstrom@broadbean.com>",
+      "Johan Lindstrom <jpl@nospam>"
+   ],
+   "x_serialization_backend" : "JSON::PP version 2.27300"
+}

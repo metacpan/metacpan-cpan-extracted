@@ -1,0 +1,28 @@
+SYNOPSIS
+      use abbreviation qw(Very::Long::ClassName::Here);
+  
+      my $obj = Very::Long::ClassName::Here->new;
+      my $obj = V::L::CN::Here->new;        # same
+
+DESCRIPTION
+    Tired of typing long class name? use abbreviation for that.
+
+TRICK AND CAVEAT
+    Dynamic package name aliasing can be implemented via:
+
+    *   symbol table aliasing. (import.pm)
+
+    *   dynamic inheritance. (namespace.pm)
+
+    Both has virtue and vice. Currently, abbreviation.pm takes the former.
+    This may change in the future.
+
+AUTHOR
+    Tatsuhiko Miyagawa <miyagawa@bulknews.net>
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+SEE ALSO
+    the import manpage, the namespace manpage.
+

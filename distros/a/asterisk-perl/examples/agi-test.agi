@@ -1,0 +1,66 @@
+#!/usr/bin/perl
+#
+# Simple AGI Application to show some of the features of AGI
+# 
+# Written by: James Golovich <james@gnuinter.net>
+#
+
+use Asterisk::AGI;
+
+$AGI = new Asterisk::AGI;
+
+my %input = $AGI->ReadParse();
+my $tests = 0;
+my $pass = 0;
+my $fail = 0;
+
+#setup callback
+$AGI->setcallback(\&mycallback);
+
+
+print STDERR "AGI Environment Dump:\n";
+foreach $i (sort keys %input) {
+	print STDERR " -- $i = $input{$i}\n";
+}
+
+print STDERR "1.  Testing 'sendfile'...";
+score($AGI->stream_file('beep'));
+print STDERR "2.  Testing 'sendtext'...";
+score($AGI->send_text('hello world'));
+print STDERR "3.  Testing 'sendimage'...";
+score($AGI->send_image('asterisk-image'));
+print STDERR "4.  Testing 'saynumber'...";
+score($AGI->say_number('192837465'));
+print STDERR "5.  Testing 'waitdtmf'...";
+score($AGI->wait_for_digit(1000));
+print STDERR "6.  Testing 'record'...";
+score($AGI->record_file('testagi', 'gsm', 1234, 300));
+print STDERR "6a.  Testing 'record' playback...";
+score($AGI->stream_file('testagi'));
+print STDERR "7.. Testing 'exec Dial,IAX/asterisk\@demo'...";
+score($AGI->exec('Dial', 'IAX/asterisk@demo'));
+
+print STDERR "================== Complete ======================\n";
+print STDERR "$tests tests completed, $pass passed, $fail failed\n";
+print STDERR "==================================================\n";
+
+sub score {
+	my ($returncode) = @_;
+
+	$tests++;
+	if ($returncode >=0) {
+		print STDERR "PASS ($returncode)\n";
+		$pass++;
+	} else {
+		print STDERR "FAIL ($returncode)\n";
+		$fail++;
+	}
+
+}
+
+sub mycallback {
+        my ($returncode) = @_;
+        print STDERR "MYCALLBACK: User Hungup ($returncode)\n";
+        exit($returncode);
+}
+

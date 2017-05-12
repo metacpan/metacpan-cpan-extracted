@@ -1,0 +1,93 @@
+1.08  Package asterisk::perl to resolve pause index upload.
+
+1.07   Replace Config with Conf namespace to resolve conflict with Asterisk::config distro
+
+1.06    New upload with original asterisk-perl distro name
+    More test script updates to increase code coverage.
+	
+1.05	Fix Asterisk::Manager undefined response RT#115789 ( Thanks Chris Hemmerly)
+	Fix MakeFile.PL and Asterisk::Perl for Pause Indexing (Thanks Jim Keenan)
+	minor updates on the test scripts
+	
+1.04    Asterisk-Perl distribution now on Github.
+	Added simple test scripts
+	Travis and CoverAll integration with new Github repository
+	Asterisk-Perl distribution now ready for Pull Request Challenge (http://cpan-prc.org/)
+	
+1.03	Fix AGI.pm from printing warnings on some optional variables (http://bugs.debian.org/525025)
+
+1.02	Fix POD for AGI.pm thanks to Lawrence Gilbert
+	Fix Manager.pm parsing values that were 0
+	Fix verbose example in AGI.pm
+	Fix return in _readparse in AGI.pm
+	Fix quoting on a few AGI.pm commands
+
+1.01	Fix 2 typos in Asterisk::Manager (Thanks Denis Smirnov)
+
+1.00	Fix AGI readresponse so if ReadParse isn't manually run, the first command output will be returned
+	Fix AGI say_datetime_all so it works correctly (pointed out by Sergey Basmanov)
+	Fix Manager sendcommand problem.  Reported by numerous people but patch used from Tilghman Lesher
+	Fix warning from being printed if AGI verbose is used without level
+
+0.10	Seriously this is a test release, and if all is well next version will be 1.0.
+	Allow AGI commands get_option and stream_file to accept an array of files in addition to a single file (inspired by Michael Komitee)
+	Add gender paramater to AGI SAY NUMBER (only in asterisk trunk)
+	Fix operator precedence login in debugging output of AGI (Thanks Matt Reilly)
+	Adjust the way we handle ReadParse so it will work if the user handles those reads themself
+	Quote options that are passed to exec and export $VERSION in AGI (Thanks Peter Beckman)
+	Allow offset to be passed to stream_file in AGI (Thanks jfields via CPAN)
+	Fix behavior of noop in AGI.pm (Thanks Dmitry Ivanov for pointing this out)
+
+0.09	Test release.  Will go to 1.0 shortly after testing
+	Change AGI.pm so we run ReadParse if the user forgot to run it manually
+	Add LICENSE file to source
+	Added 2 basic tests of AGI.pm so 'make test' does something
+	Time to 'use strict' and 'use warnings' in AGI.pm (Hurray!)
+	Added 'SetVar' as available keyword in Outgoing.pm
+	Modified Asterisk::AGI set_variable to always quote the value
+	Add directory.agi example from C. de Souza <m.list at yahoo.de>
+	Updated calleridnamelookup.agi from Jeff Siddall <jeff at siddall.name>
+	Manager.pm update from Brian Evans <brian at indosoft.ca>
+	Patches from Peter Beckman <beckman at purplecow.com> (THANKS!!!)
+		Add documentation for missing functions in AGI.pm
+		Add control_stream_file to AGI.pm
+		Add get_full_variable to AGI.pm
+		Add get_option to AGI.pm
+		Add say_alpha/date/time/datetime/phonetic to AGI.pm
+		Change callback to be in central location rather than per function
+	Allow using multiple SetVar in Outgoing.pm from Dariusz Dwornikowski <d.dwornikowski at proadmin.com.pl>
+	Use 'use strict' and 'use warnings' in Outgoing.pm
+		
+0.08	Fixed Asterisk::AGI check_result regex so get_data works with '*'
+	Added passing channel as arg to AGI command CHANNEL STATUS
+
+0.07	Added new AGI command set_music
+	Bug fix from John Halleck <John.Halleck@utah.edu>
+	Added MD5 Challenge auth to Asterisk::Manager
+
+0.06	*Interim Beta Release*
+	Added new AGI example agi-enum.agi
+	Added new module Asterisk::Outgoing
+	Added new module Asterisk::Manager
+	From Jean-Denis Girard <jd-girard@esoft.pf>:
+		Modified get_variable in Asterisk:AGI
+	Added new AGI commands database_get, database_put, database_del, and database_deltree
+	Updated AGI hangup functionality to allow passing the channel to hangup
+	Added new AGI command noop
+
+0.05	Added new AGI example: calleridnamelookup.agi
+	Added new module Asterisk::QCall
+	Added new AGI command verbose
+
+0.04	Started adding documentation to Asterisk::AGI (perldoc Asterisk::AGI)
+	Added new AGI commands set_variable and get_variable
+	Added new AGI + Festival + Net::Ping::External example: tts-ping.agi
+	Added 2 new AGI + Festival examples: tts-bofh.agi and tts-line.agi
+
+0.03	Added callback + setcallback function to detect hangups
+	Added channel_status function
+
+0.02	Added examples/agi-sayani.agi
+	Added the beginning of Asterisk::Voicemail
+
+0.01	First Release

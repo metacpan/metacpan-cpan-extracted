@@ -1,0 +1,6 @@
+name = "autobox-Transform"
+# badges = ["travis"]
+authority="cpan:JOHANL"
+
+module_maker="ModuleBuildTiny"
+

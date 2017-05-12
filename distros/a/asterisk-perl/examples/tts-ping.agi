@@ -1,0 +1,58 @@
+#!/usr/bin/perl
+#
+# AGI Script that prompts the user for an ip address, pings the ip, and reports back to the user.
+#
+# Requires the Asterisk::AGI and Net::Ping::External perl modules
+#
+# Written by: James Golovich <james@gnuinter.net>
+#
+#
+
+use Asterisk::AGI;
+use Net::Ping::External qw(ping);
+
+$AGI = new Asterisk::AGI;
+
+my %input = $AGI->ReadParse();
+
+my $finished = 0;
+
+$AGI->exec('Festival', '"Enter the eye-p address you wish to ping."');
+
+my $ipaddr = '';
+my $x = 0;
+while (!$finished) {
+	my $input = chr($AGI->wait_for_digit('5000'));
+	if ($input =~ /^[0-9\*\#]$/) {
+		if ($input =~ /^[\*\#]$/) {
+			$x++;
+			if ($x > 3) {
+				$finished = 1;
+			} else {
+				$ipaddr .= '.';
+			}
+		
+		} else {
+			$ipaddr .= $input;
+		}
+	} else {
+			#must have timed out
+			$finished = 1;
+	}
+
+	if ( length($ipaddr) > 14) {
+		$finished = 1;
+	}
+}
+
+	if ($ipaddr !~ /\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}/) {
+		$AGI->exec('Festival', "\"Invalid Address: $ipaddr\"");
+		exit 0;
+	}
+
+	$AGI->exec('Festival', '"Please wait"');
+	if (ping(host => "$ipaddr", timeout => 2)) {
+		$AGI->exec('Festival', '"Host is up"');
+	} else {
+		$AGI->exec('Festival', '"Host is down"');
+	}

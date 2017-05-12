@@ -1,0 +1,13 @@
+Write Asterisk::Config general config parser
+	Mostly done
+
+Write Asterisk::Config::Zapata, for zapata.conf parser
+	Configuration should be able to be changed per group or per channel
+
+Write Asterisk::Config::Extension
+
+Write Asterisk::Astman
+
+Write Web Interface to config files
+
+Write Web interface to astman

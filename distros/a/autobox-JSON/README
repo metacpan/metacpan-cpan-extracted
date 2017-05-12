@@ -1,0 +1,66 @@
+NAME
+    autobox::JSON - bringing JSON functions to autobox
+
+VERSION
+    version 0.0006
+
+SYNOPSIS
+        use autobox::JSON;
+
+        say {name => 'Jim', age => 34}->encode_json;
+        # {"name":"Jim","age":46}
+
+        my $person = '{"name":"Jim","age":46}'->decode_json
+        # {name => 'Jim', age => 34}
+
+        my $serialized_person = $person->encode_json;
+        # {"name":"Jim","age":46}
+
+        # works on arrays too
+        [1, 2, 3, 4, 5]->encode_json;
+
+METHODS
+  encode_json
+    This method behaves the same as "encode_json" in JSON.
+
+  encode_json_pretty
+    This method is identical to "encode_json", except that it also
+    "prettifies" the output, making it easier for us mortals to read. This
+    is useful especially when dumping a JSON structure to something
+    reasonable for, say, debug or other purposes.
+
+    It is functionally the same as:
+
+        JSON->new->utf8->canonical->pretty->encode($ref)
+
+  decode_json
+    This method behaves the same as "decode_json" in JSON.
+
+DEPRECIATED METHODS
+  to_json (depreciated)
+    This method behaves the same as "to_json" in JSON.
+
+    This method is depreciated because the JSON documentation itself prefers
+    encode_json.
+
+  from_json (depreciated)
+    This method behaves the same as "from_json" in JSON.
+
+    This method is depreciated as the JSON documentation itself prefers
+    decode_json.
+
+SEE ALSO
+    "autobox" "JSON" "autobox::Core"
+
+AUTHOR
+    Robin Edwards, <robin.ge@gmail.com>
+
+    <http://github.com/robinedwards/>
+
+COPYRIGHT AND LICENSE
+    Copyright (C) 2011 by Robin Edwards
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself, either Perl version 5.12.3 or, at
+    your option, any later version of Perl 5 you may have available.
+

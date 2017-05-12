@@ -1,0 +1,22 @@
+---
+name: all
+version: 0.5101
+author:
+  - 'James A. Duncan <jduncan@fotango.com>'
+  - 'Piotr Roszatycki <dexter@cpan.org>'
+abstract: Load all packages under a namespace
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  File::Find: 0
+  File::Spec: 0
+  perl: 5.006
+provides:
+  all:
+    file: lib/all.pm
+    version: 0.5101
+generated_by: Module::Build version 0.280801
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

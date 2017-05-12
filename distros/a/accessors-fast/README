@@ -1,0 +1,99 @@
+NAME
+    accessors::fast - Compiletime accessors using Class::Accessor::Fast
+
+VERSION
+    Version 0.03
+
+SYNOPSIS
+        package My::Simple::Package;
+        use accessors::fast qw(field1 field2);
+
+        # constructor is private, redefine only init;
+        sub init {
+            my $self = shift;
+            my %args = @_;
+            $self->field1($args{arg1});
+        }
+
+        package main;
+        my $o = My::Simple::Package->new( arg1 => 'some value' );
+        print $o->field1; # some value
+
+        for ($o->field_list) {
+            printf "object have field %s with value %s\n", $_, $o->$_;
+        }
+
+DESCRIPTION
+    This module was created as an alternative to "use fields", and uses
+    Class::Accessor::Fast as a base
+
+    Creates accessors at compiletime
+
+    Have own default "new" method: it creates object as a blessed hash, then
+    locks keys to defined field list, and invoke "init". So, recommended
+    usage inside packages, is access by hash keys (it's 3 times faster then
+    accessor). Since keys are locked, you will not suffer from
+    autovivification. Public interface recommended to be documented as
+    accessors.
+
+    Uses Class::C3
+
+METHODS
+    All methods inherited from Class::Accessors::Fast. Own methods defined
+    below
+
+  new( ARGS )
+    Creates blessed hash, locks it keys to current fields of this package,
+    and invoke "init" method with "ARGS"
+
+  init( ARGS )
+    Recommended to redefine in subclasses. Will be invoked by inherited
+    "new"
+
+  field_list
+    Since this module keeps information about object fields, it can return
+    it.
+
+        for ($o->field_list) {
+            printf "%s: %s\n",$_,$o->$_;
+        }
+
+FEATURES
+    This module uses constant::def, so it behaviour could be affected by
+    constant::abs
+
+  TIE [ = 0 ]
+    Use tied hash, instead of Hash::Util"::lock_keys". Much more slower, but
+    could help during development.
+
+    Could be enabled by
+
+        # your main program/main.pl
+        use constant::abs 'accessors::fast::TIE' => 1;
+
+  CONFESS [ = 0 ]
+    use Carp::confess instead of croak on error conditions
+
+    Could be enabled by
+
+        # your main program/main.pl
+        use constant::abs 'accessors::fast::CONFESS' => 1;
+
+  warnings
+    This module uses warnings::register. So, warnings from it could be
+    disabled by
+
+        no warnings 'accessors::fast';
+
+BUGS
+    None known
+
+COPYRIGHT & LICENSE
+    Copyright 2009 Mons Anderson.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+AUTHOR
+    Mons Anderson, <mons@cpan.org>
+

@@ -1,0 +1,59 @@
+accessors-rw-explicit
+
+ceci n'est pas un Moose
+
+The purpose of this module is to provide very basic 
+object instance attribute accessors for basic perl5
+blessed hash-reference objects. 
+
+That is a mouthful. Essentially is is just an exercise in
+codifying convention, and sensible code reuse. It is not 
+an attempt at a complete object system, with flexible
+attribute definitions. If you want that, you want Moose, 
+end of.
+
+This module will set up attribute accessors for you though, 
+and allow you to specify a prefix on your getters and setters. It
+denotes itself as explicit, as it defaults to different names 
+for the getters and setters, namely prepending "set_" to setters.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Build.PL
+	./Build
+	./Build test
+	./Build install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc accessors::rw::explicit
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=accessors-rw-explicit
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/accessors-rw-explicit
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/accessors-rw-explicit
+
+    Search CPAN
+        http://search.cpan.org/dist/accessors-rw-explicit/
+
+LICENSE AND COPYRIGHT
+
+Copyright (C) 2011 Alex Kalderimis
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See http://dev.perl.org/licenses/ for more information.
+

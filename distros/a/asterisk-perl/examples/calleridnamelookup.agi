@@ -1,0 +1,228 @@
+#!/usr/bin/perl
+#
+# Use Reverse Number Database on the net to add name to callerid info
+# Currently only tries to query 411.com and anywho.com, but other lookups can
+# be added easily
+# If your callerid is only passed as a 7 digit number, 
+# you can pass this script an argument with the default area code
+#
+# extensions.conf example:
+# exten => s,1,AGI,calleridnamelookup.agi
+# exten => s,2,Dial,Zap,1
+#
+# Written by: James Golovich <james@gnuinter.net>
+# Updated by: Jeff Siddall <jeff@siddall.name>
+
+use Asterisk::AGI;
+use LWP::UserAgent;
+
+# Set $CACHELOOKUPS to 1 to cachelookups locally, default is enabled
+$CACHELOOKUPS = 1;
+# You must create this directory if you enable $CACHELOOKUPS, or caching will fail
+$CACHEDIR = '/var/spool/asterisk/calleridlookups';
+
+# TIMEOUT is maximum number of seconds for http requests (we don't want to take too long)
+$TIMEOUT = 3;
+
+$VERSION = '0.03';
+
+$AGI = new Asterisk::AGI;
+
+my %input = $AGI->ReadParse();
+
+my $callerid = $input{'callerid'};
+my $calleridname = $input{'calleridname'};
+
+# Exit quickly unless the callerid number is the right length and the calleridname is empty or contains the word private or unknown
+# Skip the name lookup if the caller ID number is not 7, 10, or 11 digits long
+if (!(($callerid =~ /\d{7}/) || ($callerid =~ /\d{10}/) || ($callerid =~ /\d{11}/))) {
+	$AGI->exec('Set', "CALLERID(name)=\"Invalid Number\"");
+	exit(0);
+}
+# Skip the name lookup if the caller ID name is not unknown or private (ie: it is already valid)
+elsif (!(($calleridname =~ /private/i) || ($calleridname =~ /unknown/i) || (!$calleridname))) {
+	exit(0);
+}
+
+$defaultnpa = $ARGV[0] if (defined($ARGV[0]));
+
+# Remove everything non numeric from callerid string
+$callerid =~ s/[^\d]//g;
+
+if (($callerid =~ /^(\d{3})(\d{3})(\d{4})$/) || ($callerid =~ /^1(\d{3})(\d{3})(\d{4})$/)) {
+	$npa = $1;
+	$nxx = $2;
+	$station = $3;
+} elsif (defined($defaultnpa) && ($callerid =~ /^(\d{3})(\d{4})$/)) {
+	$npa = $defaultnpa;
+	$nxx = $1;
+	$station = $2;
+} else {
+	exit(0);
+}
+
+if ($name = lookup($npa, $nxx, $station)) {
+	# Only modify the calleridname portion (leave the number unchanged)
+	$AGI->exec('Set', "CALLERID(name)=\"$name\"");
+} else {
+	$AGI->exec('Set', "CALLERID(name)=\"Name Lookup Failed\"");
+}
+
+exit(0);
+
+sub lookup {
+	my $name = '';
+
+	if ($name = cache_lookup(@_)) {
+		return $name;
+
+        # Add other lookups here, always keep best db first in list
+        # Use 411.com first since it looks up Canadian and US numbers, and will report the caller's area even if the number is unlisted
+	} elsif ($name = www411_lookup(@_)) {
+
+	} elsif ($name = anywho_lookup(@_)) {
+
+	}
+
+        # Cache only lookups that don't timeout, are not null, and haven't failed
+	if (($name ne "") && ($name ne 'Name Server Timeout') && ($name ne 'Name Lookup Failed')) {
+		my $result = cacheadd($npa, $nxx, $station, $name);
+        }
+	return $name;
+}
+
+sub cacheadd {
+	my ($npa, $nxx, $station, $name) = @_;
+
+	return 0 if (!$CACHELOOKUPS);
+
+	open(CACHE, ">$CACHEDIR/$npa$nxx$station") || return 0;
+	print CACHE "$name\n";
+	close(CACHE) || return 0;
+
+	return 1;
+}
+
+sub cache_lookup {
+	my ($npa, $nxx, $station) = @_;
+
+	return 0 if (!$CACHELOOKUPS);
+
+	my $name = '';
+
+	open(CACHE, "<$CACHEDIR/$npa$nxx$station") || return '';
+	$name = <CACHE>;
+	chomp($name);
+	close(CACHE);
+
+	# Must be a negatively cached result so just add a blank space so it will pass the other tests
+	$name = ' ' if ($name eq '');
+
+	return $name;
+}
+
+sub anywho_lookup {
+	my ($npa, $nxx, $station) = @_;
+
+	my $ua = LWP::UserAgent->new( timeout => $TIMEOUT);
+
+	my $URL = 'http://www.anywho.com/qry/wp_rl';
+
+	$URL .= '?npa=' . $npa . '&telephone=' . $nxx . $station;
+
+	$ua->agent('AsteriskAGIQuery/$VERSION');
+
+	my $req = new HTTP::Request GET => $URL;
+	my $res = $ua->request($req);
+
+	if ($res->is_success()) {
+		if ($res->content =~ /<!-- listing -->(.*)<!-- \/listing -->/s) {
+			my $listing = $1;
+			if ($listing =~ /<B>(.*)<\/B>/) { 
+				my $clidname = $1;
+				return $clidname;
+			}
+
+		}
+	}
+	return '';
+}
+
+sub www411_lookup {
+	my ($npa, $nxx, $station) = @_;
+
+	my $ua = LWP::UserAgent->new( timeout => $TIMEOUT);
+
+	my $URL = "http://www.411.com/search/Reverse_Phone?phone=$npa$nxx$station";
+
+	$ua->agent('AsteriskAGIQuery/$VERSION');
+
+	my $req = new HTTP::Request GET => $URL;
+	my $res = $ua->request($req);
+
+	if ($res->is_success()) {
+		# The result may be an unlisted number, but the calling area is returned so show that
+                if ($res->content =~ /based in\s*(.+?)\s*<\/strong>/s) {
+			my $area = $1;
+
+			# If the name has an '&' character, parse the HTML out
+			$area =~ s/&amp\;/&/g;
+
+			# Also parse out %20 and replace with space
+			$area =~ s/%20/ /g;
+
+			return($area);
+		}
+
+		# If the number is invalid say that there is no listing
+		elsif ($res->content =~ /Please verify/s) {
+			return('No Listing');
+		}
+
+		# If the page returns a first and last name, this RE will grab it, with the first name in $1 and the second in $2
+		elsif ($res->content =~ /_RM_HTML_FIRST_ESC_=(.+?)\&_RM_HTML_LAST_ESC_=(.+?)\&_RM_HTML_ADDRESS_ESC_=/s) {
+			my $name = "$1 $2";
+
+			# If the name has an '&' character, parse the HTML out
+			$name =~ s/&amp\;/&/g;
+
+			# Also parse out %20 and replace with space
+			$name =~ s/%20/ /g;
+
+			# Also parse out escape characters
+			$name =~ s/\\//g;
+
+                        # Since the easy to parse result of the search has case mucked up this will capitalize the first letter of each word
+                        $name =~ s/((^\w)|(\s\w))/\U$1/g;
+
+			return($name);
+		}
+
+		# If the page returns only a first name or last name, this RE will grab it in $1
+		elsif ($res->content =~ /_RM_HTML_FIRST_ESC_=(.+?)\&_RM_HTML_LAST_ESC_=/s || $res->content =~ /_RM_HTML_LAST_ESC_=(.+?)\&_RM_HTML_ADDRESS_ESC_=/s) {
+			my $name = $1;
+
+			# If the name has an '&' character, parse the HTML out
+			$name =~ s/&amp\;/&/g;
+
+			# Also parse out %20 and replace with space
+			$name =~ s/%20/ /g;
+
+			# Also parse out escape characters
+			$name =~ s/\\//g;
+
+                        # Since the easy to parse result of the search has case mucked up this will capitalize the first letter of each word
+                        $name =~ s/((^\w)|(\s\w))/\U$1/g;
+
+			return($name);
+		}
+
+		# If anything else happens just say "Name Lookup Failed"
+		else {
+			return('Name Lookup Failed');
+		}
+
+	} else {
+	  	return('Name Server Timeout');
+	}
+}

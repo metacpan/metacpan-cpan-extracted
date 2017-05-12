@@ -1,0 +1,17 @@
+Build.PL
+Changes
+lib/aliased/factory.pm
+MANIFEST
+MANIFEST.SKIP
+META.yml
+README
+t/00-load.t
+t/basic.t
+t/tlib/SillyBunchOfObjects.pm
+t/tlib/SillyBunchOfObjects/Bar.pm
+t/tlib/SillyBunchOfObjects/Bar/Baz/Bort.pm
+t/tlib/SillyBunchOfObjects/Foo.pm
+t/tlib/SillyBunchOfObjects/Foo/Bar.pm
+t/tlib/SillyBunchOfObjects/Foo/Baz.pm
+t/tlib/SillyBunchOfObjects/Foo/Bort.pm
+t/tlib/SillyBunchOfObjects/object.pm

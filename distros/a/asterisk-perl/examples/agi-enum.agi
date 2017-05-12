@@ -1,0 +1,188 @@
+#!/usr/bin/perl
+#
+# Script performs NAPTR lookups on E164 phone numbers
+#
+# Written by: James Golovich <james@gnuinter.net>
+#
+#
+# Called like exten => _1NXXNXXXXXX,1,AGI,agi-enum.agi|enum.example.com
+#
+# Sample bind9 entries
+#this example uses the replacement field: 
+#4.3.2.1.5.5.5.0.0.8.1  IN  NAPTR 100  100 "u" "E2U+iax" . iax:testing.example.com.
+#the Dialed string would be IAX/testing.example.com
+#
+#this example uses the regexp field: 
+#4.3.2.1.5.5.5.0.0.8.1  IN  NAPTR 250  100 "u" "E2U+tel" "!^(.*)$!tel:\\1!" .
+#the Dialed string would be Zap/g2/18005551234
+#
+#this example uses the regexp field to strip off the leading 1: 
+#4.3.2.1.5.5.5.0.0.8.1  IN  NAPTR 150  100 "u" "E2U+sip" "!^1(.*)$!sip:\\1@testing.example.com!" .
+#the Dialed string would be SIP/8005551234@testing.example.com
+#
+
+use Asterisk::AGI;
+use Net::DNS;
+
+#DEFAULTDOMAIN is the default domain to append to lookups that don't include a domain
+$DEFAULTDOMAIN = 'enum.example.com';
+#DEFAULTTIMEOUT is the timeout seconds passed to the Dial app to wait for each call
+$DEFAULTTIMEOUT = 25;
+
+#SET ALLOWPSTN to allow tel: entries to be converted to Zap dialstrings.  Default is disabled
+# Be Careful with this, it will dial whatever is passed in the entry
+#$ALLOWPSTN = 1;
+#DEFAULTPSTN is the prefix to be added to tel: entries
+$DEFAULTPSTN = 'Zap/g2';
+
+@PROTOCOLS = ( 'iax', 'sip', 'tel' 
+#		'h323'
+		);
+
+$AGI = new Asterisk::AGI;
+
+my %input = $AGI->ReadParse();
+
+my $num = $input{'extension'};
+
+if (!$num) {
+	exit;
+}
+
+if ($ARGV[0] =~ /([\w\-\.]+)/) {
+	$domain = $1;
+} else {
+	$domain = $DEFAULTDOMAIN;
+}
+
+	@test = naptr_query($num, $domain);
+
+	for $x ( 0 .. $#test ) {
+		if ($aref = $test[$x]) {
+			$y = @$aref - 1;
+			for $z ( 0 .. $y ) {
+				if ($test[$x][$z]) {
+					if ($res = place_call($test[$x][$z])) {
+						exit $res;
+					}
+				}
+			}
+		}
+	}
+
+sub place_call {
+	my ($location) = @_;
+	my $res = 0;
+	my $option = '';
+
+	if ($location =~ /sip:(.*)/i) {
+		$option = 'SIP/' . $1;
+	} elsif ($location =~ /iax:(.*)/i) {
+		$option = 'IAX/' . $1;
+	} elsif ($location =~ /h323:(.*)/i) {
+		$option = 'H323/' . $1;
+	} elsif ($ALLOWPSTN && $location =~ /tel:(.*)/i) {
+		my $telnum = $1;
+		#strip all non-numeric
+		$telnum =~ s/[^0-9]//g;
+		$option = $DEFAULTPSTN . '/' . $telnum;
+	}
+
+	if ($option) {
+		$option .= '|' . $DEFAULTTIMEOUT if ($DEFAULTTIMEOUT);
+		$AGI->verbose("Executing Dial $option\n",3);
+		$res = $AGI->exec('Dial', $option);
+	}
+
+	return $res;
+}
+
+sub naptr_query {
+	my ($lookup, $domain) = @_;
+
+	my $dns = Net::DNS::Resolver->new;
+	my $name = reversenum($lookup) . '.' . $domain;
+	$query = $dns->search($name, 'NAPTR');
+	if ($query) {
+		foreach $rr ($query->answer) {
+			next unless $rr->type eq "NAPTR";
+			my $order = $rr->order;
+			my $pref = $rr->preference;
+			if ($rr->flags !~ /u/i) {
+				next;
+			}
+			foreach $svct (split(/\+/,$rr->service)) {
+				next if ($svct =~ /E2U/i);
+				next if (!validprotocol($svct));
+			}
+
+			if ($rr->replacement) {
+				$host = naptr_replace($rr->replacement, $rr->regexp, $lookup);
+			} else {
+				$host = naptr_regexp($rr->regexp, $lookup);
+			}
+			$hosts[$order][$pref] = $host;
+		}
+	} 
+	return @hosts;
+}
+
+sub naptr_replace {
+	my ($replace, $regex, $number) = @_;
+
+	return $replace;
+}
+
+sub naptr_regexp {
+	my ($string, $number) = @_;
+
+	my $regex = '';
+	my $data = '';
+	if ($string =~ /^(.).*(.)$/) {
+		$delim = $1 if ($1 eq $2);
+	} else {
+		return '';
+	}
+	if ($string =~ /$delim(.*)$delim(.*)$delim/) {
+		$regex = $1;
+		$data = $2;
+		if ($regex) {
+			if ($number =~ /$regex/) {
+				if ($t = $1) { $data =~ s/\\1/$t/g; }
+				if ($t = $2) { $data =~ s/\\2/$t/g; }
+				if ($t = $3) { $data =~ s/\\3/$t/g; }
+				if ($t = $4) { $data =~ s/\\4/$t/g; }
+				if ($t = $5) { $data =~ s/\\5/$t/g; }
+				if ($t = $6) { $data =~ s/\\6/$t/g; }
+				if ($t = $7) { $data =~ s/\\7/$t/g; }
+				if ($t = $8) { $data =~ s/\\8/$t/g; }
+				if ($t = $9) { $data =~ s/\\9/$t/g; }
+			}
+		}
+	}
+
+	return $data;
+	
+}
+
+
+sub reversenum {
+        my ($num) = @_;
+
+	#remove all non numeric
+	$num =~ s/[^0-9]//g;
+	return join('.', split(/ */, reverse($num)));
+}
+
+sub validprotocol {
+	my ($prot) = @_;
+
+	my $valid = 0;
+
+	foreach (@PROTOCOLS) {
+		if (m/$prot/i) {
+			$valid = 1;
+		}
+	}
+	return $valid;
+}

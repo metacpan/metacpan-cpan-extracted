@@ -1,0 +1,51 @@
+hhome::scott::projects::autobless::autobox-Bless::blib::lib::autobox::Bless(3)
+
+
+
+NAME
+       autobox::Bless - Call methods in unblessed hashes and hashrefs
+
+SYNOPSIS
+         package purple;
+
+         sub new {
+             my $package = shift;
+             bless { one => 1, two => 2, }, $package;
+         }
+
+         sub three {
+             my $self = shift;
+             $self->{one} + $self->{two};
+         }
+
+         #
+
+         package main;
+
+         use autobox::Bless;
+
+         my $purple = purple->new;   # optionally comment this out
+
+         my %foo = ( one => 5, two => 17 );
+         print %foo->three, "\n";    # 22!
+         print %foo->four, "\n";     # not found, but %foo is now blessed into purple (yes, really)
+
+DESCRIPTION
+       Attempts to guess which package an unblessed hash or hashref should be
+       blessed into and bless it into that package on the fly.
+
+BUGS
+       When used with autobox::Core or similar modules that add API methods to
+       primitive values, method names might clash.
+
+SEE ALSO
+AUTHOR
+       Scott Walters, <scott@slowass.net>
+
+COPYRIGHT AND LICENSE
+       Copyright (C) 2010 by Scott Walters
+
+       This library is free software; you can redistribute it and/or modify it
+       under the same terms as Perl itself, either Perl version 5.12.0 or, at
+       your option, any later version of Perl 5 you may have available.
+

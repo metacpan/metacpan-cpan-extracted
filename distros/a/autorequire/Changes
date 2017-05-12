@@ -1,0 +1,24 @@
+Revision history for Perl extension autorequire.
+
+0.07 Tue Feb 20 19:20:39 EST 2007
+	- use 5.008
+	- Copied XSLoader::bootstrap_inherit since it doesn't seem to always be 
+ 	  present.
+
+0.06 Mon Feb 19 12:52:31 EST 2007
+	- Added support for modules that use XSLoader
+
+0.05 Tue Oct 18 07:52:42 EDT 2005
+    - updated documentation
+
+0.03
+    - fixed numeroud bugs and added autodynaload.pm
+
+0.02   Sat Sun 11 16:32:28 2005
+	- added missing use Carp ;
+	- added get_code
+
+0.01  Sat Sep 10 16:32:28 2005
+	- original version; created by h2xs 1.23 with options
+		-AX -b 5.8.0 -n autorequire autorequire
+

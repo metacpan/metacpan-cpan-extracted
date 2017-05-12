@@ -1,0 +1,7 @@
+agi_request: someagi.agi
+agi_channel: Zap/1
+agi_language: en
+agi_type: Zap
+agi_context: demo
+agi_extension: 1
+agi_priority: 2

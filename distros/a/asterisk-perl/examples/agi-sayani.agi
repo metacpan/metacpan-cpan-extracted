@@ -1,0 +1,25 @@
+#!/usr/bin/perl
+#
+# Simple agi example that says the callerid and/or dnis
+#
+# Written by: James Golovich <james@gnuinter.net>
+#
+
+
+use Asterisk::AGI;
+
+$AGI = new Asterisk::AGI;
+
+my %input = $AGI->ReadParse();
+
+if (my $callerid = $input{'callerid'}) {
+	$AGI->stream_file('agi-yourcalleridis');
+	$AGI->say_digits($callerid);
+}
+if (my $dnis = $input{'dnid'}) {
+	$AGI->stream_file('agi-dnisis');
+	$AGI->say_digits($dnis);
+}
+
+exit;
+

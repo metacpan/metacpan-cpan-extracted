@@ -1,0 +1,14 @@
+=====================
+ accessors Todo List
+=====================
+
+consider adding get/set style accessors:
+
+	use accessors::setget qw( ... );
+	use accessors::get qw( ... );
+	use accessors::set qw( ... );
+
+or maybe even:
+	use getters qw( ... );
+	use setters qw( ... );
+

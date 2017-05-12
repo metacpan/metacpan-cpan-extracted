@@ -1,0 +1,9 @@
+Revision history for autobox-Numeric-Bytes
+
+0.02  2008-06-04
+  * applied autobox's new import style
+    http://search.cpan.org/~chocolate/autobox/lib/autobox.pod#import
+    (thanks: TOKUHIROM)
+
+0.01  2008-05-15
+  * Initial release.

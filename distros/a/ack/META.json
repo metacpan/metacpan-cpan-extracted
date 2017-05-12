@@ -1,0 +1,69 @@
+{
+   "abstract" : "A grep-like program for searching source code",
+   "author" : [
+      "Andy Lester <andy@petdance.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "ack",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "1.04",
+            "Cwd" : "3.00",
+            "Errno" : "0",
+            "File::Basename" : "1.00015",
+            "File::Next" : "1.16",
+            "File::Spec" : "3.00",
+            "File::Temp" : "0.19",
+            "Getopt::Long" : "2.38",
+            "Pod::Usage" : "1.26",
+            "Term::ANSIColor" : "1.10",
+            "Test::Harness" : "2.50",
+            "Test::More" : "0.98",
+            "Text::ParseWords" : "3.1",
+            "perl" : "5.008008"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/petdance/ack2"
+      },
+      "homepage" : "https://beyondgrep.com/",
+      "license" : [
+         "http://www.perlfoundation.org/artistic_license_2_0"
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/petdance/ack2.git"
+      },
+      "x_MailingList" : "https://groups.google.com/group/ack-users"
+   },
+   "version" : "2.18",
+   "x_serialization_backend" : "JSON::PP version 2.27300"
+}

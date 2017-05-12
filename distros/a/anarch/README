@@ -1,0 +1,62 @@
+anarch, version 0.04 (alpha)
+
+A script for creating offline copies of websites.
+
+
+CHANGES IN THIS RELEASE
+
+• New -add-extensions option.
+• Binary files can now be downloaded to folders that do  not  already
+  exist. They used to be skipped.
+
+
+INSTALLATION
+
+The easiest way to install this module is to use the CPAN module or
+the cpan script:
+
+    [sudo] perl -MCPAN -e "install App::Anarch"
+
+    [sudo] cpan App::Anarch
+
+Or you can use the following:
+
+    perl Makefile.PL
+    make
+    make test
+    [sudo] make install
+
+
+PREREQUISITES
+
+This module requires  perl  5.8.3 or higher (5.8.4  or  higher  recom-
+mended)  and the following modules,  which can be found on the  CPAN:
+
+  HTML::DOM 0.025 or higher
+  LWP 5.815 or higher
+  URI
+  WWW::Scripter
+  CSS::DOM 0.03 or higher
+  File::Slurp
+  WWW::Scripter::Plugin::Ajax
+
+and WWW::Scripter::Plugin::Ajax for the -run-scripts option.
+
+DOCUMENTATION
+
+After installing, you can find documentation for these modules with
+the perldoc command.
+
+    perldoc anarch
+
+Or try using man (it’s faster, in my experience):
+
+    man anarch
+
+
+COPYRIGHT AND LICENCE
+
+Copyright © 2009 Father Chrysostomos
+
+This program is free software; you may redistribute it, modify it, or
+both, under the same terms as perl.

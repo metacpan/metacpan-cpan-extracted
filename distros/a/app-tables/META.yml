@@ -1,0 +1,33 @@
+---
+abstract: 'manipulation of tables from any sources '
+author:
+  - 'Marc Chantreux <khatar@phear.org>'
+build_requires:
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '6.30'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.015, CPAN::Meta::Converter version 2.133380'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: app-tables
+requires:
+  Carp: '0'
+  Data::Table: '0'
+  Data::Table::Excel: '0'
+  Excel::Writer::XLSX: '0'
+  Exporter: '0'
+  IO::All: '0'
+  Modern::Perl: '0'
+  Spreadsheet::ParseExcel: '0'
+  Spreadsheet::WriteExcel: '0'
+  Spreadsheet::XLSX: '0'
+  YAML: '0'
+  strict: '0'
+  vars: '0'
+resources:
+  homepage: https://github.com/eiro/app-tables
+  repository: https://github.com/eiro/app-tables.git
+version: '0.4'

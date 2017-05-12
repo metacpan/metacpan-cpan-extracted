@@ -1,0 +1,32 @@
+0.08	4 April 2012
+	Added "warnings::register" as a prerequisite, so that we don't try to
+	use this module on any Perl that doesn't support this / does not have
+	it in core.
+
+0.07	31 March 2012
+	Brought up to date to current code esthetics standards.  Also made sure
+	it runs on 5.14.2, threaded and unthreaded.
+
+0.06	12 May 2009
+	Small fixes.
+
+0.05	8 September 2006
+	Removed dependency of Data::Alias: as Matthijs pointed out, there
+	is no need for Data::Alias as a simple glob => glob assignment at
+	compile time does the same.
+
+0.04	8 September 2006
+	Fixed problem with reloading modules time and time again.
+	Fixed problem with using -require- for version checks.
+	Aliased generic "import" method instead of creating a new one
+	for each module encountered.
+
+0.03	7 September 2006
+	Fixed problem with return value of -require-.
+
+0.02	7 September 2006
+	First version based on Data::Alias and uploaded to CPAN.
+
+0.01    14 October 2003
+	First public version of as.pm.  Not on CPAN, but can be found at:
+	http://perlmonks.org/index.pl?node_id=299107

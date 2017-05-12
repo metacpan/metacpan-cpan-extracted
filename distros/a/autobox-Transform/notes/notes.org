@@ -1,0 +1,386 @@
+* Stuff
+** DONE group_by default function
+** DONE group_by_count
+** DONE group_by_array
+** DONE Remove special subs
+**** DONE docs
+** DONE Fix throw, remove lib
+** DONE Release
+** DONE Deprecate Array::Transform, point to new
+** DONE map_by, grep_by, group_by hash key lookup
+*** if first item is ref HASH
+** DONE grep_by - value
+** [#A] group (group_count)
+*** group_array
+** sort
+** find(sub), like grep
+** find_by($method, $args, $value), like grep_by but first
+** contains value
+** compact - without undefined
+** compactTrue - without false
+** without - grep -v value
+** DONE grep --> filter
+*** DONE so I can write "grep" instead of autobox::Core
+*** DONE deprecate grep, but keep the alias
+*** get going with the grep --> filter, so we can use nothing (true), string eq, regex or subref.
+*** DONE Leave the old implementation behind, but deprecate it and only briefly mention it in the docs.
+** DONE grep, grep_by third arg more dwim
+*** DONE third arg sub (defaults to true)
+**** if string, do eq
+**** if regex, do =~
+** DONE enforce scalar / list context, to ref / array, hash
+** DONE Also, coerce to scalar context / reference.
+*** to_ref / as_ref
+*** to_list, as_list
+** DONE as_ref
+** DONE new format
+While doing the rename to filter, can we introduce the ["accessor",
+@args] format too? Just special case it, so if the first is an
+arrayref, use that format.
+** DONE use autobox::Core inside Transform
+*** use autobox::Core, so we can use e.g. split
+*** Provide this as a parameter with core as the default?
+** DONE Fix method with args syntax
+*** DONE methods
+**** DONE map_by
+**** DONE grep_by
+**** DONE uniq_by
+**** DONE group_by
+**** DONE group_by_count
+**** DONE group_by_array
+*** DONE tasks
+**** DONE fix
+**** DONE document new style
+**** DONE changes
+**** DONE release
+**** DONE change docs to new style
+***** DONE document old style
+***** DONE deprecate old style
+****** DONE document plan for 2.0.0
+**** DONE release
+** DONE filter dwim
+*** DONE filter
+*** DONE filter_by
+*** DONE filter_each
+** DONE Document filter_each, etc
+** array->as_hash, hash->as_array
+** TODO map_each_by
+** TODO map_each_value_by - replace the hashref/object value with the result of map_by
+** TODO group
+** TODO group_count
+** TODO group_array
+** TODO sub uplevel or whatnot
+*** so warnings and dies are reported from the caller.
+*** SIG __WARN__
+**** warn from caller, or use Carp::longmess
+** TODO Sorting using order and order_by (h2)
+*** TODO tasks
+**** DONE order
+**** DONE simple value
+**** DONE num/str
+**** DONE arg validation
+***** unknown
+**** DONE asc/desc
+**** DONE multiple options
+**** DONE arg validation - only one in each group, no repeating
+**** DONE subref
+**** DONE regex
+**** DONE multiple comparisons
+**** DONE order_by
+**** docs: order_by must return a single value that can be compared as a scalar
+**** bonus: rewrite map_by to take a subref transformer, so it can be used here
+***** and do the map_by and extractor in the same go, with just the map_by return values
+**** cache sorts?
+**** undef warnings?
+*** Sorting with sort
+
+- provide a sub that returns the comparison outcome of two values: $a and $b
+- in case of a tie, provide another comparison of $a and $b
+
+    # If the name is the same, compare age (oldest first)
+
+    sort {
+        uc( $a->{name} ) cmp uc( $b->{name} )
+        ||
+        int( $b->{age} / 10 ) <=> int( $a->{age} / 10 )
+    } @users
+
+(note the opposite order of $a and $b for the age comparison,
+something that's often difficult to discern at a glance)
+
+*** Sorting with order, order_by
+
+- provide order options for how one value should be compared with another value
+    - the value can be transformed using an optional subref, e.g. by uc($_)
+    - how to compare (cmp or <=>)
+    - which direction to sort (ascending or descending)
+- in case of a tie, provide another comparison
+
+    # If the name is the same, compare age (oldest first)
+
+    @users->order(
+        sub { $_->{name} },                               # first comparison
+        [ "num", sub { int( $_->{age} / 10 ) }, "desc" ], # second comparison
+    )
+
+    @users->order_by(
+        name => "str",                                     # first comparison
+        age  => [ num => desc => sub { int( $_ / 10 ) } ], # second comparison
+    )
+
+*** Order Options for a comparison
+
+If there's only one option for a comparison, provide a single option
+(string/regex/subref) value. If there are many options, provide them
+in an arrayref in any order.
+
+*** Comparison operator
+- "str" (cmp) - default
+- "num" (<=>)
+- "nat" (natural sort)
+*** Sort order
+- "asc" (ascending) - default
+- "desc" (descending)
+*** The value to compare
+- A subref - default is: sub { $_ }
+  - The return value is used in the comparison
+- A regex
+  - The value of join("", @captured_groups) are used in the comparison (i.e. $1, $2, $3 etc.)
+
+*** Examples
+
+    ## Simple
+    # order: first item is the comparison options (one or an arrayref
+    # with many)
+    ->order()  # Defaults: str, asc, $_, just like sort
+    ->order(sub { uc($_) })
+    ->order( qr/first_name: (\w+), last_name: (\w+)/ )
+    ->order([ num => qr/id: (\d+)/ ])
+    ->order([ sub { int($_) }, "num" ])
+
+    # order_by: first item is the accessor, second item is the
+    # comparison options (one or an arrayref with many)
+    ->order_by("id")
+    ->order_by("id", "num")
+    ->order_by("name", sub { uc($_) })
+    ->order_by(log_line => qr/first_name: (\w+), last_name: (\w+)/ )
+    ->order_by("log_line", [ num => qr/id: (\d+)/ ])
+    ->order_by(age => [ sub { int($_) }, "num" ])
+    ->order_by([ age_by_interval => 10 ] => [ sub { int($_) }, "num" ])
+    ->order_by([ name_with_title => $title ], sub { uc($_) })
+
+    ## Multiple comparisons
+    # order: subsequent comparison options are added as needed (one or
+    # an arrayref with many, per comparison)
+    ->order(
+        [ sub { uc($_) }, "desc" ],
+        "str",
+    )
+    ->order(
+        [ sub { $_->{price} }, "num" ], # First a numeric comparison of price
+        [ sub { $_->{name} }, "desc" ], # or if same, a reverse comparison of the name
+    )
+    ->order(
+        qr/type: (\w+)/,
+        [ num => desc => qr/duration: (\d+)/ ]
+        [ num => sub { /id: (\d+)/ } ],
+        "str",
+    )
+
+    # order_by:
+    ...
+
+*** Order methods
+
+See L</order> and L</order_by>
+*** TODO Fresh
+**** order
+***** description
+****** for each key there's an option or arrayref of options
+****** If there are multiple keys to compare
+******* there are multiple option(s)
+***** examples
+
+**** order_by
+***** description
+****** for each key, there's pair of accessor-option(s)
+******* the first item is always the accessor
+******* the second item is always an option or an arrayref of options
+****** if there are multiple keys to compare
+******* there are multiple pairs of accessor-option(s)
+***** param check
+****** when all items are consumed,
+******* if there's an expected option
+******** the default is an empty option list
+***** examples
+->order_by("name")
+->order_by(name => sub { int($_) })
+->order_by(name => [ "desc", sub { int($_) } ])
+->order_by([ price => $discount ] => sub { int($_) })
+->order_by([ price => $discount ] => [ sub { int($_) }, "num" ])
+->order_by(
+    [ price => $discount ] => [ sub { int($_) }, "num" ],
+    name => [ sub { uc($_) }, "desc" ],
+    time => [ ],
+    [ duration => $now ] => "natural",
+)
+*** CPAN
+**** https://v1.metacpan.org/pod/Sort::Maker
+**** https://v1.metacpan.org/pod/Sort::Key
+**** https://metacpan.org/pod/Sort::Key::Multi
+**** https://metacpan.org/pod/Sort::Key::Maker
+**** https://metacpan.org/pod/Sort::Key::Natural
+*** Old attempts
+**** multi key using hashrefs
+***** description
+***** examples
+->order("num")
+->order(sub { int($_) }, "num")
+->order(
+    { num => 1, value => sub { uc($_) } },
+    { str => 1, value => sub { int($_) } },
+)
+->order({ num => sub { $_->[1] } })
+
+->order_by(
+    { num => [ "price", 0.22 ] },
+    { str => "symbol", value => sub { uc($_) } },
+    { num => "id" },
+)
+->order_by("symbol")
+->order_by([ price => 0.22 ])
+->order_by({ num => "id" })
+->order_by({ num => [ "price" => 0.22 ] })
+**** multi key using arrayrefs
+***** description
+****** for _by, first item is always the accessor
+****** the rest are named options
+******* e.g. option strings, or a subref to transform it
+***** examples
+->order("num")
+->order(sub { int($_) }, "num")
+->order(
+    [ num => sub { uc($_) } ],
+    [ "str", sub { int($_) } ],
+)
+->order(num => sub { $_->[1] })
+->order_by(
+    # PROBLEM:  how is this distinguished from an arrayref accessor?
+    [ [ "price", 0.22 ], "num" ],
+    [ "symbol", str => sub { uc($_) } ],
+    [ id => "num" ],
+)
+
+->order_by("symbol")
+->order_by([ price => 0.22 ])
+->order_by(id => "num", "reverse")
+->order_by([ "price" => 0.22 ], "num")
+** set_each
+set_each([$accessor, @args])
+
+This uses the same format for getting at a accessor and args as
+everything else, i.e. an arrayref.
+
+For hashrefs, set the key $accessor to $args[0] (because a hashref
+value can't be a list)
+
+For objects, call $_->$accessor(@args) to set the value.
+** array includes, includes_by / contains, contains_by
+*** http://emberjs.com/api/classes/Ember.Enumerable.html
+*** with predicate, same as always: string eq, regex, hashref keys, (array in (later))
+*** hash contains_value_by
+** hash contains_key, contains_value -- checks the predicate for keys/values
+** Ember Array, Enumerable
+*** http://emberjs.com/api/classes/Ember.Array.html
+** Fix croak, use throw
+* Hash
+** DONE key_value($key, $new_key_name=$key) : ($new_key_name => $value) | { $new_key_name => $value }
+*** exists
+*** exists, undef
+*** doesn't exist, undef
+** DONE key_value_if_exists($key, $new_key_name=$key) : ($new_key_name => $value) | { $new_key_name => $value }
+** DONE key_value_if_true($key, $new_key_name=$key) : ($new_key_name => $value) | { $new_key_name => $value }
+** DONE key_value_if_defined($key, $new_key_name=$key) : ($new_key_name => $value) | { $new_key_name => $value }
+** keys_value* to support multiple pairs
+*** if there are more than one arg, assume they are pairs
+** map family
+*** map hash -> array
+**** [#A] map_each_to_array($subref)
+***** ($key, $value), $_ is value
+****** return value (or die) to be list item
+***** return array with return values
+*** map hash -> hash
+**** map_each($subref)
+***** ($key, $value), $_ is value
+****** return new key, new value (or die)
+***** return hash with return values
+**** map_each_value($subref, $new_key = $key)
+***** ($key, $value), $_ is value
+****** return new value
+***** return hash with same key, return value
+**** map_each_value_by($accessor, $new_key = $accessor) maps values from one thing to another
+***** (key, $value, $accessor_value), $_ is accessor_value
+****** return new value
+***** return hash with same keys + $new_key = return value
+**** map_by ?
+** grep family
+*** grep -> hash
+**** [#A] grep_each($subref = true)
+***** ($key, $value), $_ is value
+**** [#B] grep_each_defined
+***** value is defined
+**** grep_each_by($accessor, $args?, $subref = true)
+***** ($key, $value, $accessor_value), $_ is accessor value
+**** grep_each_by_defined
+***** accessor value is defined
+* DOCS
+** Operate on an array of scalars
+*** TODO grep_true
+*** TODO grep_defined
+*** flat
+*** TODO group
+*** TODO group_count
+*** TODO group_array
+** Operate on a hash
+*** map_each
+*** map_each_value
+*** map_each_to_array
+*** grep_each
+*** TODO grep_each_true
+*** grep_each_defined
+*** key_value
+*** key_value_if_true
+*** key_value_if_defined
+*** key_value_if_exists
+** Operate on an array of hashrefs/objects
+*** map_by
+*** grep_by
+*** TODO grep_by_true
+*** TODO grep_by_defined
+*** uniq_by
+*** group_by
+*** group_by_array
+*** group_by_count
+** Operate on a hash with hashref/object values
+*** TODO map_each_value_by
+*** TODO grep_each_value_by
+*** TODO grep_each_value_by_true
+*** TODO grep_each_value_by_defined
+* Cookbook
+** Document the gems from core
+*** elements
+**** avoid ugly deref punctuation
+*** length
+*** strip
+**** better chomp
+** map_by("strip")
+** map_each_value_by("group_count")
+** map_by("flat")
+** map_by([ split => "/" ])
+** DBIC
+->all doesn't work so well, since it returns a list
+
+Base ResultSet
+
+sub all_ref { [ shift->all ] }
+** etc

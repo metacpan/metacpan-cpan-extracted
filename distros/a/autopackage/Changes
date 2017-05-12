@@ -1,0 +1,13 @@
+Revision history for autopackage
+
+0.01    2012-09-19
+        * Practical rewrite by Toby Inkster <tobyink@cpan.org>
+          getting rid of Filter::Simple, but adding a few new
+          deps.  Since Filter::Simple isn't going to continue to
+          be in future revisions of Perl (at this point it's
+          marked for removal from core), and someone has volunteered
+          code to get rid of it, I had to take it.
+        * Fix @INC limitation, again by Toby Inkster <tobyink@cpan.org>
+
+0.001   2012-06-08
+        * First release.

@@ -1,0 +1,65 @@
+NAME
+    autobox::Camelize - autobox methods for (de)camelcasing
+
+VERSION
+    This document describes version 0.001 of autobox::Camelize - released
+    March 17, 2013 as part of autobox-Camelize.
+
+SYNOPSIS
+        use autobox::Camelize;
+
+        # $foo is 'this_is__my__name'
+        my $foo = 'ThisIs::My::Name'->decamelize;
+
+        # $bar is 'ThisIs::NotMy::Name'
+        my $bar = 'this_is__not_my__name'->camelize;
+
+DESCRIPTION
+    This is a simple set of autobox methods that work on strings, and
+    camelize/decamelize them according to how the author thinks camelization
+    should work:
+
+    Camelizing replaces '__[a-z]' with '::[A-Z]', and '_[a-z]' with '[A-Z]'.
+    The first character is capitalized.
+
+    Decamelizing replaces '::[A-Z]' with '__[a-z]', and '[A-Z]' with
+    '_[a-z]'. The first character is lowercased.
+
+STRING METHODS
+  camelize
+    Camelize a string.
+
+  decamelize
+    Decamelize a string.
+
+SEE ALSO
+    Please see those modules/websites for more information related to this
+    module.
+
+    *   autobox
+
+    *   autobox::Core has a fairly comprehensive collection of autobox
+        methods.
+
+SOURCE
+    The development version is on github at
+    <http://github.com/RsrchBoy/autobox-Camelize> and may be cloned from
+    <git://github.com/RsrchBoy/autobox-Camelize.git>
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    https://github.com/RsrchBoy/autobox-Camelize/issues
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+AUTHOR
+    Chris Weyl <cweyl@alumni.drew.edu>
+
+COPYRIGHT AND LICENSE
+    This software is Copyright (c) 2012 by Chris Weyl.
+
+    This is free software, licensed under:
+
+      The GNU Lesser General Public License, Version 2.1, February 1999
+

@@ -1,0 +1,31 @@
+NAME
+    all - pragma to load all packages under a namespace
+
+SYNOPSIS
+      # use everything in the IO:: namespace
+      use all of => 'IO::*';
+      use all 'IO::*';
+
+      # use everything in the IO:: and Sys:: namespaces
+      use all 'IO::*', 'Sys::*';
+      use all of => qw{IO::* Sys::*};
+
+DESCRIPTION
+    With the all pragma you can load multiple modules that share the same
+    root namespace. This vastly reduces the amount of times you need to
+    spend use'ing modules.
+
+BUGS / FEATURES
+    *   This will remove the ability to use exported / optionally exported
+        functions.
+
+AUTHOR
+    James A. Duncan <jduncan@fotango.com>
+
+COPYRIGHT
+    Copyright 2003 Fotango Ltd. All Rights Reserved.
+
+    Copyright 2008 Piotr Roszatycki <dexter@cpan.org>.
+
+    This module is released under the same terms as Perl itself.
+

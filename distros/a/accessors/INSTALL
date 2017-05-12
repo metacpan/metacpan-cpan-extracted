@@ -1,0 +1,24 @@
+========================
+ accessors Installation
+========================
+
+INSTALLATION
+------------
+
+Ideally, use the CPANPLUS or CPAN shell (`cpanp` or `cpan`) to download and
+install the latest distribution from your nearest CPAN.
+
+To install it manually type the following:
+
+   perl Build.PL
+   ./Build
+   ./Build test
+   ./Build install
+
+Or, if you prefer to use make:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+

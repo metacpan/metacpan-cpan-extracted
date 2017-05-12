@@ -1,0 +1,10 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+lib/abbreviation.pm
+t/test.t
+testlib/CAPS/On.pm
+testlib/Foo.pm
+testlib/FooBar/Baz.pm
+testlib/FooBar/Baz/Doh.pm

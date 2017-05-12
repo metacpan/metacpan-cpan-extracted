@@ -1,0 +1,511 @@
+#!/usr/bin/perl -s
+
+$VERSION = '0.04';
+
+if($h || $help || $v || $version || !$start) {
+ require File::Slurp;
+ File::Slurp::read_file($0) =~ /^=head1 SYNOPSIS(.*?)=head1 DESCRIPTION/ms;
+ print(
+qq"
+This is anarch, version $VERSION. Type 'man anarch' or 'perldoc anarch'
+for the manual.
+
+Usage:$1");
+ exit ;
+}
+
+use CSS::DOM 0.03;
+use CSS::DOM::Parser;
+use CSS::DOM::Rule 0.03 ':all';
+use File::Basename;
+use File::Path;
+use HTML::DOM 0.025;
+use LWP::UserAgent 5.815;
+use URI;
+use URI::file;
+use WWW::Scripter;
+
+$m = new WWW::Scripter agent => $agent = "anarch/$VERSION";
+$lwp = new LWP::UserAgent agent => $agent;
+env_proxy $lwp;
+
+
+$root ||= ($start =~ /^(.*\/)/)[0];
+$save_as = ${'save-as'};
+length $save_as or $save_as = ($root =~ /([^\/]+)\/*\z/)[0];
+$exclude = defined $exclude ?  qr/$exclude/ : qr/(?!)/;
+$add_ext = ${'add-extensions'};
+
+if(${'run-scripts'}) {
+ $m->use_plugin(Ajax, init => sub {
+  $need_doc_clone = 1;
+ });
+ $dom ||= ${'remove-scripts'};
+ $m->add_handler(
+  request_send => sub {
+   push @link_accumulator, shift->uri;
+   return # We must explicitly return nothing here, as LWP will think any
+  }       # true value is a response object.
+ );
+}
+else {
+ $dom = 1
+}
+
+if($sync) {
+ $m->add_handler(
+  request_prepare => sub {
+   if(defined $local_url) {
+    my $req = shift;
+    $real_url = $req->uri($local_url);
+    delete $$req{proxy};
+    $local_url = undef
+   }
+   return;
+  }
+ );
+ $m->add_handler(
+  response_done => sub {
+   if(defined $real_url) {
+    shift->request->uri($real_url);
+    $real_url = undef
+   }
+   return;
+  }
+ );
+}
+
+
+my %link_attr = qw(
+    a      href
+    area   href
+    body   background
+    frame  src
+    iframe src
+    link   href
+    img    src
+    table  background
+    tr     background
+    td     background
+    th     background
+);
+
+$link_attr{script} = 'src' unless ${'remove-scripts'};
+
+my $link_tag_qr = qr/^(?:${\join '|', keys %link_attr})\z/;
+
+fetch($start);
+
+sub fetch {
+	my ($url,$ct,$ext) = @_;
+	return if $url !~ /^\Q$root\E(.*)/;
+	my $save_name = $1;
+	return if $visited{$url}++;
+
+	$save_name =~ s/%([a-fA-F0-9]{2})/chr hex $1/ge;
+	substr($save_name,0,0) = $save_as. '/';
+	$save_name =~ s/(?<=\/)\z/index.html/;
+	$save_name .= ".$ext" if $ext;
+
+	my $syncked;
+	my $caput;
+	if($sync) {{
+#		warn "checking $save_name for mods";
+		my $mod_time = (stat $save_name)[9];
+		defined $mod_time or last;
+		$caput ||= $lwp->head($url);
+		if( # not modified
+		 $caput->is_success and $caput->last_modified == $mod_time
+		) {
+			# No point in checking for links in sound files
+			return unless (
+			 defined $ct ? $ct : ($ct = $caput->content_type)
+			)  =~ '^text/';
+			++$syncked;
+		}
+	}}
+	if($syncked) {
+#		warn "checking $save_name for links";
+		$local_url = new_abs URI::file $save_name;
+		$m->location->replace($url);
+		$syncked = 0 unless $m->success;
+	}
+	if(!$syncked) {
+		print #"\t" x $level .
+		 "$url\n";
+
+		# Check the file type before downloading it into memory. It
+		# might be a huge binary file.
+		$caput = $lwp->head($url);
+		if($caput->content_type =~ '^text/') {
+			$need_doc_clone = undef;
+			$m->location->replace($url);
+		}
+		else { # for binary files, download directly to a file
+		       # and use a handler to abort WWW::Scripter’s post-
+		       # processing.
+			$m->set_my_handler(
+			 response_done => sub { WWW::Scripter::abort }
+			);
+			mkpath dirname $save_name;
+			$m->get($url, ':content_file', $save_name);
+			$m->set_my_handler( response_done => undef );
+			return;
+		}
+	}
+	return unless $m->success;
+	
+	my $is_html;
+	my $content;
+	my @links; @link_accumulator = ();
+	if(defined $ct ? $ct eq 'text/html' : $m->is_html) {
+		++$is_html; # ~~~ temporary charset hack
+		my $other_doc;
+		my $doc = $dom || !$need_doc_clone
+		  ? $m->document
+		  : do {
+		     # reparse the source without script handlers
+		     my $doc = $m->document;
+		     my $cs = $doc->charset;
+		     my $clone = new HTML::DOM
+		      response => my $res = $m->res,
+		      charset => $cs,
+		     ;
+		     $clone->write(
+		      defined $cs
+		       ? scalar(
+		          require Encode,
+		          Encode::decode $cs, $res->content
+		         )
+		       : $res->content
+		     );
+		     $m->document($clone);
+		     $other_doc = $doc;
+		     $clone;
+		    };
+		if (${'remove-scripts'}) {
+			for ($doc->getElementsByTagName('*')) {
+				$_->detach, $_->delete, next if tag $_ eq 'script';
+				my $a = $_->attributes;
+				for (map $a->item($_), 0..$a->length-1) {
+					my $name = $_->name;
+					$a->removeNamedItem($name) if
+						$name =~ /^on/i;
+				}
+			}
+		}
+		# ~~~ temporary; doesn't work in the general case:
+		my $enc_elem = $doc->createElement('meta');
+		$enc_elem->attr('http-equiv', 'Content-Type');
+		$enc_elem->attr('content', 'text/html; charset=utf-8');
+		($doc->getElementsByTagName('head'))[0]->splice_content(0,0,
+			$enc_elem);
+		my $base = $doc->base;
+		{
+			my $base = $doc->find('base') or next;
+			$base->detach;
+			$base->delete
+		}
+		for (
+		 map $_->getElementsByTagName('*'), grep $_,$doc,$other_doc
+		) {
+			my $tag = tag $_;
+			if($tag =~ $link_tag_qr) {
+				my $link = _deal_with_link(
+					$_->attr($link_attr{$tag}),
+					$tag =~ /^(?:body|img|td|script)\z/
+						? 'pass-through' :
+					$tag eq 'link' && eval{$_->sheet}
+						? 'text/css' : undef,
+					$url,$base,\@links
+				);
+				$_->attr($link_attr{$tag}=>$link);
+			}
+			if($tag eq 'style') {
+				my $s = sheet $_;
+				my $css_code = _deal_with_ss(
+					$s,$url,$base,\@links
+				);
+				$css_code and $_->firstChild->data(
+					"<!--\n$css_code-->"
+				);
+			}
+			if(defined(my $style = $_->attr('style'))) {
+				my $css_code = _deal_with_css_urls(
+					$style,$url,$base,\@links
+				);
+				$css_code and $_->attr(style =>
+					$css_code);
+			}
+		}
+		$content = $m->content;
+	}
+	elsif(defined $ct ? $ct eq 'text/css' : $m->ct eq 'text/css') {
+		# ~~~ What do we do about charsets?
+		my $c = CSS'DOM'parse $m->res->content;
+		my $css_code = _deal_with_ss(
+			$c,$url,$url,\@links
+		);
+		$content = $css_code || $m->res->content;
+	}
+	else {
+		$content = $m->res->content;
+	}
+
+	if(!$syncked) {
+		mkpath dirname $save_name;
+		my $fh;
+		$is_html ? (open $fh, ">:utf8", $save_name) :
+		           (open $fh, ">", $save_name) or warn <<, return;
+anarch: I couldn't save $save_name for the following most unfortu-
+        nate reason: $!
+
+		print $fh $content;
+		close $fh;
+		if(my $mod_time = $m->res->last_modified) {
+			utime $mod_time, $mod_time, $save_name;
+		}
+	}
+	
+	local $level = $level + 1;
+	return if defined $depth and $level > $depth;
+	push @links, @link_accumulator;
+	for (@links) {
+		fetch(@$_);
+		$m->back;
+	}
+}
+
+sub _deal_with_link{
+	my($url,$type,$page_url,$base,$links) = @_;
+	return unless defined $url;
+	my $url = new_abs URI $url, $base;
+	$url =~ /^\Q$root/ and $url !~ $exclude or return $url;
+	(my $wo_hash = $url)->fragment(undef);
+	push @$links, [$wo_hash,$type];
+	$url =~ s/\?/%3f/;
+	$url = (new URI $url)->rel($page_url);
+	if($add_ext && $type ne 'pass-through') {
+		my $type = $type;
+		if(not $type) {
+			my $caput = $lwp->head($wo_hash);
+			$type = $PageTypes{$wo_hash}
+			 = $caput->content_type;
+		}
+		use LWP::MediaTypes;
+		$SuffixRe{$type} ||= do {
+			my $s = join "|", media_suffix $type;
+			qr/\.(?:$s)\z/
+		};
+		if($wo_hash !~ $SuffixRe{$type}) {
+			my $suf = media_suffix $type;
+			push @{$$links[-1]}, $suf;
+			$url->path($url->path . ".$suf");
+		}
+	}
+	$url =~ s/(?<=\/)\z/index.html/ # ~~~ this won’t work for foo.html#/
+	 and @{$$links[-1]} = @{$$links[-1]}[0,1]; # remove the $ext if
+	return $url        # it’s there, as we don’t want it for index.html
+}
+
+sub _deal_with_ss {
+	my ($ss, $page_url, $base, $links) = @_;
+	my $made_changes;
+	for($ss->cssRules) {
+		next unless $_->type == IMPORT_RULE;
+		# ~~~ only works with URLs that do not contain quotes
+		$_->cssText('@import "' . _deal_with_link(
+			$_->href,'text/css',$page_url,$base, $links
+		) . '" ' . $_->media->mediaText);
+		++$made_changes;
+	}
+	my $css_code = join '', map $_->cssText, cssRules $ss;
+
+	$css_code2 = _deal_with_css_urls($css_code,$page_url,$base,$links);
+
+	return $css_code2 || $made_changes && $css_code;
+}
+
+sub _deal_with_css_urls {
+	my ($css_code, $page_url, $base, $links) = @_;
+
+	my $made_changes;
+
+	# I’m using the undocumented innards of CSS::DOM::Parser here.
+	my($types, $tokens) = CSS'DOM'Parser'tokenise $css_code;
+	while($types =~ /u/g) {
+		++$made_changes;
+		my $url = $$tokens[my $indx = $-[0]];
+		$url =~ s/^url\([ \t\r\n\f]*//;
+		$url =~ s/[ \t\r\n\f]*\)\z//;
+		$url =~ s/^['"]// and chop $url;
+# ~~~ doesn't take escapes into account!
+		$$tokens[$indx] = "url(" . _deal_with_link(
+			CSS'DOM'Parser'unescape($url)
+			,undef,$page_url,$base, $links
+		) . ")";
+	}
+
+	return $made_changes && join '', @$tokens;	
+}
+
+=head1 NAME
+
+anarch - A script for creating offline copies of websites
+
+=head1 VERSION
+
+0.03 (alpha)
+
+=head1 SYNOPSIS
+
+ anarch -start=http://www.example.com/some_page.html           \
+      [ -root=http://www.example.com ]                         \
+      [ -exclude='^http://www\.example\.com/dont-want-this/' ] \
+      [ -save-as=folder\ name ]                                \
+      [ -depth=5 ]                                             \
+      [ -run-scripts ]                                         \
+      [ -remove-scripts ]                                      \
+      [ -dom ]                                                 \
+      [ -sync ]                                                \
+      [ -add-extensions ]
+
+=head1 DESCRIPTION
+
+anarch is a script for creating offline copies of websites. It downloads a
+website, correcting links in pages and style sheets so that they are all 
+relative (and all links outside the root directory are absolute), and
+removing '<base href>' tags. It can also run scripts in pages (to find out
+which files the scripts use or to save pages with generated content) and
+remove scripts.
+
+=head1 OPTIONS
+
+=over
+
+=item -start=...
+
+The page to start on
+
+=item -root=...
+
+Only get URLs beginning with this. If this is omitted, C<-start> is used,
+trimmed to the last slash.
+
+=item -exclude=...
+
+Regular expression for URLs to be excluded
+
+=item -save-as=...
+
+Where to save it. If this is omitted, the last path segment of C<-root> is
+used.
+
+=item -depth=...
+
+How many links to follow one after the other before going back
+
+=item -run-scripts
+
+Run scripts in HTML pages. This will be used to find which files the 
+scripts
+need, so that those can be fetched as well. It is not always guaranteed that this will work, as some scripts have
+absolute URLs hard-coded.
+
+=item -remove-scripts
+
+Remove scripts from HTML pages. This can be used in conjunction with 
+C<-run-scripts> to save generated content while removing the 
+scripts that
+generated it. C<-remove-scripts> implies 
+C<-dom>.
+
+=item -dom
+
+Save the HTML DOM, possibly modified by scripts or C<-remove-scripts>.
+Without this, the only changes to the DOM that are saved are those made
+to links to make them relative.
+
+=item -sync
+
+Synchronise mode: Only files that have changed since the last download will 
+be
+downloaded if this option is given.
+
+=item -add-extensions
+
+This feature is highly experimental. Use it at your own risk!
+
+This adds extensions to files based on the MIME type, if the file does not
+already have an appropriate extension. (This exists for the sake of picky
+web browsers that refuse to open certain files.)
+
+It currently has four problems with it: The start page never gets an extension added; index.html is sometimes saved as index.html.html; images
+and style sheets never get extensions added, unless they are linked to
+directly (via C<< <a href...> >>); and extra HEAD requests are made (far more than necessary), which slow things down to a crawl.
+
+=back
+
+=head1 BUGS
+
+If you find any bugs, please e-mail the author.
+
+This program doesn't take redirection into account.
+
+It doesn't work with pages that have an explicit encoding in the source
+code.
+
+It doesn't work with pages not in UTF-8. (It would need to
+apply a charset attribute to various elements or save the page in the
+original encoding.)
+
+Style attributes containing URLs get mangled.
+
+When URLs in CSS style sheets are made relative, they are not properly
+escaped, so quotation marks may produce invalid CSS.
+
+The C<-run-scripts> option causes the script to eat up all your memory.
+
+If a scripts browses to another page and C<-dom> or C<-remove-scripts> is
+specified, then the wrong DOM tree is serialised.
+
+There is no way to set the local IP address to bind to. But you can use
+this nutty workaround, which requires L<Hook::WrapSub>:
+
+  perl -sS -MHook::WrapSub -MIO::Socket::INET \
+    -M'less Hook::WrapSub::wrap_subs
+      sub{push @_, LocalAddr => "10.10.10.205" },
+      "IO::Socket::INET::new"' \
+    anarch ...
+
+There are not enough tests yet.
+
+If you run anarch as an argument to L<perl>, and you are using L<perl>
+5.8.8 or lower, you will need to call L<perl> with the C<-s> option.
+
+=head1 SINE QUIBUS NON
+
+This program requires L<perl> 5.8.3 or higher (5.8.4 or higher recommended)
+and the following L<CPAN|http://www.cpan.org/> modules:
+
+L<WWW::Scripter>
+
+L<CSS::DOM> 0.03 or higher
+
+L<URI>
+
+L<File::Slurp>
+
+L<LWP> 5.815 or higher
+
+L<HTML::DOM> 0.025 or higher
+
+L<WWW::Scripter::Plugin::Ajax> is required for the C<-run-scripts> option
+to work.
+
+=head1 AUTHOR & COPYLEFT
+
+Copyright (C) 2009, Father Chrysostomos (sprout at, um, cpan dot org)
+
+This program is free software; you may redistribute or modify it (or both)
+under the same terms as perl.

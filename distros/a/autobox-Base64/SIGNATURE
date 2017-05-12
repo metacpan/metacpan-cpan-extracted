@@ -1,0 +1,50 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.70.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 eaa92088a955c4d4eb2b0f67c93dabf6811b3cba Changes
+SHA1 2dbb30717d4bec6bb3305e87341bf90a05be8995 INSTALL
+SHA1 425b43f09d540543817bef8dbecb4c1a2da36085 LICENSE
+SHA1 c5f085c9b7e5cbb2475634c0db719316deb3390d MANIFEST
+SHA1 fd2d91714afc9bf459a957997b789d0a78642a7e META.json
+SHA1 4001e69bc65b9bd454b1143b2d748811ba079e32 META.yml
+SHA1 7b05be940ee58c19465010442a51b63f803e11ec Makefile.PL
+SHA1 2b6f5da5074e4c39efbdd5147a8225b4dde4a4c1 README
+SHA1 846245d9bb0b1afb92ee20ba02345c43c75bba0d cpanfile
+SHA1 e751e67db1ee94d657b65e364351318ccc266ed9 dist.ini
+SHA1 6e8f6045adcb829eec4e99a546c5389edae7c427 lib/autobox/Base64.pm
+SHA1 2aa0c8ed5450b91d921743a70b2d7111f6ef32f0 t/00-compile.t
+SHA1 bc563a743d3dda792f9c3b6bba2ec0f61c50502c t/000-report-versions-tiny.t
+SHA1 891821df8712099a835e4ad1a0698171b98285f7 t/author-pod-spell.t
+SHA1 7e8562d60a33e0a2161395de711ef634a8bd8cd4 t/basic.t
+SHA1 9c3627ff37f4fd5bddc34bf46cf3359eaf76a060 t/release-consistent-version.t
+SHA1 a032c41ef6887fab1b900669c2d304fab46680e2 t/release-eol.t
+SHA1 34eed30d6c9f0c9027bf5ec78599f153d37b2324 t/release-has-version.t
+SHA1 2bd85374bfccb610cd87489829ce03eb2dbdf8f9 t/release-no-smart-comments.t
+SHA1 455d1dd1867212a665ad5ea4126b572411de300c t/release-no-tabs.t
+SHA1 97df8168bb0f366d00364f4d98f198de3764fd14 t/release-pod-coverage.t
+SHA1 b3f3e45a2ae5df911a2de47b86dd612144215a7a t/release-pod-linkcheck.t
+SHA1 38400d3e03c76e7396fe610b67dd1f7b5bc6ad57 t/release-pod-syntax.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.11 (GNU/Linux)
+
+iQEcBAEBAgAGBQJRmwF7AAoJEOd5N1CvIgQkBvoIAJhJVfGsb2vHEB85ln/CSLLZ
+cMbNGlBbdRlfiibZ2y46PjfJNpC+zsELaHpPtNU+RtQnczpw2KqJtoTRtCgd7vSG
+Gk7wM1yKkAyRVImr2NmwXkIqrNy99f3XF2mxc5qTFe6BsZAzWNMbB7acR5/EdW42
+VIDXDRqHdGkZ0D+4ZOIA7Id0U4wvyT0gN2f0CgWnQTvgPDryQAoMndWN6I0+cqax
+XZrlGDeCWdAk4YdDpwHPu/2SAtS5OrMJJsasGrgS+lXW2lY71+6lqUKfZNb9iboj
+LPGMpdZRt7iNS++5jUA9nMwtnH1q6/HD6hOG7m/CZmaup7Ourx6LoKArkY2nWJ8=
+=R4Wt
+-----END PGP SIGNATURE-----

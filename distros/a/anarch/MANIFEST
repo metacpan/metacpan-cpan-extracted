@@ -1,0 +1,12 @@
+anarch
+Changes
+lib/App/Anarch.pm
+Makefile.PL
+MANIFEST
+README
+t/dummy-site-1/index.html
+t/dummy-site-1/second.html
+t/Probe/Perl.pm
+t/test.t
+t/tests.pm
+META.yml                                 Module meta-data (added by MakeMaker)

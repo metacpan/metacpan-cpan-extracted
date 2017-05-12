@@ -1,0 +1,42 @@
+---
+abstract: 'auto call setlocale() when set $ENV{"LANG"}'
+author:
+  - 'Hideaki Ohno <hide.o.j55 {at} gmail.com>'
+build_requires:
+  Test::Fatal: '0'
+  Test::More: '0.98'
+configure_requires:
+  Module::Build: '0.38'
+dynamic_config: 0
+generated_by: 'Minilla/v2.1.1, CPAN::Meta::Converter version 2.142060'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: autolocale
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  autolocale:
+    file: lib/autolocale.pm
+    version: '0.07'
+recommends:
+  Variable::Magic: '0'
+requires:
+  POSIX: '0'
+  perl: '5.010000'
+resources:
+  bugtracker: https://github.com/hideo55/p5-autolocale/issues
+  homepage: https://github.com/hideo55/p5-autolocale
+  repository: git://github.com/hideo55/p5-autolocale.git
+version: '0.07'
+x_contributors:
+  - 'hideo55 <hide.o.j55@gmail.com>'

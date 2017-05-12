@@ -1,0 +1,28 @@
+---
+abstract: 'Provide core functions to autoboxed scalars, arrays and hashes.'
+author:
+  - 'Scott Walters scott@slowass.net'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '6.46'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: autobox-Core
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Test::More: '0.88'
+  Want: '0.26'
+  autobox: '2.71'
+resources:
+  bugtracker: http://github.com/scrottie/autobox-Core/issues
+  repository: http://github.com/scrottie/autobox-Core
+version: '1.33'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.012'

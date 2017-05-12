@@ -1,0 +1,22 @@
+Revision history for Perl extension autolocale
+
+0.07 2014-09-11T17:45:26Z
+    - Fixed violation of CPAN Meta Spec
+
+0.06 2013-07-04T22:11:28Z
+    - Switch to Minilla
+
+0.05    Thu Nov 15 02:50:00 2012
+        - Fixed broken tests for several environments
+
+0.04    Tue Oct 23 03:25:00 2012
+        - Fixed broken tests
+
+0.03    Mon Oct 22 01:35:00 2012
+        - Switch to Module::Build
+
+0.02    Mon Dec 05 21:05:00 2011
+        - Skip tests if locale is not supported
+
+0.01    Fri Nov 25 00:12:36 2011
+        - original version

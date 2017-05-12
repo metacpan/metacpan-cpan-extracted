@@ -1,0 +1,23 @@
+---
+name: aliased-factory
+version: v0.0.1
+author:
+  - 'Eric Wilhelm @ <ewilhelm at cpan dot org>'
+abstract: shorter versions of a class tree's constructors
+license: perl
+resources:
+  bugtracker: http://rt.cpan.org/NoAuth/Bugs.html?Dist=aliased-factory
+  homepage: http://scratchcomputing.com/
+  license: http://dev.perl.org/licenses/
+  repository: http://scratchcomputing.com/svn/aliased-factory/trunk
+build_requires:
+  Module::Build: 0.26
+  Test::More: 0
+provides:
+  aliased::factory:
+    file: lib/aliased/factory.pm
+    version: v0.0.1
+generated_by: Module::Build version 0.3301
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4

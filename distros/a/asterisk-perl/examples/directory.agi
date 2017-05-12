@@ -1,0 +1,738 @@
+#!/usr/bin/perl
+################################################################################
+# Version: 0.1
+# File: directory.agi
+#
+# The purpose of this agi script is to provide an online telephone directory
+# that can be easily accessed using the numbers on the phone dial pad.
+#
+#
+# You select entries by spelling out the name of the person you want to contact 
+# using the phone dial pad. Now this is normally pretty labourious so the script 
+# provides a few shortcuts to make things easier. 
+#
+# The best way to illustrate this is by example:
+# Say you want to phone John Smith:
+# -  You would start by typing 5, this would find all entries that start with 
+# j,k or l.
+# - Next you would type 6 which would narrow down the selection to all entries
+# starting with either "j", "k" or "l" followed by either "m", "n" or "o".
+# - You continue to spell out the name in this fashion (4 = gHi, 6 = mnO etc)
+# until either a distinct match is found in the direcotry or the number of 
+# matches is 9 or less. 
+#
+# If a distinct match is found the number associated with the name is returned 
+# and can be dialed.
+#
+# If the number of matches is 9 or less you can have an IVR menu containing the
+# matching names built on the fly and you will be prompted to select a name
+# (e.g. Press 1 for John Smith, Press 2 for John Doe etc). Once a name is 
+# selected the number associated with the name is returned and can be dialed.
+#
+#
+# Now you might think that this is still pretty laborious but in fact you
+# usually only have to spell out the first few letter of the first name and the
+# last name to get a good match.
+#
+#
+#
+# Other feature include:
+# - Being able to jump to the last name without having to finish spelling out the
+# first name (i.e. Press 0 to skip to the last name)
+# - Multiple numbers can be associated with a name. In this case you will be 
+# prompted to select which number you wanted returned for dialing (e.g. Press 1 
+# for Home, Press 2 for Business, etc)
+# - Undo last typed entry in case you misstyped something
+# - Wildcard matching (Press 1 to match any letter) 
+# - IVR menus built on the fly so you do not need to prerecord anything
+# - IVR menus cached (the more you use it the quicker it gets)
+# - Returns the selected number in the variable "DIRNUMBER"
+# 
+#
+#
+# So now that you are interrested the next question is how do you get this thing 
+# up and running? 
+#
+# First off you need the following:
+# - Festival
+# - Perl
+# - The Perl module Asterisk::AGI
+# 
+# 
+# Then just follow the next couple of steps:
+# 1). Place this file in the Asterisk agi-bin directory (/usr/share/asterisk/agi-bin)
+# and check the section "Check the following and adjust to your local environment"
+# to make sure it fits with your needs
+#
+# 2). Create an extension something like this: 
+#    exten => 100,1,AGI,directory.agi|Phonebook}
+#    exten => 100,2,GotoIf($["${DIRNUMBER}" = ""]?3:4)
+#    exten => 100,3,Hangup
+#    exten => 100,4,Dial(SIP/${DIRNUMBER}@GW-PSTN,30)
+#
+# 3). Create a phone directory file called "Phonebook" and place it in 
+# the directory /usr/share/asterisk/directory/.
+# 
+# The phone directory conisist of one Heading Line and multiple Entry Lines
+# 
+# The "Heading Line" has the following format:
+#
+#    First Name<TAB>Last Name<TAB>Phone Location 1<TAB>Phone Location 2<TAB>...
+#
+# where by the <TAB> must be a real tab character and there can be up to a
+# maximum of 9 phone locations
+#
+# The "Entry Lines" contain the actual data for the heading line columns also
+# seperated by <TAB> characters.
+#
+#
+# Sounds complicated but the following example should help you understand: 
+# 
+# First Name<TAB>Last Name<TAB>Company<TAB>Business Phone<TAB>Home Phone<TAB>Mobile Phone
+# Remko<TAB>Golden<TAB><TAB>+49 (89) 145456<TAB><TAB>
+# Peter<TAB>Klein<TAB><TAB><TAB>0221 87654230<TAB>
+# Claudia<TAB>Thompson<TAB><TAB>052 52586345<TAB>069 8765478<TAB>0171 65443897	
+# 
+# Of course you can always also do what I did and that is to use the Microsoft
+# Outlook export feature.  
+#
+#
+# To Do:
+# - Find undo bug. Sometines after an undo the search gets confused and returns
+# the wrong results.
+# - Allow skipping between first, last and company names. The handling is not that 
+# clean and you cannot switch back and forth.
+# - Currently all the IVR prompts are build on the fly and cached. It would be 
+# better to cat snippets together and use those. Would be simple if STREAM FILE
+# could take a list of files instead of just one.   
+# - Cleanup the Perl code.
+# - Added ability to prerecord names as some are hard to understand.
+#
+#
+# Copyright (C) 2006 C. de Souza ( m.list at yahoo.de )
+#
+# This program is free software; you can redistribute it and/or
+# modify it under the terms of the GNU General Public License
+# as published by the Free Software Foundation; either version 2
+# of the License, or (at your option) any later version.
+# 
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+################################################################################
+use Asterisk::AGI;
+use File::Basename;
+use Digest::MD5 qw(md5_hex);
+
+################################################################################
+# Check the following and adjust to your local environment
+################################################################################
+# location of the phone directory files
+local $DIRECTORYDIR="/usr/share/asterisk/directory/";
+
+# location of the wave file cache and owrking directory
+local $SOUNDDIR = "/var/lib/asterisk/festivalcache/";
+
+# festival text2wave location 
+local $T2WDIR= "/usr/bin/";
+
+# International Country Code
+local $INTLCOUNTRYCODE = "\\+49";
+
+# International Dialing Code
+local $INTLDAILINGCODE = "00";
+
+# National Dialing Code
+local $NATIONALDAILINGCODE = "0";
+
+
+################################################################################
+# Local stuff, should not require changing
+################################################################################
+local $hitCnt = 0;
+
+local $FLSEPERATOR = "~";
+
+local %directory;
+local %directoryOrig;
+
+local $searchstr = "";
+local $searchstrOrig = "";
+
+local @numberLabels = ();
+
+local $MODE_COMMAND = "command";
+local $MODE_ERROR = "error";
+local $MODE_EXIT = "exit";
+local $MODE_FOUND = "found";
+local $MODE_SEARCHING = "searching";
+local $mode = $MODE_SEARCHING;
+
+#my $debug = 0;
+
+my $SUBNAME = "MAIN";
+my %input;
+
+################################################################################
+# Sub debug
+################################################################################
+sub debug {
+  
+  my $string = shift;
+  my $level = shift || 3;
+
+  $AGI->verbose($string, $level)   if ( $debug );
+  
+  return(0);
+
+} # sub debug
+
+
+################################################################################
+# sub getTTSFilename 
+################################################################################
+sub getTTSFilename {
+  
+  my ( $text ) = @_;
+
+  my $hash = md5_hex($text);
+  my $wavefile = "$SOUNDDIR"."tts-diirectory-$hash.wav";
+  
+  unless( -f $wavefile ) {
+    open( fileOUT, ">$SOUNDDIR"."say-text-$hash.txt" );
+    print fileOUT "$text";
+    close( fileOUT );
+    my $execf=$T2WDIR."text2wave $SOUNDDIR"."say-text-$hash.txt -F 8000 -o $wavefile";
+    system( $execf );
+    unlink( $SOUNDDIR."say-text-$hash.txt" );
+  }
+
+  return "$SOUNDDIR".basename($wavefile,".wav");
+} # sub getTTSFilename 
+
+################################################################################
+# sub performSearch {
+################################################################################
+sub performSearch {
+  
+  my( $digits, $mode, $hitCnt, $searchstr, $searchstrOrig ) = @_;
+
+  my $SUBNAME = "performSearch"; 
+
+  my $digit = "";
+
+  $AGI->verbose( "$SUBNAME: Entering", 1 );
+
+  while(( length( $digits ) > 0    ) &&
+	( $mode eq $MODE_SEARCHING )    ) {
+    
+    $digit = substr( $digits, 0, 1 );
+    $digits = substr( $digits, 1, length( $digits ) - 1 );
+    
+  switch: {
+      if( $digit eq "*" ) 
+	{ $mode = $MODE_COMMAND;
+	  last switch}
+      if( $digit == 0 ) 
+	{ $searchstr .= ".*?~"; # use ? for minimal match i.e. first "$FLSEPERATOR"
+	  $searchstrOrig .= $digit;
+	  last switch}
+      if( $digit == 1 ) 
+	{ $searchstr .= ".";
+	  last switch}
+      if( $digit == 2 ) 
+	{ $searchstr .= "[abc]";
+	  $searchstrOrig .= $digit;
+	  last switch}
+      if( $digit == 3 ) 
+	{ $searchstr .= "[def]";
+	  $searchstrOrig .= $digit;
+	  last switch}
+      if( $digit == 4 ) 
+	{ $searchstr .= "[ghi]";
+	  $searchstrOrig .= $digit;
+	  last switch}
+      if( $digit == 5 ) 
+	{ $searchstr .= "[jkl]";
+	  $searchstrOrig .= $digit;
+	  last switch}
+      if( $digit == 6 ) 
+	{ $searchstr .= "[mno]";
+	  $searchstrOrig .= $digit;
+	  last switch}
+      if( $digit == 7 ) 
+	{ $searchstr .= "[pqrs]";
+	  $searchstrOrig .= $digit;
+	  last switch}
+      if( $digit == 8 ) 
+	{ $searchstr .= "[tuv]";
+	  $searchstrOrig .= $digit;
+	  last switch}
+      if( $digit == 9 ) 
+	{ $searchstr .= "[wxyz]";
+	  $searchstrOrig .= $digit;
+	  last switch}
+    } # switch
+  
+  }
+  
+  if( $mode eq $MODE_SEARCHING ) {
+    my $name = "";
+    foreach $name ( keys %directory ) {
+      if( $name  !~ /^$searchstr/i ) {
+	delete $directory{ $name };
+	$hitCnt--;
+      }
+    } # foreach $name
+  } # if( $mode eq $MODE_SEARCHING 
+
+  # Output some status info for debug
+  #foreach $name ( keys %directory ) {
+  #  $AGI->verbose( "$SUBNAME: Found<$name>", 1 );
+  #} # foreach $name
+  $AGI->verbose( "$SUBNAME: mode<$mode>" , 1 );
+  $AGI->verbose( "$SUBNAME: searchstr<$searchstr>" , 1 );
+  $AGI->verbose( "$SUBNAME: searchstrOrig<$searchstrOrig>" , 1 );
+  $AGI->verbose( "$SUBNAME: hitCnt<$hitCnt>", 1 );
+  
+  return $mode, $hitCnt, $searchstr, $searchstrOrig;
+  
+} # sub performSearch {
+
+################################################################################
+# sub loadFile
+################################################################################
+sub loadFile {
+  
+  my( $DIRECTORYDIR, $FLSEPERATOR, $name ) = @_;
+
+  my $SUBNAME = "loadFile";
+  my $hitCnt = 0;
+  my $line = "";
+  my $flname = "";
+  $AGI->verbose( "$SUBNAME: Entering", 1 );
+
+  open( FILE, $DIRECTORYDIR.$name ); # or die "Cannot open '$FILENAME': $!";
+  
+  while(  $line = <FILE> ) {
+    chop( $line );
+    chop( $line );  # seem to have a ^M in as well
+    #print "line<$line>\n";
+    
+    my ( $fname, $lname, $bname, $phoneNumbers ) = split /\t/, $line, 4;
+    #print "fname<$fname>\tlname<$lname>\tbname<$bname>\n";
+    
+    $flname = "";
+    
+    $flname .= $fname.$FLSEPERATOR.$lname.$FLSEPERATOR.$bname;
+    
+    #print "flname<$flname>\tphone<$phoneNumbers>\n";
+    
+
+    if(( $phoneNumbers ne ""                          ) &&
+       ( $flname       ne "$FLSEPERATOR.$FLSEPERATOR" )     ) {
+      if( @numberLabels == 0 ) { # deal with labels
+	( @numberLabels ) = split /\t/, $phoneNumbers, 9;
+	
+      } else { # deal with entries
+	if( $directory{ $flname } ){
+	  debug( "$SUBNAME: Duplicate entry <$flname>", 1 );
+	} else {
+	  $hitCnt++;
+	  $directory{ $flname } = $phoneNumbers;
+	  $directoryOrig{ $flname } = $phoneNumbers;
+	}
+      } #if( $hitCnt
+      
+    } else {
+      debug( "$SUBNAME: No phone number(s) for <$flname>", 1 );
+    } #if( $phoneNumbers
+  } #while
+
+  close( FILE );
+
+  #print "hitCnt<$hitCnt>\n";
+  
+  #foreach $name ( keys %directory ) {
+  #  print "Loaded <$name>\n";
+  #}
+
+  return $hitCnt;
+
+} # sub loadFile
+
+################################################################################
+# sub cmdSelectContactFromMenu {
+################################################################################
+sub cmdSelectContactFromMenu {
+
+  my( $mode, $hitCnt ) = @_;
+
+  my $SUBNAME = "cmdSelectContactFromMenu";
+  my $contactMenu = "";
+  my $escapeDigits = "*";
+  my $menuPos = 0;
+  my $fname = "";
+  my $lname = "";
+  my $inputKey = "";
+
+  $AGI->verbose( "$SUBNAME: Entering", 1 );
+  
+  if( $hitCnt > 9 ) {
+    $AGI->verbose( "$SUBNAME: hitCnt > 9", 1);
+    $AGI->stream_file( getTTSFilename( "$hitCnt" )); 
+    $AGI->stream_file( getTTSFilename( "names is too may to list" )); 
+
+  } elsif( $hitCnt == 0 ) {
+    $AGI->verbose( "$SUBNAME: hitCnt == 0", 1);
+    $AGI->stream_file( getTTSFilename( "There are no names in the list" )); 
+
+  } else {
+    my $name = "";
+    foreach $name ( sort keys %directory ) {
+      $name =~ s/~/ /g; # needs to replace with $FLSEPERATOR
+      $contactMenu .= "Press " .  ++$menuPos . " to select $name. ";
+      $escapeDigits .= "$menuPos";
+    } # foreach $name
+    
+    $AGI->verbose( "$SUBNAME: <$escapeDigits>$contactMenu ", 1);
+
+    my $dtmfInput = 0;
+    while( $dtmfInput == 0 ) {
+      $dtmfInput = $AGI->stream_file( getTTSFilename( "$contactMenu" ), "$escapeDigits" ); 
+      ( $dtmfInput > 0 ) or 
+	$dtmfInput = $AGI->stream_file( getTTSFilename( "Press star to exit"), "$escapeDigits" ); 
+      
+    } # while
+    
+    if( $dtmfInput < 0 ) { # ERROR!
+      $mode = $MODE_EXIT;
+    
+    } else {
+      
+      $inputKey = chr( $dtmfInput );
+    
+      $AGI->verbose( "$SUBNAME: inputKey = <$inputKey>", 1 );
+
+      if( $inputKey ne "*" ) {
+	$menuPos = 0;
+	foreach $name ( sort keys %directory ) {
+	  if( ++$menuPos != $inputKey ) {
+	    delete $directory{ $name };
+	    $hitCnt--;
+	    #print "deleting $name ht:$hitCnt mp:$menuPos \n";
+	  }
+	} # foreach $name
+      } # if( $inputKey ne "*"
+    } # if( $dtmfInput < 0
+  } # if( $hitCnt
+
+  #print $hitCnt;
+  return $mode, $hitCnt;
+
+} # sub cmdSelectContactFromMenu 
+
+################################################################################
+# sub cmdUndoLastSearch {
+################################################################################
+sub cmdUndoLastSearch {
+
+  my( $searchstrOrig, $mode, $hitCnt, $searchstr ) = @_;
+
+  my $SUBNAME = "cmdUndoLastSerach";
+  my $lastInput = "";
+  my $tmpSearchStrOrig = "";
+
+  $AGI->verbose( "$SUBNAME: Entering", 1 );
+  
+  if( $searchstrOrig ) {
+    # Reset hit count and search str as we will build this from the updated original search str
+    $hitCnt = 0;
+    $searchstr = "";
+
+    # Get last input
+    $lastInput = substr( $searchstrOrig, length( $searchstrOrig ) - 1, 1);
+    $AGI->verbose( "$SUBNAME: lastInput <$lastInput>", 1 );
+
+    # Chop last input off the end - could us chop()  
+    chop( $searchstrOrig );
+    $AGI->verbose( "$SUBNAME: searchstrOrig <$searchstrOrig>", 1 );
+    
+    # Overwrite re-init directory, should be okay to overwrite
+    my $key = "";
+    foreach $key ( keys %directoryOrig ) {
+      $directory{ $key } = $directoryOrig{ $key };
+      $hitCnt++;
+    }
+    
+    # Reprocess search
+    # We have to mess with the mode here as we are in command mode but need to be in 
+    # search mode for the call to perform search - not nice
+    ( $mode, $hitCnt, $searchstr, $searchStrOrig ) = 
+      performSearch( $searchstrOrig, "$MODE_SEARCHING", $hitCnt, $searchstr, "" );
+    $mode = $MODE_COMMAND;
+
+    $AGI->stream_file( getTTSFilename( "Last search input, $lastInput, undone" ) ); 
+
+  } else {
+    $AGI->stream_file( getTTSFilename( "Search input empty, nothing to undo." ) );
+    
+  } # if( $searchstrOrig 
+
+  return $searchstrOrig, $mode, $hitCnt, $searchstr;
+
+} # sub cmdUndoLastSearch 
+
+################################################################################
+# sub cmdReviewSearch
+################################################################################
+sub cmdReviewSearch {
+
+  my( $searchstrOrig ) = @_;
+
+  my $SUBNAME = "cmdReviewSerach";
+
+  $AGI->verbose( "$SUBNAME: Entering", 1 );
+  
+  if( $searchstrOrig ) {
+    $AGI->stream_file( getTTSFilename( "Search input entered so far is $searchstrOrig. " ) );
+
+  } else {
+    $AGI->stream_file( getTTSFilename( "Search input empty." ) );
+    
+  } # if( $searchstrOrig 
+
+  return $searchstrOrig, $mode, $hitCnt, $searchstr;
+
+} # sub cmdReviewSearch 
+
+################################################################################
+# processTargetNumber {
+################################################################################
+sub processTargetNumber {
+
+  my( $mode, $targetName, $targetNumber ) = @_;
+      
+  my $SUBNAME = "processTargetNumber";
+
+  $AGI->verbose( "$SUBNAME: Entering", 1 );
+
+  $AGI->verbose( "$SUBNAME: Target number before cleanup <$targetNumber>", 1 );
+
+  # expect number in format or similar
+  # - $INTLDAILINGCODE (area-code) local-number 
+  # - $NATIONALDAILINGCODE area-code local-number
+  # - local number
+  $targetNumber =~ s/\s//g; 
+  $targetNumber =~ s/$INTLCOUNTRYCODE/$NATIONALDAILINGCODE/;
+  $targetNumber =~ s/\+/$INTLDAILINGCODE/;
+  $targetNumber =~ s/\D//g;
+
+  $AGI->verbose( "$SUBNAME: Target number after cleanup <$targetNumber>", 1 );
+
+  $AGI->verbose( "$SUBNAME: Dialing $targetName on ($targetNumber)", 1 );
+  
+  $AGI->stream_file( getTTSFilename( "Dialing $targetName on $targetNumber" ) );
+  
+  $AGI->set_variable( 'DIRNUMBER', "$targetNumber" );
+
+  return $mode;
+
+} # sub processTargetNumber
+
+
+###############################################################################
+# Main
+###############################################################################
+
+#
+# Initialise Asterisk AGI
+#
+$AGI = new Asterisk::AGI;
+
+%input = $AGI->ReadParse();
+;foreach $i (sort keys %input) {
+;  $AGI->verbose( " -- $i = $input{ $i }", 4 );
+;}
+
+#
+# Load the phone direcotry
+#
+my $directoryName = $ARGV[0];
+
+$hitCnt = loadFile( $DIRECTORYDIR, $FLSEPERATOR, $directoryName );
+
+if( $hitCnt == 0 ) {
+  $mode = $MODE_EXIT;
+  $AGI->verbose( "There was a problem opening the directory", 1);
+  $AGI->stream_file( getTTSFilename( "There was a problem opening the directory" )); 
+  $AGI->stream_file( getTTSFilename( "Please contact the system administrator" ));
+}
+
+
+#
+# Enter the main processing loop
+#
+while(( $mode eq $MODE_SEARCHING ) ||
+      ( $mode eq $MODE_COMMAND   )    ) { 
+
+  # Return dynamic menu
+  my $inputKey = "";
+  my $validInput = ""; # False
+
+  if( $mode eq $MODE_SEARCHING ) {
+    $AGI->verbose( "$SUBNAME: Search Mode", 1);
+    
+    # $AGI->stream_file( getTTSFilename( "$hitCnt contacts listed" ) );
+ 
+    if( $hitCnt == 0) {
+      $inputKey = $AGI->get_data( getTTSFilename( "Zero contacts listed. Press the star key to access the undo last search input function" )); 
+    } else {
+      $inputKey = $AGI->get_data( getTTSFilename( "$hitCnt contacts listed. Spell out the name of the contact by pressing the numbers corresponding to the letters, press 0 to skip to the last name, press 1 to match any letter. Press star for more options" )); 
+    }
+      
+    
+    if( $inputKey == -1  ) { # ERROR!
+      $mode = $MODE_EXIT;
+    } elsif( $inputKey ne "" ) {
+      $validInput = ! $validInput; # True
+    }
+
+    if( $validInput ) {     # Process the input
+      $validInput = ""; # Reset to False
+
+      ( $mode, $hitCnt, $searchstr, $searchstrOrig ) = 
+	performSearch( $inputKey, $mode, $hitCnt, $searchstr, $searchstrOrig );
+    
+    } # if( $validInput
+
+  } else { #MODE_COMMAND
+    $AGI->verbose( "$SUBNAME: Command Mode", 1);
+
+    $inputKey =
+      $AGI->get_data( getTTSFilename( "Press 1 to list contacts. " .
+				      "Press 2 to undo last search input. " .
+				      "Press 3 to review search input. " .
+				      "Press 9 to continue searching. " .
+				      "Press star to exit. " ), 2000, 1 );
+
+    if( $inputKey == -1  ) { # ERROR!
+      $mode = $MODE_EXIT;
+    } elsif( $inputKey ne "" ) {
+      $validInput = ! $validInput; # True
+    }
+
+    if( $validInput ) {     # Process the input
+      $validInput = ""; # Reset to False
+
+    switch: {
+	if( $inputKey eq "*" ) 
+	  { $mode = $MODE_EXIT;
+	    last switch}
+	if( $inputKey == 1 ) 
+	  { ( $mode, $hitCnt ) = cmdSelectContactFromMenu( $mode, $hitCnt );
+	    last switch}
+	if( $inputKey == 2 ) 
+	  { ( $searchstrOrig, $mode, $hitCnt, $searchstr ) = 
+	      cmdUndoLastSearch( $searchstrOrig, $mode, $hitCnt, $searchstr  );
+	    last switch}
+	if( $inputKey == 3 ) 
+	  { cmdReviewSearch( $searchstrOrig );
+	    last switch}
+	if( $inputKey == 9 ) 
+	  { $mode = $MODE_SEARCHING;
+	    last switch}
+      } # switch
+      
+    } # if( $validInput
+
+  } # if( $mode eq $MODE_SEARCHING
+
+  if(( $mode eq $MODE_SEARCHING ) ||
+     ( $mode eq $MODE_COMMAND   )    ){
+    # Check if we found what we want or nothing left
+    if( $hitCnt == 1 ) {
+      $mode = $MODE_FOUND;
+    }
+  }
+  
+} # while(
+
+
+if( $mode eq $MODE_FOUND ) {
+
+  #
+  # Determine number to dial
+  #
+  my $targetName = "";
+  my $targetNumber = ""; 
+  my @targetNumbers;
+
+  # Get array of possible numbers to dial, should only be one contact to take
+  my $name = "";
+  foreach $name ( keys %directory ) {
+    $targetName = $name;
+    $targetName =~ s/~/ /g; #need to replace with FLSEPERATOR
+    ( @targetNumbers ) = split /\t/, $directory{ $name }, 9;
+    
+  } # foreach $name
+  
+  # Match the numbers to the number labels in case we need to prompt
+  my $numberPosCnt = 0;
+  my @numberMenu = ();
+  my $escapeDigits = "*";
+
+  my $number = "";
+  foreach $number ( @targetNumbers ) {
+    $numberPosCnt++;
+    
+    if( $number ne "" ) { # Create a menu entry
+      $targetNumber = $number;
+      $escapeDigits .= "$numberPosCnt";
+      $numberMenu[ @numberMenu ] = 
+	"Press $numberPosCnt to dial $numberLabels[ $numberPosCnt - 1 ]. ";
+    }
+  } #foreach $number
+  
+  $numberMenu[ @numberMenu ] = "Press * to exit. ";
+  
+  $AGI->verbose( "$SUBNAME: numberMenu <@numberMenu>", 1);
+
+  if( @numberMenu > 2 ) {  # Multiple numbers, prompt
+    $mode = $MODE_SEARCHING;
+    my $digit = 0;
+
+    while( $mode eq $MODE_SEARCHING ) { # keep prompting till we get valid input
+      my $dfmtInput = 0;
+      my $prompt = "";
+
+      $AGI->stream_file( getTTSFilename( "$targetName has multiple numbers listed. " ) );
+
+      foreach $prompt ( @numberMenu ) { # cycle through the prompts
+	($dtmfInput > 1 ) or 
+	  $dtmfInput = $AGI->stream_file( getTTSFilename( "$prompt" ), "$escapeDigits" );
+	$AGI->verbose( "$SUBNAME: Chosen number<$dtmfInput>", 1 );
+      } # foreach
+      
+      if( $dtmfInput < 0 ) { # ERROR!
+	$mode = $MODE_EXIT;
+  
+      } elsif( $dtmfInput > 0 ) { # valid input
+	$mode = $MODE_FOUND;
+	$digit = chr( $dtmfInput );
+      }
+      
+    } # while 
+
+    if( $digit eq "*" ) {
+      $mode = $MODE_EXIT;
+    } else {
+      $targetNumber =  $targetNumbers[ $digit - 1 ];
+    }
+  } # if( @numberMenu
+
+  if( $mode eq $MODE_FOUND ) {
+    $mode = processTargetNumber( $mode, $targetName, $targetNumber ); 
+  }
+} #( $mode eq $MODE_FOUND 

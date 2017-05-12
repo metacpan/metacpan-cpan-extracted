@@ -1,0 +1,59 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.80.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 007d9eadef38d89600c372861a631e950cadab7e .travis.yml
+SHA1 22a4f2d4b56b7c1838e3bc25d5ab55ec003b2fe9 Changes
+SHA1 2ae407c2b0ef32edaf34a75d367122b8a2e63e33 LICENSE
+SHA1 53549f4156cb70cbaf0c60206da1d53764871698 MANIFEST
+SHA1 04b74fcee622fb8ec27e0a77102ce5de3e645601 META.json
+SHA1 56462ccaf3d5706727c347a466e7c7c9b1ae027f META.yml
+SHA1 fa21add76be9f797d9d4dafa701d1e95dd0de32d Makefile.PL
+SHA1 058c05dabba831cadea38b3627b4439a60905adb README
+SHA1 e2829256b12988cf763aca3878078dd9f165bd53 cpanfile
+SHA1 d57b8a932051b03aaf8a02622e43d126c01dacbc dist.ini
+SHA1 73a0b932e85bd4dcad3d4e3c81e18ebe7e5bab52 lib/autobox/Junctions.pm
+SHA1 4bdb7637c377a4563e26e887313ef118c1d1a22d t/00-check-deps.t
+SHA1 081394de2e3579a107262b92163279a58464c9ee t/00-compile.t
+SHA1 e2467566100e35225d6798ecd2d4ada9c64f7ef0 t/00-report-prereqs.dd
+SHA1 b02cc0d2f7c02f54f615406fa0678fb43adf7d5f t/00-report-prereqs.t
+SHA1 59db4d8889e201cafb3bca9c119070212d738798 t/basic.t
+SHA1 b80ad734615298e6d619b4d27338b444d1aabf09 xt/author/eol.t
+SHA1 84c359410807ec3ac9d897f0c3a8721fc2ccf607 xt/author/no-tabs.t
+SHA1 207fc1a9a35dd8a0a044f2679000c83b65e464ef xt/author/pod-coverage.t
+SHA1 caa2f330fd45ad08e9add40a7873a4bcafa4b17c xt/author/pod-spell.t
+SHA1 6363eed8a474a93d49761e6a120f97e4c27efeaf xt/author/pod-syntax.t
+SHA1 a7948d34cfaad400286ea5d5fa6206c4c7e2552c xt/release/consistent-version.t
+SHA1 e1b849bdb4e0e44318a8e81c4e5b7f2d7ad7c9fe xt/release/has-version.t
+SHA1 7dae329ce0c82654e3ec8874e6e6721f20e89b50 xt/release/minimum-version.t
+SHA1 ba85fcd6a22862cfa8cff2f7311bdb36aa115151 xt/release/no-smart-comments.t
+SHA1 3d2786e7ea7eac5a748ce7346b91faae1cfceb4a xt/release/pod-linkcheck.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iQIcBAEBAgAGBQJXatu6AAoJEJ/Rlq0N/NXWZJsP/1kR9Qi9NuNoYW0vJqWWYgXE
+9fg7BIIWy4pCy1CxaOLwb8NsTp+FACAvI+o1gp7j2+fgFAEk1q2HVH00IV3xN1hu
+8PMtJ6GYxZLz6vVAbDm4iBP6kf3f4DBRkd0HGHYSsSw0o30cA9Y/PVqPuuSGSc+m
+Wfl34Es/7U1j+ZymaSMQrVBVJG3zQobRsDWjaXgchfc4LIRvmkYu1AS/j75maYkT
+4s2IOOQNskmFq22o9LYIdMjviDLlNi8OCXftVvR5JQepqf+17I0ob+qKHqDJMsoh
+etzMWtqOKJ4udBmTqsh9BDm1Sk2+WAzUHD421EF1AJ3T4mwn5VRJEq02PHy7OdLh
+0Fjb4sCl1CeBxFiJuMKpJz55vOEZQ7gp2i9RSZeDGbubSA7MgfRL51sfqb8EP6wW
++qXRZsfJjWDP4wkkcAWgLShqVx/Sii8p6+k4ZNXhRNDH4e9mnulgzQ3G+6jn3+6/
+CMNJcpPZedUmv/o/L5H8shVzVz8KJXmk2FfUdoth/VZzWPZRDkOvkCW2cMDzt0uL
+cigaVK0a/ZO9W2PUS5dFf1KRuE79HX8k0853oKCx+Ys6DPQl7U2CNKlopC0jOXtw
+ggWX0uIXXHsAEjr/BBwpSNEqHcizStCbEp1u2LA2S1Oe3DMM3X7BiYQIqaimlXWy
+gkKcmbMAKwOWFx0idv8I
+=aHhq
+-----END PGP SIGNATURE-----

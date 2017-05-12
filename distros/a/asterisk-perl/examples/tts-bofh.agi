@@ -1,0 +1,28 @@
+#!/usr/bin/perl
+#
+# AGI Example that picks a random bofh excuse from the fortune database 
+# and sends it to Festival (text to speech processor)
+#
+# This script also requires the Fortune perl module
+#
+# Written by: James Golovich <james@gnuinter.net>
+#
+
+
+
+use Asterisk::AGI;
+use Fortune;
+
+$AGI = new Asterisk::AGI;
+
+my %input = $AGI->ReadParse();
+
+my $base_filename = '/usr/share/games/fortunes/bofh-excuses';
+
+$ffile = new Fortune ($base_filename);
+$ffile->read_header ();
+$fortune = '"' . $ffile->get_random_fortune () . '"';
+$fortune =~ s/\n/ /g;
+$fortune =~ s/BOFH excuse \#(\d*):/Bastard Operator From Hell Excuse Number $1:,., /;
+
+$AGI->exec('Festival', $fortune);

@@ -1,0 +1,9 @@
+Makefile
+Makefile.old
+MANIFEST
+blib
+pm_to_blib
+asterisk-perl*tar.gz
+/META.yml
+/META.json
+/MYMETA.*

@@ -1,0 +1,8 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/00_symbol_table.t
+t/01_arena.t
+lib/autobox/Bless.pm
+META.yml                                 Module meta-data (added by MakeMaker)

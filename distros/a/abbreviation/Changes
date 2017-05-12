@@ -1,0 +1,9 @@
+Revision history for Perl extension abbreviation.
+
+0.02  Wed Jun 27 13:22:28 JST 2001
+	* add all CAPS on cases.
+	- went on CPAN.
+
+0.01  Wed Jun 27 05:45:15 2001
+	- original version; created by h2xs 1.19
+

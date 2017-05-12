@@ -1,0 +1,188 @@
+Revision history for autobox::Core
+
+1.32
+    Docs
+    - Corrected spelling mistake (thanks again Gregor Herrmann)
+
+1.31
+    Docs
+    - Corrected spelling mistake (thanks Gregor Herrmann)
+    - Document that strings work as regexen (thanks jarich)
+
+    New Features
+    - Call backtick() qx() instead (but keep backtick around) (thanks jarich)
+
+    Incompatible Changes
+    - s() now returns the modified string or success/fail depending on context
+
+    Fix
+    - m() and nm() were failing to signal failure (thanks grtodd!)
+
+1.30
+    New Features
+    - first() arguments are now consistent with grep(), so now  you can
+      supply single non-ref scalar to it (xenu)
+
+    Incompatible Changes
+    - Removed smartmatch from first() and grep(). Now these methods have
+      consistent behaviour under all perl versions and their code is much
+      cleaner (xenu)
+
+    Docs
+    - Fixed typo reported by myfwhite on annocpan (xenu)
+
+1.29
+    Fix
+    - Suppress smartmatch deprecation warnings in perls >= 5.18 (xenu)
+
+1.28
+    Misc
+    - Make crypt() test optional for platforms without it (thanks Hugmeir)
+
+1.27
+    Misc
+    - new version just to creage a new .tar.gz.  a './' owned by root
+      apparently got added to the tar at some point after 'make dist'.
+
+1.26
+    Fix
+    - remove 'use feature' from t/synopsis.t.  this lets older perls perl.
+
+1.25 Wed Jun 12 14:45:54 CDT 2013
+    Fix
+    - remove 'use feature' from t/synopsis.t.  that was cut and paste from the
+      docs but wasn't actually necessary there.
+
+1.24 Sun Jul 15 11:05:11 PDT 2012
+    Misc
+    - MANIFEST no longer includes previous distribution tar balls (Jacinta
+      Richardson)
+
+1.23 Thu Jul 12 18:05:46 PDT 2012
+    Docs
+    - Minor corrections (Jacinta Richardson)
+
+1.22  Thu Jul 12 17:16:06 PDT 2012
+    New Features
+    - %hash->each is now guaranteed to iterate through the complete hash,
+      unlike each(%hash). [github 7]
+    - defined()
+
+    Distribution Changes
+    - Added Test::More 0.88 as a pre-req (Jacinta Richardson)
+    - Added license for new versions of EMM
+
+    Docs
+    - Expanded module synopsis (Jacinta Richardson)
+    - Wrote documentation for all (or most) functions
+    - Tidied book extract (Jacinta Richardson)
+
+    Incompatible changes (Jacinta Richardson)
+    - Removed functions
+      - rand
+      - times
+      - add
+      - band
+      - bor
+      - bxor
+      - div
+      - eq
+      - flip
+      - ge
+      - gt
+      - le
+      - lshift
+      - mult
+      - mcmp
+      - ne
+      - meq
+      - mge
+      - mgt
+      - mle
+      - mlt
+      - mne
+      - rshift
+      - sub
+      - autobox::Core::CODE::map
+
+    Bug Fixes
+    - xor uses xor instead of ^ (Jacinta Richardson)
+
+1.21  Mon Sep 26 16:15:19 PDT 2011
+    New Features
+    - $string->reverse will now always reverse the string regardless of context.
+      (Technically an incompatible change, but the list behavior of $string->reverse
+      was clearly useless).
+
+    Distribution Changes
+    - fix MANIFEST (thanks Steffen Müller).
+    - move POD History section into standard Changes file (chocolateboy).
+    - look, a change log!
+
+    Misc
+    - removed unnecessary prototypes on methods (schwern)
+    - updated dependency on autobox
+
+
+1.2 Fri Mar 19 12:11:00 2010
+    - fixes version 1.1 losing the MANIFEST and being essentially
+      a null upload. Bah!
+    - merges in brunov's flip, center, last_index, slice,
+      range, documentation, and various bug fixes.
+
+1.1 Thu Mar 18 13:33:00 2010
+    - actually adds the tests to the MANIFEST so they get bundled.
+    - Thanks to http://github.com/daxim daxim/Lars DIECKOW for clearing
+      out the RT queue (which I didn't know existed), merging in the fixes and
+      features that still applied, which were several.
+
+1.0 Sun Mar  7 22:35:00 2010
+    - is identical to 0.9. PAUSE tells me 0.9 already exists so
+      bumping the number. *^%$!
+
+0.10 Mon Jan 25 17:18:00 2010
+    - no change recorded.
+
+0.9 Mon Jan 25 17:07:00 2010
+    - is identical to 0.8. PAUSE tells me 0.8 already exists so bumping the number.
+
+0.8 Mon Jan 25 14:28:00 2010
+    - fixes unshift and pop to again return the value removed
+      (oops, thanks brunov) and adds many, many more tests (wow, thanks brunov!).
+
+0.7 Thu Mar  4 23:07:00 2010
+    - uses autobox itself so you don't have to, as requested, and
+      ... oh hell. I started editing this to fix Schwern's reported v-string
+      warning, but I'm not seeing it.
+    - Use ~~ on @array->grep if we're using 5.10 or newer.
+    - Add an explicit LICENSE section per request.
+    - Took many tests and utility functions from perl5i.
+    - Pays attention to wantarray and returns a list or the reference, as dictated by context.
+    - flatten should rarely if ever be needed any more.
+
+0.6 Mon May 26 05:19:00 2008
+    - propogates arguments to autobox and doesn't require you to use
+      autobox. I still can't test it and am applying patches blindly. Maybe I'll
+      drop the Hash::Util dep in the next version since it and Scalar::Util are
+      constantly wedging on my system.
+      The documentation needs to be updated and mention of Perl6::Contexts mostly removed.
+    - JJ contributed a strip method for scalars - thanks JJ!
+
+0.5 Tue May 13 23:59:00 2008
+    - has an $arrayref->unshift bug fix and and a new flatten method for hashes.
+    - this version is untested because my Hash::Util stopped working, dammit.
+
+0.4 Sat Jan  5 17:00:00 2008
+    - got numeric operations.
+
+0.3 Wed Jan  5 21:12:00 2005
+    - fixes a problem where unpack wasn't sure it had enough arguments
+      according to a test introduced in Perl 5.8.6 or perhaps 5.8.5.
+      This problem was reported by Ron Reidy - thanks Ron!
+    - added the references to Perl 6 Now and the excerpt.
+
+0.2 Sat May 29 21:42:00 2004
+    - rounded out the API and introduced the beginnings of functional-ish methods.
+
+0.1 Tue Mar 30 09:51:00 2004
+    - woefully incomplete initial version.

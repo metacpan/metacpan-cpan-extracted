@@ -1,0 +1,39 @@
+Revision history for aliased
+
+0.34  2015-01-03 20:39:44Z
+      - re-release to fix problematic $VERSION declaration (RT#101095)
+
+0.33  2014-12-21 02:19:34Z
+      - fix warnings on perl 5.21.6 and up (RT#100359; thanks, Father
+        Chrysostomos!)
+
+0.32  2014-07-05 00:00:00Z
+      - Don't inherit from Exporter (via Olivier Mengué)
+      - Fix docs issues (via Grzegorz Rożniecki)
+
+0.31  2013-02-18 00:00:00Z
+      - Bumped the number for a production release.
+
+0.30_01   2010-01-03 00:00:00Z
+      - Added prefix() function. [rt#48289]
+      - Moved Test::More to build_requires [rt#48926]
+      - Moved author tests to xt/author
+
+0.30  2009-08-05 00:00:00Z
+      - Applied changes from Florian Ragwitz to ensure that we preserve the
+        name of the package the alias is defined in.
+
+0.22  2008-02-12 00:00:00Z
+      - Preserve $SIG{__DIE__} behavior just as if aliased had not been used.
+
+0.21  2007-03-29 00:00:00Z
+      - Applied $SIG{__DIE__} patch from Schwern and tightened up the test.
+
+0.12  2005-08-23 00:00:00Z
+      - Add pod and pod coverage tests
+      - Added patch from Schwern to allow aliasing to a scalar
+
+0.10  2005-01-05
+      - Changed name to 'aka' due to general consensus on the
+        module-authors list.
+

@@ -1,0 +1,12 @@
+0.002   2017-02-14 (PERLANCAR)
+
+        - No functional changes.
+
+        - Mention RT#120238 for reference.
+
+        - [build] Rebuild to reorder the POD sections.
+
+
+0.001   2017-02-14 (PERLANCAR)
+
+        - First release, forked from everywhere 0.07.

@@ -1,0 +1,21 @@
+Revision history for autobox-Closure-Attributes
+
+0.05    2016-04-22
+        Make the synopsis more easily digestible
+        Minor other documentation and packaging improvements
+
+0.04    Sun Jun 14 15:16:06 2009
+        Modernize the dist
+
+0.03    Fri May 16 11:57:00 2008
+        Thanks chocolateboy, for adding $code->$name!
+        Add support for $code->$at_array and $code->$percent_hash
+
+0.02    Thu Feb 21 03:09:40 2008
+        Mistakenly put the AUTOLOAD in a non-namespace package.
+        Fix SYNOPSIS.
+        Tried to make $c->'@primes' work, but no dice.
+
+0.01    Tue Feb 19 01:30:41 2008
+        First version, released on an unsuspecting world.
+

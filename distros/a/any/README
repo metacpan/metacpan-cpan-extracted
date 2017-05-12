@@ -1,0 +1,30 @@
+any version 0.0.1
+==================
+
+See POD (perldoc any) for more info about use and purpose
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+or
+  perl -MCPAN -e 'install any;'
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+   first
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2007 by Daniel Muey
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.6 or,
+at your option, any later version of Perl 5 you may have available.

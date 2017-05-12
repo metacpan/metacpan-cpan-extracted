@@ -1,0 +1,7 @@
+Revision history for Perl extension Anticaptcha.
+
+1.02  Tue Yan 03 11:42:34 2017 GMT
+	- add ErrorID=999 for HTTP errors;
+
+1.00  Sun Oct 30 07:20:27 2016 GMT
+	- original version;

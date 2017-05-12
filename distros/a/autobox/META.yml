@@ -1,0 +1,26 @@
+---
+abstract: 'call methods on native types'
+author:
+  - 'chocolateboy <chocolate@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.18, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: autobox
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Scope::Guard: '0.21'
+  perl: '5.008000'
+resources:
+  bugtracker: https://github.com/chocolateboy/autobox/issues
+  repository: https://github.com/chocolateboy/autobox
+version: '2.85'

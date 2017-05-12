@@ -1,0 +1,9 @@
+^_build
+^Build$
+^blib
+~$
+\.bak$
+CVS
+^\.DS_Store$
+^accessors-
+Makefile$

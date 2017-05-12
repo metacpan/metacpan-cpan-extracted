@@ -1,0 +1,97 @@
+NAME
+
+    autobox::Junctions - Autoboxified junction-style operators
+
+VERSION
+
+    This document describes version 0.002 of autobox::Junctions - released
+    June 22, 2016 as part of autobox-Junctions.
+
+SYNOPSIS
+
+        # somewhere above...
+        use autobox::Junctions;
+    
+        # somewhere below...
+        my @explodey = qw{ bing bang boom };
+        warn "boom!\n"
+            if @explody->any eq 'boom';
+    
+        my $still_explody = [ @explodey ];
+        warn "not all explody\n"
+            unless $still_explody->all eq 'boom';
+    
+        # now, bonus points...
+        use autobox::Core;
+    
+        my $weapons = {
+            mateu => 'bow & arrow',     # fearsome hunter
+            ether => 'disarming smile', # Canadian
+            jnap  => 'shotgun',         # upstate NY
+        };
+    
+        warn 'mateu is armed!'
+            if $weapons->keys->any eq 'mateu'
+    
+        warn '...but at least no one has a nuke'
+            if $weapons->values->none eq 'nuke';
+
+DESCRIPTION
+
+    This is a simple autoboxifying wrapper around
+    Syntax::Keyword::Junction, that provides array and array references
+    with the functions provided by that package as methods for arrays: any,
+    all, one, and none.
+
+AUTOBOXED METHODS
+
+    See: "any" in Syntax::Keyword::Junction, "all" in
+    Syntax::Keyword::Junction, "one" in Syntax::Keyword::Junction, and
+    "none" in Syntax::Keyword::Junction.
+
+SEE ALSO
+
+    Please see those modules/websites for more information related to this
+    module.
+
+      * Syntax::Keyword::Junction
+
+      * autobox
+
+BUGS
+
+    Please report any bugs or feature requests on the bugtracker website
+    https://github.com/RsrchBoy/autobox-Junctions/issues
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+AUTHOR
+
+    Chris Weyl <cweyl@alumni.drew.edu>
+
+ I'm a material boy in a material world
+
+    Please note I do not expect to be gittip'ed or flattr'ed for this work,
+    rather it is simply a very pleasant surprise. I largely create and
+    release works like this because I need them or I find it enjoyable;
+    however, don't let that stop you if you feel like it ;)
+
+    Flattr
+    <https://flattr.com/submit/auto?user_id=RsrchBoy&url=https%3A%2F%2Fgithub.com%2FRsrchBoy%2Fautobox-Junctions&title=RsrchBoy's%20CPAN%20autobox-Junctions&tags=%22RsrchBoy's%20autobox-Junctions%20in%20the%20CPAN%22>,
+    Gratipay <https://gratipay.com/RsrchBoy/>, or indulge my Amazon
+    Wishlist <http://bit.ly/rsrchboys-wishlist>... If and *only* if you so
+    desire.
+
+CONTRIBUTOR
+
+    Сергей Романов <sromanov-dev@yandex.ru>
+
+COPYRIGHT AND LICENSE
+
+    This software is Copyright (c) 2013 by Chris Weyl.
+
+    This is free software, licensed under:
+
+      The GNU Lesser General Public License, Version 2.1, February 1999
+

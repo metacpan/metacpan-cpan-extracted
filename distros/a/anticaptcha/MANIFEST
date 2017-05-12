@@ -1,0 +1,8 @@
+Changes
+Makefile.PL
+MANIFEST
+META.json
+README
+t/Anticaptcha.t
+lib/Anticaptcha.pm
+lib/Anticaptcha/Request.pm

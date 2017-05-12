@@ -1,0 +1,21 @@
+---
+abstract: 'bringing JSON functions to autobox'
+author:
+  - 'Robin Edwards <robin.ge@gmail.com>'
+build_requires:
+  Test::More: '0.94'
+configure_requires:
+  ExtUtils::MakeMaker: '6.30'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.014, CPAN::Meta::Converter version 2.140640'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: autobox-JSON
+requires:
+  JSON: '2.50'
+  autobox: '2.72'
+version: '0.0006'
+x_contributors:
+  - 'Chris Weyl <cweyl@alumni.drew.edu>'

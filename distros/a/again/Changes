@@ -1,0 +1,40 @@
+Revision history for Perl module 'again'
+
+0.08 2014-09-27 NEILB
+    - If you had use'd a module the regular way ("use <module>"),
+      then reloaded it with "use again <Module>", you'd get a warning
+      about an uninitialized value. RT#97789
+
+0.07 2014-08-16 NEILB
+    - Improved the abstract (NAME section in pod)
+    - Switched to Dist::Zilla
+    - Minor improvements to DESCRIPTION, particularly first paragraph.
+    - Tweaked the SEE ALSO; removed the bit saying Module::Reload seems
+      abandoned, since I've now adopted it as well.
+
+0.06 2014-05-25 NEILB
+    - Added a SEE ALSO section to the pod
+    - Improved first paragraph of DESCRIPTION
+    - Added github repo to pod
+
+0.05 2014-01-29 NEILB
+    - Added strict, warnings and Carp as prereqs in Makefile.PL
+    - Moved again.pm into lib/
+    - Specified min perl version as 5.6.0
+
+0.04 2013-10-01 NEILB
+    - Added metadata for repository and license
+    - use strict and warnings in again.pm (with scoped use of no strict 'refs')
+
+0.03 2013-02-23 NEILB
+    - added section to doc explaining you will need to re-import any
+      symbols you imported on first use.
+    - reformatted Changes to conform to CPAN::Changes::Spec
+
+0.02 2003-08-07 JUERD
+    - Added /g. again.pm didn't work with module names that have more than
+      one set of "::". It looked for Net/Whois::Raw.pm.
+
+0.01 2003-03-06 JUERD
+    - original version; created by h2xs 1.22 with options -AXn again
+

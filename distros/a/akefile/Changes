@@ -1,0 +1,26 @@
+0.08 Sat Aug 16 10:08:35 PDT 2014
+ - Meta 0.0.2
+
+0.07 Sat Aug 16 03:36:55 PDT 2014
+ - Eliminate spurious trailing whitespace
+
+0.06 Fri Aug 15 15:35:11 PDT 2014
+ - Add t/000-compile-modules.t
+ - CPAN Day 2014 - 21 Release Salute!
+
+0.05 Wed Aug 13 23:03:42 PDT 2014
+ - Switch to Zilla::Dist
+
+0.04 Sat Nov  5 01:04:36 PDT 2011
+ - Remove XXX dep
+ - Use newer Mo.
+
+0.03 Wed Sep 14 15:29:57 CEST 2011
+ - Added au++ great idea to support 'perl -make -test' and 'perl -make
+   -install'
+ - Released from Liz++ and Wendy++' attic
+
+0.02 Wed Sep 14 14:37:34 CEST 2011
+ - First Release
+ - Released from Liz++ and Wendy++' Library
+

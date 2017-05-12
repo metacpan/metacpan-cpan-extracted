@@ -1,0 +1,30 @@
+--- #YAML:1.0
+name:               autobox-Bless
+version:            0.02
+abstract:           Guess which package a hash or hashref probably should be and blessed it
+author:
+    - Scott Walters <scott@slowass.net>
+license:            unknown
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  6.46
+build_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    autobox:           2.7
+    Data::Dumper:      0.001
+    Devel::Caller:     2.05
+    Devel::Gladiator:  0.01
+    Devel::Peek:       1.04
+    Scalar::Util:      0.001
+resources:
+    bugtracker:  mailto:scott@slowass.net
+    repository:  http://github.com/scrottie/autobox-Bless
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.56
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

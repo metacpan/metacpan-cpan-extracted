@@ -1,0 +1,30 @@
+#! /usr/bin/perl
+use Modern::Perl;
+use App::Tables;
+use YAML;
+
+=head1 SYNOPSIS
+
+    tables from source to dest
+
+where sources and dest can be an excel file (.xls or .xlsx) or a directory (no
+extension, optionally suffixed with a C</> to be explicit).
+
+=head1 directory layout
+
+every sheet is recorded as a tsv file. it's easy to edit it with vim
+
+    :set et nowrap ts=25
+
+extra tips in L<this page|http://acg.github.io/2013/03/29/turn-vim-into-excel-tips-for-tabular-data-editing.html>.
+
+=cut
+
+my $app = App::Tables::init @ARGV;
+
+my ( $from, $to ) = map {
+    $$app{$_} or die YAML::Dump { "can't find key $_ in" => $app };
+    App::Tables::provider $$app{$_}
+} qw< from to >;
+
+$to->write( $from->read );

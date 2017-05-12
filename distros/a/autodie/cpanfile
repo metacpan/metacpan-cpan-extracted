@@ -1,0 +1,47 @@
+requires "B" => "0";
+requires "Carp" => "0";
+requires "Exporter" => "5.57";
+requires "Fcntl" => "0";
+requires "POSIX" => "0";
+requires "Scalar::Util" => "0";
+requires "Tie::RefHash" => "0";
+requires "constant" => "0";
+requires "overload" => "0";
+requires "parent" => "0";
+requires "perl" => "5.008004";
+requires "strict" => "0";
+requires "warnings" => "0";
+recommends "IPC::System::Simple" => "0.12";
+recommends "Sub::Identify" => "0";
+recommends "perl" => "5.010";
+
+on 'test' => sub {
+  requires "File::Copy" => "0";
+  requires "File::Spec" => "0";
+  requires "File::Temp" => "0";
+  requires "FindBin" => "0";
+  requires "IO::Handle" => "0";
+  requires "Socket" => "0";
+  requires "Test::More" => "0";
+  requires "if" => "0";
+  requires "lib" => "0";
+};
+
+on 'test' => sub {
+  recommends "BSD::Resource" => "0";
+  recommends "Import::Into" => "1.002004";
+  recommends "Pod::Coverage::TrustPod" => "0";
+  recommends "Test::Kwalitee" => "0";
+  recommends "Test::Perl::Critic" => "0";
+  recommends "perl" => "5.010";
+};
+
+on 'configure' => sub {
+  requires "ExtUtils::MakeMaker" => "0";
+};
+
+on 'develop' => sub {
+  requires "Pod::Coverage::TrustPod" => "0";
+  requires "Test::Pod" => "1.41";
+  requires "Test::Pod::Coverage" => "1.08";
+};

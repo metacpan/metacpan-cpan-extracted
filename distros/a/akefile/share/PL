@@ -1,0 +1,9 @@
+# This is just a sad stub template until akefile.pm gets more love.
+
+use ExtUtils::MakeMaker;
+
+WriteMakefile(
+    NAME => '[% module.name %]',
+    AUTHOR => '[% author.name %] <[% author.email %]>',
+    VERSION => '[% module.version %]',
+);

@@ -1,0 +1,37 @@
+NAME
+    akefile - Generate a Makefile.PL in your favorite style
+
+SYNOPSIS
+    From command line:
+
+        perl -Makefile=PL   # Create a Makefile.PL and run it
+        make test           # test
+        make install        # install
+        make purge          # Clean up and delete the Makefile.PL
+
+    Other invocations:
+
+        perl Makefile=MI    # Module Install
+        perl Makefile=MP    # Module Package
+        perl Makefile=MB    # Module Build
+        perl Makefile=DZ    # DistZilla
+        perl Makefile=XY    # From akefile::XY plugin
+
+DESCRIPTION
+    This module will attempt to generate a Makefile.PL for you, so that you
+    can stop worrying about that stuff.
+
+STATUS
+    This module is brand new. Don't use it yet.
+
+AUTHOR
+    Ingy döt Net <ingy@cpan.org>
+
+COPYRIGHT AND LICENSE
+    Copyright 2011-2014. Ingy döt Net.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+    See <http://www.perl.com/perl/misc/Artistic.html>
+

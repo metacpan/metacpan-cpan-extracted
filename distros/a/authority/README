@@ -1,0 +1,77 @@
+NAME
+    authority - loads a module only if it has a particular authority
+
+SYNOPSIS
+     use authority 'cpan:STEVAN', Moose => qw();
+     use authority 'cpan:TOBYINK', HTML::HTML5::Builder => qw(:standard);
+
+DESCRIPTION
+    This pragma allows you to indicate that you wish to load a module only if
+    its authority is a particular URI.
+
+    Using this pragma automatically enables UNIVERSAL::AUTHORITY.
+
+    `use authority $authority, $module, @arguments`
+        Require and import the module at compile time. This is the usual mode
+        of operation.
+
+    `authority->import($authority, $module, @arguments)`
+        Require and import the module at run time.
+
+    Note that the special $authority value "Any", indicates that any authority
+    is allowed (including undef).
+
+    Experimentally, $module may contain a module name and minimum version,
+    separated with a space.
+
+    There is also a very experimental feature allowing releases of the same
+    package by different authorities to live side-by-side, though only one of
+    them can be required into a running script.
+
+    In this case, assuming that the inc path is `/opt/perl/lib` and a script
+    does this:
+
+     use authority 'cpan:JOE', My::Module => qw();
+
+    Then Perl will attempt to load `/opt/perl/lib/cpan_3A_JOE/My/Module.pm`
+    before it tries the usual `/opt/perl/lib/My/Module.pm`.
+
+    This is not anywhere near as powerful as the authority feature of Perl 6,
+    but it's a start.
+
+BUGS
+    Please report any bugs to
+    <http://rt.cpan.org/Dist/Display.html?Queue=authority>.
+
+SEE ALSO
+    *   Object::AUTHORITY - an AUTHORITY method for your class
+
+    *   authority::shared - a more sophisticated AUTHORITY method for your
+        class
+
+    *   UNIVERSAL::AUTHORITY - an AUTHORITY method for every class
+        (deprecated)
+
+    *   UNIVERSAL::AUTHORITY::Lexical - an AUTHORITY method for every class,
+        within a lexical scope
+
+    *   *authority* (this module) - load modules only if they have a
+        particular authority
+
+    Background reading: <http://feather.perl6.nl/syn/S11.html>,
+    <http://www.perlmonks.org/?node_id=694377>.
+
+AUTHOR
+    Toby Inkster <tobyink@cpan.org>.
+
+COPYRIGHT AND LICENCE
+    This software is copyright (c) 2011 by Toby Inkster.
+
+    This is free software; you can redistribute it and/or modify it under the
+    same terms as the Perl 5 programming language system itself.
+
+DISCLAIMER OF WARRANTIES
+    THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
+    WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+    MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+

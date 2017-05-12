@@ -1,0 +1,45 @@
+---
+abstract: 'Replace functions with ones that succeed or die with lexical scope'
+author:
+  - 'Paul Fenwick <pjf@cpan.org>'
+build_requires:
+  File::Copy: 0
+  File::Spec: 0
+  File::Temp: 0
+  FindBin: 0
+  IO::Handle: 0
+  Socket: 0
+  Test::More: 0
+  if: 0
+  lib: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.037, CPAN::Meta::Converter version 2.142060'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: autodie
+recommends:
+  IPC::System::Simple: 0.12
+  Sub::Identify: 0
+  perl: 5.010
+requires:
+  B: 0
+  Carp: 0
+  Exporter: 5.57
+  Fcntl: 0
+  POSIX: 0
+  Scalar::Util: 0
+  Tie::RefHash: 0
+  constant: 0
+  overload: 0
+  parent: 0
+  perl: 5.008004
+  strict: 0
+  warnings: 0
+resources:
+  bugtracker: http://rt.cpan.org/NoAuth/Bugs.html?Dist=autodie
+  repository: git://github.com/pjf/autodie
+version: 2.29

@@ -1,0 +1,19 @@
+<xml>
+	<group>
+		<groupname>admin</groupname>
+		<acl info="admin_acl_1">
+			<default>DENY</default>
+			<hostmask>host1.foo.com</hostmask>
+			<permit cmd="test">
+				<argmask>.*</argmask>
+			</permit>
+		</acl>
+                <acl info="admin_acl_2">
+                        <default>DENY</default>
+                        <hostmask>host2.foo.com</hostmask>
+                        <permit cmd="bar">
+                                <argmask>.*</argmask>
+                        </permit>
+                </acl>
+	</group>
+</xml>

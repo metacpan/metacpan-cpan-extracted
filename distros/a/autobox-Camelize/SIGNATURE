@@ -1,0 +1,51 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.70.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 1453aab15c08b2e7a99b73b9f02c30625da52c25 Changes
+SHA1 4656e416583c8ecc8639d7b946ce2a8744143381 INSTALL
+SHA1 05207cbc5971035849c1de2c7cb3babaeaccb6fb LICENSE
+SHA1 6dd3f34e0aba739a61662989464362fc1ed5515e MANIFEST
+SHA1 d32254e74d078ba8289ae232c58ea29f56fc5913 META.json
+SHA1 633426ac154cd84e483860de56f507b328fbcddc META.yml
+SHA1 a9a2aa5883018c369cd61deae02c3f3b4fc65f9e Makefile.PL
+SHA1 6d8328789a990988603d53746223269b11bd0bc6 README
+SHA1 ca205924e149f51c73de5f7cae99df7b04d409dc cpanfile
+SHA1 12ba1e4d4157793cc5247d35a710d665ce920f16 dist.ini
+SHA1 3a6c7e3207d103ff98246ac7ac9e9de9608ed8c9 lib/autobox/Camelize.pm
+SHA1 61cece9772c74b1c5d372f848789040ba507c349 t/00-compile.t
+SHA1 4cc8f6cd17f8a71bf31bf80dca488212fc47db34 t/000-report-versions-tiny.t
+SHA1 951fc0fc44474ba97401b625af2ea51a8bc2d145 t/author-pod-spell.t
+SHA1 1febd28aa7a243208013053356f238a31326f37e t/basic.t
+SHA1 9c3627ff37f4fd5bddc34bf46cf3359eaf76a060 t/release-consistent-version.t
+SHA1 a032c41ef6887fab1b900669c2d304fab46680e2 t/release-eol.t
+SHA1 18787f26ff8dbfdd5f3099928f683b9b2ba173c6 t/release-has-version.t
+SHA1 cbf881db2c2b3b57b843a5b409f0f1cd6a06b511 t/release-no-smart-comments.t
+SHA1 455d1dd1867212a665ad5ea4126b572411de300c t/release-no-tabs.t
+SHA1 6a97a8bae4a3ad4709732451b7d787ed53573b1c t/release-pod-coverage.t
+SHA1 84cf4c2faf9130b9de7e72fff6868257d06e770c t/release-pod-linkcheck.t
+SHA1 06c326c9ea6204633d8ddc85045ec1f444afa838 t/release-pod-syntax.t
+SHA1 bc68a6695b13368c9d532becc71745166e1f574e t/release-synopsis.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.11 (GNU/Linux)
+
+iQEcBAEBAgAGBQJRRWxNAAoJEOd5N1CvIgQkaF4H/11AO+EetlEletw9cq6h23SE
+dI+qwoA0cOOyay0/Z1ZWFhMKBh6KwcL+W8/n5uxmcW+7c5uz+CuOR0EXhWCV2HJo
+8blHEZ+DT6wvsWAPNDdtZgVMKcLqsjcewHR1VKQ9XWYKy/4lOTkjtywQ82o+2bD6
+TXkBwFoBUwlorxvNzIRhajjI/OkkxXPyEdQXZqXP+im9iY1wqA29wS6TzhbtX0fJ
++cLURS04dlaPYnXX9uATa12FPgcOd+BXcnPyv7IdA/34R2BBUlGH4U9P2pL18EgJ
+AnQ3bhiHATp+Ma8ptO7j6lK3yoUK6kTXCXdDKNsUg0+rkN6LRSb08DLQcJ7jXMQ=
+=3skH
+-----END PGP SIGNATURE-----

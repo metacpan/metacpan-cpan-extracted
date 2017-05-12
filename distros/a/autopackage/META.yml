@@ -1,0 +1,29 @@
+---
+abstract: 'Automatically set your package based on how your module was loaded.'
+author:
+  - 'Darin McBride <dmcbride@cpan.org>'
+build_requires:
+  File::Basename: 0
+  Module::Build: 0.3601
+  Test::More: 0
+configure_requires:
+  Module::Build: 0.3601
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300021, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: autopackage
+no_index:
+  directory:
+    - t/My
+requires:
+  B::Hooks::Parser: 0.08
+  Carp: 0
+  strict: 0
+  warnings: 0
+resources:
+  homepage: https://github.com/dmcbride/autopackage
+  repository: https://github.com/dmcbride/autopackage.git
+version: 0.01

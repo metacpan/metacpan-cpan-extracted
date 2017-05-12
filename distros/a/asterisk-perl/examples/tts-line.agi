@@ -1,0 +1,28 @@
+#!/usr/bin/perl
+#
+# AGI Example that reads through a file one line at a time and sends it to 
+# Festival
+#
+# Written by: James Golovich <james@gnuinter.net>
+#
+
+use Asterisk::AGI;
+
+$AGI = new Asterisk::AGI;
+
+my %input = $AGI->ReadParse();
+
+my $filename = $ARGV[0];
+
+open(TEXT, "<$filename") || die "Cannot open $filename: $!\n";
+while ($string = <TEXT>) {
+	chop($string);
+
+# remove any quotes (") because they will screw up the string being passed to festival
+	$string =~ s/\"/ /g;
+
+	if ($string) {
+		$return = $AGI->exec('Festival', "\"$string\"");
+	}
+}
+close(TEXT);

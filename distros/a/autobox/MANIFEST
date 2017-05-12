@@ -1,0 +1,34 @@
+autobox.xs
+Changes
+lib/autobox.pm
+lib/autobox.pod
+lib/autobox/universal.pm
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+ppport.h
+ptable.h
+README
+t/all.t
+t/autoref.t
+t/coderef.t
+t/default.t
+t/export.t
+t/hints.t
+t/import_hashref.t
+t/isa.t
+t/lib/autobox_scope_1.pm
+t/lib/autobox_scope_2.pm
+t/lib/Versioned.pm
+t/merge.t
+t/name.t
+t/rt_46814.t
+t/rt_55652.t
+t/rt_71777.t
+t/rt_80400.t
+t/scalar.t
+t/type.t
+t/universal_type.t
+t/unmerge.t
+t/version.t
+META.json                                Module JSON meta-data (added by MakeMaker)

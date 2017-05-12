@@ -1,0 +1,184 @@
+# Revision history for Perl module autobox::Transform
+
+1.029 2016-10-24T22:09:19Z
+
+  * @array->to_hash, and %hash->to_array
+
+
+1.028 2016-10-23T20:18:46Z
+
+  * Even more docs improvements for ->order, ->order_by.
+
+
+1.027 2016-10-23T17:41:02Z
+
+  * POD fixes for order, order_by
+  * Other docs improvements
+
+
+1.026 2016-10-23T16:58:04Z
+
+  * New feature: sorting using @array->order and @array->order_by.
+
+
+1.025 2016-10-13T12:18:59Z
+
+  * Document %hash->filter_each to make it official.
+
+
+1.024 2016-10-12T21:00:44Z
+
+ * ->filter and ->filter_by now takes a dwim predicate
+   which can be one of: subref (returns true), string (eq), regex
+   (=~), hashref (key exists).
+
+   Arrayref (in) and undef (is) will annoyingly have to wait until the
+   old call style is removed in 2.000 .
+
+
+1.023 2016-10-10T21:46:35Z
+
+ * Officially rename all "grep"-related methods to "filter" something,
+   to open up for a new $array->filter() method which is more capable
+   than autobox::Core's $array->grep(). There are aliases for all
+   existing grep-methods.
+
+   All grep-related methods will continue to work: they are not
+   deprecated and will probably never go away.
+
+ * Simple $array->filter($subref) method.
+
+
+1.022 2016-10-09T20:11:29Z
+
+ * POD fixes and documentation improvements
+
+
+1.021 2016-10-09T19:33:10Z
+
+ * The new call style for accessors is now the preferred one, the old
+   one deprecated but still supported until 2.000 .
+
+   If you have code with the old call style, please pin your version
+   to < 2.000 in your cpanfile, dist.ini or whatever you use.
+
+
+1.020 2016-10-09T15:15:22Z
+
+ * Support for new call style for accessor method calls with arguments
+   e.g. ->map_by([ price_with_discount_code => $code ])
+
+
+1.019 2016-08-21T19:32:42Z
+
+ * Minor POD fixes
+
+
+1.018 2016-08-21T18:55:54Z
+
+ * Array->to_ref, Hash->to_ref, Array->to_array, Hash->to_hash.
+   Use these e.g. as a nicer way to enfore scalar or list context.
+
+ * Use autobox::Core inside of autobox::Transform, so that e.g. String
+   autobox methods can be used in a map_by
+
+
+1.017 2016-07-25T11:53:06Z
+
+ * Allow empty $args arrayref when accessing hash keys
+
+
+1.016 2016-07-23T15:50:32Z
+
+ * Improved docs
+
+
+1.015 2016-07-23T15:27:10Z
+
+ * Make $hash->map_each_value() official by documenting it.
+
+ * grep_by can now take a $grep_subref to check if each item should
+   remain (default: check for true values).
+
+
+1.014 2016-07-21T17:02:10Z
+
+ * map_each_value Hash method (so far undocumented)
+
+
+1.013 2016-07-19T12:29:41Z
+
+ * Change version required to 5.010, hopefully closing #3. Thanks to
+   https://github.com/findmo for reporting.
+
+ * Make $hash->map_each(), $hash->map_each_to_array() official by
+   documenting them.
+
+
+1.012 2016-07-07T17:10:47Z
+
+ * Require perl 5.10, to avoid bogus test failures on unsupported
+   versions. This resolves issue #2: Fails with perls < 5.10
+
+
+1.011 2016-07-07T12:57:42Z
+
+ * Rename Hash grep -> grep_each, grep_defined -> grep_each_defined
+   - This is why they're undocumented
+
+ * map_each, map_each_to_array Hash method (so far undocumented)
+
+
+1.010 2016-06-04T06:59:49Z
+
+ * grep, grep_defined Hash methods (so far undocumented)
+
+
+1.009 2016-06-05T21:24:57Z
+
+ * More doc improvements, examples
+
+
+1.008 2016-06-04T16:51:58Z
+
+ * Docs fixes and improvements
+
+
+1.007 2016-06-04T16:19:00Z
+
+ * Add new transform: uniq_by
+
+
+1.006 2016-04-29T08:30:01Z
+
+ * key_value* Hash methods (so far undocumented)
+
+
+1.004 2016-03-06T12:23:17Z
+
+ * Cleaner docs
+
+
+
+1.003 2016-03-05T22:02:59Z
+
+ * map_by, grep_by, group_by can look up hash keys as well as make
+   method calls
+
+
+
+1.002 2016-03-01T14:00:06Z
+
+ * Fix #1: Add cpanfile deps
+
+
+
+1.001 2016-02-28T22:18:35Z
+
+ * Documentation for all methods
+
+
+
+1.000 2016-02-28T21:37:22Z
+
+ * Original version

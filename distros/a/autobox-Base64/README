@@ -1,0 +1,58 @@
+NAME
+    autobox::Base64 - Convert strings to and from base64 easily
+
+VERSION
+    This document describes version 0.001 of autobox::Base64 - released May
+    20, 2013 as part of autobox-Base64.
+
+SYNOPSIS
+        use autobox::Base64;
+
+        my $encode = 'la la la'->encode_base64;      # bGEgbGEgbGE=
+        my $decode = 'bGEgbGEgbGE='->decode_base64;  # la la la
+
+DESCRIPTION
+    Pretty simple -- just provides autobox methods to strings that work in
+    the way you expect.
+
+STRING METHODS
+  encode_base64
+    This method behaves the same as "encode_base64" in MIME::Base64.
+
+  decode_base64
+    This method behaves the same as "decode_base64" in MIME::Base64.
+
+SEE ALSO
+    Please see those modules/websites for more information related to this
+    module.
+
+    *   autobox
+
+    *   autobox::Core
+
+    *   autobox::JSON
+
+    *   MIME::Base64
+
+SOURCE
+    The development version is on github at
+    <http://github.com/RsrchBoy/autobox-Base64> and may be cloned from
+    <git://github.com/RsrchBoy/autobox-Base64.git>
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    https://github.com/RsrchBoy/autobox-Base64/issues
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+AUTHOR
+    Chris Weyl <cweyl@alumni.drew.edu>
+
+COPYRIGHT AND LICENSE
+    This software is Copyright (c) 2013 by Chris Weyl.
+
+    This is free software, licensed under:
+
+      The GNU Lesser General Public License, Version 2.1, February 1999
+

@@ -1,0 +1,22 @@
+---
+abstract: 'RW object attribute accessors, with explicit semantics'
+author:
+  - 'Alex Kalderimis <alex dot kalderimis at gmail dot com>'
+build_requires:
+  Test::More: 0
+  accessors: 0
+configure_requires:
+  Module::Build: 0.36
+generated_by: 'Module::Build version 0.3607'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: accessors-rw-explicit
+provides:
+  accessors::rw::explicit:
+    file: lib/accessors/rw/explicit.pm
+    version: 0.02
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.02
