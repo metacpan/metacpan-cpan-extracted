@@ -1,0 +1,72 @@
+###########################################################################
+# INSTALLATION OVERVIEW
+###########################################################################
+
+WEB RESOURCES
+  JS-App is made up of JavaScript files (.js), Cascading Style Sheet
+  files (.css), and image files (.png/.jpg/.gif).  With these, you
+  can build a complete client-side application in JavaScript.
+  These need to be installed somewhere under your web server's
+  document root (i.e. "htdocs").
+
+CGI PROGRAMS
+  In order to enable your applications to be full web applications
+  (accessing functions on the server), a few perl programs are 
+  provided.  These are (working) example programs that essentially
+  provide web services to the JavaScript application. Their functionality
+  can be reimplemented in any language, thus making the js-app framework
+  not necessarily dependent on perl.  To use these perl programs, they
+  need to be installed in a directory which your web server recognizes
+  as containing CGI programs (i.e. "cgi-bin").
+
+UTILITY PROGRAMS
+  Other tools (such as theme-generation, theme-manipulation, and image
+  manipulation tools) are written in perl.  These tools are not necessary
+  for the successful running of the application.  They are useful for 
+  development.  They need to be installed in a directory which is in your
+  PATH so that these programs can be executed (i.e. "bin").
+
+NOTES:
+  * A variety of files exist in the base directory of this distribution
+    which are used by the perl installation tool, Module::Build.
+    Other files exist for regression testing or documentation.
+    They are not needed for use of the
+
+###########################################################################
+# PERL-BASED INSTALLATION
+###########################################################################
+
+Make sure you have "Module::Build" and "App::Build" installed.
+If not (or to make sure), as root, type:
+
+   perl -MCPAN -e "install Module::Build"
+   perl -MCPAN -e "install App::Build"
+
+This distribution can be installed from CPAN (the Comprehensive Perl
+Archive Network) with the following command.
+
+   perl -MCPAN -e "install js-app"
+
+However, because you are reading this README, it is likely you have
+downloaded the distribution yourself (perhaps because you have a version
+more recent than that which is on CPAN or you got it from CVS).
+
+In that case, to install this module, cd to the directory that contains
+this README file and type the following.
+
+   perl Build.PL
+   perl Build
+   perl Build test     #(optional)
+   perl Build install
+
+###########################################################################
+# MANUAL INSTALLATION
+###########################################################################
+
+   export DOCROOT=/usr/local/apache/htdocs   # set this as appropriate
+   export CGIROOT=/usr/local/apache/cgi-bin  # set this as appropriate
+   export BINDIR=/usr/local/bin              # set this as appropriate
+   cp -r htdocs/js-app $DOCROOT
+   cp -r cgi-bin/js-app $CGIROOT
+   cp bin/* $BINDIR
+

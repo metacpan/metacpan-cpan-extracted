@@ -1,0 +1,7 @@
+MANIFEST
+Makefile.PL
+lib/App/JSONPretty.pm
+t/pretty.t
+t/simple.json
+script/jsonpretty
+META.yml                                 Module meta-data (added by MakeMaker)

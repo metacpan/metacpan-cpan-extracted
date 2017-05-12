@@ -1,0 +1,63 @@
+/***********************************************************************
+* General CSS Definitions
+************************************************************************
+* NOTE: There's a lot of redundancy here because of the quirkiness of
+* various browsers in propagating the styles properly.
+* I really ought to go through and figure which ones of these are
+* truly needed and on which browsers, but for the time being, I leave
+* the redundancy in.
+***********************************************************************/
+body {
+    color: navy;
+    font-family: Verdana, Geneva, Arial, sans-serif;
+    font-size: 1em;
+}
+h1 {
+    color: navy;
+    font-family: Verdana, Geneva, Arial, sans-serif;
+    font-size: 1.6em;
+}
+h2 {
+    color: navy;
+    font-family: Verdana, Geneva, Arial, sans-serif;
+    font-size: 1.5em;
+}
+h3 {
+    color: navy;
+    font-family: Verdana, Geneva, Arial, sans-serif;
+    font-size: 1.4em;
+}
+h4 {
+    color: navy;
+    font-family: Verdana, Geneva, Arial, sans-serif;
+    font-size: 1.2em;
+}
+p {
+    color: navy;
+    font-family: Verdana, Geneva, Arial, sans-serif;
+}
+a {
+    color: navy;
+    font-size: 1em;
+}
+th {
+    font-family: Verdana, Geneva, Arial, sans-serif;
+    font-size: 0.9em;
+}
+td {
+    color: navy;
+    font-family: Verdana, Geneva, Arial, sans-serif;
+    font-size: 0.8em;
+    white-space: nowrap;
+}
+select {
+    font-family: Verdana, Geneva, Arial, sans-serif;
+    font-size: 0.8em;
+}
+input {
+    font-family: Verdana, Geneva, Arial, sans-serif;
+    font-size: 0.8em;
+}
+/***********************************************************************
+* Special CSS Classes for Specific Widgets
+***********************************************************************/

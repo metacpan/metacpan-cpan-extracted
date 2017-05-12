@@ -1,0 +1,144 @@
+#!/usr/bin/perl
+
+=head1 NAME
+
+j4psh - A JMX Shell
+
+=cut
+
+use Getopt::Long
+;
+use strict;
+use JMX::Jmx4Perl::Config;
+use JMX::Jmx4Perl::J4psh;
+use Config::General;
+
+=head1 SYNOPSIS
+
+  j4psh [options] <server>
+
+  j4psh --help
+
+  j4psh --version
+
+ Options:
+   --user <user>           Credential used for authentication   
+   --password <pwd>  
+   --proxy <url>           URL to use as proxy proxy
+   --proxy-user <user>     Authentication information for a proxy
+   --proxy-password <pwd>
+   --target <jmx-url>      JSR-160 JMX Service URL to be used as the target server
+   --target-user <user>    Credential for the target server if --target is given
+   --target-password <pwd> 
+   --option key=val        Options for tuning the output of jmx4perl. Known keys are
+                              format   : Either 'json' or 'data'
+                              booleans : Pair of strings separated by slash to use for printing 
+                                         boolean values (Default: [true]/[false])
+                              indent   : Space indent when printing complex data structures 
+   --config <cfg>          Path to an optional configuration file (default: ~/.j4p). Can be a directory
+                           in which case <dir>/jmx4perl.cfg is used.
+   --color [yes|no]        Color option (default: yes)
+
+An optional argument can be used to directly connect to an agent URL or
+symbolic name as defined in the configuration file. If not given, the shell
+does no initial connect.
+
+=head1 DESCRIPTION
+
+B<j4psh> is a frontend to C<JMX::Jmx4Perl> providing an interactive shell for
+accessing JMX MBeans on a remote Java server. 
+
+=over 4
+
+=item *
+
+Readline and history support based on GNU Readline/History as known from other
+shells like 'bash'. When GNU Readline is not available, a pure Perl Module is
+used instead.
+
+=item *
+
+Context sensitive argument completion, e.g. on MBean names and attributes.
+
+=item * 
+
+Colored output (can be switched off)
+
+=item *
+
+Multi-Server support
+
+=item * 
+
+Remote operation via HTTP(S)
+
+=back
+
+=cut
+
+my %opts = ();
+my $result = GetOptions(\%opts,
+                        "user|u=s","password|p=s",
+                        "proxy=s",
+                        "proxy-user=s","proxy-password=s",
+                        "config=s",
+                        "version!",
+                        "color=s",
+                        "option|opts|o=s%",
+                        "target|t=s","target-user=s","target-password=s",
+                        "help|h!" => sub { &Getopt::Long::HelpMessage() }
+                       );
+
+my $server = shift;
+
+if ($opts{version}) {
+    print "j4psh ",$JMX::Jmx4Perl::VERSION,"\n";
+    exit(0);
+}
+
+# Parse configuration files
+my $j4p_config = new JMX::Jmx4Perl::Config($opts{config});
+
+# Create global context object
+my $j4psh = new JMX::Jmx4Perl::J4psh(initial_server => $server,config => $j4p_config,args => \%opts);
+
+# Let the shell run
+$j4psh->run;
+
+=head1 LICENSE
+
+This file is part of jmx4perl.
+
+Jmx4perl is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 2 of the License, or
+(at your option) any later version.
+
+jmx4perl is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with jmx4perl.  If not, see <http://www.gnu.org/licenses/>.
+
+A commercial license is available as well. Please contact roland@cpan.org for
+further details.
+
+=head1 PROFESSIONAL SERVICES
+
+Just in case you need professional support for this module (or Nagios or JMX in
+general), you might want to have a look at
+http://www.consol.com/open-source-monitoring/consulting/. Contact roland.huss@consol.de for
+further information (or use the contact form at http://www.consol.com/contact/)
+
+=head1 AUTHOR
+
+roland@cpan.org
+
+=cut
+
+1;
+
+
+

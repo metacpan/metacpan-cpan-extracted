@@ -1,0 +1,94 @@
+
+#############################################################################
+## $Id: js-app.pod,v 1.1 2006/03/11 15:36:40 spadkins Exp $
+#############################################################################
+
+=head1 NAME
+
+js-app - A framework for building dynamic widgets or full applications in Javascript
+
+=head1 SYNOPSIS
+
+    <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+    <html>
+
+    <head>
+      <title>demo</title>
+      <script type="text/javascript" language="JavaScript">
+        var appOptions = {
+          urlDocRoot    : "/demo",
+          urlScriptRoot : "/cgi-bin/demo",
+          urlDocDir     : "/usr/local/htdocs",
+          urlScriptDir  : "/usr/local/cgi-bin",
+          theme         : "js-app"
+        };
+        var appConf = {
+          global : {
+            js : [
+                "/demo/js-app/lib/Select.js",
+                "/demo/js-app/lib/Date.js"
+            ]
+            // css : [ ]
+          }
+        };
+      </script>
+      <script src="/demo/js-app/init.js" type="text/javascript" language="JavaScript"></script>
+    </head>
+    <body>
+    <form>
+    <h1>JS-App</h1>
+    JS-App is a Javascript Application framework with which you can build
+    rich web applications and widgets embeddable in web pages. 
+    The following are a sampling of the widgets available in JS-App.
+
+    <hr />
+
+    <table border="0" cellspacing="0">
+      <tr>
+        <td>Date</td>
+        <td>
+          <script type="text/javascript">
+            context.widget("date",{ "serviceClass" : "DateWidget", submittable : 1 }).write();
+          </script>
+        </td>
+      </tr>
+      <tr>
+        <td>Fruit</td>
+        <td>
+          <script type="text/javascript">
+            context.widget("fruits", {
+              "serviceClass" : "DualSelectWidget",
+              "values" : [ "apple", "orange", "banana", "grape", "lemon", "lime", "peach" ],
+              "labels" : {
+                "apple"  : "Red Apple",
+                "orange" : "Florida Orange",
+                "banana" : "Chiquita Banana",
+                "grape"  : "Concord Grape",
+                "lemon"  : "Sour Lemon",
+                "lime"   : "Tart Lime",
+                "peach"  : "Georgia Peach"
+              }
+            }).write();
+          </script>
+        </td>
+      </tr>
+    </table>
+    <input type="submit" value="Submit">
+    </form>
+    </body>
+    </html>
+
+=head1 DESCRIPTION
+
+JS-App is a Javascript Application framework with which you can build
+rich web applications and widgets embeddable in web pages. 
+
+=head1 ACKNOWLEDGEMENTS
+
+ * Author:  Stephen Adkins <stephen.adkins@officevision.com>
+ * License: This is free software. The Javascript is licensed under the LGPL.
+
+=head1 SEE ALSO
+
+=cut
+

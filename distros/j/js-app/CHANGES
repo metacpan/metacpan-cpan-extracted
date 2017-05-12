@@ -1,0 +1,13 @@
+#############################################################################
+# CHANGE LOG
+#############################################################################
+
+VERSION 0.13
+ o Added dummy JavaScript::App module to get CPAN to install it properly
+
+VERSION 0.12
+ o Date.js - fixed initialization
+
+VERSION 0.10
+ o initial release
+

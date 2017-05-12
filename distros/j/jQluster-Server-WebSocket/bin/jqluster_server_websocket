@@ -1,0 +1,77 @@
+#!perl
+
+use strict;
+use warnings;
+use Getopt::Long qw(:config no_ignore_case bundling);
+use Plack::Runner;
+use Pod::Usage;
+use jQluster::Server::WebSocket;
+
+my $OPT_HOST = "0.0.0.0";
+my $OPT_PORT = 5000;
+my $OPT_HELP;
+
+GetOptions(
+    "o|host=s" => \$OPT_HOST,
+    "p|port=i" => \$OPT_PORT,
+    "h|help"   => \$OPT_HELP,
+);
+
+if($OPT_HELP) {
+    pod2usage(-verbose => 2, -noperldoc => 1);
+    exit 0;
+}
+
+my $runner = Plack::Runner->new;
+$runner->parse_options(
+    "-s" => "Twiggy",
+    "-o" => $OPT_HOST,
+    "-p" => $OPT_PORT,
+);
+
+$runner->run(jQluster::Server::WebSocket->new(logger => sub {
+    my ($level, $msg) = @_;
+    warn "$level: $msg\n";
+})->to_app);
+ 
+
+__END__
+
+=head1 NAME
+
+jqluster_server_websocket - start a jQluster::Server::WebSocket process
+
+=head1 SYNOPSIS
+
+    jqluster_server_websocket [OPTIONS]
+
+    jqluster_server_websocket --host 127.0.0.1 --port 8080
+
+=head1 DESCRIPTION
+
+This is a simple script to start a L<jQluster::Server::WebSocket> server process.
+
+=head1 OPTIONS
+
+=over
+
+=item -o, --host BIND_ADDRESS (default: 0.0.0.0)
+
+Address or host name the server listens to.
+
+=item -p, --port BIND_PORT (default: 5000)
+
+TCP port number the server listens to.
+
+=item -h, --help
+
+Show this message.
+
+=back
+
+
+=head1 AUTHOR
+
+Toshio Ito C<< <toshioito [at] cpan.org> >>
+
+

@@ -1,0 +1,274 @@
+#!/usr/local/bin/perl -wT
+
+
+#########################################################
+# TODO
+#########################################################
+# o load image from file
+# o load image from URL
+#
+#
+#
+#########################################################
+
+BEGIN {
+    #$ENV{GDFONTPATH} = "/usr/local/fonts";
+    #$ENV{DEFAULT_FONTPATH} = "/usr/local/fonts";
+}
+
+use CGI;
+$cgi = new CGI;
+
+use GD;
+
+#########################################################
+# CREATE THE IMAGE
+#########################################################
+my $file = $cgi->param("background");
+if ($file) {
+    $im = new GD::Image($file);
+    $type = $cgi->param("type");
+    if (!$type) {
+        $type = ($file =~ /\.([a-z]+)$/i) ? lc($1) : "png";
+    }
+    $type = "png" if (!$type || $type ne "jpeg");
+    ($width,$height) = $im->getBounds()
+}
+else {
+    $type = $cgi->param("type");
+    $type = "png" if (!$type || $type ne "jpeg");
+
+    $height = $cgi->param("height");
+    $height = 19 if (!$height);
+
+    $width = $cgi->param("width");
+    $width = 85 if (!$width);
+
+    $im = new GD::Image($width,$height);
+}
+
+#########################################################
+# ALLOCATE COLORS ON DEMAND
+#########################################################
+$numcolors = 0;    # number of colors allocated so far
+%colorvalue = (
+    "white"   => "#ffffff",
+    "black"   => "#000000",
+    "red"     => "#ff0000",
+    "blue"    => "#0000ff",
+    "green"   => "#00ff00",
+    "magenta" => "#ff00ff",
+    "cyan"    => "#00ffff",
+    "yellow"  => "#ffff00",
+);
+%color = ();
+$current_color = undef;  # current color
+%hexvalue = (
+    '0' => 0, '1' => 1, '2' => 2,  '3' => 3,  '4' => 4,  '5' => 5,  '6' => 6,  '7' => 7,
+    '8' => 8, '9' => 9, 'a' => 10, 'b' => 11, 'c' => 12, 'd' => 13, 'e' => 14, 'f' => 15,
+);
+
+sub color {
+    my ($colortext) = @_;
+    my ($color, $r, $g, $b);
+    if ($colortext =~ /^#?([0-9A-Fa-f]{2})([0-9A-Fa-f]{2})([0-9A-Fa-f]{2})$/) {  # an RGB triple (i.e. #cc9999)
+        $color = $color{$colortext};
+        if (! defined $color) {
+            $r = lc($1);
+            $g = lc($2);
+            $b = lc($3);
+            $r = $hexvalue{substr($r,0,1)} * 16 + $hexvalue{substr($r,1,1)};
+            $g = $hexvalue{substr($g,0,1)} * 16 + $hexvalue{substr($g,1,1)};
+            $b = $hexvalue{substr($b,0,1)} * 16 + $hexvalue{substr($b,1,1)};
+            $color = $im->colorAllocate($r,$g,$b);
+            $color{$colortext} = $color;
+            $current_color     = $color;
+            $numcolors++;
+        }
+    }
+    elsif ($colortext =~ /^[0-9]+$/) {      # a colormap index (i.e. 0)
+        $color = $color{$colortext};
+        if (! defined $color) {
+            $color = $current_color;
+        }
+    }
+    else {                                  # a color name (i.e. "white")
+        $color = $color{$colortext};
+        if (! defined $color) {
+            if (defined $colorvalue{$colortext}) {
+                $color = &color($colorvalue{$colortext});
+                $color{$colortext} = $color;
+            }
+            else {
+                $color = $current_color;
+            }
+        }
+    }
+    if (! defined $color) {
+        if ($numcolors >= 2) {
+            $color = &color(1);
+        }
+        elsif ($numcolors == 1) {
+            $color = &color("#000000");
+        }
+        else {
+            $color = &color("#ffffff");
+        }
+    }
+    $color;
+}
+
+#########################################################
+# COLORMAP INITIALIZATION
+#########################################################
+
+$colormap = $cgi->param("colormap") || "";
+if ($colormap eq "basic") {
+    foreach $colortext ("white", "black", "red", "green", "blue", "cyan", "magenta", "yellow") {
+        &color($colortext);
+    }
+}
+
+$bgcolor = $cgi->param("bgcolor") || "#cccccc";
+&color($bgcolor);   # make sure the bgcolor is in the color map
+
+#########################################################
+# SET OPTIONAL ATTRIBUTES
+#########################################################
+$transparent = $cgi->param("transparent");
+if (defined $transparent && $transparent ne "" && defined $color{$transparent}) {
+    $im->transparent($color{$transparent});
+}
+
+$interlaced = $cgi->param("interlaced");
+if ($interlaced) {
+    $im->interlaced('true');
+}
+
+#########################################################
+# DRAW LINES
+#########################################################
+
+$text = $cgi->param("text");
+$text = "Submit" if (! defined $text);
+
+$bevel = $cgi->param("bevel");
+$bevel = "2" if (! defined $bevel);
+
+$mode = $cgi->param("mode") || ($file ? "image" : "button");
+
+$fontsize = $cgi->param("fontsize");
+$fontsize = 8 if (! defined $fontsize);
+$fontsize = 1 if ($fontsize <= 0);
+
+$fontcolor = $cgi->param("fontcolor");
+$fontcolor = "#000000" if (! defined $fontcolor);
+
+$fontname = $cgi->param("fontname");
+$fontname = "builtin" if (! defined $fontname);
+
+@builtin_font = (
+    gdTinyFont,       gdTinyFont,       gdTinyFont,       gdTinyFont,       gdTinyFont,       #  0- 4
+    gdSmallFont,      gdSmallFont,      gdSmallFont,      gdSmallFont,                        #  5- 8
+    gdMediumBoldFont, gdMediumBoldFont, gdMediumBoldFont, gdMediumBoldFont,                   #  9-12
+    gdLargeFont,      gdLargeFont,      gdLargeFont,      gdLargeFont,                        # 13-16
+    gdGiantFont,      gdGiantFont,      gdGiantFont,      gdGiantFont,                        # 17-20
+);
+
+if ($mode eq "button") {
+    $im->fill(0,0,&color($bgcolor));
+
+    $im->line(0       ,0        ,$width-1,0        ,&color("#ffffff"));  # top
+    $im->line(0       ,0        ,0       ,$height-1,&color("#ffffff"));  # left
+    $im->line(0       ,$height-1,$width-1,$height-1,&color("#888888"));  # bottom
+    $im->line($width-1,0        ,$width-1,$height-1,&color("#888888"));  # right
+
+    if ($bevel > 1) {
+        $im->line(1       ,1        ,$width-2,1        ,&color("#dddddd"));  # top
+        $im->line(1       ,1        ,1       ,$height-2,&color("#dddddd"));  # left
+        $im->line(1       ,$height-2,$width-2,$height-2,&color("#aaaaaa"));  # bottom
+        $im->line($width-2,1        ,$width-2,$height-2,&color("#aaaaaa"));  # right
+    }
+}
+elsif ($mode eq "tab") {
+    $im->fill(0,0,&color($bgcolor));
+    my $selected = $cgi->param("selected");
+    my $corner = $cgi->param("corner");
+    $corner = 6 if (!defined $corner);
+
+    # Black Outline
+    $im->line($corner+1      ,1        ,$width-$corner,1        ,&color("#000000"));  # top
+    $im->line($corner        ,1        ,0             ,$corner+1,&color("#000000"));  # top-left corner
+    $im->line(0              ,$height-3,0             ,$corner+1,&color("#000000"));  # left
+    $im->line($width-$corner ,1        ,$width-1      ,$corner  ,&color("#000000"));  # top-right corner
+
+    # White inscribed line
+    $im->line($corner+1      ,2        ,$width-$corner,2        ,&color("#ffffff"));  # top
+    $im->line($corner+1      ,2        ,1             ,$corner+1,&color("#ffffff"));  # top-left corner
+    $im->line(1              ,$height-1,1             ,$corner+1,&color("#ffffff"));  # left
+    $im->line(0              ,$height-1,0             ,$height-2,&color("#ffffff"));  # bottom left
+    $im->line($width-1       ,$height-1,$width-1      ,$height-2,&color("#ffffff"));  # bottom left
+
+    # Gray shadow
+    $im->line($width-$corner ,2        ,$width-1      ,$corner+1,&color("#888888"));  # top-right corner
+    $im->line($width-1       ,$corner+1,$width-1      ,$height-3,&color("#888888"));  # right
+
+    if ($selected) {
+        $fontsize += 2;
+    }
+    else {
+        $im->line(0              ,$height-1,$width-1      ,$height-1,&color("#ffffff"));  # bottom
+        $im->line(0              ,$height-2,$width-1      ,$height-2,&color("#ffffff"));  # bottom
+        $im->line(0              ,$height-3,$width-1      ,$height-3,&color("#000000"));  # bottom line
+    }
+}
+
+if (defined $fontname && $fontname ne "" && $fontname ne "builtin") {
+    $fontfile = lc($fontname);
+    $fontfile .= ".ttf" if ($fontfile !~ /\.ttf$/);
+    $fontfile = "/usr/local/fonts/$fontfile";
+    @bounds = GD::Image->stringTTF(0,$fontfile,$fontsize,0,1,1,$text);
+    if ($#bounds == 7) {
+        $stringheight = $bounds[5] - $bounds[3];
+        $stringwidth = $bounds[2] - $bounds[0];
+        $x = int(($width - $stringwidth)/2);
+        $y = int(($height - $stringheight)/2);
+        $im->stringTTF(&color($fontcolor),$fontfile,$fontsize,0,$x,$y,$text);
+    }
+    else {
+        $im->string(gdSmallFont,5,5,$@ . ": $fontfile",&color($fontcolor));
+    }
+}
+else {
+    $fontsize = $#builtin_font if ($fontsize > $#builtin_font);
+    $font = $builtin_font[$fontsize];
+    $fontheight = $font->height;
+    $fontwidth = $font->width;
+    $x = int(($width - $fontwidth*length($text))/2);
+    $y = int(($height - $fontheight + 1)/2);
+    $im->string($font,$x,$y,$text,&color($fontcolor));
+}
+
+binmode STDOUT;   # make sure we are writing to a binary stream
+
+$method = $cgi->request_method();
+
+if ($method) {
+    # use this line during development (otherwise the browser will cache your image)
+    #print $cgi->header(-type=>"image/$type");
+    print $cgi->header(-type=>"image/$type", -expires=>'+1d', -Last_modified => 'Sun, 06 Jan 1980 00:00:00 GMT');
+}
+
+if (!$method || $method ne "HEAD") {
+    if ($type eq "jpeg") {
+        $quality = $cgi->param("quality");
+        $quality = 100 if (!defined $quality || $quality !~ /^[0-9]+$/);
+        $quality = 0 if ($quality < 0);
+        $quality = 100 if ($quality > 100);
+        print $im->jpeg($quality);
+    }
+    else {
+        print $im->png;
+    }
+}
+

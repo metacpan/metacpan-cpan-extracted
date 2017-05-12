@@ -1,0 +1,58 @@
+######################################################################
+# TODO
+######################################################################
+
+ x convert vars to internal caps
+ x separate init.js code from app.js code
+
+TASKS - These items are what will be required to get to Version 1.0
+ o add graphs
+ o add Ajax calls
+ o separate app.conf from app.pl (deploy config vs. devel config)
+ o init.js:AppInit() - detect if application config/css not loaded
+   and determine which ones should be loaded
+ o basic button object (based on <a> tag)
+ o basic select object (based on <select> tag)
+ o get themes to work/allow theme switching
+ o authentication (login)
+ o detect lang properly
+ o user settings (lang/theme)
+ o New Service: ValueDomain
+ o New Service: Repository
+ o BIG - compatibility selection logic
+ o BIG - JS/CSS import manager
+ o BIG - image theme-izer
+ o BIG - template engine(s)
+
+PROJECTS - These things need a volunteer to pursue
+ o a cross-browser compatibility test application and database
+ o a regression test suite
+ o large theme suite
+
+######################################################################
+# KEY OBJECTS TO LEARN ABOUT
+######################################################################
+
+ x window
+ x navigator
+ x screen
+ x [window.]document
+
+ o [window.]userProfile
+ o [window.]history
+ o [window.]location
+
+ o XMLHttpRequest
+ o <iframe>
+ o <layer>
+
+ o Array
+ o Boolean
+ o Date
+ o Function
+ o Math
+ o Number
+ o Object
+ o RegExp
+ o String
+

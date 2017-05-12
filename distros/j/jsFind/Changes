@@ -1,0 +1,347 @@
+------------------------------------------------------------------------
+r38 | dpavlin | 2004-10-31 02:34:01 +0100 (Sun, 31 Oct 2004) | 2 lines
+Changed paths:
+   M /trunk/MANIFEST
+
+update of MANIFEST before release
+
+------------------------------------------------------------------------
+r37 | dpavlin | 2004-10-30 23:48:31 +0200 (Sat, 30 Oct 2004) | 9 lines
+Changed paths:
+   M /trunk/t/10homer.t
+
+homer test can now index any text file supplied as first (and only) argument
+in command line. This is useful to generate test data from other sources.
+I don't recommend input files which are not plain 7-bit ASCII, because
+generated JavaScript array might have wrong encoding for 8-bit characters.
+This is serious problem. However, since JavaScript comparison and sort order
+are locale dependent, it's much easier to use something like Text::Unaccent
+on input data than to fix sort/comparison order (which could also be done,
+see my js_locale project)
+
+------------------------------------------------------------------------
+r36 | dpavlin | 2004-10-30 22:50:39 +0200 (Sat, 30 Oct 2004) | 5 lines
+Changed paths:
+   M /trunk/html/js/search.js
+   M /trunk/jsFind.pm
+   D /trunk/t/06base62.t
+   A /trunk/t/06base_x.t (from /trunk/t/06base62.t:35)
+   M /trunk/t/10homer.t
+
+remove all capital letters from base62 encoding which made it base 36 I
+guess. They are not supported under Windows (because filesystem is case
+preserving, you can burn files with capital and lower letters, but browser
+will read wrong one)
+
+------------------------------------------------------------------------
+r35 | dpavlin | 2004-10-24 13:13:22 +0200 (Sun, 24 Oct 2004) | 3 lines
+Changed paths:
+   M /trunk/jsFind.pm
+   M /trunk/t/03insert.t
+   M /trunk/t/04words.t
+   M /trunk/t/05entities.t
+   M /trunk/t/10homer.t
+
+new version 0.06 with API change on to_jsfind.
+It also documents (still unimplemented) output_filter option.
+
+------------------------------------------------------------------------
+r34 | dpavlin | 2004-10-10 07:11:29 +0200 (Sun, 10 Oct 2004) | 2 lines
+Changed paths:
+   D /trunk/Changes
+   M /trunk/MANIFEST
+   A /trunk/MANIFEST.SKIP
+   M /trunk/Makefile.PL
+   M /trunk/README
+
+last changes before packaging 0.05
+
+------------------------------------------------------------------------
+r33 | dpavlin | 2004-10-10 07:10:25 +0200 (Sun, 10 Oct 2004) | 2 lines
+Changed paths:
+   M /trunk/jsFind.pm
+
+Version 0.05: much better documentation, no API change
+
+------------------------------------------------------------------------
+r32 | dpavlin | 2004-10-10 07:07:37 +0200 (Sun, 10 Oct 2004) | 2 lines
+Changed paths:
+   M /trunk/html/search.html
+
+create debug box on bottom of page
+
+------------------------------------------------------------------------
+r31 | dpavlin | 2004-10-10 06:53:22 +0200 (Sun, 10 Oct 2004) | 2 lines
+Changed paths:
+   M /trunk/html/js/search.js
+   M /trunk/html/js/usage.js
+
+experimental iframe implementation (mostly for Opera 7.54 without Java)
+
+------------------------------------------------------------------------
+r30 | dpavlin | 2004-10-10 03:19:36 +0200 (Sun, 10 Oct 2004) | 2 lines
+Changed paths:
+   M /trunk/html/search.html
+
+make XHTML 1.0 strict
+
+------------------------------------------------------------------------
+r29 | dpavlin | 2004-10-08 14:22:18 +0200 (Fri, 08 Oct 2004) | 2 lines
+Changed paths:
+   M /trunk/html/test.html
+
+generate color report, simplify code
+
+------------------------------------------------------------------------
+r28 | dpavlin | 2004-10-08 00:47:39 +0200 (Fri, 08 Oct 2004) | 2 lines
+Changed paths:
+   M /trunk/t/10homer.t
+
+create additional homer_freq.txt debug file
+
+------------------------------------------------------------------------
+r27 | dpavlin | 2004-10-08 00:43:49 +0200 (Fri, 08 Oct 2004) | 4 lines
+Changed paths:
+   M /trunk/html/test.html
+
+re-wrote test to create output with document.createElement, much better
+output, print just failed tests and some statistics (more verbose output of
+correct tests can be turned on by uncommenting one line)
+
+------------------------------------------------------------------------
+r26 | dpavlin | 2004-10-08 00:41:16 +0200 (Fri, 08 Oct 2004) | 2 lines
+Changed paths:
+   M /trunk/html/js/search.js
+
+create debug with appendChild, great speedup for test
+
+------------------------------------------------------------------------
+r25 | dpavlin | 2004-10-07 19:30:03 +0200 (Thu, 07 Oct 2004) | 3 lines
+Changed paths:
+   M /trunk/html/search.html
+   M /trunk/html/test.html
+   M /trunk/t/10homer.t
+
+create elements in test.html (instead of updating innerHTML), 10homer.t will
+now split document in lines instead of paragraphs.
+
+------------------------------------------------------------------------
+r24 | dpavlin | 2004-10-07 18:26:31 +0200 (Thu, 07 Oct 2004) | 2 lines
+Changed paths:
+   M /trunk/MANIFEST
+   M /trunk/Makefile.PL
+
+fix MANIFEST, better clean
+
+------------------------------------------------------------------------
+r23 | dpavlin | 2004-10-07 18:21:54 +0200 (Thu, 07 Oct 2004) | 5 lines
+Changed paths:
+   M /trunk/t/03insert.t
+   M /trunk/t/04words.t
+   M /trunk/t/05entities.t
+   D /trunk/t/10homer.pl
+   A /trunk/t/10homer.t (from /trunk/t/10homer.pl:22)
+
+convert all print STDERR to diag, rename homer test to end with .t (woops),
+create homer_words.txt and homer_text.txt, preserve order when inserting
+into index (it doesn't really matter for index, but it's nice to have
+debugging output which is correct)
+
+------------------------------------------------------------------------
+r22 | dpavlin | 2004-10-06 17:39:56 +0200 (Wed, 06 Oct 2004) | 2 lines
+Changed paths:
+   M /trunk/MANIFEST
+
+added Homer to manifest
+
+------------------------------------------------------------------------
+r21 | dpavlin | 2004-10-06 17:33:33 +0200 (Wed, 06 Oct 2004) | 2 lines
+Changed paths:
+   M /trunk/html/test.html
+   A /trunk/t/10homer.pl (from /trunk/t/10ulyss.pl:20)
+   D /trunk/t/10ulyss.pl
+   A /trunk/t/homer.txt
+
+added Homer's The Odyssey as test data
+
+------------------------------------------------------------------------
+r20 | dpavlin | 2004-10-04 21:51:05 +0200 (Mon, 04 Oct 2004) | 2 lines
+Changed paths:
+   A /trunk/html/test.html
+   A /trunk/t/10ulyss.pl
+
+start of tests for jsFind
+
+------------------------------------------------------------------------
+r19 | dpavlin | 2004-10-03 23:26:37 +0200 (Sun, 03 Oct 2004) | 3 lines
+Changed paths:
+   M /trunk/html/js/usage.js
+
+added try{} around header.replaceData which doesn't exists in IE5.5,
+better scope header variable, Robert Avilov re-wrote form handler (thanks).
+
+------------------------------------------------------------------------
+r18 | dpavlin | 2004-10-03 23:24:57 +0200 (Sun, 03 Oct 2004) | 4 lines
+Changed paths:
+   M /trunk/html/js/search.js
+   M /trunk/html/search.html
+
+re-wrote debug function to prevent Internet Explorer from returning
+"operation aborted", move xmldoc to outer scope to prevent garbage
+collector dereferencing it before XML loads (SeaMonkey/FireFox).
+
+------------------------------------------------------------------------
+r17 | dpavlin | 2004-09-13 16:36:06 +0200 (Mon, 13 Sep 2004) | 2 lines
+Changed paths:
+   M /trunk/t/99pod.t
+
+check if Test::Pod exists before testing
+
+------------------------------------------------------------------------
+r16 | dpavlin | 2004-09-05 20:00:46 +0200 (Sun, 05 Sep 2004) | 2 lines
+Changed paths:
+   M /trunk/MANIFEST
+   A /trunk/t/06base62.t
+
+added forgot base62 test
+
+------------------------------------------------------------------------
+r15 | dpavlin | 2004-09-05 19:57:21 +0200 (Sun, 05 Sep 2004) | 3 lines
+Changed paths:
+   M /trunk/Makefile.PL
+   M /trunk/jsFind.pm
+   M /trunk/t/04words.t
+
+version 0.04: fix bug when creating jsFind index files without first
+encoding numbers in base62
+
+------------------------------------------------------------------------
+r14 | dpavlin | 2004-08-28 17:19:22 +0200 (Sat, 28 Aug 2004) | 2 lines
+Changed paths:
+   M /trunk/Makefile.PL
+   M /trunk/README
+   M /trunk/jsFind.pm
+
+final touches before first release to CPAN
+
+------------------------------------------------------------------------
+r13 | dpavlin | 2004-08-28 16:37:13 +0200 (Sat, 28 Aug 2004) | 2 lines
+Changed paths:
+   M /trunk/MANIFEST
+
+updated manifest
+
+------------------------------------------------------------------------
+r12 | dpavlin | 2004-08-28 16:31:58 +0200 (Sat, 28 Aug 2004) | 2 lines
+Changed paths:
+   M /trunk/Makefile.PL
+   M /trunk/jsFind.pm
+
+documentation improvements
+
+------------------------------------------------------------------------
+r11 | dpavlin | 2004-07-26 22:30:12 +0200 (Mon, 26 Jul 2004) | 3 lines
+Changed paths:
+   M /trunk/jsFind.pm
+   A /trunk/t/05entities.t
+
+to_jsfind will try to decode entities from data, and recode then to
+target encoding (UTF-8 by default)
+
+------------------------------------------------------------------------
+r10 | dpavlin | 2004-07-26 22:17:57 +0200 (Mon, 26 Jul 2004) | 2 lines
+Changed paths:
+   A /trunk/t/90xmllint.t
+
+xmllint test for produces jsFind index files
+
+------------------------------------------------------------------------
+r9 | dpavlin | 2004-07-22 01:37:49 +0200 (Thu, 22 Jul 2004) | 3 lines
+Changed paths:
+   M /trunk/jsFind.pm
+
+Version 0.02: API extension: to_jsfind now accepts also data and xml
+encoding as optional parametars
+
+------------------------------------------------------------------------
+r8 | dpavlin | 2004-07-21 17:44:15 +0200 (Wed, 21 Jul 2004) | 2 lines
+Changed paths:
+   M /trunk/jsFind.pm
+
+more fixes
+
+------------------------------------------------------------------------
+r7 | dpavlin | 2004-07-21 17:34:03 +0200 (Wed, 21 Jul 2004) | 2 lines
+Changed paths:
+   M /trunk/jsFind.pm
+
+documentaton fix and better info message
+
+------------------------------------------------------------------------
+r6 | dpavlin | 2004-07-20 19:59:47 +0200 (Tue, 20 Jul 2004) | 2 lines
+Changed paths:
+   M /trunk/html/js/usage.js
+   M /trunk/html/search.html
+
+cleanup and fix
+
+------------------------------------------------------------------------
+r5 | dpavlin | 2004-07-20 19:47:30 +0200 (Tue, 20 Jul 2004) | 2 lines
+Changed paths:
+   M /trunk/MANIFEST
+   M /trunk/jsFind.pm
+
+B_search documentation, updated MANIFEST
+
+------------------------------------------------------------------------
+r4 | dpavlin | 2004-07-20 19:08:06 +0200 (Tue, 20 Jul 2004) | 3 lines
+Changed paths:
+   M /trunk/html/js/getargs.js
+   M /trunk/html/js/search.js
+   M /trunk/html/js/usage.js
+   M /trunk/html/search.html
+   M /trunk/t/03insert.t
+   M /trunk/t/04words.t
+
+support for searching more than one index from same page (using index_name
+variable which is actually a name of directory in which index is located)
+
+------------------------------------------------------------------------
+r3 | dpavlin | 2004-07-20 19:07:20 +0200 (Tue, 20 Jul 2004) | 2 lines
+Changed paths:
+   M /trunk/Makefile.PL
+
+make html documentation with "make html"
+
+------------------------------------------------------------------------
+r2 | dpavlin | 2004-07-11 23:15:44 +0200 (Sun, 11 Jul 2004) | 2 lines
+Changed paths:
+   M /trunk/html/js/search.js
+
+print "Noting Found" in all cases (especially on W2K, don't know why)
+
+------------------------------------------------------------------------
+r1 | dpavlin | 2004-07-11 22:18:25 +0200 (Sun, 11 Jul 2004) | 2 lines
+Changed paths:
+   A /trunk
+   A /trunk/Changes
+   A /trunk/MANIFEST
+   A /trunk/Makefile.PL
+   A /trunk/README
+   A /trunk/html
+   A /trunk/html/js
+   A /trunk/html/js/getargs.js
+   A /trunk/html/js/search.js
+   A /trunk/html/js/usage.js
+   A /trunk/html/search.html
+   A /trunk/jsFind.pm
+   A /trunk/t
+   A /trunk/t/01load.t
+   A /trunk/t/02btree.t
+   A /trunk/t/03insert.t
+   A /trunk/t/04words.t
+   A /trunk/t/99pod.t
+
+initial import into subversion of version 0.1
+
+------------------------------------------------------------------------

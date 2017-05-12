@@ -1,0 +1,12 @@
+0.03 Monday February 23 13:40:22 PST 2009:
+ - Non-developer release
+
+0.02_1 Saturday February 21 13:34:02 PST 2009:
+ - Moved out of JS::jQuery::Loader namespace
+
+0.02 Thursday June 05 21:07:25 PDT 2008:
+ - jQuery version bump to 1.2
+ - Now using Google's AJAX Libraries API as the Internet source
+
+0.01 Saturday May 03 19:13:05 PDT 2008:
+ - Intial release

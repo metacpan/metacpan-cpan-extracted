@@ -1,0 +1,31 @@
+---
+abstract: 'Load (and cache) the jQuery JavaScript library'
+author:
+  - 'Robert Krimen, C<< <rkrimen at cpan.org> >>'
+build_requires:
+  Directory::Scratch: 0
+  Test::Most: 0
+distribution_type: module
+generated_by: 'Module::Install version 0.79'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: jQuery-Loader
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Carp::Clan::Share: 0
+  File::Copy: 0
+  HTML::Declare: 0
+  LWP::UserAgent: 0
+  Moose: 0
+  Path::Abstract: 0
+  Path::Class: 0
+  URI: 0
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: http://github.com/robertkrimen/jquery-loader/tree/master
+version: 0.03

@@ -1,0 +1,779 @@
+#!/usr/bin/perl
+
+=head1 NAME
+
+jmx4perl - JMX access tools and modules
+
+=cut
+
+use Getopt::Long;
+use FindBin;
+use JMX::Jmx4Perl;
+use JMX::Jmx4Perl::Util;
+use JMX::Jmx4Perl::Request;
+use JMX::Jmx4Perl::Alias;
+use strict;
+use Carp;
+use JSON;
+use Data::Dumper;
+my %COMMANDS = 
+  (
+   info => \&command_info,
+   list => \&command_list,
+   attributes => \&command_attributes,
+   read => \&command_read,
+   get => \&command_read,
+   write => \&command_write,
+   set => \&command_write,
+   exec => \&command_exec,
+   call => \&command_exec,
+   search => \&command_search,
+   version => \&command_version
+);
+
+my %opts = ();
+my $result = GetOptions(\%opts,
+                        "user|u=s","password|p=s",
+                        "proxy=s",
+                        "proxy-user=s","proxy-password=s",
+                        "target|t=s","target-user=s","target-password=s",
+                        "product=s",
+                        "config=s",
+                        "method=s",
+                        "verbose|v!",
+                        "shell|s=s",
+                        "version!",
+                        "history!",
+                        "legacy-escape!",
+                        "option|opts|o=s%",
+                        "help|h!" => sub { Getopt::Long::HelpMessage() }
+                       );
+
+
+my $url;
+my $command;
+my @args;
+
+if (lc $ARGV[0] eq "aliases") {
+    command_aliases();
+    exit(0);
+} elsif (lc $ARGV[0] eq "encrypt") {
+    command_encrypt($ARGV[1]);
+    exit(0);
+} elsif (@ARGV == 1) {
+    $command = "info";
+    $url = $ARGV[0];
+} else {
+    $url = shift @ARGV;
+    $command = lc shift @ARGV;
+    @args = ( @ARGV );
+}
+
+if ($opts{version}) {
+    if ($url) {
+        $command = "version";
+    } else {
+        print "jmx4perl ",$JMX::Jmx4Perl::VERSION,"\n";
+        exit(0);
+    }
+}
+
+my $sub = $COMMANDS{$command} || die "No command '",$command,"' known. See --help for assistance\n";
+my $config = new JMX::Jmx4Perl::Config($opts{config});
+my $jmx_args = &_get_args_for_jmx4perl($url,$config,\%opts);
+my $jmx4perl = new JMX::Jmx4Perl($jmx_args);
+&{$sub}($jmx4perl,@args);
+
+=head1 SYNOPSIS
+
+  jmx4perl .... http://server:8080/jolokia ["info"] 
+
+  jmx4perl .... <agent-url> read <mbean-name> <attribute-name> [path] 
+
+  jmx4perl .... <agent-url> write <mbean-name> <attribute-name> <value> [path]
+
+  jmx4perl .... <agent-url> exec <mbean-name> <operation> <arg1> <arg2> ...
+
+  jmx4perl .... <agent-url> search <mbean pattern>
+
+  jmx4perl .... <agent-url> list [<domain-name>[:<mbean name>]]
+
+  jmx4perl .... <agent-url> attributes [max-depth max-list-size max-objects] 
+
+  jmx4perl .... aliases
+
+  jmx4perl .... encrypt <password>
+
+  jmx4perl --help
+
+  jmx4perl --version [<agent-url>]
+
+Options:
+
+   --product <id>          Product to use for aliasing (ommits autodetection)
+   --user <user>           Credential used for authentication   
+   --password <pwd>  
+   --proxy <url>           URL to proxy
+   --proxy-user <user>     Authentication information for a proxy
+   --proxy-password <pwd>
+   --target <jmx-url>      JSR-160 JMX Service URL to be used as the target server
+   --target-user <user>    Credential for the target server if --target is given
+   --target-password <pwd> 
+   --config <cfg>          Path to an optional configuration file (default: ~/.j4p). Can be a directory
+                           in which case <dir>/jmx4perl.cfg is used.
+   --history               Print out the history of return values (if switched on and present)
+   --legacy-escape         Used for contacting pre 1.0 Jolokia agent for MBeans containing 
+                           slashes in their name.
+   --method <get|post>     Method to be used for HTTP request ("get" or "post")
+   --option key=val        Options for tuning the output of jmx4perl. Known keys are
+                              format   : Either 'json' or 'data'
+                              booleans : Pair of strings separated by slash to use for printing 
+                                         boolean values (Default: [true]/[false])
+                              indent   : Space indent when printing complex data structures 
+   --verbose               Print out more information
+   
+=head1 DESCRIPTION
+
+B<jmx4perl> is a command line utility for an easy access of an instrumented
+application server. Before you can use this tool, you need to deploy a small
+agent application. In the following C<agent-url> is the URL for accessing this
+agent. If you use a configuration file, you can use also a symbolic name as
+stored in the configuration file. See L<JMX::Jmx4Perl::Manual> for details.
+
+With the C<--option> (or C<-o> for short) the output of B<jmx4perl> can be
+tuned. I.e. the way boolean values are printed can be tuned as well as the 
+data format to use for complex data structure. The known options are 
+
+=over 
+
+=item format 
+
+the value an be either C<json> or <data> for printing out complex data as JSON
+or as a Perl data structure. Default is "data".
+
+=item booleans
+
+Specify the pair of strings to use for boolean values for the C<data> output
+format. The value of this option should be given as a string separated with a
+C</>. The default value is C<[true]/[false]>. 
+
+=item method
+
+Specify the HTTP method to use for requesting the server. This can either be
+C<get> or C<post>. By default "get" is used.
+
+=item legacy-escape
+
+Prior to version 1.0 Jolokia used a different escaping scheme for GET requests
+which contains slashes. This option must be used, when the server-side agent
+has a version < 1.0 and the MBean name contains slashes ("/"). Alternatively,
+C<--method post> can be used, since the post method doesn't suffer from any
+escaping issues.
+
+=item indent
+
+Number of spaces to use for indenting the output of complex data
+structures. Default are 4 spaces. 
+
+=back
+
+The options can be also put into the configuration file in a section called
+C<Jmx4Perl>. For example:
+
+    <Jmx4Perl>
+      # 'json' or 'data'
+      Format json
+ 
+      # Boolean values: Default is [true]/[false]
+      Booleans 0/1
+
+      # Number of spaces to indent for complex 
+      # data structures
+      Indent 4
+    </Jmx4Perl>
+
+B<jmx4perl> serves also an example of how to use the L<JMX::Jmx4Perl> package.
+See its documentation for more details on how to embed JMX access into your
+programs. 
+
+=cut
+
+# =================================================================================================== 
+# Commands:
+
+=head1 COMMANDS
+
+=head2 info
+
+If you use jmx4perl without any command or with C<info> as command, you get a
+description about the server, including the application server's product name
+and version. This works by autodetection and only for the supported application
+servers (see L<JMX::Jmx4Perl::Manual> for a list of supported products). The
+only argument required is the url which points to the deployed jmx4perl agent.
+
+With C<--verbose> C<info> prints the system properties and runtime arguments as
+well. 
+
+=cut 
+
+sub command_info {
+    my $jmx = shift;
+    print $jmx->info($opts{verbose});
+}
+
+=head2 list
+
+
+List meta data of all registered mbeans on the target application server. This
+includes attributes and operations along whith their descriptions and
+parameters (as far as they are provided by mbean's info).
+
+You can provide an inner path as an additional argument as well. See
+L<JMX::Jmx4Perl::Request> for an explanation about inner paths (in short, it's
+some sort of XPath expression which selects only a subset of all MBeans and
+their values). See L<JMX::Jmx4Perl>, method "list()" for a more rigorous
+documentation abouting listing of MBeans.
+
+=cut
+
+sub command_list {
+    my ($jmx,$path) = @_;
+    $path =~ s|:|/|;
+    my $req = JMX::Jmx4Perl::Request->new(LIST,$path);
+    my $resp = $jmx->request($req);
+    &_check_for_error($resp);
+
+    # Show list of beans
+    print $jmx->formatted_list($resp);       
+}
+
+=head2 attributes 
+
+Show all attributes of all registerd mbeans and their values. For simple scalar
+values they are shown on one line, for more complex data structures,
+L<Data::Dumper> is used. Please note, that it is normal, that for certain
+attributes an error is returned (i.e. when this attribute is not implemented on
+the server side e.g. or an MXMbean). To see the full server side stacktrace for
+this errors, use C<--verbose> as command line option
+
+The attribute list can get quite large (moren than 200 MB for JBoss 5). To
+restrict the output you can use the following extra optional parameters (given
+in this order):
+
+=over
+
+=item maxDepth
+
+Maximum nesting level of the returned JSON structure for a certain MBean
+(default: 5)
+
+=item maxCollectionSize
+
+Maximum size of a collection after which it gets truncated (default: 150)
+
+=item maxObjects
+
+Maximum overall objects to fetch for a certain MBean (default: 1000)
+
+=back
+
+In the case of truncation, the JSON answer contains marker entries like
+C<[Object limit exceeded]> or C<[Depth limit ...]>. Loops are detected, too
+which results in markers of the form C<[Reference ...]>
+
+=cut
+
+sub command_attributes {
+    my $jmx = shift;
+    my $max_depth = defined($_[0]) ? $_[0] : 6;
+    my $max_list_size = defined($_[1]) ? $_[1] : 150;
+    my $max_objects = defined($_[2]) ? $_[2] : 100000;
+    my $mbeans = $jmx->search("*:*");
+    
+    for my $mbean (@$mbeans) {
+        my $request = JMX::Jmx4Perl::Request->new(READ,$mbean,undef,{maxDepth => $max_depth,
+                                                                     maxObjects => $max_objects,
+                                                                     maxCollectionSize => $max_list_size,
+                                                                     ignoreErrors => 1});        
+        eval {
+            my $response = $jmx->request($request);
+            if ($response->is_error) {                            
+                print "\nERROR: ",$response->error_text,"\n";
+                if ($opts{verbose}) {
+                    if ($response->stacktrace) {
+                        print $response->stacktrace;
+                    } else {
+                        print _dump($response);
+                    }
+                }
+            } else {
+                my $values = $response->value;
+                if (keys %$values) {
+                    for my $a (keys %$values) {
+                        print "$mbean -- $a";
+                        my $val = $values->{$a};
+                        if (_is_object($val)) {
+                            my $v = _dump($val);
+                            $v =~ s/^\s*//;
+                            print " = ",$v;
+                        } else {
+                            print " = ",_dump_scalar($val),"\n";
+                        }
+                    }                                
+                }
+            }
+        };
+        if ($@) {
+            print "\nERROR: ",$@,"\n";
+        }
+    }
+}   
+
+
+=head2 read / get
+
+Read an JMX attribute's value and print it out. The required arguments are the
+MBean's name and the attribute's name. Additionally, you can provide a I<path>
+within the return value to pick a sub-value. See L<JMX::Jmx4Perl::Request> for a
+detailed explanation of paths.
+
+The MBean's name and the attribute can be substituted by an
+alias name, too.
+
+For a single value, the value itself is printed (without additional newline),
+for a more complex data structure, L<Data::Dumper> is used. 
+
+If the option C<--history> is given and history tracking is switched on (see
+below), then the stored history is printed as well.
+
+=cut 
+
+sub command_read {
+    my $resp = &_get_attribute(@_);    
+    &_check_for_error($resp);    
+    &_print_response($resp);
+}
+
+=head2 write / set
+
+Write a JMX attribute's value and print out the value as it is returned from
+the server. The required arguments are the MBean's name, the attribute and the
+value to set. Optionally, a inner path can be provided as well in which case a
+inner value is set. The MBean's name and the attribute can be substituted by an
+alias name, too. See also L</"aliases"> for getting all available aliases.
+
+The old value of the attribute (or the object pointed to by the inner path) is
+printed out in the same as for L</"read">
+
+To set a C<null> value use "[null]" as argument, to set an empty string use an
+empty argument (i.e. C<""> on the command line). These values are interpreted
+special, so you can't use them literally as values.
+
+If the option C<--history> is given and history tracking is switched on (see
+below), then the stored history is printed as well.
+
+=cut
+
+sub command_write {
+    my $resp = &_set_attribute(@_);
+    &_check_for_error($resp);
+    &_print_response($resp);
+}
+
+=head2 exec / call
+
+Execute a JMX operation. The required arguments are the MBean's name, the name
+of the operation to execute and the arguments required for this operations
+(which can be empty if the operation doesn't take any arguments). The return
+value is the return value of the operation which can be C<undef> in the case of
+a void operation.
+
+A operation alias can also be used for the MBean's name and operation.
+
+To use a C<null> argument use "[null]", to set an empty string as argument use
+an empty argument (i.e. C<"">) on the command line. These values are
+interpreted special, so you can't use them literally as values.
+
+For a single return value, the value itself is printed (without additional
+newline), for a more complex data structure, L<Data::Dumper> is used.
+
+If the option C<--history> is given and history tracking is switched on (see
+below), then the stored history is printed as well.
+
+=cut
+
+sub command_exec {
+    my $resp = &_exec_operation(@_);
+    &_check_for_error($resp);
+    &_print_response($resp);    
+}
+
+=head2 aliases 
+
+Print out all known aliases. See L<JMX::Jmx4Perl::Manual> for a discussion
+about aliases. In short, you can use an alias as a shortcut for an MBean's
+and attribute's name.
+
+=cut
+
+sub command_aliases {
+    &JMX::Jmx4Perl::Alias::help;
+}
+
+=head2 search
+
+Search for a certain MBean. As argument you should provide a pattern like
+C<*:j2eeType=Servlet,*>. I.e you can use the wildcard C<*> for the domain
+name part, and properties as a whole (but not within a key=property tuple). See
+L<http://java.sun.com/j2se/1.5.0/docs/api/javax/management/ObjectName.html> for
+a complete explanation of how a pattern can look like. As a result of this
+operation, a list of fully qualified MBean names is printed out line by line
+which match the given pattern. 
+
+=cut
+
+sub command_search {
+    my $resp = &_search_attribute(@_);
+    return if $resp->status == 404;
+    &_check_for_error($resp);
+    my $val = $resp->value;
+    $val = [ $val ] unless ref($val) eq "ARRAY";
+    for my $l (@$val) {
+        print $l,"\n";
+    }
+}
+
+=head2 encrypt 
+
+Encrypt a given password so that it can be stored in its encrypted form in a
+configuration file. Please note, that this is by no means secure and only usual
+to avoid casual discovery of the password. Since jmx4perl acts as a client it
+needs to be able to decrypt the password on its own when contacting the agent,
+so it is a simple symmetric encryptions. The password printed out can be used
+as C<Password> value for HTTP authentication and HTTP proxy authentication in
+configuration files or at the command line.
+
+=cut 
+
+sub command_encrypt {
+    require JMX::Jmx4Perl::Agent;
+    my $val = shift;
+    my $enc = JMX::Jmx4Perl::Agent::encrypt($val);
+    print $enc,"\n";
+}
+
+
+=head1 HISTORY TRACKING
+
+The agent knows about a history mode, which can remember a certain
+amount return values from previous requests. This mode can be switched on/off
+on a per attribute (+ inner path) and operation basis. By default it is
+switched off completely. You can switch in on by executing the
+C<JMX4PERL_HISTORY_MAX_ATTRIBUTE> and C<JMX4PERL_HISTORY_MAX_OPERATION>
+operation with L</"exec"> commands. This is best explained by some example:
+
+ jmx4perl exec JMX4PERL_HISTORY_MAX_ATTRIBUTE java.lang:type=Memory HeapMemoryUsage used 10 <agent-url>
+
+This switches on tracking of this particular attribute. I.e. each time a
+C<read> request is performed, the value is remembered along with a timestamp on
+the server side. At maximum 10 entries are kept, the oldest entries get shifted
+out after the eleventh read. Setting the value to C<0> will remove the history
+completely. You can't set the limit beyond a certain hard limit, which can be
+found as attribute under the alias
+C<JMX4PERL_HISTORY_MAX_ENTRIES>. Unfortunately, one can not use an alias yet
+for the arguments of C<JMX4PERL_HISTORY_MAX_ATTRIBUTE>. Also note, if you don't
+has an inner path, you need to use a C<[null]> as the argument before the max
+entry number.
+
+For completely resetting the history, use
+
+ jmx4perl exec JMX4PERL_HISTORY_RESET <agent-url>
+
+If you are curious about the size of the history for all entries, use 
+
+ jmx4perl read JMX4PERL_HISTORY_SIZE <agent-url>
+
+This will print out the history size in bytes.
+
+=cut
+
+# Command for printing out the version
+sub command_version {
+    my $jmx = shift;
+    
+    print "jmx4perl  ",$JMX::Jmx4Perl::VERSION,"\n";
+    my $resp = $jmx->request(new JMX::Jmx4Perl::Request(AGENT_VERSION));
+    #print Dumper($resp);
+    if ($resp->is_error) {
+        die "Cannot fetch agent version: ",$resp->error_text;
+    }
+    my $val = $resp->{value};
+    print "Jolokia Agent " . $val->{agent} . " (protocol: " . $val->{protocol} . ")\n";
+    exit(0);
+}
+
+# =============================================================================
+
+sub _check_for_error { 
+    my $resp = shift;
+    if ($resp->is_error) {
+        print STDERR "ERROR: ",$resp->error_text,"\n";
+        if ($opts{verbose}) {
+            print STDERR "Content:\n" . $resp->{content} if $resp->{content};
+            if ($resp->stacktrace) {
+                print STDERR "Server Stacktrace:\n";
+                print STDERR $resp->stacktrace;
+            }
+        }
+        exit 1;
+    }
+}
+
+sub _is_object {
+    return JMX::Jmx4Perl::Util->is_object_to_dump(shift);
+}
+
+sub _dump_scalar {
+    return JMX::Jmx4Perl::Util->dump_scalar(shift,_get_opt_or_config("Booleans"));
+}
+
+sub _dump {
+    my $value = shift;
+    my $format = $opts{format} || "data";
+    return JMX::Jmx4Perl::Util->dump_value($value,{format => _get_opt_or_config("Format"),
+                                                   booleans => _get_opt_or_config("Booleans"),
+                                                   indent => _get_opt_or_config("Indent")
+                                                  });
+}
+
+sub _get_opt_or_config {
+    my $key = shift;
+    if (defined($opts{option}) && defined($opts{option}->{lc $key})) {
+        return $opts{option}->{lc $key};
+    } else {
+        my $j4pconfig = $config->{jmx4perl} || {};
+        return $j4pconfig->{lc $key};
+    }
+}
+
+sub _has_tty {
+  return -t STDOUT;
+}
+
+sub _print_response {
+    my $resp = shift;
+    my $val = $resp->value;
+    if (_is_object($val)) {
+        print _dump($val);
+    } else {
+        print _dump_scalar($val);
+        print "\n" if &_has_tty;
+    }
+
+    if ($opts{history} && $resp->history) {
+        print "\nHistory:\n";
+        for my $entry (@{$resp->history}) {
+            my $time = localtime($entry->{timestamp});
+            my $value = $entry->{value};
+            if (_is_object($value)) {
+                print $time,"\n";
+                print _dump($value);
+                print "\n";
+            } else {
+                printf " %s : %s\n",$time,_dump_scalar($value);
+            }
+        }
+    }
+}
+
+sub _get_attribute {
+    my $jmx = shift;
+    my ($mbean,$attribute,$path) = _extract_get_set_parameter($jmx,"get",@_);
+    if (ref($mbean) eq "CODE") {
+        return $jmx->delegate_to_handler($mbean,@args);
+    }
+
+    my $req = new JMX::Jmx4Perl::Request(READ,$mbean,$attribute,$path);
+    return $jmx->request($req);
+}
+
+sub _set_attribute {
+    my $jmx = shift;
+    my ($mbean,$attribute,$path,$value) = _extract_get_set_parameter($jmx,"set",@_);
+    if (ref($mbean) eq "CODE") {
+        return $jmx->delegate_to_handler($mbean,@args);
+    }
+    my $req = new JMX::Jmx4Perl::Request(WRITE,$mbean,$attribute,$value,$path);
+    return $jmx->request($req);
+}
+
+sub _search_attribute {
+    my $jmx = shift;
+    my ($pattern) = @_;
+    my $req = new JMX::Jmx4Perl::Request(SEARCH,$pattern);
+    return $jmx->request($req);
+}
+
+sub _exec_operation {
+    my $jmx = shift;
+    my ($mbean,$operation,@args) = @_;    
+    my $alias = JMX::Jmx4Perl::Alias->by_name($mbean);    
+    if ($alias) {
+        croak $alias->{alias}, " is not an operation alias" unless $alias->{type} eq "operation";
+        unshift @args,$operation if $operation;
+        ($mbean,$operation) = $jmx->resolve_alias($alias);
+        if (ref($mbean) eq "CODE") {
+            return $jmx->delegate_to_handler($mbean,@args);
+        }
+        die "Alias ",$alias->{alias}," is not available for product ",$jmx->product,"\n" unless $mbean;
+    } else {
+        &_validate_mbean_name($mbean);
+        die "ERROR No operation given for MBean $mbean given\n" unless $operation;
+    }    
+    print "$mbean $operation\n";
+    my $req = new JMX::Jmx4Perl::Request(EXEC,$mbean,$operation,@args);
+    return $jmx->request($req);
+}
+
+
+sub _extract_get_set_parameter {
+    my ($jmx,$mode,$mbean,$attribute,$path_or_value,$path) = @_;
+    my $value;
+    $path = $path_or_value if $mode eq "get";
+    $value = $path_or_value if $mode eq "set";
+
+    croak "No MBean name or alias given\n" unless $mbean;
+
+    # Try to resolve the MBean name as an alias. If this works, we are using
+    # this alias.
+    my $alias = JMX::Jmx4Perl::Alias->by_name($mbean);
+    if ($alias) {
+        # Shift arguments
+        $path = $attribute if $mode eq "get";  # path comes after alias
+        if ($mode eq "set") {
+            $path = $value;
+            $value = $attribute;
+        }
+        my ($o,$a,$p) = $jmx->resolve_alias($alias);
+        die "Alias ",$alias->{alias}," is not available for product ",$jmx->product,"\n" unless $o;
+        if ($path) {
+            $p = $p ? $p . "/" . $path : $path;
+        }
+        return ($o,$a,$p,$value);
+    } else {
+        &_validate_mbean_name($mbean);
+        die "ERROR No attribute for MBean $mbean given\n" if (!defined($attribute) && $mode eq "set");
+        return ($mbean,$attribute,$path,$value);
+    }    
+}
+
+sub _validate_mbean_name {
+    my $mbean = shift;
+    die "ERROR: Invalid format for MBean name $mbean (Did you misspelled an alias name ?)\n" if 
+      ($mbean !~ /^[^:]+:[^:]+$/ || $mbean !~ /:([^=]+)=/);    
+}
+
+sub _get_args_for_jmx4perl {
+    my $url = shift;
+    my $config = shift;
+    my $opts = shift;
+    # Try provided first argument as server name first in a 
+    # given configuration
+    my $ret;
+    my $server_config = $config->get_server_config($url);
+    if ($server_config && $server_config->{url}) {
+        print "Taking ",$server_config->{url}, " from configuration for $url\n" if $opts->{verbose};
+        &_verify_url($server_config->{url});
+        # Use server configs as default
+        $ret = { server => $url, config => $config };
+    } else {
+        &_verify_url($url);
+        $ret = { url => $url };
+    }
+
+    # Basic options to take over literally
+    for my $arg (qw(product user password verbose method legacy-escape)) {
+        if (defined($opts->{$arg})) {
+            $ret->{$arg} = $opts->{$arg};
+        }
+    }
+
+    # Take proxy and target from config
+    if ($server_config) {
+        if ($server_config->{proxy}) {
+            my $proxy = $server_config->{proxy};
+            die "Old proxy syntax (Proxy,Proxy_User,Proxy_Password) not supported in config anymore" 
+              unless ref($proxy) eq "HASH";
+            $ret->{proxy} = $proxy;
+        }
+        if ($server_config->{target}) {
+            $ret->{target} = $server_config->{target}
+        }
+    }
+
+    # Overwrite with command line arguments
+    if (defined($opts->{proxy})) {
+        my $proxy = {};
+        $proxy->{url} = $opts->{proxy};
+        for my $k (qw(proxy-user proxy-password)) {
+            $proxy->{$k} = defined($opts->{$k}) if $opts->{$k};
+        }
+        $ret->{proxy} = $proxy;
+    }        
+    if (defined($opts->{target})) {
+        $ret->{target} = {
+                          url => $opts->{target},
+                          $opts->{'target-user'} ? (user => $opts->{'target-user'}) : (),
+                          $opts->{'target-password'} ? (password => $opts->{'target-password'}) : (),
+                         };
+    }
+    return $ret;
+}
+
+sub _verify_url {
+    my $url = shift;
+    
+    unless ($url =~ m|^\w+://|) {
+        my $text = "No url or server name given for command. See --help for assistance.\n";
+        my $last = $#ARGV >= 0 ? $ARGV[$#ARGV] : undef;
+        if ($last && $last =~ m|^\w+://| && $last ne $url) {
+            $text .= "Please note, that the URL must be given as first argument, not as last.\n";
+        }
+        die $text;
+    }
+}
+
+=head1 SEE ALSO
+
+L<JMX::Jmx4Perl> - Entry point for programmatic JMX access which is used by
+this tool.
+
+L<check_jmx4perl> - a production ready Nagios check using L<JMX::Jmx4Perl>
+
+L<jolokia> - utility for downloading and managing Jolokia agents
+
+L<j4psh> - readline based JMX shell with context sensitive command line
+completion. 
+
+=head1 LICENSE
+
+This file is part of jmx4perl.
+
+Jmx4perl is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 2 of the License, or
+(at your option) any later version.
+
+jmx4perl is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with jmx4perl.  If not, see <http://www.gnu.org/licenses/>.
+
+=head1 AUTHOR
+
+roland@cpan.org
+
+=cut

@@ -1,0 +1,22 @@
+Changes
+Makefile.PL
+MANIFEST
+MANIFEST.SKIP
+README
+jsFind.pm
+html/search.html
+html/js/search.js
+html/js/usage.js
+html/js/getargs.js
+html/test.html
+t/01load.t
+t/02btree.t
+t/03insert.t
+t/04words.t
+t/05entities.t
+t/06base_x.t
+t/90xmllint.t
+t/99pod.t
+t/10homer.t
+t/homer.txt
+META.yml                                 Module meta-data (added by MakeMaker)

@@ -1,0 +1,48 @@
+jsFind version 0.05
+===================
+
+This module can be used to create index files for jsFind, powerful tool
+for adding a search engine to a CDROM archive or catalog without
+requiring the user to install anything.
+
+Main difference between this module and scripts delivered with jsFind are:
+
+- You don't need to use swish-e to create index
+- You can programatically (and incrementaly) create index for jsFind
+- search more than one index from same interface.
+
+It also includes numerous changes to JavaScript part of jsFind including
+experimental support for Opera 7.54 using iframes.
+
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  Carp
+  File::Path
+  HTML::Entities
+  Text::Iconv
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2004 by Dobrica Pavlinusic
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of the GNU General Public License as published by the Free
+Software Foundation; either version 2 of the License, or (at your option)
+any later version. This program is distributed in the hope that it will be
+useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General
+Public License for more details.
+
+

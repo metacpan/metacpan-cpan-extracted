@@ -1,0 +1,191 @@
+
+/*******************************************************************************
+ * SET UP RESIZEABLE FONTS
+ * http://diveintoaccessibility.org/examples/fontsize.html
+ * In order to have resizable fonts that work in all recent browsers
+ * (NS4+, IE4+), we use the standard set of hacks to work around bugs
+ * in various browsers and provide a consistent 12px resizeable font.
+ ******************************************************************************/
+
+/* styles that apply to all browsers */
+body, div, p, th, td, li, dd, code, tt {
+  font-family: Verdana, Arial, Helvetica, sans-serif;
+  font-size: 12px;
+}
+h1 {
+  font-size: 24px;
+}
+h2 {
+  font-size: 18px;
+}
+h3 {
+  font-size: 14px;
+}
+
+/* styles that apply to everything but Netscape 4 */
+/*/*/a{}
+body, body div, body p, body th, body td, body li, body dd, body code, body tt, body h3 {
+  font-size: x-small;
+  voice-family: "\"}\"";
+  voice-family: inherit;
+  font-size: small;
+}
+html>body, html>body div, html>body p, html>body th, html>body td, html>body li, html>body dd, html>body code, html>body tt, html>body h3 {
+  font-size: small;
+}
+body h1 {
+  font-size: large;
+  voice-family: "\"}\"";
+  voice-family: inherit;
+  font-size: x-large;
+}
+html>body h1 {
+  font-size: x-large;
+}
+body h2 {
+  font-size: medium;
+  voice-family: "\"}\"";
+  voice-family: inherit;
+  font-size: large;
+}
+html>body h2 {
+  font-size: large;
+}
+/* end NS4 hack */
+
+/*******************************************************************************
+ * Neutralize Default Styles
+ * Undo some of the default styling of common (X)HTML browsers.
+ * This means that when you get the look right with *explicit* styling, you
+ * have a greater chance of it looking the same in a wide range of browsers.
+ ******************************************************************************/
+
+/* link underlines tend to make hypertext less readable, 
+   because underlines obscure the shapes of the lower halves of words */
+:link, :visited {
+  text-decoration:none;
+}
+
+/* no list-markers by default, since lists are used more often for semantics */
+ul, ol {
+  list-style:none;
+}
+
+/* avoid browser default inconsistent heading font-sizes */
+/* and pre/code/kbd too */
+h1, h2, h3, h4, h5, h6, pre, code, kbd {
+  font-size:1em;
+}
+
+/* remove the inconsistent (among browsers) default ul,ol padding or margin  */
+/* the default spacing on headings does not match nor align with 
+   normal interline spacing at all, so let's get rid of it. */
+/* zero out the spacing around pre, form, body, html, p, blockquote as well */
+/* form elements are oddly inconsistent, and not quite CSS emulatable. */
+/*  nonetheless strip their margin and padding as well */
+form, body, html, fieldset {
+  margin:  0;
+  padding: 0;
+}
+
+dl, ul, ol, h1, h2, h3, h4, h5, h6, pre, p, input {
+  margin:  1em 0;
+  padding: 0;
+}
+
+li, dd, blockquote {
+  margin-left: 1em;
+}
+
+/* whoever thought blue linked image borders were a good idea? */
+a img, :link img, :visited img {
+  border:none;
+}
+
+/* de-italicize address, abbr */
+address, abbr {
+  font-style:normal;
+}
+
+/* miscellaneous conveniences */
+form label {
+  cursor: pointer;
+}
+fieldset {
+  border: none;
+}
+input, select, textarea {
+  font-size: 100%;
+}
+
+/*******************************************************************************
+ * TableWidget Default Styles
+ ******************************************************************************/
+.TableWidget table {
+  background-color: #ff0000;
+}
+
+/*******************************************************************************
+ * MISCELLANEOUS
+ ******************************************************************************/
+
+.branch {
+   cursor: pointer;
+   display: block;
+}
+.leaf {
+   display: none;
+   margin-left: 16px;
+}
+a {
+   text-decoration: none;
+}
+a:hover {
+   text-decoration: underline;
+}
+
+/* button1: a minimal button, simply text with an <a> anchor */
+.button1 {
+   padding: 1px;
+   font-size: .8em;
+   font-weight: bold;
+   background-color: #cccccc;
+   color: #000000;
+   text-decoration: none;
+}
+a:hover.button1 {
+   color: #000099;
+   background-color: #aaaaaa;
+   text-decoration: none;
+}
+a:active.button1 {
+   color: #660066;
+   background-color: #888888;
+   text-decoration: none;
+}
+
+/* button2: <input type="submit"> */
+.button2 {
+   font-size: .8em;
+   font-weight: bold;
+}
+
+/* button3: <a> inside a <td> */
+.button3 {
+   border: 2px outset #cccccc;
+   padding: 3px;
+   font-size: .8em;
+   font-weight: bold;
+   background-color: #cccccc;
+}
+a.button3a {
+   text-decoration: none;
+   color: #000000;
+}
+a:hover.button3a {
+   color: #000099;
+}
+a:active.button3a {
+   color: #660066;
+}
+

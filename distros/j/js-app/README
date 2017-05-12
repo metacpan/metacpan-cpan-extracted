@@ -1,0 +1,117 @@
+######################################################################
+# OVERVIEW
+######################################################################
+
+This is "js-app", a framework for building applications in Javascript.
+
+ * for installation instructions, see the INSTALL file
+
+######################################################################
+# DESCRIPTION
+######################################################################
+
+JS-App is a Javascript Application framework with which you can build
+rich web applications and widgets embeddable in web pages. 
+The framework is object-oriented, data-driven, cross-browser,
+internationalizable, themeable, extensible. (+ Ajax)
+
+######################################################################
+# REQUIREMENTS
+######################################################################
+
+The js-app framework is designed to allow programs to be developed
+that meet the following requirements.
+
+ o Rich, highly-interactive applications which give the feel of a
+   desktop application but delivered by the web
+ o Widget-based, Object-oriented framework
+ o Widgets should be embeddable within a page as easily as they are
+   used to implement an application taking up the entire page
+ o Widgets should be useful within any other page-generation
+   technology (JSP, ASP, PHP, SSI, Perl Mason, Perl TT, App-WidgetJS,
+   CGI.pm, etc.)
+ o Cross-browser (type and version) (as much as possible)
+   with graceful degradation allowed for convenience features
+ o Internationalizable (translation dictionary, content encoding)
+ o Themeable (based on CSS)
+ o Data-driven application development
+ o Supports asynchronous event dispatching and callbacks
+ o Employs JSON-RPC (XMLHttpRequest/iframe) for server interaction
+ o Built-in Timer/Scheduler
+ o Bookmark-ability: access to any widget and session state encoding
+ o Support printing (via separate CSS style sheet?)
+ o Support for Sessions that makes sense (stored in a cookie?)
+ o Support for Bookmarks/Favorites
+ o Support for Bug submission (to drive a regression test with libjs?)
+ o Support templates in every widget
+ o Framework version support (About box)
+ o Support light-weight widgets
+ o Framework needs a style guide
+
+Project Requirements:
+
+ o Name: js-app (or JS-App)
+ o Pure Javascript (with css/js/png resources) but includes Perl
+   installer and reference server interface programs.
+ o Stand on the shoulders of as many other projects as we can find.
+   (probably meaning using their code)
+ o Regression testable manually with many sample html files
+ o Needs browser compatibility database and collection system
+ o Regression testable with perl Javascript (libjs.a) and DOM::Mozilla modules
+ o Hosted on SourceForge
+ o Licensed as LGPL
+ o Announced on Freshmeat
+ o Distributed on CPAN with a Build.PL (App::Build) installer
+ o Distributed on theoryx via PPM
+ o Project includes core and extended subprojects
+   (i.e. js-app, js-app-security, etc.)
+
+Nice to have.
+
+ o Limited local storage in cookies (?!?) (Preferences/Settings?)
+ o Supports an interactive screen-builder
+ o Standard regression test database application
+ o Theme generation tool (requires theme-neutral image resources)
+
+######################################################################
+# SOURCEFORGE DESCRIPTION
+######################################################################
+
+OVERVIEW
+
+JS-App is a Javascript Application framework with which you can build
+rich web applications and widgets embeddable in web pages.  The
+framework is object-oriented, data-driven, cross-browser,
+internationalizable, themeable, extensible. (+ Ajax)
+
+BACKGROUND
+
+ * I needed to write a rich web application using Javascript/DHTML
+   and searched for a good framework.  I found a variety of
+   miscellaneous Javascript/DHTML widgets (menus, navbars, treeviews,
+   grids, date selection calendars), but no general application
+   development framework which ties it all together.
+
+ * There is a lot of hoopla these days about Google's DHTML-driven
+   apps and Ajax techniques.  The only framework I found on
+   Sourceforge addressing Ajax techniques is "sajax", but this is
+   PHP-centric.  I need a good way to build a complete application
+   in Javascript which addresses the full range of application
+   concerns.
+
+REQUIREMENTS
+
+ * data-driven - the Widget code exists, we need only configure to use it
+ * cross-browser - architected for maximum compatibility (versions and brands)
+ * internationalizable - a simple translation table should allow t
+ * themeable - should reserve maximum flexibility of look and feel for the app developer
+ * leveraged - incorporate existing (3rd party) widgets with a thin wrapper layer
+ * object-oriented and extensible - every application requires custom widgets/logic
+ * Ajax - asynchronous interaction with the server
+
+DETAILS
+
+ * Language: Javascript (for the framework) (+CSS)
+ * Auxiliary Language: Perl for installation, regression testing, and server-side support
+ * Browsers: As many as possible (IE 4+, NS 4+, Moz/Gecko/Firefox, Opera, Safari, Konqueror)
+

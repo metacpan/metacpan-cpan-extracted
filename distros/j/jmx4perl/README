@@ -1,0 +1,148 @@
+                               Jmx4Perl
+                               ========
+
+INTRODUCTION
+
+  Jmx4Perl provides an alternate way for accessing Java JEE Server
+  management interfaces which are based on JMX (Java Management
+  Extensions). It is an agent based approach, where a small Java
+  Webapplication deployed on the application server provides an
+  HTTP/JSON based access to JMX MBeans registered within the
+  application server.
+
+HOW IT WORKS
+
+  For the agent mode a small Java Agent WAR (web archive) needs to be
+  deployed on the Java application server. This agent is provided by
+  the Jolokia project (www.jolokia.org). There is no need to add any
+  startup parameters to the application server and to open any
+  additional ports. All communication takes places via HTTP where JSON
+  objects are exchanged. Additionally, the agent benefits from the
+  security infrastructure in place which every application server
+  provides for web application. More information about the agent can
+  be found at http://www.jolokia.org
+
+  The Perl module JMX::Jmx4Perl accesses the deployed agent servlet
+  and transform the request's results from JSON into a simple Perl
+  object.
+
+TOOLS
+
+  This distribution comes with several tools, which uses the
+  JMX::Jmx4Perl for accessing the server:
+
+  jmx4perl          - Command line tool for gathering JMX information
+  check_jmx4perl    - Full featured Nagios Plugin
+  j4psh             - Interactive, readline based JMX shell with context 
+                      sensitive command completion
+  jolokia           - Utility for downloading and managing Jolokia 
+                      agents.
+
+INSTALLATION
+
+  The Perl part installs as any other module via Module::Build, which
+  you need to have installed. Using
+
+  perl Build.PL
+  ./Build installdeps             # If there are dependencies missing and you 
+                                  # have Module::Build >= 0.36 installed.
+  ./Build
+  ./Build test
+  ./Build install
+
+  will install the modules. It is highly recommended to install the
+  recommended dependent modules, too to get the full jmx4perl
+  power. The set of 'required' modules is kept small and guarantees
+  only that 'jmx4perl' and the modules around JMX::Jmx4Perl are
+  working properly. The other tools (check_jmx4perl, j4psh and
+  jolokia) require the recommended modules for proper working. Look
+  into Build.PL for which tool requires which module.
+
+  In order to download the Jolokia WAR agent into the local directory
+  as jolokia.war, use the following command
+
+      jolokia
+
+  This agent "jolokia.war" needs to be deployed on the JEE Server to
+  monitor. Please consult http://www.jolokia.org/agent.html for more
+  information how to install the agent. E.g. for Tomcat this war file
+  needs to be copied into the webapps directory.
+
+  To test it, you can use 'jmx4perl' with the URL of the deployed
+  agent:
+
+      jmx4perl http://<jeeserver>:<port>/jolokia
+      
+  Consult 'man jmx4perl' for more information about this command
+  utility.  
+ 
+RESOURCES
+
+  * Jmx4perl's source is hosted on github.com. You can clone the
+    repository with git://github.com/rhuss/jmx4perl.git as URL
+
+  * Interesting articles around Jmx4Perl, JMX and Nagios can be found
+    at http://labs.consol.de Checkout the various post categories for
+    selecting a specific topic.
+
+  * www.jmx4perl.org is the canonical entry point for jmx4perl related
+    information. 
+
+NOTE 
+
+  For you convenience, the latest Module::Build is included in this
+  distribution, so there is no need of a locally install Module::Build
+  for installing this suite. More information about Module::Build can
+  be found http://search.cpan.org/~dagolden/Module-Build/
+
+LICENSE
+  
+  Copyright (C) 2009-2011 Roland Huss (roland@cpan.org)
+
+  Jmx4perl is free software: you can redistribute it and/or modify it
+  under the terms of the GNU General Public License as published by
+  the Free Software Foundation, either version 2 of the License, or
+  (at your option) any later version.
+
+  jmx4perl is distributed in the hope that it will be useful, but
+  WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+  General Public License for more details.
+
+  You should have received a copy of the GNU General Public License
+  along with jmx4perl.  If not, see <http://www.gnu.org/licenses/>.
+
+  A commercial license is available as well. You can either apply the
+  GPL or obtain a commercial license for closed source
+  development. Please contact roland@cpan.org for further information.
+
+PROFESSIONAL SERVICES
+
+  Just in case you need professional support for this module (or
+  Nagios, JMX or JEE in general), you might want to have a look at
+  http://www.consol.com/nagios-monitoring . Contact
+  roland.huss@consol.de for further information (or use the contact
+  form at http://www.consol.com/contact/ )
+
+ACKNOWLEDGMENTS
+  
+  Big thanks go to ...
+
+  * Gerhard Lausser, who initially pushed me to think harder
+    about a better way for monitoring JEE Servers with Nagios.
+
+  * Danijel Tasov for patching, patching, patching and keeping 
+    an eye on contemporary perl styling.
+ 
+  * All bug reporters and blog commenters for helping me to 
+    increase the overall quality (and for letting me know that 
+    this is not software for the ivory tower)
+
+BUGS 
+
+  Please report any bugs and/or feature requests at 
+  http://rt.cpan.org/Public/Bug/Report.html?Queue=jmx4perl
+
+AUTHOR
+
+  roland@cpan.org

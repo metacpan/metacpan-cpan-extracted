@@ -1,0 +1,43 @@
+Revision history for Perl extension jQuery::File::Upload::Imager.
+
+1.01  Thu May 30 13:14:00 2013
+	- In sub _save_local(), call close on the file handle after writing the file to disk.
+		This flushes the output buffers and saves the data. Otherwise the output file contains 0 bytes.
+		It's difficult to see how the code could ever have worked with this bug in place.
+		There is commented-out code in sub _save_cloud() which writes to the same file handle.
+		I have not examined that code nor have I un-commented it.
+	- In sub handle_request(), shift the call to _clear() from the start of the sub to the end.
+		Calling it at the start zapped various object attributes, e.g. the CGI object, which had been
+		passed in via new(). Zapping them at the start means they were not available during processing.
+		At the end they are cleaned-up ready for the next invocation.
+		As above, it's difficult to see how the code could ever have worked with this bug in place.
+		However, since the original author (seems to have) developed under Catalyst, perhaps this
+		was never a problem.
+	- Re-work many links in the POD.
+	- Remove trailing blanks on many lines.
+	- The code refers to $ENV{SCRIPT_URI} aks $ENV{'SCRIPT_URI'}. CGI and Plack set $ENV{SCRIPT_NAME},
+		but I have not yet determined what to do about this problem. I scanned the source of Catalyst,
+		but could not find any cases where Catalyst sets $ENV{SCRIPT_URI}.
+	- I've added a FAQ to the POD, to discuss these issues and various other problems.
+
+1.00  Thu May 23 13:57:00 2013
+	- Original version.
+	- This is a fork of jQuery::File::Upload V 0.16.
+	- It replaces Image::Magick with Imager because all copies of Image::Magick
+		have been removed from CPAN. They are still on backpan.perl.org though.
+	- Features converted:
+		Image::Magick		               Imager
+		-----------------------------------------
+		Read(file => $fh)                  read(fh => $fh)
+		Get('width')                       getwidth()
+		Get('height')                      getheight()
+		Clone()                            copy()
+		Resize(width => $w, height => $h)  scale(xpixels => $x, ypixels => $y, type => 'nonprop')
+		Set(quality => $q)                 write(file => $name, type => $type, jpegquality => $q)
+		Set(density => $d): $d="${x}x$y"   scale(xpixels => $x, ypixels => $y, type => 'nonprop')
+		Write("$format:$name")             write(file => $name, type => $format)
+	- Rename Changes to CHANGES.
+	- Add Changelog.ini.
+	- Various POD patches.
+	- Various minor Makefile.PL patches.
+	- Add Build.PL.

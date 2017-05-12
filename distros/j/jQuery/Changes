@@ -1,0 +1,17 @@
+Revision history for Perl extension jQuery.
+
+0.001  Tue Jul 24 05:12:46 2011
+	- original version; created by h2xs 1.23 with options
+		-X -n jQuery
+
+0.002  Tue Nov 25 2011
+	- bunch of fixes
+	
+0.003  Tue May 13 2012
+	- bunch of fixes
+	- some more features
+	
+0.004  Fri Jun 14 2013
+	- adding data function
+	- adding tests
+	

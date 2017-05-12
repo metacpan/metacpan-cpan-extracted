@@ -1,0 +1,20 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+LICENSE
+t/jBilling-Client-SOAP.t
+t/00-JavaDouble.t
+lib/jBilling/Client/SOAP.pm
+lib/jBilling/Client/SOAP/API.pm
+lib/jBilling/Client/SOAP/Exception.pm
+lib/jBilling/Client/SOAP/JavaDouble.pm
+lib/jBilling/Client/SOAP/MetaFieldValueWS.pm
+lib/jBilling/Client/SOAP/Object.pm
+lib/jBilling/Client/SOAP/OrderLineWS.pm
+lib/jBilling/Client/SOAP/OrderWS.pm
+lib/jBilling/Client/SOAP/PriceModelWS.pm
+lib/jBilling/Client/SOAP/ItemDTOEx.pm
+lib/jBilling/Client/SOAP/ItemTypeWS.pm
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

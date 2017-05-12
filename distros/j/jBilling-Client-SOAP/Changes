@@ -1,0 +1,20 @@
+Revision history for Perl extension jBilling::Client::SOAP.
+
+0.01  Tue Feb  3 09:14:44 2015
+	- original version; created by h2xs 1.23 with options
+		-Xan jBilling::Client::SOAP
+0.02  Tue Feb 17 11:20:00 2015
+        - Added further models.
+	  Refactored metaFields method.
+	  Added additional getItemByCategory method to retrieve items
+0.03  Sun Mar 01 17 21:30:00 2015
+        - Bugfixes and code tidy.
+0.04  Thu Apr 02 11:20:00 2015
+        - Bugfixes and code tidy.
+	  Initial release to CPAN.
+0.05  Thu Apr 02 23:00:00 2015
+        - Bugfixes and code tidy.
+	  LICENSE Added.
+0.06  Thu Apr 02 17:02:00 2015
+		- POD Corrections.
+		- Added META_MERGE for repo and issue tracker.

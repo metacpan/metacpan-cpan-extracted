@@ -1,0 +1,54 @@
+######################################################################
+# COMPATIBILITY
+######################################################################
+
+This is a document on browser-compatibility and the approach that
+JS-App takes.
+
+  1. The goal is to provide the richest web-borne application 
+     experience possible while maintaining strong cross-browser
+     compatibility.
+
+  2. The main/core JS-App files support the latest, W3C standards-
+     compliant browsers.
+
+  3. Small incompatibilities which can be worked around with a simple
+     test will be accommodated in the main files.
+
+  4. Large incompatibilities which require a large body of code not
+     necessary for other browsers will be accommodated in the
+     alternate compatibility files.
+
+=== REFERENCES =======================================================
+
+[1] http://www.zytrax.com/tech/web/popout_apache.htm#browsers
+  Suggests classifying browsers in Apache's httpd.conf in three
+  classes like so.
+    BrowserMatchNoCase Mozilla/[4-6] isJS
+    BrowserMatchNoCase MSIE isIE
+    BrowserMatchNoCase Gecko isW3C
+    BrowserMatchNoCase MSIE.((5\.[5-9])|([6-9])) isW3C
+    BrowserMatchNoCase W3C_ isW3C
+
+[2] http://www.mozilla.org/build/revised-user-agent-strings.html
+    http://www.mozilla.org/build/user-agent-strings.html
+  Mozilla's UserAgent string format specification.
+
+[3] http://www.zytrax.com/tech/web/browser_ids.htm
+  A list of UserAgent strings for different browsers.
+
+[4] http://www.pgts.com.au/pgtsj/pgtsj0208c.html
+  A list of UserAgent strings for different browsers.
+
+[5] http://www.quirksmode.org/
+  Extensive JavaScript/DHTML/CSS compatibility information.
+
+[6] ftp://ftp.ecma.ch/ecma-st/Ecma-262.pdf
+  The ECMAScript standardization of JavaScript 1.1
+
+[*] http://www.ietf.org/rfc/rfc1945.txt
+  HTTP/1.0
+
+[*] http://www.ietf.org/rfc/rfc2616.txt
+  HTTP/1.1
+

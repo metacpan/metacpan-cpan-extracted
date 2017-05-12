@@ -1,0 +1,212 @@
+<!DOCTYPE html PUBLIC
+          "-//W3C//DTD XHTML 1.0 Strict//EN"
+          "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1"/>
+    <title>jsFind Test page</title>
+    <script src="js/search.js" type="text/javascript"></script>
+    <script src="test_data.js" type="text/javascript"></script>
+    <script type="text/javascript">
+
+/*
+var test_data = {
+          'by': {
+                    '33': 1,
+                    '28': 1,
+                    '7': 2,
+                    '91': 1,
+                    '78': 2,
+                    '8': 1,
+                    '1': 2,
+                    '16': 1,
+                    '23': 1,
+                    '100': 1,
+                    '65': 1
+                  },
+          'voice.': {
+                        '80': 1
+                      }
+};
+*/
+
+function get_el(name) {
+	var div = document.getElementById(name);
+	if (! div) alert("can't find div "+name);
+	return div;
+}
+
+var test_div = null;
+
+
+var passed_tests = 0;
+var failed_tests = 0;
+var test_failed = false;
+
+var word_nr = -1;	// first emement is word_nr++
+var words = Array();
+var total_words = null;
+
+function create_color_msg(color,msg) {
+	var e = document.createElement("span");
+	e.setAttribute('style', 'color: '+color);
+    	e.appendChild(document.createTextNode(msg));
+	return e;
+}
+
+function msg_debug(msg) {
+    	test_div.appendChild(create_color_msg('black',msg));
+    	test_div.appendChild(document.createElement("br"));
+	return;
+}
+
+function msg_error(msg) {
+	var e = create_color_msg('red',msg);
+
+	test_div.appendChild(e);
+    	test_div.appendChild(document.createElement("br"));
+
+	failed_tests++;
+	test_failed = true;
+	return true;
+}
+
+function msg_ok(msg) {
+	var e = create_color_msg('green',msg);
+
+	test_div.appendChild(e);
+    	test_div.appendChild(document.createElement("br"));
+
+	passed_tests++;
+	return true;
+}
+
+function got_result(result) {
+	if (result.length < 0) {
+		msg_error("no results for word "+words[word_nr]);
+	}
+
+	var i;
+
+	var word = words[word_nr];
+	var len = 0;
+	for (i in result) len++;
+	result.length = len;
+	len = 0;
+	for (i in test_data[word]) len++;
+
+	if (result.length == len) {
+		msg_ok("found "+result.length+" results");
+	} else if ( result.length > len )
+		msg_error("too much results "+result.length+" > "+len)
+	else	msg_error("too fiew results "+result.length+" < "+len);
+
+	for(i=result.length-1; i>=0; i--) {
+		var test_hit = i+": '"+
+				result[i].title+"' link: "+
+				result[i].link+" frequency: "+
+				result[i].frequency;
+
+		if ( test_data[ words[word_nr] ][ result[i].link ] != result[i].frequency ) {
+			msg_error("error in frequency "+i+": '"+words[word_nr]+"' "+test_data[ words[word_nr] ][ result[i].link ]+" != "+result[i].frequency);
+			msg_error("HIT "+test_hit);
+
+		} else {
+			msg_ok("OK frequency "+i+": '"+words[word_nr]+"' ["+result[i].frequency+"]");
+		}
+
+	}
+
+	if (test_failed) {
+		get_el('debug').appendChild(test_div);
+		get_el('debug').appendChild(debug_div);
+	} else {
+		// uncomment this to show also passed tests
+		//get_el('debug').appendChild(test_div);
+	}
+
+	get_el('nr_words').value = word_nr;
+	get_el('nr_tests').value = passed_tests + test_failed;
+	get_el('nr_passed').value = passed_tests;
+	get_el('nr_failed').value = failed_tests;
+	get_el('completed').value = ((word_nr + 1) * 100 / total_words).toPrecision(4);
+
+	// try next search
+	if (word_nr < words.length) do_search();
+
+	return true;
+}
+
+function do_test() {
+
+	test_div = document.createElement("div");
+	debug_div = document.createElement("div");
+
+	total_words = 0;
+
+	for (word in test_data) {
+		words[total_words] = word;
+		msg_debug("word "+total_words+": "+words[total_words]);
+		total_words++;
+	}
+
+	get_el('debug').appendChild(test_div);
+	get_el('debug').appendChild(debug_div);
+	do_search();
+}
+
+
+function do_search() {
+
+	word_nr++;
+
+	test_div = document.createElement("div");
+	debug_div = document.createElement("div");
+
+	if (word_nr < words.length && words[word_nr] != 'undefined') {
+
+		test_failed = false;
+
+		msg_debug("");
+		msg_debug("search "+word_nr+": "+words[word_nr]);
+
+		results = null;
+        	doSearch('homer', words[word_nr], got_result);
+
+	} else {
+		msg_debug("");
+		//msg_debug("tested "+word_nr+" words, "+passed_tests+" test passed, "+failed_tests+" test failed.");
+		var r = create_color_msg('blue'," tested "+word_nr+" words, ");
+		r.appendChild(create_color_msg('green', passed_tests));
+		r.appendChild(create_color_msg('blue'," tests passed, "));
+		r.appendChild(create_color_msg('red', failed_tests));
+		r.appendChild(create_color_msg('blue'," tests failed."));
+
+		get_el('debug').appendChild(r);
+		get_el('status').appendChild(r);
+	}
+}
+
+    </script>
+  </head>
+
+  <body onLoad="do_test();">
+
+    <div id="status" style="color: blue;">
+      This is test html for jsFind -- it might take a long time on slower
+      computers and/or browsers, so please be patient!<br/>
+    </div>
+
+    <form>
+      Words:<input type="text" id="nr_words" size="4" value="0" />
+      &nbsp;Tests:<input type="text" id="nr_tests" size="4" value="0" />
+      &nbsp;Passed:<input type="text" id="nr_passed" size="4" value="0" />
+      &nbsp;Failed:<input type="text" id="nr_failed" size="4" value="0" />
+      &nbsp;Completed:<input type="text" id="completed" size="4" value="0" />%
+    </form>
+
+    <div id="debug" style="color: gray;">
+    </div>
+
+  </body>
+</html>

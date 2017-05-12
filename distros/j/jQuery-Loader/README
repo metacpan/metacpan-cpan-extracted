@@ -1,0 +1,224 @@
+NAME
+    jQuery::Loader - Load (and cache) the jQuery JavaScript library
+
+VERSION
+    Version 0.03
+
+jQuery VERSION
+    Version 1.2.6
+
+SYNOPSIS
+        use jQuery::Loader;
+
+        my $loader = jQuery::Loader->new_from_internet;
+        print $loader->html;
+
+        # The above will yield:
+        # <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.2.6/jquery.js" type="text/javascript"></script>
+
+
+        # If you need the minified version, you can use the following:
+        $loader = jQuery::Loader->new_from_internet(filter => "min");
+
+        # Which will yield:
+        # <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.2.6/jquery.min.js" type="text/javascript"></script>
+
+    You can also cache jQuery locally:
+
+        my $loader = jQuery::Loader->new_from_internet(cache => { dir => "htdocs/assets/\%l", uri => "http://localhost/assets/\%l" });
+        print $loader->html;
+
+        # The above will yield:
+        # <script src="http://localhost/assets/jquery-1.2.6.js">
+
+DESCRIPTION
+    jQuery::Loader is a tool for fetching and serving the jQuery JavaScript
+    library. Using this package you can download jQuery directly from
+    <http://code.google.com/p/jqueryjs/>, cache it locally, and serve it
+    from a URI within your application.
+
+Specifying URI/file locations for the jQuery .js asset
+    90% of the time, you should be able to get by by specifying an absolute
+    URI/file location. Something like this, for example:
+
+        jQuery::Loader->new_from_internet(cache => { uri => "http://localhost/assets/jquery.js", file => "htdocs/assets/jquery.js" })
+
+    However, if you want more control over the path (like specifying
+    filter/version information, you can use the following conversion
+    specifications:
+
+        %l          The value of the location parameter as passed to the cache constructor
+                    You can use this to specify a path common to both the uri-part and file-part of the cache
+                    The location parameter value can also include %j, %v, $f, etc.
+
+        %j          Equivalent to "jquery%-v%.f.js"
+
+        %v          The number of the version jQuery being used (e.g. "1.2.6")
+        %[./-]v     Preceding %v with a ., /, or - will put that same character in
+                    front of the number, or a nothing for the whole specification if no version is given
+
+        %f          The name of the filter being used (e.g. "min")
+        %[./-]f     Preceding %f with a ., /, or - will put that same character in
+                    front of the filter, or a nothing for the whole specification if no filter is in use
+
+    Here is an example:
+
+        location => "js/jq%-v.js"           # js/jq-1.2.6.js
+        uri => "http://localhost/assets/%l" # http://localhost/assets/js/jq-1.2.6.js
+        file => "./htdocs/static/%l"        # ./htdocs/static/js/jq-1.2.6.js
+
+METHODS
+  jQuery::Loader->new_from_internet([ version => <version>, cache => <cache> ])
+    Return a new jQuery::Loader object configured to serve/fetch the jQuery
+    .js asset from from the Internet (currently
+    <http://jqueryjs.googlecode.com/files/jquery-1.2.6.js>)
+
+  jQuery::Loader->new_from_uri([ uri => <uri>, cache => <cache> ])
+    Return a new jQuery::Loader object configured to serve/fetch the jQuery
+    .js asset from an arbitrary uri
+
+    As an example, for a <uri> of "http://localhost/assets/%l", the jQuery
+    asset uri should be
+
+        http://localhost/assets/jquery-1.2.6.js
+
+  jQuery::Loader->new_from_file([ file => <file>, cache => <cache> ])
+    Return a new jQuery::Loader object configured to fetch/serve the jQuery
+    .js asset from an arbitrary file
+
+    As an example, for a file of "./assets/%l", the jQuery asset file should
+    be
+
+        ./assets/jquery-1.2.6.js
+
+  $loader->filter( <filter> )
+    Set or clear the current filter
+
+    Currently, "min" is the only valid filter
+
+    Pass "undef" to clear the filter
+
+    These are equivalent:
+
+        $loader->filter_min
+        $loader->filter("min")
+
+        $loader->no_filter
+        $loader->filter(undef)
+
+  $loader->version( <version> )
+    Set which jQuery version you want to use
+
+    This will also change the filename of the jQuery asset (unless the
+    source/cache has been specially configured)
+
+    By default, the latest version is used:
+
+        $loader->version("1.2.6");
+
+  $loader->filter_min
+    Use the .min version of jQuery
+
+  $loader->no_filter
+    Disable filtering of included components (do not use the .min version)
+
+  $loader->uri
+    Attempt to fetch a URI for jQuery using the current filter setting of
+    the loader (.min, etc.)
+
+    If the loader has a cache, then this method will try to fetch from the
+    cache. Otherwise it will use the source.
+
+  $loader->file
+    Attempt to fetch a Path::Class::File for jQuery using the current filter
+    setting of the loader (.min, etc.)
+
+    If the loader has a cache, then this method will try to fetch from the
+    cache. Otherwise it will use the source.
+
+  $loader->cache_uri
+    Attempt to fetch a URI for jQuery using the current filter setting of
+    the loader (.min, etc.) from the cache
+
+  $loader->cache_file
+    Attempt to fetch a Path::Class::File for jQuery using the current filter
+    setting of the loader (.min, etc.) from the cache
+
+  $loader->source_uri
+    Attempt to fetch a URI for jQuery using the current filter setting of
+    the loader (.min, etc.) from the source
+
+  $loader->source_file
+    Attempt to fetch a Path::Class::File for jQuery using the current filter
+    setting of the loader (.min, etc.) from the source
+
+  $loader->html
+    Generate and return a string containing HTML describing how to include
+    components. For example, you can use this in the <head> section of a web
+    page.
+
+    If the loader has a cache, then it will attempt to generate URIs from
+    the cache, otherwise it will use the source.
+
+    Here is an example:
+
+        <script src="http://localhost/assets/jquery-1.2.6.js" type="text/javascript"></script>
+
+  $loader->source_html
+    Generate and return a string containing HTML describing how to include
+    components. For example, you can use this in the <head> section of a web
+    page.
+
+    Here is an example:
+
+        <script src="http://localhost/assets/jquery-1.2.6.js" type="text/javascript"></script>
+
+AUTHOR
+    Robert Krimen, "<rkrimen at cpan.org>"
+
+SEE ALSO
+    <http://jquery.com/>
+
+    <http://code.google.com/p/jqueryjs/>
+
+    jQuery
+
+    YUI::Loader
+
+BUGS
+    Please report any bugs or feature requests to "bug-js-jquery-loader at
+    rt.cpan.org", or through the web interface at
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=jQuery-Loader>. I will
+    be notified, and then you'll automatically be notified of progress on
+    your bug as I make changes.
+
+SUPPORT
+    You can find documentation for this module with the perldoc command.
+
+        perldoc jQuery::Loader
+
+    You can also look for information at:
+
+    *   RT: CPAN's request tracker
+
+        <http://rt.cpan.org/NoAuth/Bugs.html?Dist=jQuery-Loader>
+
+    *   AnnoCPAN: Annotated CPAN documentation
+
+        <http://annocpan.org/dist/jQuery-Loader>
+
+    *   CPAN Ratings
+
+        <http://cpanratings.perl.org/d/jQuery-Loader>
+
+    *   Search CPAN
+
+        <http://search.cpan.org/dist/jQuery-Loader>
+
+ACKNOWLEDGEMENTS
+COPYRIGHT & LICENSE
+    Copyright 2008 Robert Krimen, all rights reserved.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

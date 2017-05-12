@@ -1,0 +1,647 @@
+#!/usr/bin/perl
+
+=head1 NAME
+
+jolokia - Utility for managing Jolokia agents used by jmx4perl
+
+=cut
+
+use Getopt::Long;
+use JMX::Jmx4Perl::Agent::Jolokia::Meta;
+use JMX::Jmx4Perl::Agent::Jolokia::DownloadAgent;
+use JMX::Jmx4Perl::Agent::Jolokia::Logger;
+use JMX::Jmx4Perl::Agent::Jolokia::ArtifactHandler;
+use JMX::Jmx4Perl::Agent::Jolokia::WebXmlHandler;
+use JMX::Jmx4Perl;
+use Digest::MD5;
+use Data::Dumper;
+use strict;
+
+=head1 SYNOPSIS
+
+  # Execute command 'command' with options and additional, command specific 
+  # arguments
+  jolokia [options] <command> <arg1> <arg2> ...
+
+  # Download the latest Jolokia WAR agent compatible with this jmx4perl release
+  # into the local directory as 'jolokia.war'
+  jolokia download
+
+  # Print information about a downloaded agent (i.e. its version)
+  jolokia info jolokia.war
+
+  # Repackage the agent to include a security policy
+  jolokia repack --policy jolokia.war
+
+  # Jmx4Perl version
+  jolokia --version
+
+  # Online help
+  jolokia --help
+
+Options:
+
+  Command 'download':
+     --agent <type>[:<version>]    Agent to download. <type> must be one of "war", "osgi", 
+                                   "osgi-bundle", "mule" or "jvm". An optional Jolokia version 
+                                   can be added after a colon.
+     --outdir <dir>                Output directory for the agent downloaded (default: ".")
+     --repository <repo-url>       Repository URL from where to fetch the Jolokia agent. 
+                                   (default is taken from meta data)
+     --template <name>[:<version>] Download a template with given name and optional version. E.g.
+                                   "jolokia-access.xml:0.83". If used with --agent, the same version
+                                   as for the agent is used by default
+     --policy                      Same as --template jolokia-access.xml
+
+  Command 'info':
+     --verify                      Check signature of given file
+     --policy                      Print out an embedded jolokia-access.xml
+
+  Command 'repack':
+     --policy                      Adds a jolokia-access.xml policy file, which is in the current 
+                                   directory. --no-policy removes the policy file.
+     --policy-file <policy file>   Alternate policy file to use (implies --policy)
+     --security                    Add security to the web.xml with role 'jolokia' by default. 
+                                   Use no-security in order to remove security section completely
+     --security-role <role>        Select a different role for WEB security. Implies --security
+     --no-jsr160-proxy             Remove the JSR-160 proxy declaration from web.xml. Re-add with 
+                                   --jsr160-proxy
+
+  General:
+     --quiet            No output on the standard out
+     --verbose          Print verbose
+     --no-color         Don't use colors
+     --no-cache         Fetch meta information afresh from www.jolokia.org
+     --proxy            Proxy-URL for HTTP(S) requests
+     --proxy-user       Proxy user for proxy authentication
+     --proxy-password   Proxy password for proxy authentication
+     --help             Print online help (and exit)
+     --version          Jmx4Perl version 
+
+=head1 DESCRIPTION
+
+B<jolokia> is a command line utility for managing the Jolokia agent,
+which is used by jmx4perl for accessing remote JMX information. Several 
+commands are available
+
+=over 
+
+=item download
+
+This mode allows for downloading the latest Jolokia agent version compatible
+with this Jmx4Perl installation or any other agent version. PGP is used
+optionally for verifying the integrity of the downloaded artifacts.
+
+=item info
+
+For a given Jolokia agent, this manager gives you information about the version
+of the agent and also allows for PGP validation.
+
+=item repack
+
+A Jolokia agent can be repacked in order to add a policy file or to manipulate
+the internal web.xml with this mode. 
+
+=back
+
+C<download> ist the default mode when no non-opt argument is given, if a single
+argument is given and this single argument is not one of the modes above, C<info> is
+used as the default command and the single argument is the file to examine.
+
+=head1 META-DATA
+
+Meta-data about the available Jolokia agents and their compatibility to given
+Jmx4Perl versions is obtained from L<http://www.jolokia.org/jolokia.meta>. This
+meta data is cached locally in F<~/.jolokia_meta> and only fetched once a
+day. The meta download can be forced by using the option C<--no-cache>. 
+
+=head1 VALIDATION
+
+B<jolokia> uses PGP for validating all files downloaded. For this to work,
+either the CPAN module L<Crypt::OpenPGP> or GnuPG (L<http://www.gnupg.org/>)
+must be installed. If it is not available, validation falls back to simple
+checksum validation with a SHA1 alogrithm, or, if this is not possible to an
+MD5 check. Since the checksums are also downloaded over an insecure channel,
+using PGP is highly recommended. The public key used for the signature check is
+contained locally in the modules so there is no need to add the key manually or
+to download it from an PGP key server. I.e. if GnuPG is used, the key will be
+added to the local keystore for the first validation. 
+
+=head1 COMMANDS
+
+=cut
+
+# Agent manager for 
+# - adding security constraints
+# - manipulating the policy file
+# - deploying it to the target server
+
+my %opts = ();
+GetOptions(\%opts,
+           "agent|a=s",
+           "template=s",
+           "outdir|o=s",
+           "repository|r=s",
+           "policy!",
+           "policy-file:s",
+           "quiet|q",
+           "version|v",
+           "verify!",
+           "verbose",
+           "color!",
+           "proxy=s",
+           "proxy-user=s",
+           "proxy-password=s",
+           "cache!",
+           "security!",
+           "security-role=s",
+           "jsr160-proxy!",
+           "help|h" => sub { Getopt::Long::HelpMessage() },
+          ) || die "Use --help for available options\n";
+
+if ($opts{version}) {
+    print "jolokia ",$JMX::Jmx4Perl::VERSION,"\n";
+    exit(0);
+}
+
+my %COMMANDS = 
+  (
+   download => \&command_download,
+   info => \&command_info,
+   repack => \&command_repack
+  );
+
+my $mode;
+if (!@ARGV) {
+    $mode = "download";
+} elsif (!$COMMANDS{$ARGV[0]}) {
+    $mode = "info";
+} else {
+    $mode = shift @ARGV;
+}
+my $command = $COMMANDS{$mode} || die "Unknown mode " . $mode . "\n";
+
+# TODO: Add UserAgent Config here
+my $ua_config = {
+                 $opts{proxy} ? (http_proxy => $opts{proxy}, https_proxy => $opts{proxy}) : (),
+                 $opts{'proxy-user'} ? (proxy_user => $opts{'proxy_user'}) : (),
+                 $opts{'proxy-password'} ? (proxy_password => $opts{'proxy_password'}) : (),
+                };
+
+my $logger = new JMX::Jmx4Perl::Agent::Jolokia::Logger
+  (
+   quiet => $opts{quiet},debug => $opts{verbose},
+   color => defined($opts{color}) ? $opts{color} : 1
+  );
+my $meta = new JMX::Jmx4Perl::Agent::Jolokia::Meta
+  (
+   logger => $logger,
+   ua_config => $ua_config,
+   force_load => defined($opts{cache}) ? !$opts{cache} : 0
+  );
+
+my $verifier = new JMX::Jmx4Perl::Agent::Jolokia::Verifier
+  (
+   logger => $logger,
+   ua_config => $ua_config
+  );
+
+$command->($meta,\%opts,@ARGV);
+
+# ===========================================================
+
+=head2 download
+
+This commands allows for downloading a certain Jolokia agent from Jolokia's
+Maven repository. The repository URL is taken from the meta descriptor, but can
+be overridden with the C<--repository> option. Agents come in several flavors: 
+
+=over
+
+=item * war
+
+The WAR agent is the most popular one and is used for instrumenting an JEE
+application server. It is a simple web application which needs to deployed on
+the target server
+
+=item * osgi, osgi-bundle
+
+The OSGi agents can be used to access OSGi containers
+
+=item * mule
+
+For accessing a Mule ESB, this agent is the proper choice
+
+=item * jvm
+
+For all other Java server, which don't contain a servlet container, this agent
+can be used. The only prerequisite is, that the application must run with an
+Oracle Java 6 virtual machine
+
+=back
+
+Much more information about those agents can be found at
+L<http://www.jolokia.org/agent.html>.
+
+By default, the war agent is downloaded. The agent type ("war", "osgi",
+"osgi-bundle", "mule" or "jvm" can be specified with the C<--agent> option. 
+
+Also by default, the latest agent version compatible with the installed
+Jmx4Perl release is downloaded. A specific version can be given on the command
+line also with the C<--agent> option, added after the agent type with a
+':'. E.g. C<--agent osgi:0.82> will download the OSGi agent with version 0.82. 
+
+The output directory for the agent can be specified with the C<--outdir>
+option. By default, the agent is stored in the current working directory. 
+
+A template can be downloaded with C<--template>. This option uses the same
+syntax as C<--agent>, i.e. a version number can be optionally defined. If no
+version number is provided, either the default template is downloaded, or, if
+used together with C<--agent>, the template matching the agent's version is
+used. 
+
+=cut
+
+sub command_download {
+    my ($meta,$args) = @_;
+
+    fatal("Cannot load meta data for download ... Aborting") if !$meta->load;
+    my ($agent,$agent_version) = parse_version("agent",[keys %{$meta->get("mapping")}],$args->{agent});
+    my $t = $args->{template} || ($args->{policy} ? "jolokia-access.xml" : undef);
+    my ($template,$template_version) = parse_version("template",[keys %{$meta->get("templates")}],$t);
+
+    $agent = "war" if (!$template && !$agent);
+    $agent_version = agent_version($meta,$agent_version);
+    
+    # Dynamic switching for pre-1.0 clients
+    if ($agent =~ /^(jvm|jdk6)$/) {
+        $agent = $agent_version < "1.0.0" ? "jdk6" : "jvm";
+    }
+    $template_version = $agent_version if ($template && !$template_version);
+
+    download_agent($meta,$agent,$agent_version,$args) if $agent;
+    download_template($meta,$args,$template,$template_version) if $template;
+}
+
+sub parse_version {
+    my $type = shift;
+    my $keys = shift;
+    my $spec = shift;
+    return (undef,undef) unless $spec;
+    my $regexp = '^(' . join("|",@$keys) . '):?([\d\.]*(-SNAPSHOT)?)\s*$';
+    if ($spec =~ $regexp) {
+        return ($1,$2);
+    } else {
+        $logger->error("Invalid $type specification \"$spec\". Known ${type}s are: ",join(", ",sort @$keys)) && exit(1);
+    }
+}
+
+sub agent_version {
+    my $meta = shift;
+    my $version = shift;
+
+    if ($version) {        
+        verify_version($meta,$version);
+        return $version;
+    } else {
+        $version = $meta->latest_matching_version($JMX::Jmx4Perl::VERSION);
+        fatal("Cannot find compatible Jolokia version for Jmx4Perl ",$JMX::Jmx4Perl::VERSION)
+          unless $version;
+    }    
+}
+
+sub download_template {
+    my $meta = shift;
+    my $args = shift;
+    my $template = shift;
+    my $version = shift;
+    
+    my $url = $meta->template_url($template,$version);
+    fatal("No template $template known") unless $url;
+    
+    my $file = path($args,$template);
+    $logger->info("Downloading ","[em]",$template,"[/em]", " version ",$version);
+    download($url,$file,$args);
+    verify_signature($file,$url);
+}
+
+sub path {
+    my $args = shift;
+    my $file = shift;
+    my $dir = $args->{outdir} || ".";
+    return $dir . "/" . $file;
+}
+
+sub download_agent {
+    my $meta = shift;
+    my $agent = shift;
+    my $version = shift;
+    my $args = shift;
+
+    my $is_snapshot = $version =~ /(.*?)-SNAPSHOT$/;
+    my $repositories;
+    if ($args->{repository}) {
+        $repositories = [ $args->{repository} ];
+    } else {
+        $repositories = $is_snapshot ? $meta->get('snapshots-repositories') : $meta->get('repositories');
+    }
+
+    $logger->info("Using ","[em]","Jolokia $version","[/em]", 
+                  " for ","[em]","Jmx4Perl $JMX::Jmx4Perl::VERSION","[/em]");    
+    for my $repository (@$repositories) {
+        eval {
+            my $mapping = $meta->get("mapping");
+
+            my $full_version = $is_snapshot ? get_snapshot_version($meta,$repository,$agent,$version,$args) : $version;
+            my $download_url = get_download_url($meta,$repository,$agent,$full_version);
+            my $file = path($args,$mapping->{$agent}->[2]);
+            $logger->info("Downloading ","[em]",$agent," agent","[/em]", " version ",$version," from repository " . $repository);
+            download($download_url,$file,$args);
+            verify_signature($file,$download_url);
+        };
+        if ($@) {
+            print "Cannot fetch from $repository: " . $@ . "Trying next ...\n";
+        } else {
+            return;
+        }
+    }
+    $logger->error("Couldn't download a $agent agent from any these repositories:\n   ",join("\n   ",@$repositories));
+    die "\n";
+}
+
+=head2 info
+
+In order to determine the version number of an already downloaded agent, the
+C<info> command can be used. It takes as single argument the path to the agent,
+e.g. 
+
+   jolokia info ./jolokia.war
+
+The output contains information about the agent's type and version, whether a
+security policy file is installed, if authentication is switched on and if the
+JSR160 proxy is active.
+
+With the option C<--verify> an additional signature check can be performed,
+where the signature is fetched from the Jolokia repository.
+
+C<info> is the default command if a single file argument is given (i.e. the
+example above could be abreviated to C<jolokia ./jolokia.war>).
+
+If the option <--policy> is provided, an included Jolokia policy file will be
+printed out (if any).
+
+=cut
+
+sub command_info {
+    my ($meta,$args,$file) = @_;
+    my $handler = new JMX::Jmx4Perl::Agent::Jolokia::ArtifactHandler(logger => $logger, 
+                                                                     meta => $meta,file => $file);
+    $meta->load;
+    if ($args->{policy}) {
+        my $policy = $handler->get_policy;
+        fatal("No jolokia-access.xml embedded in $file") unless $policy;
+        print $policy;
+        return;
+    }
+    my $ret = $handler->info;
+    $logger->info("Type:     ","[em]",$ret->{type},"[/em]");
+    $logger->info("Version:  ","[em]",$ret->{version},"[/em]");
+    my $policy = $handler->has_policy;
+    $logger->info("Policy:   ",$policy ? ("[em]","jolokia-access.xml","[/em]"," embedded") : "No security policy installed");
+
+    if ($ret->{type} eq "war") {
+        my $webxml_handler = new JMX::Jmx4Perl::Agent::Jolokia::WebXmlHandler(logger => $logger);
+        my $webxml = $handler->extract_webxml;
+        my $auth = $webxml_handler->has_authentication($webxml);
+        $logger->info("Security: ",$auth ? ("Authentication enabled for role ","[em]",$auth,"[/em]") : "No authentication enabled");
+        
+        my $jsr160 = $webxml_handler->has_jsr160_proxy($webxml);
+        $logger->info("Proxy:    ","JSR-160 proxy is ",$jsr160 ? ("[em]","enabled","[/em]") : "disabled");
+    }
+
+    if ($args->{verify}) {
+        if ($meta->initialized()) {
+            my $repositories = $args->{repository} ? [ $args->{repository} ] : $meta->get('repositories');
+            for my $repo (@$repositories) {
+                my $url = get_download_url($meta,$repo,$ret->{type},$ret->{version});
+                $logger->info("Checking against $repo");
+                verify_signature($file,$url);
+            }
+        } else {
+            $logger->error("Cannot verify signature since Jolokia META data couldn't be downloaded");
+        }
+    }
+}
+
+=head2 repack
+
+Repack an Jolokia agent in order to switch on/off certain features. 
+
+=over
+
+=item --policy / --no-policy
+
+Adds a Jolokia policy file to the agent given as argument. By default a policy
+file F<jolokia-access.xml> from the current directory is used, but this file
+can be directly specified with the C<--policy-file> option. For example,
+
+   jolokia repack --policy jolokia.war
+
+add the local policy file F<jolokia-access.xml> to the WAR agent specified as
+argument. A sample F<jolokia-access.xml> can be downloaded with C<jolokia
+--policy> which will then be saved locally. The policy contained in agent can
+be viewed with C<jolokia --policy jolokia.war>. L<JMX::Jmx4Perl::Manual/"ACCESS
+POLICY"> contains more information about Jolokia policy files.
+
+=item --security / --no-security
+
+For WAR agents, the included F<web.xml> descriptor can contain authentication
+configuration. This configuration (which is absent by default), associates an
+URL pattern with a role. With C<jolokia repack --security jolokia.war> the
+authenticatin mechanism is switched on with an associated role "Jolokia". You
+need to configure your servlet container accordingly to connect a user to this
+role. The role can be specified with C<--security-role> (which implies 
+C<--security>):
+  
+    jolokia repack --security-role JMX jolokia.war
+
+=item --jsr160-proxy / --no-jsr160-proxy
+
+By default, the WAR agent allows for JSR-160 proxy requests. This can be
+switched by repacking the agent with C<--no-jsr160-proxy>:
+
+    jolokia repack --no-jsr160 jolokia.war
+
+=back
+
+=cut
+
+sub command_repack {
+    my ($meta,$args,$file) = @_;
+
+    my $artifact_handler = new JMX::Jmx4Perl::Agent::Jolokia::ArtifactHandler(logger => $logger, meta => $meta,file => $file);
+    
+    my $done = undef;
+    if ($args->{'policy-file'}) {
+        $artifact_handler->add_policy($args->{'policy-file'});
+        $done = 1;
+    } elsif (defined($args->{policy})) {
+        if ($args->{policy}) {
+            $artifact_handler->add_policy("jolokia-access.xml");
+        } else {
+            $artifact_handler->remove_policy;
+        }
+        $done = 1;
+    } 
+
+    # Security handling
+    if (defined($args->{security}) || $args->{'security-role'}) {
+        fatal("--security can only be used with WAR agents") unless $artifact_handler->type eq "war";
+
+        my $webxml_handler = new JMX::Jmx4Perl::Agent::Jolokia::WebXmlHandler(logger => $logger);
+
+        my $webxml = $artifact_handler->extract_webxml();
+        my $new_webxml;
+        if ( (defined($args->{security}) && $args->{security}) || $args->{'security-role'} ) {
+            my $role = $args->{'security-role'} || "Jolokia";
+            $new_webxml = $webxml_handler->add_security($webxml,{ role => $role });
+        } else {
+            $new_webxml = $webxml_handler->remove_security($webxml);
+        }
+        $artifact_handler->update_webxml($new_webxml);
+        $done = 1;
+    }
+
+    # JSR-160 proxy
+    if (defined($args->{'jsr160-proxy'})) {
+        fatal("--jsr160-proxy can only be used with WAR agents") unless $artifact_handler->type eq "war";
+
+        my $webxml_handler = new JMX::Jmx4Perl::Agent::Jolokia::WebXmlHandler(logger => $logger);
+
+        my $webxml = $artifact_handler->extract_webxml();
+        my $new_webxml = 
+          $args->{'jsr160-proxy'} ? 
+            $webxml_handler->add_jsr160_proxy($webxml) : 
+              $webxml_handler->remove_jsr160_proxy($webxml);
+        $artifact_handler->update_webxml($new_webxml) if $new_webxml;
+        $done = 1;
+    }
+
+    fatal("Nothing to repack (at least one of --policy/--policy-file/--security/--jsr160-proxy required)") unless $done;
+}
+
+# ======================================================================================= 
+
+sub create_ua {
+    my $config = shift || {};
+    return new JMX::Jmx4Perl::Agent::Jolokia::DownloadAgent(quiet => $config->{quiet},%{$config->{ua_config}});
+}
+
+sub download {
+    my ($url, $file, $args) = @_;
+    my $config = $args || {};
+    my $ua = create_ua($args);
+    my $response = $ua->get($url,":content_file" => $file);
+    if ($response->is_error) {
+        fatal("Could not download agent from " . $url . ": " . $response->status_line);
+    }
+    $logger->info("Saved ", "[em]", $file, "[/em]"); 
+}
+
+sub verify_signature {
+    my $file = shift;
+    my $url = shift;
+    $verifier->verify(url => $url, path => $file);
+}
+
+sub verify_version {
+    my ($meta,$version) = @_;
+    my @versions = keys %{$meta->get('versions')};
+    $logger->error("No version $version known. Known versions: [",join(", ",sort @versions),"]") && die "\n"
+      unless grep { $version eq $_ } @versions;
+    $logger->warn("This Jmx4Perl version $JMX::Jmx4Perl::VERSION is not supported by Jolokia version $version")
+                  unless $meta->versions_compatible($JMX::Jmx4Perl::VERSION,$version);
+}
+
+sub get_download_url {
+    my ($meta,$repository,$agent,$version) = @_;
+    my ($name,$artifact) = artifact_and_name($meta,$agent,$version);
+    $repository =~ s/\/+$//;
+    my $version_path = $version;
+    $version_path = $1 . "-SNAPSHOT" if $version =~ /(.*)-\d+\.\d+-\d+/;
+    return $repository . "/org/jolokia/" . $name . "/" . $version_path . "/" . $artifact;    
+}
+
+sub get_snapshot_version {
+    my ($meta,$repository,$agent,$version,$args) = @_;
+    my ($name,$artifact) = artifact_and_name($meta,$agent,$version);    
+    my $meta_url = $repository . "/org/jolokia/" . $name . "/" . $version . "/maven-metadata.xml";
+    
+    my $ua  = create_ua($args);
+    my $response = $ua->get($meta_url);
+
+    if ($response->is_error) {
+        fatal("Could not download maven meta from " . $meta_url . " for getting snapshot version: " . $response->status_line);
+    }
+    
+    my $content = $response->decoded_content;
+    my $timestamp = $1 if $content =~ m|<timestamp>\s*(.*?)\s*</timestamp>|si;
+    my $build_nr = $1 if $content =~ m|<buildNumber>\s*(.*?)\s*</buildNumber>|si;
+    my $base_version = $1 if $version =~ /(.*)-SNAPSHOT$/;
+    
+    fatal("Couldn't parse timestamp or buildNumber from $meta_url") unless defined($timestamp) && defined($build_nr);
+    return $base_version . "-" . $timestamp . "-" . $build_nr;
+}
+
+# Map agent to its artifact id and its full name (including any classifier)
+sub artifact_and_name {
+    my $meta = shift;
+    my $agent = shift;
+    my $version = shift;
+
+    my $mapping = $meta->get("mapping");
+    my $parts = $mapping->{$agent} 
+      || $logger->error("Unknown agent type $agent. Known agent types are: ",join(", ",sort keys %$mapping)) && exit(1);
+    my $name = $parts->[0];
+    my $artifact = $parts->[1];
+    $artifact =~ s/\%v/$version/g;
+    return ($name,$artifact);
+}
+
+
+sub fatal {
+    $logger->error(@_);
+    die "\n";
+}
+
+=head1 SEE ALSO
+
+L<check_jmx4perl> - a production ready Nagios check using L<JMX::Jmx4Perl>
+
+L<jmx4perl> - CLI for accessing the agents
+
+L<j4psh> - readline based JMX shell with context sensitive command line
+completion. 
+
+=head1 LICENSE
+
+This file is part of jmx4perl.
+
+Jmx4perl is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 2 of the License, or
+(at your option) any later version.
+
+jmx4perl is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with jmx4perl.  If not, see <http://www.gnu.org/licenses/>.
+
+=head1 AUTHOR
+
+roland@cpan.org
+
+=cut

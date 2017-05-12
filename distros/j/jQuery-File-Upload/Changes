@@ -1,0 +1,121 @@
+Revision history for jQuery-File-Upload
+
+0.01    Date/time
+        First version, released on an unsuspecting world.
+
+0.02
+
+	added methods data and relative_url_path
+
+0.03
+
+	added methods thumbnail_upload_dir, thumbnail_url_base, and thumbnail_url_base. Also fixed
+	bug where if thumbnail_prefix was set to '' and thumbnail and original filenames were the same,
+  then the original file would overwrite the thumbnail.
+
+0.04
+
+	pod test failed, so I fixed it. Was missing documentation for these two methods:
+
+	show_client_filename
+	thumbnail_quality
+
+	Also, added a little bit about how you can get access to the ctx object in the PRE/POST METHODS section.
+
+0.05
+
+	added thumbnail_postfix method
+
+0.06
+
+  added relative_to_host method
+
+0.07 
+
+  added require_image method
+
+0.08
+
+	fixed issue where if should_delete was set to 0 and handle_request was called with a 1, would not handle response correctly because it would never get to print_response call
+
+0.09
+
+	fixed issue where the _clear method would delete some initial passed in values, such as filename and thumbnail_filename
+
+0.10
+
+  fixed issue where calling generate_output may cause an error depending on what you passed into it (essentially if _set_uri ended up not being called). Fixed this by calling it manually.
+
+0.11
+
+  added delete_params as an option for generate_output method
+	fixed issue where calling generate_output would generate null for delete urls if there was more than one file to generate it for. (needed to reset delete_url each time around loop)
+
+0.12
+
+	fixed _set_uri to use Catalyst URI if it already exists. Also, fixed issue where uri was being reused to generate delete_url in _delete_url if generate_output was passed more than one file.
+
+0.13
+
+	fixed issue where IE needs the content-type to be text/plain. suggested by this bug: https://rt.cpan.org/Ticket/Display.html?id=84300&results=fcb4720e2a3df735d29b41e959a7c5af
+
+0.15
+
+	fixed bug
+
+0.16
+
+	added to documentation for the data subroutine about using catalyst context object to store data
+
+0.17
+
+	moved _clear call in handle_request to end of subroutine
+
+0.18
+
+	added 'close OUTFILE;' in _save_local.
+
+0.19
+
+	removed duplicate entry for thumbnail_prex in docs
+
+0.20
+
+	Fixed docs for <gt> by author name
+
+0.21
+
+	Fixed docs for <gt> by author name
+
+
+0.22
+
+	Updated deleteType, deleteUrl, and thumbnailUrl for new jQuery File Upload
+
+
+0.23
+
+	Updated delete response for new expected JSON
+
+0.24
+
+
+0.25
+	added size function for file size
+
+0.26
+	fixed issue in generate_output where url was not set
+
+0.27
+	filenames now generated using Data::GUID. pre_post and pre_delete can now return errors.
+
+0.28
+	Fixed "user_eror" typo for delete in handle_request
+
+0.29
+	Added reject_file_types
+
+
+0.30
+    Added copy_to and process_image
+	Added reject_file_types

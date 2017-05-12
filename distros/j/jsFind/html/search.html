@@ -1,0 +1,78 @@
+<!DOCTYPE html PUBLIC
+          "-//W3C//DTD XHTML 1.0 Strict//EN"
+          "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1"/>
+    <title>jsFind Example</title>
+    <script src="js/getargs.js" type="text/javascript"></script>
+    <script src="js/search.js" type="text/javascript"></script>
+    <script src="js/usage.js" type="text/javascript"></script>
+  </head>
+
+  <body>
+   <div>
+    <h1>Example Search with jsFind</h1>
+
+    <script type="text/javascript">
+    // <!--
+      var args=getArgs();
+      function select_option(value,text,selected) {
+        document.write('<option value="'+value+'"');
+	if (value == selected) document.write(' selected');
+	document.write('>'+text+'</option>');
+      }
+    // -->
+    </script>
+    
+    <form id="search" action="get" onsubmit="return go(this);">
+    <div>
+      <span style="color: maroon;">Query</span>
+      <script type="text/javascript">
+      // <!--
+        document.write('<select name="index_name">');
+        select_option("lorem","Lorem example",args.index_name);
+        select_option("words","Words from dict",args.index_name);
+        select_option("homer","Homer: The Odyssey",args.index_name);
+        document.write('</select>');
+      // -->
+      </script>
+      for
+      <script type="text/javascript">
+      // <!--
+        document.write("<input name=\"query\" value=\"");
+
+        if (args.query) {
+          var search_string = args.query.replace(/\+/gi," ");
+          document.write(search_string);
+        }
+
+        document.write("\" type=\"text\" size=\"60\"/>\n");
+      // -->
+      </script>
+
+      <input type="submit" value="Submit"/><br/>
+    </div>
+    </form>
+
+    <script type="text/javascript">
+    // <!--
+      if (args.query) {
+        document.write("<div id=\"results\"><h2>Please wait...</h2></div>\n");
+        doSearch(args.index_name, args.query, printResults);
+      }      
+    // -->
+    </script>
+
+    <div>
+      Enter your keywords to search for seperated by spaces.<br/>The
+      results will be only those documents which contain <b>ALL</b> of the
+      requested keywords
+    </div>
+
+    <div id="debug" style="color: gray;">
+    </div>
+
+   </div>
+  </body>
+</html>

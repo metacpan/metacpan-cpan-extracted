@@ -1,0 +1,55 @@
+{
+   "abstract" : "Server-side solution for blueimp jQuery file upload plugin",
+   "author" : [
+      "q{Adam Hopkins <srchulo@cpan.org>}"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4003, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "jQuery-File-Upload-Imager",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0.96"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.38"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "CGI" : "3.63",
+            "Cwd" : "0",
+            "Digest::MD5" : "2.52",
+            "Imager" : "0.96",
+            "JSON::XS" : "2.34",
+            "Net::SSH2" : "0.48",
+            "Net::SSH2::SFTP" : "0",
+            "URI" : "1.6",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "jQuery::File::Upload::Imager" : {
+         "file" : "lib/jQuery/File/Upload/Imager.pm",
+         "version" : "1.01"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://www.perlfoundation.org/artistic_license_2_0"
+      ]
+   },
+   "version" : "1.01"
+}

@@ -1,0 +1,725 @@
+=head1 Methods
+
+=head2 attr
+
+=over 4
+
+=item attr( attributeName )
+
+Get the value of an attribute for the first element in the set of matched
+elements.
+
+=item attr( attributeName, value )
+
+Set one or more attributes for the set of matched elements.
+
+=item attr( map )
+
+map: A hash ref of attribute-value pairs to set.
+
+=item attr( attributeName, sub { my ( $index, $attr ) = @_; } )
+
+=back
+
+Check jQuery API
+
+L<http://api.jquery.com/attr/>
+
+=cut
+
+=head2 removeAttr
+
+Remove an attribute from each element in the set of matched elements.
+
+Check jQuery API
+
+L<http://api.jquery.com/removeAttr/>
+
+=head2 addClass
+
+Adds the specified class(es) to each of the set of matched elements.
+
+=over 4
+
+=item addClass( string )
+
+One or more class names to be added to the class attribute of each matched
+element.
+
+=item addClass( sub { my ($index,$this,$currentClass) = @_; } )
+
+A function returning one or more space-separated class names to be added.
+Receives the index position of the element in the set and the old class value
+as arguments.
+    
+=back
+
+Check jQuery API
+
+L<http://api.jquery.com/addClass/>
+
+=cut
+
+=head2 removeClass
+
+Remove a single class, multiple classes, or all classes from each element in
+the set of matched elements.
+
+=over 4
+
+=item removeClass( string )
+
+One or more space-separated classes to be removed from the class attribute of
+each matched element
+
+=item addClass( sub { my ($index,$this,$currentClass) = @_; } )
+
+A function returning one or more space-separated class names to be removed.
+Receives the index position of the element in the set and the old class value
+as arguments.
+    
+=back
+
+Check jQuery API
+
+L<http://api.jquery.com/removeClass/>
+
+=cut
+
+=head2 toggleClass
+
+Add or remove one or more classes from each element in the set of matched
+elements, depending on either the class's presence or the value of the switch
+argument.
+
+=over 4
+
+=item toggleClass( string )
+
+One or more class names (separated by spaces) to be toggled for each element in
+the matched set.
+
+=item toggleClass( className, switch )
+
+className: One or more class names (separated by spaces) to be toggled for each
+element in the matched set.
+
+switch: A boolean value to determine whether the class should be added or removed.
+
+=item addClass( sub { my ($this,$index,$currentClass) = @_; }, switch )
+
+A function returning one or more space-separated class names to be removed.
+Receives the index position of the element in the set and the old class value
+as arguments.
+
+switch: A boolean value to determine whether the class should be added or removed.
+    
+=back
+
+Check jQuery API
+
+L<http://api.jquery.com/toggleClass/>
+
+=cut
+
+=head2 hasClass
+
+Determine whether any of the matched elements are assigned the given class.
+
+=over 4
+
+=item hasClass( string )
+
+String: The class name to search for.
+
+=back
+
+Check jQuery API
+
+L<http://api.jquery.com/hasClass/>
+
+=cut
+
+=head2 val
+
+Get the current value of the first element in the set of matched elements.
+
+=over 4
+
+=item val()
+
+Get the current value of the first element in the set of matched elements.
+
+=item val( string )
+
+Set the value of each element in the set of matched elements.
+
+=item val( sub{ my ($index,$this,$value) = @_; } )
+
+A function returning the value to set.
+    
+=back
+
+Check jQuery API
+
+L<http://api.jquery.com/val/>
+
+=cut
+
+=head2 id
+
+return element id
+
+=cut
+
+=head2 find
+
+Get the descendants of each element in the current set of matched elements,
+filtered by a selector.
+
+=over 4
+
+=item find( selector )
+    
+=back
+
+Check jQuery API
+
+L<http://api.jquery.com/find/>
+
+=cut
+
+=head2 css
+
+insert css style(s) to the selected Element
+
+=over 4
+
+=item css({style=>value, style2 => value2, ...});
+
+set list of hashref styles to the selected element(s)
+
+=item css('style','value');
+
+set one style to the selected element(s)
+    
+=back
+
+=cut
+
+=head2 data
+
+Store arbitrary data associated with the specified element. Returns the value that was set.
+
+=over 4
+
+=item $obj->data( element, key, value )
+
+or
+
+=item $element->data( key, value )
+
+element : The DOM element to associate with the data.
+
+key : A string naming the piece of data to set.
+
+value : The new data value.
+
+=back
+
+Check jQuery API
+
+L<http://api.jquery.com/jQuery.data/>
+
+=cut
+
+=head2 filter
+
+Reduce the set of matched elements to those that match the selector or pass the function's test.
+
+=over 4
+
+=item filter( selector )
+
+=item filter( function )
+    
+=item filter( element )
+    
+=item filter( jQuery object )
+    
+=back
+
+Check jQuery API
+
+L<http://api.jquery.com/filter/>
+
+=cut
+
+=head2 map
+
+Translate all items in an array or object to new array of items.
+
+L<http://api.jquery.com/jQuery.map/>
+
+=cut
+
+=head2 html
+
+=over 4
+
+=item html()
+
+Get the contents of any element. If the selector expression matches more than
+one element, only the first one's HTML content is returned.
+
+=item html( htmlString )
+
+htmlString: A string of HTML to set as the content of each matched element.
+
+=item html(sub {my ($this,$index,$oldhtml) = @_;} );
+
+A CODE ref returning the HTML content to set. Receives element, the index
+position of the element in the set and the old HTML value as arguments. jQuery
+empties the element before calling the function; use the oldhtml argument to
+reference the previous content.
+
+same as jQuery .html( function(index, oldhtml) )
+
+=back
+
+Check jQuery API
+
+L<http://api.jquery.com/html/>
+
+=cut
+
+=head2 text
+
+=over 4
+
+=item text()
+
+The result of the text() method is a string containing the combined text of all
+matched elements.
+
+=item text( textString )
+
+textString: A string of text to set as the content of each matched element.
+
+=item text(sub { my ($index,$oldtext,$element) = @_;} );
+
+A CODE ref returning the text content to set. Receives the element, index
+position of the element in the set and the old text value as arguments.
+
+same as jQuery .text( function(index, oldtext) )
+
+=back
+
+Check jQuery API
+
+L<http://api.jquery.com/html/>
+
+=cut
+
+=head2 append
+
+Insert content, specified by the parameter, to the end of each element in the
+set of matched elements.
+
+=over 4
+
+=item append( content )
+
+content: An element, HTML string, or jQuery object to insert at the end of each
+element in the set of matched elements.
+
+=item append( sub { my ($index,$this,$html) = @_; } )
+
+A CODE ref that returns an HTML string to insert at the end of each element in
+the set of matched elements. Receives the index position of the element in the
+set and the old HTML value of the element as arguments.
+
+same as jQuery .append( function(index, html) )
+
+=back
+
+Check jQuery API
+
+L<http://api.jquery.com/append/>
+
+=cut
+
+=head2 prepend
+
+Insert content, specified by the parameter, to the beginning of each element in
+the set of matched elements.
+
+=over 4
+
+=item prepend( content )
+
+content: An element, HTML string, or jQuery object to insert at the beginning of
+each element in the set of matched elements.
+
+=item prepend( sub { my ($this,$index,$html) = @_; } )
+
+A CODE ref that returns an HTML string to insert at the beginning of each
+element in the set of matched elements. Receives the index position of the
+element in the set and the old HTML value of the element as arguments.
+
+same as jQuery .prepend( function(index, html) ) function
+    
+=back
+
+Check jQuery API
+
+L<http://api.jquery.com/prepend/>
+
+=cut
+
+=head2 appendTo
+
+Insert every element in the set of matched elements to the end of the target.
+
+=over 4
+
+=item appendTo( Target )
+
+Target: A selector, element, HTML string, or jQuery object; the matched set of
+elements will be inserted at the end of the element(s) specified by this parameter.
+    
+=back
+
+Check jQuery API
+
+L<http://api.jquery.com/appendTo/>
+
+=cut
+
+=head2 prependTo
+
+Insert every element in the set of matched elements to the beginning of the
+target.
+
+=over 4
+
+=item prependTo( Target )
+
+Target: A selector, element, HTML string, or jQuery object; the matched set of
+elements will be inserted at the beginning of the element(s) specified by this
+parameter.
+    
+=back
+
+Check jQuery API
+
+L<http://api.jquery.com/prependTo/>
+
+=cut
+
+=head2 add
+
+Add elements to the set of matched elements.
+
+=over 4
+
+=item add( selector )
+
+selector: A string containing a selector expression to match additional
+elements against.
+
+=item add( selector, context )
+
+selector: A string containing a selector expression to match additional
+elements against.
+
+context: Add some elements rooted against the specified context.
+    
+=item add( element )
+
+elements: one or more elements to add to the set of matched elements.
+    
+=item add( <html> )
+
+html: An HTML fragment to add to the set of matched elements.
+    
+=back
+
+Check jQuery API
+
+L<http://api.jquery.com/add/>
+
+=cut
+
+=head2 andSelf
+
+Add the previous set of elements on the stack to the current set.
+
+Check jQuery API
+
+L<http://api.jquery.com/andSelf/>
+
+=cut
+
+=head2 next
+
+Get the immediately following sibling of each element in the set of matched
+elements. If a selector is provided, it retrieves the next sibling only if it
+matches that selector.
+
+=over 4
+
+=item next( [ selector ] )
+    
+=back
+
+Check jQuery API
+
+L<http://api.jquery.com/next/>
+
+=head2 nextAll
+
+Get all following siblings of each element in the set of matched elements,
+optionally filtered by a selector.
+
+=over 4
+
+=item nextAll( [ selector ] )
+    
+=back
+
+Check jQuery API
+
+L<http://api.jquery.com/nextAll/>
+
+=head2 nextUntil
+
+Get all following siblings of each element up to but not including the element
+matched by the selector.
+
+=over 4
+
+=item nextUntil( [ selector ] )
+    
+=back
+
+Check jQuery API
+
+L<http://api.jquery.com/nextUntil/>
+
+=head2 parent
+
+Get the parent of each element in the current set of matched elements, optionally
+filtered by a selector.
+
+=over 4
+
+=item parent( [ selector ] )
+    
+=back
+
+Check jQuery API
+
+L<http://api.jquery.com/parent/>
+
+=cut
+
+=head2 children
+
+Get the children of each element in the set of matched elements, optionally
+filtered by a selector.
+
+=over 4
+
+=item children( [selector] )
+
+=back
+
+Check jQuery API
+
+L<http://api.jquery.com/children/>
+
+=cut
+
+=head2 closest
+
+Get the first ancestor element that matches the selector, beginning at the
+current element and progressing up through the DOM tree.
+
+=over 4
+
+=item closest( selector )
+
+=item closest( selector, context )
+    
+=back
+
+Check jQuery API
+
+L<http://api.jquery.com/closest/>
+
+=cut
+
+=head2 contents
+
+Get the children of each element in the set of matched elements, including text
+and comment nodes.
+
+=over 4
+
+=item contents()
+    
+=back
+
+Check jQuery API
+
+L<http://api.jquery.com/contents/>
+
+=cut
+
+=head2 end
+
+End the most recent filtering operation in the current chain and
+return the set of matched elements to its previous state.
+
+=over 4
+
+=item end()
+    
+=back
+
+Check jQuery API
+
+L<http://api.jquery.com/end/>
+
+=cut
+
+=head2 eq
+
+Reduce the set of matched elements to the one at the specified index.
+
+=over 4
+
+=item eq( index )
+
+=item eq( -index )
+    
+=back
+
+Check jQuery API
+
+L<http://api.jquery.com/eq/>
+
+=cut
+
+=head2 first
+
+Reduce the set of matched elements to the first in the set.
+
+=over 4
+
+=item first( selector )
+    
+=back
+
+Check jQuery API
+
+L<http://api.jquery.com/first/>
+
+=cut
+
+=head2 last
+
+Reduce the set of matched elements to the final one in the set.
+
+Check jQuery API
+
+L<http://api.jquery.com/last/>
+
+=cut
+
+=head2 has
+
+Reduce the set of matched elements to those that have a descendant that matches
+the selector or DOM element.
+
+=over 4
+
+=item has( selector )
+
+=item has( contained )
+    
+=back
+
+Check jQuery API
+
+L<http://api.jquery.com/has/>
+
+=cut
+
+=head2 contains
+
+=cut
+
+=head2 is
+
+Check the current matched set of elements against a selector
+and return true if at least one of these elements matches the selector.
+
+=over 4
+
+=item is( selector )
+    
+=back
+
+Check jQuery API
+
+L<http://api.jquery.com/is/>
+
+=cut
+
+=head2 not
+
+Remove elements from the set of matched elements.
+
+=over 4
+
+=item not( selector )
+
+=item not( function )
+    
+=item not( element )
+    
+=item not( jQuery object )
+    
+=back
+
+Check jQuery API
+
+L<http://api.jquery.com/not/>
+
+=head2 replaceWith
+
+=head2 wrap
+
+=head2 unwrap
+
+=head2 wrapInner
+
+=head2 wrapAll
+
+=head2 after
+
+=head2 before
+
+=head2 insertBefore
+
+=head2 insertAfter
+
+=head2 clone
+
+=head2 length
+
+returns number of matched elements
+
+=head2 remove

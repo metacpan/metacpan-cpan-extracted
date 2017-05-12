@@ -1,0 +1,62 @@
+NAME
+    junk - use junk
+
+SYNOPSIS
+     use 5.010;
+     use junk KnRlaCdiaXRlPSp0YWRwb2xlJ3dheD0qZGFyZSd5b3U9c3Vie3BvcH0K;
+     no junk;
+     say bite teh wax tadpole "monkey brains" if you dare "punkass",
+         or alarm my $accountant;
+
+DESCRIPTION
+    The "junk" module performs two very different tasks depending on whether
+    you type `use junk` or `no junk`.
+
+  `import`
+    `use junk` takes each of its arguments, performs some unescaping on each,
+    decodes them as base64, and then passes them each to `eval`.
+
+    The unescaping is as follows:
+
+     "_D0"   => "0"
+     "_D1"   => "1"
+     "_D2"   => "2"
+     "_D3"   => "3"
+     "_D4"   => "4"
+     "_D5"   => "5"
+     "_D6"   => "6"
+     "_D7"   => "7"
+     "_D8"   => "8"
+     "_D9"   => "9"
+     "_P"    => "+"
+     "_S"    => "/"
+
+    This allows base64 to be encoded as Perl barewords (provided you're not in
+    strict mode).
+
+    Called with no arguments, it switches off switch mode.
+
+  `unimport`
+    `no junk` is equivalent to saying `use strict 'subs', 'vars'`.
+
+    I don't know about you, but 'refs' is the only part of strict that I ever
+    disable, so `no junk` just enables all of strict except 'refs'.
+
+BUGS
+    Please report any bugs to
+    <http://rt.cpan.org/Dist/Display.html?Queue=junk>.
+
+AUTHOR
+    Toby Inkster <tobyink@cpan.org>.
+
+COPYRIGHT AND LICENCE
+    This software is copyright (c) 2012 by Toby Inkster.
+
+    This is free software; you can redistribute it and/or modify it under the
+    same terms as the Perl 5 programming language system itself.
+
+DISCLAIMER OF WARRANTIES
+    THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
+    WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+    MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+
